@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -8,6 +9,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	{
 		[NotNull] private const string SuffixResource =
 			"GammaJul.ForTea.Core.Resources.TemplateBaseFullExecutableSuffix.cs";
+
+		[NotNull] private const string HostResource = "GammaJul.ForTea.Core.Resources.Host.cs";
 
 		public T4CSharpExecutableIntermediateConverter(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
@@ -26,6 +29,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendBaseClass();
 			AppendMainContainer();
+			if (hostspecific) AppendHostDefinition();
 			AppendClass();
 		}
 
@@ -33,7 +37,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendIndent();
 			Result.AppendLine(
-				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
+				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; } =");
+			AppendIndent();
+			Result.AppendLine("    new Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost();");
+		}
+
+		private void AppendHostDefinition()
+		{
+			var provider = new T4TemplateResourceProvider(HostResource, this);
+			string host = provider.ProcessResource(File.GetSourceFile().GetLocation().FullPath);
+			Result.Append(host);
 		}
 
 		private void AppendMainContainer()

@@ -80,6 +80,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendIndent();
 			Result.AppendLine("using System;");
+			if (IntermediateResult.HasHost)
+			{
+				AppendIndent();
+				Result.AppendLine("using System.CodeDom.Compiler;");
+			}
+
 			Result.Append(IntermediateResult.CollectedImports); // TODO: Indent these, too
 		}
 
