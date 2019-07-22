@@ -56,10 +56,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendNamespaceContents()
 		{
 			AppendImports();
-			AppendClasses();
+			AppendClasses(IntermediateResult.HasHost);
 		}
 
-		protected virtual void AppendClasses()
+		protected virtual void AppendClasses(bool hostspecific)
 		{
 			AppendClass();
 			AppendBaseClass();
@@ -93,12 +93,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
-			if (IntermediateResult.HasHost)
-			{
-				AppendIndent();
-				Result.AppendLine(
-					"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
-			}
+			if (IntermediateResult.HasHost) AppendHost();
 
 			AppendTransformMethod();
 			Result.Append(IntermediateResult.CollectedFeatures);
@@ -181,6 +176,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine(provider.ProcessResource(GeneratedBaseClassName));
 		}
 
+		protected abstract void AppendHost();
 		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
 
 		[NotNull]

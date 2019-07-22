@@ -1,7 +1,7 @@
     /// <summary>
     /// Base class for this transformation
     /// </summary>
-    public class TEMPLATE_PLACEHOLDER_BASE_CLASS
+    public class $(PARAMETER_0)
     {
     	/// <summary>
     	/// The string builder that generation-time code is using to assemble generated output

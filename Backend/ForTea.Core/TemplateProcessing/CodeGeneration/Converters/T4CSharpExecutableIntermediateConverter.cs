@@ -22,17 +22,24 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		// When creating executable, it is better to put base class first,
 		// to make error messages more informative
-		protected override void AppendClasses()
+		protected override void AppendClasses(bool hostspecific)
 		{
 			AppendBaseClass();
 			AppendMainContainer();
 			AppendClass();
 		}
 
+		protected override void AppendHost()
+		{
+			AppendIndent();
+			Result.AppendLine(
+				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
+		}
+
 		private void AppendMainContainer()
 		{
 			var provider = new T4TemplateResourceProvider(SuffixResource, this);
-			string suffix = provider.ProcessResource(GeneratedBaseClassName, GeneratedClassName);
+			string suffix = provider.ProcessResource(GeneratedClassName);
 			Result.Append(suffix);
 		}
 	}

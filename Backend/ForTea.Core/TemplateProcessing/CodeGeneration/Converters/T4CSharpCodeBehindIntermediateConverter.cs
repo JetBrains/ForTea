@@ -11,6 +11,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	{
 		[NotNull] public const string GeneratedClassNameString = "Generated\x200CTransformation";
 		[NotNull] public const string GeneratedBaseClassNameString = GeneratedClassNameString + "Base";
+		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
 
 		[NotNull, ItemNotNull] private string[] DisabledPropertyInspections =
 		{
@@ -74,8 +75,28 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		private void AppendDisabledInspections([NotNull] string inspection)
 		{
-			Result.Append("        // ReSharper disable once ");
+			Result.Append("        // ReSharper disable ");
 			Result.AppendLine(inspection);
+		}
+
+		protected override void AppendClasses(bool hostspecific)
+		{
+			AppendClass();
+			AppendBaseClass();
+			if (hostspecific) AppendHostInterface();
+		}
+
+		private void AppendHostInterface()
+		{
+			var provider = new T4TemplateResourceProvider(HostStubResourceName, this);
+			Result.AppendLine(provider.ProcessResource());
+		}
+
+		protected override void AppendHost()
+		{
+			AppendIndent();
+			Result.AppendLine(
+				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
 		}
 
 		// No indents should be inserted in code-behind file in order to avoid indenting code in code blocks
