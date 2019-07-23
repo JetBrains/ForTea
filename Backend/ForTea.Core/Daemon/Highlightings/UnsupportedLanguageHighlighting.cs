@@ -12,9 +12,9 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		ShowToolTipInStatusBar = true,
 		AttributeId = HighlightingAttributeIds.ERROR_ATTRIBUTE
 	)]
-	public class UnsupportedLanguageHighlighting : T4HighlightingBase<IT4Token>
+	public class UnsupportedLanguageHighlighting : T4HighlightingBase<IT4AttributeValue>
 	{
-		public UnsupportedLanguageHighlighting([NotNull] IT4Token associatedNode) : base(associatedNode)
+		public UnsupportedLanguageHighlighting([NotNull] IT4AttributeValue associatedNode) : base(associatedNode)
 		{
 		}
 
