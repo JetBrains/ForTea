@@ -2,6 +2,6 @@
 	{
 		public static void Main(string[] args)
 		{
-			Console.Write(new $(PARAMETER_0)().TransformText());
+			File.WriteAllText(args[0], new $(PARAMETER_0)().TransformText(), Encoding.UTF8);
 		}
 	}

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
@@ -176,25 +177,20 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var lifetime = definition.Lifetime;
 			var process = LaunchProcess(lifetime, executablePath);
 			lifetime.ThrowIfNotAlive();
-			process.WaitForExitSpinning(100, info.ProgressIndicator);
+			process.Process.WaitForExitSpinning(100, info.ProgressIndicator);
 			lifetime.ThrowIfNotAlive();
-			string stdout = process.StandardOutput.ReadToEnd();
-			lifetime.ThrowIfNotAlive();
-			string stderr = process.StandardError.ReadToEnd();
-			lifetime.ThrowIfNotAlive();
-			string result = stderr.IsNullOrEmpty() ? stdout : ErrorMessage;
-			return result;
+			return process.OutputFile.ReadAllText2(Encoding.UTF8).Text;
 		}
 
-		private Process LaunchProcess(Lifetime lifetime, FileSystemPath executablePath)
+		private T4ProcessInfo LaunchProcess(Lifetime lifetime, FileSystemPath executablePath)
 		{
+			var output = FileSystemDefinition.CreateTemporaryFile(lifetime, executablePath.Directory);
 			var startInfo = new JetProcessStartInfo(new ProcessStartInfo
 			{
 				UseShellExecute = false,
-				RedirectStandardOutput = true,
-				RedirectStandardError = true,
 				FileName = executablePath.FullPath,
-				CreateNoWindow = true
+				CreateNoWindow = true,
+				Arguments = output.FullPath
 			});
 
 			var request = JetProcessRuntimeRequest.CreateFramework();
@@ -211,7 +207,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					if (!process.HasExited) process.KillTree();
 				})
 			);
-			return process;
+			return new T4ProcessInfo(process, output);
 		}
 
 		[NotNull]

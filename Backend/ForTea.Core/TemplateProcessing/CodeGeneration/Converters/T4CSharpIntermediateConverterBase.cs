@@ -76,7 +76,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			return T4CSharpCodeGenerationUtils.ChooseBetterNamespace(ns, ns2);
 		}
 
-		private void AppendImports()
+		protected virtual void AppendImports()
 		{
 			AppendIndent();
 			Result.AppendLine("using System;");

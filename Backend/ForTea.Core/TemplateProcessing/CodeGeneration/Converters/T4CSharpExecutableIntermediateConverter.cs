@@ -55,5 +55,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			string suffix = provider.ProcessResource(GeneratedClassName);
 			Result.Append(suffix);
 		}
+
+		protected override void AppendImports()
+		{
+			base.AppendImports();
+			AppendIndent();
+			Result.AppendLine("using System.IO;");
+			AppendIndent();
+			Result.AppendLine("using System.Text;");
+		}
 	}
 }
