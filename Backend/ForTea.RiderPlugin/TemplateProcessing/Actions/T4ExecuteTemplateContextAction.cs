@@ -25,7 +25,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 
 		protected override void DoExecute(ISolution solution, IProgressIndicator progress)
 		{
-			string result = solution.GetComponent<IT4TemplateExecutionManager>().Execute(File.NotNull(), progress);
+			var result = solution.GetComponent<IT4TemplateExecutionManager>().Execute(File.NotNull(), progress);
 			var fileManager = solution.GetComponent<IT4TargetFileManager>();
 			using (WriteLockCookie.Create())
 			{

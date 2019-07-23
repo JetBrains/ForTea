@@ -41,7 +41,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Solution = solution;
 		}
 
-		private string GetTargetFileName([NotNull] IT4File file, [CanBeNull] string targetExtension)
+		public string GetTargetFileName(IT4File file, string targetExtension = null)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -91,7 +91,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			       ?? throw new InvalidOperationException();
 		}
 
-		public FileSystemPath SaveResults(string result, IT4File file, string targetExtension = null)
+		public FileSystemPath SaveResults(IT4ExecutionResult result, IT4File file, string targetExtension = null)
 		{
 			Locks.AssertReadAccessAllowed();
 			if (Locks.IsWriteAccessAllowed()) return OperateUnderWriteLock(result, file, targetExtension);
@@ -99,23 +99,28 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		[NotNull]
-		private FileSystemPath OperateWithoutWriteLock(string result, IT4File file, string targetExtension)
+		private FileSystemPath OperateWithoutWriteLock(
+			IT4ExecutionResult result,
+			[NotNull] IT4File file,
+			[CanBeNull] string targetExtension
+		)
 		{
 			Locks.AssertReadAccessAllowed();
 			Assertion.Assert(!Locks.IsWriteAccessAllowed(), "!Locks.IsWriteAccessAllowed()");
 			// We are being called from SingleFileCustomToolManager, that will take care of caches
 			var destination = SelectDestination(file, targetExtension);
-			destination.WriteAllText(result);
+			result.Save(destination);
 			if (FindExistingFile(file, targetExtension) != null) return destination;
 			// Transaction cannot be performed right away, so add file to project model later
+			string targetFileName = GetTargetFileName(file, targetExtension);
 			Locks.ExecuteOrQueueEx(Solution.GetLifetime(), "Creating file for T4 execution results", () =>
-				Solution.InvokeUnderTransaction(cookie => CreateDestinationFile(cookie, file, targetExtension))
+				Solution.InvokeUnderTransaction(cookie => CreateDestinationFile(cookie, file, targetFileName))
 			);
 			return destination;
 		}
 
 		private FileSystemPath OperateUnderWriteLock(
-			[NotNull] string result,
+			IT4ExecutionResult result,
 			[NotNull] IT4File file,
 			[CanBeNull] string targetExtension
 		)
@@ -129,7 +134,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			{
 				destination = CreateDestinationFileIfNeeded(cookie, file, targetExtension);
 				destinationLocation = destination.Location;
-				destinationLocation.WriteAllText(result);
+				result.Save(destinationLocation);
 			});
 			Solution.GetComponent<DocumentHost>().SyncDocumentsWithFiles(destinationLocation);
 			var sourceFile = destination.ToSourceFile();

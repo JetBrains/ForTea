@@ -75,14 +75,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 				: targetExtension;
 		}
 
-		[CanBeNull]
-		public static string ChooseBetterNamespace([CanBeNull] string first, [CanBeNull] string second)
-		{
-			if (first == null) return second;
-			if (second == null) return first;
-			return first.IsEmpty() ? second : first;
-		}
-
 		public static void WaitForExitSpinning(
 			[NotNull] this Process process,
 			int interval,

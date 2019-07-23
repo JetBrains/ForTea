@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Resources.Shell;
@@ -32,7 +33,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 			var fileManager = solution.GetComponent<IT4TargetFileManager>();
 			using (WriteLockCookie.Create())
 			{
-				fileManager.SaveResults(message, File, PreprocessResultExtension);
+				fileManager.SaveResults(new T4ExecutionResultInString(message), File, PreprocessResultExtension);
 			}
 		}
 

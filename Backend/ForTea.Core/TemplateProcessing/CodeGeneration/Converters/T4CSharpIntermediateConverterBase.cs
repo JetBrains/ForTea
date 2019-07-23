@@ -73,7 +73,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			string ns = projectFile.GetCustomToolNamespace();
 			string ns2 = sourceFile?.Properties.GetDefaultNamespace();
-			return T4CSharpCodeGenerationUtils.ChooseBetterNamespace(ns, ns2);
+			if (ns == null) return ns2;
+			if (ns2 == null) return ns;
+			return ns.IsEmpty() ? ns2 : ns;
 		}
 
 		protected virtual void AppendImports()
