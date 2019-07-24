@@ -19,7 +19,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 	public abstract class T4FileBasedContextActionBase : ContextActionBase
 	{
 		[NotNull]
-		private LanguageIndependentContextActionDataProvider Provider { get; }
+		protected LanguageIndependentContextActionDataProvider Provider { get; }
 
 		[CanBeNull]
 		protected IT4File File => FindT4File(Provider);
@@ -31,7 +31,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 		private static IT4File FindT4File([NotNull] LanguageIndependentContextActionDataProvider provider) =>
 			provider.SourceFile.GetPsiFile<T4Language>(provider.DocumentCaret) as IT4File;
 
-		public sealed override bool IsAvailable(IUserDataHolder cache) => File != null;
+		public override bool IsAvailable(IUserDataHolder cache) => File != null;
 
 		public sealed override void Execute(ISolution solution, ITextControl textControl)
 		{

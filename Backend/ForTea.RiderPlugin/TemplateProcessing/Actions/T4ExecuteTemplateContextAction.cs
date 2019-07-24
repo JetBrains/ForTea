@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.Diagnostics;
@@ -5,6 +6,7 @@ using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 {
@@ -17,6 +19,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 	public sealed class T4ExecuteTemplateContextAction : T4FileBasedContextActionBase
 	{
 		[NotNull] private const string Message = "Execute T4 design-time template";
+
+		[SuppressMessage("ReSharper", "AssignNullToNotNullAttribute",
+			Justification = "If base decides that action is available, File is guaranteed to be not nul")]
+		public override bool IsAvailable(IUserDataHolder cache)
+		{
+			var manager = Provider.Solution.GetComponent<IT4TemplateExecutionManager>();
+			return base.IsAvailable(cache) && manager.CanExecute(File);
+		}
 
 		public T4ExecuteTemplateContextAction([NotNull] LanguageIndependentContextActionDataProvider dataProvider) :
 			base(dataProvider)

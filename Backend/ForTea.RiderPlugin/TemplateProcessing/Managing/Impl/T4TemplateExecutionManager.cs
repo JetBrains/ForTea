@@ -14,7 +14,10 @@ using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CSharp;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
@@ -43,7 +46,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		[NotNull]
 		private ISolutionProcessStartInfoPatcher Patcher { get; }
-		
+
 		[NotNull]
 		private IT4TargetFileManager Manager { get; }
 
@@ -88,7 +91,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			if (progress != null) progress.CurrentItemText = "Generating code";
 			using (ReadLockCookie.Create())
 			{
-				var timeStamp = file.GetSourceFile().NotNull().LastWriteTimeUtc;
 				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager);
 				string code = generator.Generate().RawText;
 				var references = ExtractReferences(file);
@@ -221,5 +223,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var directory = FileSystemDefinition.CreateTemporaryDirectory();
 			return FileSystemDefinition.CreateTemporaryFile(lifetime, directory, DefaultExecutableExtensionWithDot);
 		}
+
+		public bool CanExecute(IT4File file) =>
+			file.GetSourceFile()
+				?.GetPsiFiles(CSharpLanguage.Instance)
+				.SingleOrDefault()
+				?.ContainsErrorElement()
+			== false;
 	}
 }

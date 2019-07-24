@@ -2,7 +2,6 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
@@ -16,9 +15,24 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 {
-	[ShellComponent] // TODO: make SolutionComponent
+	[SolutionComponent]
 	public class T4InternalGenerator : ISingleFileCustomTool
 	{
+		[NotNull]
+		private IT4TemplateExecutionManager ExecutionManager { get; }
+
+		[NotNull]
+		private IT4TargetFileManager TargetManager { get; }
+
+		public T4InternalGenerator(
+			[NotNull] IT4TemplateExecutionManager executionManager,
+			[NotNull] IT4TargetFileManager targetManager
+		)
+		{
+			ExecutionManager = executionManager;
+			TargetManager = targetManager;
+		}
+
 		public string Name => "Bundled T4 template executor";
 		public string ActionName => "Execute T4 template";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
@@ -39,15 +53,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
 			AssertOperationValidity(projectFile);
-
 			var file = AsT4File(projectFile).NotNull("file != null");
-			var solution = projectFile.GetSolution();
-			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
-			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
-			
-			var result = executionManager.Execute(file); // Write to buffer
-			var affectedFile = targetFileManager.SaveResults(result, file); // Write disk entry
+			if (!ExecutionManager.CanExecute(file))
+			{
+				return new SingleFileCustomToolExecutionResult(
+					new FileSystemPath[] { },
+					new[] {"File contains syntax errors"}
+				);
+			}
 
+			var result = ExecutionManager.Execute(file);
+			var affectedFile = TargetManager.SaveResults(result, file);
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);
 		}
 
