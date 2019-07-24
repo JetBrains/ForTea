@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using JetBrains.Application;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Psi.CSharp.CodeStyle.FormatSettings;
@@ -29,7 +29,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			var rightChild = ctx.RightChild;
 
 			if (leftChild is ICommentNode &&
-			    leftChild.GetText() == T4CSharpCodeBehindGenerationInfoCollector.CodeCommentStart &&
+			    leftChild.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentStart &&
 			    !leftChild.HasLineFeedsTo(rightChild, context.CodeFormatter))
 			{
 				if (ctx.Parent is IClassBody)
@@ -41,7 +41,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			}
 
 			if (rightChild is ICommentNode &&
-			    rightChild.GetText() == T4CSharpCodeBehindGenerationInfoCollector.CodeCommentEnd)
+			    rightChild.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd)
 			{
 				if (ctx.Parent is IClassBody)
 				{

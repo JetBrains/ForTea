@@ -4,7 +4,6 @@ using GammaJul.ForTea.Core.Parsing.Builders;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -12,7 +11,6 @@ using JetBrains.Application;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -135,24 +133,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		/// <param name="codeBlock">The code block.</param>
 		private void HandleCodeBlock([NotNull] IT4CodeBlock codeBlock)
 		{
-			var codeToken = codeBlock.GetCodeToken();
-			if (codeToken == null) return;
+			if (!(codeBlock.GetCodeToken() is T4Code codeToken)) return;
 			switch (codeBlock)
 			{
 				case T4ExpressionBlock _:
-					var result = Result.FeatureStarted
-						? Result.CollectedFeatures
-						: Result.CollectedTransformation;
-					AppendExpressionWriting(result, codeToken);
-					result.AppendLine();
+					if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(codeToken));
+					else Result.AppendTransformation(new T4ExpressionDescription(codeToken));
 					break;
 				case T4FeatureBlock _:
-					AppendCode(Result.CollectedFeatures, codeToken);
-					Result.CollectedFeatures.AppendLine();
+					Result.AppendFeature(new T4CodeDescription(codeToken));
 					break;
 				default:
-					AppendCode(Result.CollectedTransformation, codeToken);
-					Result.CollectedTransformation.AppendLine();
+					Result.AppendTransformation(new T4CodeDescription(codeToken));
 					break;
 			}
 		}
@@ -194,18 +186,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			Result.Append(description);
 		}
 
-		private void AppendExpressionWriting(
-			[NotNull] T4CSharpCodeGenerationResult result,
-			[NotNull] TreeElement token
-		)
-		{
-			result.Append("            this.Write(");
-			result.Append(ToStringConversionStart);
-			AppendCode(result, token);
-			result.Append(ToStringConversionEnd);
-			result.Append(");");
-		}
-
 		private void AppendRemainingMessage([NotNull] ITreeNode lookahead)
 		{
 			if (lookahead is IT4Token) return;
@@ -216,15 +196,5 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		#endregion Utils
 
 		protected abstract void AppendTransformation([NotNull] string message);
-
-		[NotNull]
-		protected abstract string ToStringConversionStart { get; }
-
-		[NotNull]
-		protected virtual string ToStringConversionEnd => ")";
-
-		protected abstract void AppendCode(
-			[NotNull] T4CSharpCodeGenerationResult result,
-			[NotNull] TreeElement token);
 	}
 }

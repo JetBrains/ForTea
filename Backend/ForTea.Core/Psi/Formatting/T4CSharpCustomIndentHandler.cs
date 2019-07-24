@@ -1,5 +1,5 @@
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Application;
@@ -42,7 +42,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 
 			if (node is ITokenNode tokenNode
 			    && tokenNode.GetTokenType().IsComment
-			    && tokenNode.GetText() == T4CSharpCodeBehindGenerationInfoCollector.CodeCommentEnd)
+			    && tokenNode.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd)
 				return HandleComment(indentType, file, tokenNode);
 			if (helper.IsGeneratedMethodMember(node))
 			{

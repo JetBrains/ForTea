@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
@@ -65,6 +66,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual void AppendClasses(bool hostspecific)
 		{
 			AppendClass();
+			AppendIndent();
+			Result.AppendLine();
 			AppendBaseClass();
 		}
 
@@ -112,7 +115,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			PushIndent();
 			if (IntermediateResult.HasHost) AppendHost();
 			AppendTransformMethod();
-			Result.Append(IntermediateResult.CollectedFeatures);
+			foreach (var description in IntermediateResult.FeatureDescriptions)
+			{
+				description.AppendContent(Result, Provider);
+			}
+
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
 			AppendTemplateInitialization(IntermediateResult.ParameterDescriptions);
 			PopIndent();
@@ -169,8 +176,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
+			AppendIndent();
+			Result.AppendLine();
 			AppendTransformationPrefix();
-			Result.Append(IntermediateResult.CollectedTransformation);
+			foreach (var description in IntermediateResult.TransformationDescriptions)
+			{
+				description.AppendContent(Result, Provider);
+			}
+
 			AppendIndent();
 			Result.AppendLine("return this.GenerationEnvironment.ToString();");
 			PopIndent();
@@ -208,6 +221,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
 
+		[NotNull]
+		protected abstract IT4ElementAppendFormatProvider Provider { get; }
+
 		protected virtual void AppendTransformationPrefix()
 		{
 		}
@@ -217,7 +233,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		#region Indentation
-		private int CurrentIndent { get; set; }
+		protected int CurrentIndent { get; set; }
 		protected void PushIndent() => CurrentIndent += 1;
 		protected void PopIndent() => CurrentIndent -= 1;
 		protected void AppendIndent() => AppendIndent(CurrentIndent);
