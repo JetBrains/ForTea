@@ -4,9 +4,9 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
+namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public class T4ParameterDescription
+	public class T4ParameterDescription : T4ElementDescriptionBase
 	{
 		[NotNull]
 		public ITreeNode TypeToken { get; }
@@ -23,9 +23,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		[NotNull]
 		public string FieldNameString { get; }
 
-		public bool IsVisible { get; private set; }
-		public void MakeInvisible() => IsVisible = false;
-
 		private T4ParameterDescription(
 			[NotNull] ITreeNode typeToken,
 			[NotNull] ITreeNode nameToken,
@@ -37,7 +34,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			TypeString = typeString.EscapeKeyword();
 			NameString = nameString.EscapeKeyword();
 			FieldNameString = $"_{nameString}Field";
-			IsVisible = true;
 		}
 
 		[CanBeNull]

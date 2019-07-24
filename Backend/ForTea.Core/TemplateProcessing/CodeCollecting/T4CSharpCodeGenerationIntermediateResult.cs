@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
@@ -10,9 +11,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
 	public sealed class T4CSharpCodeGenerationIntermediateResult
 	{
-		[NotNull]
-		public T4CSharpCodeGenerationResult CollectedImports { get; }
-
 		[NotNull]
 		public T4CSharpCodeGenerationResult CollectedBaseClass { get; }
 
@@ -26,8 +24,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private List<T4ParameterDescription> MyParameterDescriptions { get; }
 
 		[NotNull, ItemNotNull]
+		private List<T4ImportDescription> MyImportDescriptions { get; }
+		
+		[NotNull, ItemNotNull]
 		public IReadOnlyList<T4ParameterDescription> ParameterDescriptions => MyParameterDescriptions;
 
+		public IReadOnlyList<T4ImportDescription> ImportDescriptions => MyImportDescriptions;
 		public IT4InfoCollectorState State { get; private set; }
 		public bool FeatureStarted => State.FeatureStarted;
 		public bool HasHost { get; private set; }
@@ -37,21 +39,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public T4CSharpCodeGenerationIntermediateResult([NotNull] IT4File file)
 		{
-			CollectedImports = new T4CSharpCodeGenerationResult(file);
 			CollectedBaseClass = new T4CSharpCodeGenerationResult(file);
 			CollectedTransformation = new T4CSharpCodeGenerationResult(file);
 			CollectedFeatures = new T4CSharpCodeGenerationResult(file);
 			MyParameterDescriptions = new List<T4ParameterDescription>();
+			MyImportDescriptions = new List<T4ImportDescription>();
 			State = new T4InfoCollectorStateInitial();
 			HasHost = false;
 		}
 
-		public void Append([NotNull] T4ParameterDescription description) =>
-			MyParameterDescriptions.Add(description);
+		public void Append([NotNull] T4ParameterDescription description) => MyParameterDescriptions.Add(description);
+		
+		public void Append([NotNull] T4ImportDescription description) => MyImportDescriptions.Add(description);
 
 		public void Append([NotNull] T4CSharpCodeGenerationIntermediateResult other)
 		{
-			CollectedImports.Append(other.CollectedImports.RawText);
+			foreach (var description in other.MyImportDescriptions)
+			{
+				description.MakeInvisible();
+			}
+			MyImportDescriptions.addAll(other.MyImportDescriptions);
 			// base class is intentionally ignored
 			CollectedTransformation.Append(other.CollectedTransformation.RawText);
 			CollectedFeatures.Append(other.CollectedFeatures.RawText);

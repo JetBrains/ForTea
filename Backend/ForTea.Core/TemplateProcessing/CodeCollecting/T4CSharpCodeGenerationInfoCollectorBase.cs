@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing.Builders;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
@@ -160,15 +161,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		/// <param name="directive">The import directive.</param>
 		private void HandleImportDirective([NotNull] IT4Directive directive)
 		{
-			Pair<ITreeNode, string> ns =
-				directive.GetAttributeValueIgnoreOnlyWhitespace(Manager.Import.NamespaceAttribute.Name);
-
-			if (ns.First == null || ns.Second == null)
-				return;
-
-			Result.CollectedImports.Append("using ");
-			Result.CollectedImports.AppendMapped(ns.Second, ns.First.GetTreeTextRange());
-			Result.CollectedImports.AppendLine(";");
+			var description = T4ImportDescription.FromDirective(directive, Manager);
+			if (description == null) return;
+			Result.Append(description);
 		}
 
 		/// <summary>
@@ -216,7 +211,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (lookahead is IT4Token) return;
 			string produced = Result.State.Produce(lookahead);
 			if (produced.IsNullOrEmpty()) return;
-			// ReSharper disable once AssignNullToNotNullAttribute
 			AppendTransformation(produced);
 		}
 		#endregion Utils
