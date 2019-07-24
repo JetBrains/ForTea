@@ -62,9 +62,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			if (!(element is IT4Include include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File));
-			var target = include.Path.Resolve();
-
-			if (target?.LanguageType.Is<T4ProjectFileType>() == true)
+			var target = include.Path.Resolve() ?? throw new T4OutputGenerationException();
+			if (target.LanguageType.Is<T4ProjectFileType>())
 				target.GetPrimaryPsiFile()?.ProcessDescendants(this);
 			else BuildT4Tree(target).ProcessDescendants(this);
 		}
@@ -84,8 +83,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			switch (element)
 			{
 				case IT4Include _:
-					string suffix = Result.State.ProduceBeforeEof();
-					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+					// Any remaining message has already been appended
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
 					return; // Do not advance state here
