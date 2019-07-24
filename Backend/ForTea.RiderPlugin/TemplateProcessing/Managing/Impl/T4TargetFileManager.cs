@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.Tree;
@@ -11,14 +10,11 @@ using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers.Transactions;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features;
-using JetBrains.ReSharper.Host.Features.Documents;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Caches.SymbolCache;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Rider.Model;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
@@ -30,7 +26,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private T4DirectiveInfoManager Manager { get; }
 
 		[NotNull]
-		private ISolution Solution { get; }
+		protected ISolution Solution { get; }
 
 		[NotNull]
 		private IShellLocks Locks => Solution.Locks;
@@ -136,23 +132,19 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				destinationLocation = destination.Location;
 				result.Save(destinationLocation);
 			});
-			Solution.GetComponent<DocumentHost>().SyncDocumentsWithFiles(destinationLocation);
+			SyncDocuments(destinationLocation);
 			var sourceFile = destination.ToSourceFile();
 			if (sourceFile != null) SyncSymbolCaches(sourceFile);
-			RefreshFiles(Solution, destinationLocation);
+			RefreshFiles(destinationLocation);
 			return destinationLocation;
 		}
 
-		private static void RefreshFiles(ISolution solution, FileSystemPath destinationLocation)
+		protected virtual void SyncDocuments(FileSystemPath destinationLocation)
 		{
-			var fileSystemModel = solution.GetProtocolSolution().GetFileSystemModel();
-			solution.GetProtocolSolution()
-				.Editors
-				.SaveFiles
-				.Start(new List<string> {destinationLocation.FullPath});
-			fileSystemModel
-				.RefreshPaths
-				.Start(new RdRefreshRequest(new List<string> {destinationLocation.FullPath}, true));
+		}
+
+		protected virtual void RefreshFiles(FileSystemPath destinationLocation)
+		{
 		}
 
 		private void SyncSymbolCaches([NotNull] IPsiSourceFile changedFile)
