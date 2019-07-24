@@ -119,7 +119,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			if (info.ProgressIndicator != null) info.ProgressIndicator.CurrentItemText = "Compiling code";
 			var executablePath = CreateTemporaryExecutable(definition.Lifetime);
-			var compilation = CreateCompilation(info);
+			var compilation = CreateCompilation(info, executablePath);
 			var errors = compilation
 				.GetDiagnostics(definition.Lifetime)
 				.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
@@ -130,12 +130,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				return new T4ExecutionFailure();
 			}
 
-			compilation.Emit(executablePath.FullPath, cancellationToken: definition.Lifetime);
+			var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
+			compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: definition.Lifetime);
 			CopyAssemblies(info, executablePath);
 			return Run(info, definition.Lifetime, executablePath);
 		}
 
-		private CSharpCompilation CreateCompilation(T4TemplateExecutionManagerInfo info)
+		private CSharpCompilation CreateCompilation(T4TemplateExecutionManagerInfo info, FileSystemPath executablePath)
 		{
 			var options = new CSharpCompilationOptions(OutputKind.ConsoleApplication)
 				.WithOptimizationLevel(OptimizationLevel.Debug)
@@ -145,9 +146,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				info.Code,
 				CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
 
-			// TODO: use actual name
 			return CSharpCompilation.Create(
-				"T4CompilationAssemblyName.exe",
+				executablePath.Name,
 				new[] {syntaxTree},
 				options: options,
 				references: info.References);
