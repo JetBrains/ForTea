@@ -3,7 +3,6 @@ using JetBrains.Application;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Psi.CSharp.CodeStyle.FormatSettings;
 using JetBrains.ReSharper.Psi.CSharp.Impl.CodeStyle;
-using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -25,57 +24,26 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 
 		public override SpaceType GetBlockSpaceType(CSharpFmtStageContext ctx, CSharpCodeFormattingContext context)
 		{
+			// Do not break one-line code blocks
 			var leftChild = ctx.LeftChild;
 			var rightChild = ctx.RightChild;
-
-			if (leftChild is ICommentNode &&
-			    leftChild.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentStart &&
-			    !leftChild.HasLineFeedsTo(rightChild, context.CodeFormatter))
-			{
-				if (ctx.Parent is IClassBody)
-				{
-					return SpaceType.Vertical;
-				}
-
+			if (IsCodeStartComment(leftChild) && !leftChild.HasLineFeedsTo(rightChild, context.CodeFormatter))
 				return SpaceType.Horizontal;
-			}
-
-			if (rightChild is ICommentNode &&
-			    rightChild.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd)
-			{
-				if (ctx.Parent is IClassBody)
-				{
-					// This doesn't works, because line break is always inserted after start comment
-					/*var start = context.RightChild.LeftSiblings()
-					  .FirstOrDefault(c => c is ICommentNode && c.GetText() == AspCSharpCodeBehindGenerator.LEADING_COMMENT);
-		  
-					if (start == null)
-					  return SpaceType.Horizontal;
-		  
-					return start.HasLineFeedsTo(context.RightChild) ? SpaceType.Vertical : SpaceType.Horizontal;*/
-					return SpaceType.Vertical;
-				}
-
-				if (leftChild.HasLineFeedsTo(rightChild, context.CodeFormatter))
-					return SpaceType.Vertical;
+			if (IsCodeEndComment(rightChild) && !leftChild.HasLineFeedsTo(rightChild, context.CodeFormatter))
 				return SpaceType.Horizontal;
-			}
-
 			return SpaceType.Default;
 		}
 
-		public override SpaceType GetInvocationSpaces(CSharpFmtStageContext context)
+		private static bool IsCodeEndComment(ITreeNode rightChild)
 		{
-			if (!(context.Parent is IInvocationExpression invocationExpression)) return SpaceType.Default;
-			var leftPar = invocationExpression.LPar;
-			if (leftPar?.GetDocumentRange().IsValid() == false && context.LeftChild == leftPar)
-				return SpaceType.Horizontal;
+			if (!(rightChild is ICommentNode)) return false;
+			return rightChild.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd;
+		}
 
-			var rightPar = invocationExpression.RPar;
-			if (rightPar?.GetDocumentRange().IsValid() == false && context.RightChild == rightPar)
-				return SpaceType.Horizontal;
-
-			return SpaceType.Default;
+		private static bool IsCodeStartComment(ITreeNode candidate)
+		{
+			if (!(candidate is ICommentNode)) return false;
+			return candidate.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentStart;
 		}
 	}
 }
