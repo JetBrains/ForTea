@@ -1,14 +1,21 @@
 using System.Text;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
 	public sealed class T4InfoCollectorStateSeenFeature : T4InfoCollectorStateBase
 	{
+		[CanBeNull]
 		private IT4Token LastToken { get; set; }
+
+		public T4InfoCollectorStateSeenFeature([NotNull] IT4CodeGenerationInterrupter interrupter) : base(interrupter)
+		{
+		}
 
 		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
 		{
@@ -18,11 +25,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 				default:
 					Die();
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE)
-						return new T4InfoCollectorStateSeenFeatureAndNewLine();
+						return new T4InfoCollectorStateSeenFeatureAndNewLine(Interrupter);
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
-						return new T4InfoCollectorStateSeenFeatureAndText(new StringBuilder(Convert(LastToken)));
+						return new T4InfoCollectorStateSeenFeatureAndText(
+							new StringBuilder(Convert(LastToken)),
+							Interrupter);
 
-					throw new T4OutputGenerationException();
+					Interrupter.InterruptAfterProblem();
+					return this;
 			}
 		}
 

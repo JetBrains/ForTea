@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Parsing.Builders;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -48,7 +49,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		[NotNull]
 		public T4CSharpCodeGenerationIntermediateResult Collect()
 		{
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File));
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
 			File.ProcessDescendants(this);
 			string suffix = Result.State.ProduceBeforeEof();
 			if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
@@ -61,8 +62,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public void ProcessBeforeInterior(ITreeNode element)
 		{
 			if (!(element is IT4Include include)) return;
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File));
-			var target = include.Path.Resolve() ?? throw new T4OutputGenerationException();
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+			var target = include.Path.Resolve();
+			if (target == null)
+			{
+				Interrupter.InterruptAfterProblem();
+				return;
+			}
+
 			if (target.LanguageType.Is<T4ProjectFileType>())
 				target.GetPrimaryPsiFile()?.ProcessDescendants(this);
 			else BuildT4Tree(target).ProcessDescendants(this);
@@ -194,5 +201,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		#endregion Utils
 
 		protected abstract void AppendTransformation([NotNull] string message);
+
+		protected abstract IT4CodeGenerationInterrupter Interrupter { get; }
 	}
 }

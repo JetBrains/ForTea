@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
@@ -45,14 +46,17 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public void RequireHost() => HasHost = true;
 		public bool HasBaseClass => !CollectedBaseClass.IsEmpty;
 
-		public T4CSharpCodeGenerationIntermediateResult([NotNull] IT4File file)
+		public T4CSharpCodeGenerationIntermediateResult(
+			[NotNull] IT4File file,
+			[NotNull] IT4CodeGenerationInterrupter interrupter
+		)
 		{
 			CollectedBaseClass = new T4CSharpCodeGenerationResult(file);
 			MyTransformationDescriptions = new List<T4AppendableElementDescriptionBase>();
 			MyFeatureDescriptions = new List<T4AppendableElementDescriptionBase>();
 			MyParameterDescriptions = new List<T4ParameterDescription>();
 			MyImportDescriptions = new List<T4ImportDescription>();
-			State = new T4InfoCollectorStateInitial();
+			State = new T4InfoCollectorStateInitial(interrupter);
 			HasHost = false;
 		}
 

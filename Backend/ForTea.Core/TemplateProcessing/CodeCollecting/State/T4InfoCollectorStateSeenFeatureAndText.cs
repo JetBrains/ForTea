@@ -1,4 +1,5 @@
 using System.Text;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -11,7 +12,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		[NotNull]
 		private StringBuilder Builder { get; }
 
-		public T4InfoCollectorStateSeenFeatureAndText([NotNull] StringBuilder builder) => Builder = builder;
+		public T4InfoCollectorStateSeenFeatureAndText(
+			[NotNull] StringBuilder builder,
+			[NotNull] IT4CodeGenerationInterrupter interrupter
+		) : base(interrupter) => Builder = builder;
 
 		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
 		{
@@ -19,15 +23,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			{
 				case T4FeatureBlock _:
 					Die();
-					return new T4InfoCollectorStateSeenFeature();
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4Token _: return this;
-				default: throw new T4OutputGenerationException();
+				default:
+					Interrupter.InterruptAfterProblem();
+					return this;
 			}
 		}
 
 		protected override bool FeatureStartedSafe => true;
 		protected override void ConsumeTokenSafe(IT4Token token) => Builder.Append(Convert(token));
 		protected override string ProduceSafe(ITreeNode lookahead) => Builder.ToString();
-		protected override string ProduceBeforeEofSafe() => throw new T4OutputGenerationException();
+		protected override string ProduceBeforeEofSafe()
+		{
+			Interrupter.InterruptAfterProblem();
+			return Builder.ToString();
+		}
 	}
 }

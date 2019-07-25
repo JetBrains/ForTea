@@ -1,4 +1,5 @@
 using System.Text;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -11,11 +12,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		[NotNull]
 		private StringBuilder Builder { get; }
 
-		public T4InfoCollectorStateInitial() : this(new StringBuilder())
+		public T4InfoCollectorStateInitial([NotNull] IT4CodeGenerationInterrupter interrupter) :
+			this(new StringBuilder(), interrupter)
 		{
 		}
 
-		public T4InfoCollectorStateInitial([NotNull] StringBuilder builder) => Builder = builder;
+		public T4InfoCollectorStateInitial(
+			[NotNull] StringBuilder builder,
+			[NotNull] IT4CodeGenerationInterrupter interrupter
+		) : base(interrupter) => Builder = builder;
 
 		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
 		{
@@ -23,14 +28,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			{
 				case T4FeatureBlock _:
 					Die();
-					return new T4InfoCollectorStateSeenFeature();
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4Directive _:
 				case T4StatementBlock _:
 					Die();
-					return new T4InfoCollectorSateSeenDirectiveOrStatementBlock();
+					return new T4InfoCollectorSateSeenDirectiveOrStatementBlock(Interrupter);
 				case T4ExpressionBlock _:
 					Die();
-					return new T4InfoCollectorStateInitial();
+					return new T4InfoCollectorStateInitial(Interrupter);
 				default: return this;
 			}
 		}
