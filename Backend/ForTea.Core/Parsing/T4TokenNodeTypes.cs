@@ -12,7 +12,7 @@ namespace GammaJul.ForTea.Core.Parsing {
 		[NotNull] public static readonly T4TokenNodeType DIRECTIVE_START = new T4TokenNodeType("DIRECTIVE_START", 1004, "<#@", T4TokenNodeFlag.Tag);
 		[NotNull] public static readonly T4TokenNodeType BLOCK_END = new T4TokenNodeType("BLOCK_END", 1005, "#>", T4TokenNodeFlag.Tag);
 		[NotNull] public static readonly T4TokenNodeType WHITE_SPACE = new T4TokenNodeType("WHITE_SPACE", 1006, " ", T4TokenNodeFlag.Whitespace);
-		[NotNull] public static readonly T4TokenNodeType NEW_LINE = new T4TokenNodeType("NEW_LINE", 1007, "\r\n", T4TokenNodeFlag.Whitespace);
+		[NotNull] public static readonly T4TokenNodeType NEW_LINE = new T4TokenNodeType("NEW_LINE", 1007, "\n", T4TokenNodeFlag.Whitespace);
 		[NotNull] public static readonly T4TokenNodeType QUOTE = new T4TokenNodeType("QUOTE", 1008, "\"", T4TokenNodeFlag.None);
 		[NotNull] public static readonly T4TokenNodeType EQUAL = new T4TokenNodeType("EQUAL", 1009, "=", T4TokenNodeFlag.None);
 		[NotNull] public static readonly T4TokenNodeType TOKEN = new T4TokenNodeType("TOKEN", 1010, null, T4TokenNodeFlag.Identifier);
