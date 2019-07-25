@@ -25,6 +25,9 @@
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
     <!-- delegation to backend -->
+    <rider.debuggerSupportPolicy
+        language="T4"
+        implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy"/>
     <lang.documentationProvider
         language="T4"
         implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
