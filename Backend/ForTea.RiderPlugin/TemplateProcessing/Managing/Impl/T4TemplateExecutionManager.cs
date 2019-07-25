@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
@@ -224,11 +225,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return FileSystemDefinition.CreateTemporaryFile(lifetime, directory, DefaultExecutableExtensionWithDot);
 		}
 
-		public bool CanExecute(IT4File file) =>
-			file.GetSourceFile()
-				?.GetPsiFiles(CSharpLanguage.Instance)
-				.SingleOrDefault()
-				?.ContainsErrorElement()
-			== false;
+		public bool CanExecute(IT4File file)
+		{
+			var sourceFile = file.GetSourceFile();
+			var cSharpFile = sourceFile?.GetPsiFiles(CSharpLanguage.Instance).SingleOrDefault();
+			var t4File = sourceFile?.GetPsiFiles(T4Language.Instance).SingleOrDefault();
+			if (cSharpFile?.ContainsErrorElement() != false) return false;
+			if (t4File?.ContainsErrorElement() != false) return false;
+			return true;
+		}
 	}
 }
