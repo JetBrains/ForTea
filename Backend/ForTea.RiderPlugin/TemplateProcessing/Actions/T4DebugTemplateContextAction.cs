@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
+using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
+using JetBrains.ReSharper.Host.Features.RunConfiguration;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
@@ -35,7 +37,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 		
 		protected override void DoExecute(ISolution solution, IProgressIndicator progress)
 		{
-			
+			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
+			Assertion.AssertNotNull(File, "File != null");
+			Assertion.Assert(manager.CanCompile(File), "manager.CanCompile(File)");
+			if (!manager.Compile(solution.GetLifetime(), File)) return;
+			var host = solution.GetComponent<RunConfigurationHost>();
+
+			int x = 2 + 2;
+//			host.CreateAndRun(TODO);
 		}
 	}
 }
