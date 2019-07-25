@@ -63,27 +63,30 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				Interrupter.InterruptAfterProblem();
 				return;
 			}
-			
+
 			include.Path.ResolveT4File()?.ProcessDescendants(this);
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)
 		{
-			AppendRemainingMessage(element);
 			switch (element)
 			{
 				case IT4Include _:
-					// Any remaining message has already been appended
+					string suffix = Result.State.ProduceBeforeEof();
+					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
 					return; // Do not advance state here
 				case IT4Directive directive:
+					AppendRemainingMessage(element);
 					HandleDirective(directive);
 					break;
 				case IT4CodeBlock codeBlock:
+					AppendRemainingMessage(element);
 					HandleCodeBlock(codeBlock);
 					break;
 				case IT4Token token:
+					AppendRemainingMessage(element);
 					Result.State.ConsumeToken(token);
 					break;
 			}
@@ -184,7 +187,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		#endregion Utils
 
 		protected abstract void AppendTransformation([NotNull] string message);
-
 		protected abstract IT4CodeGenerationInterrupter Interrupter { get; }
 	}
 }
