@@ -69,7 +69,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			var attribute = directive.GetAttribute(Manager.Include.FileAttribute.Name);
 			var value = attribute?.GetValueToken();
 			if (value == null) return; // This case will be reported elsewhere?
-			MyHighlightings.Add(new HighlightingInfo(directive.GetHighlightingRange(),
+			MyHighlightings.Add(new HighlightingInfo(value.GetHighlightingRange(),
 				new T4UnresolvedIncludeHighlighting(value)));
 		}
 	}

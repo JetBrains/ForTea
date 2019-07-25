@@ -299,12 +299,14 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 			if (!(directive.GetAttribute(DirectiveInfoManager.Include.FileAttribute.Name) is T4DirectiveAttribute
 				fileAttr))
 			{
+				HandleFailedInclude(parentElement);
 				return;
 			}
 
 			var valueToken = fileAttr.GetValueToken();
 			if (valueToken == null)
 			{
+				HandleFailedInclude(parentElement);
 				return;
 			}
 
@@ -326,11 +328,18 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 		)
 		{
 			var path = CreateIncludePath(includeFileName);
-			if (AnalyzeInclude(fileAttr, path, once)) return;
+			AnalyzeInclude(fileAttr, path, once);
 			var include = new T4Include {Path = path};
 			Includes.Add(include);
 			// do not use AppendNewChild, we don't want the PsiBuilderLexer to move line breaks from the include into the main file.
 			parentElement.AddChild(include);
+		}
+
+		private void HandleFailedInclude([NotNull] CompositeElement element)
+		{
+			var include = new T4Include {Path = T4EmptyPathWithMacros.Instance};
+			Includes.Add(include);
+			element.AddChild(include);
 		}
 
 		// TODO: move to problem analyzer
@@ -338,7 +347,7 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 		/// Checks whether include contains problems
 		/// </summary>
 		/// <returns>Whether any problems found</returns>
-		private bool AnalyzeInclude(
+		private void AnalyzeInclude(
 			[NotNull] T4DirectiveAttribute fileAttr,
 			[NotNull] IT4PathWithMacros path,
 			bool once
@@ -347,30 +356,27 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 			if (path.IsEmpty)
 			{
 				fileAttr.ValueError = $@"Unresolved file ""{path}""";
-				return true;
+				return;
 			}
 
 			fileAttr.Reference = path;
 			if (!ExistingIncludePaths.Add(path))
 			{
 				if (!once) fileAttr.ValueError = $@"Already included file ""{path}""";
-				return true;
+				return;
 			}
 
 			if (path.ResolvePath() == SourceFile.GetLocation())
 			{
 				fileAttr.ValueError = "Recursive include";
 				ExistingIncludePaths.Add(path);
-				return true;
+				return;
 			}
 
 			if (!path.ResolvePath().ExistsFile)
 			{
 				fileAttr.ValueError = $@"File ""{path}"" not found";
-				return true;
 			}
-
-			return false;
 		}
 
 		private IT4PathWithMacros CreateIncludePath(
