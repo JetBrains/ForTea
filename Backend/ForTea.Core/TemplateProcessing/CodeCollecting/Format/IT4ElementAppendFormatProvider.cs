@@ -1,6 +1,8 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format
 {
@@ -13,6 +15,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format
 		string CodeCommentStart { get; }
 		string CodeCommentEnd { get; }
 		string Indent { get; }
+
+		void AppendCompilationOffset(
+			[NotNull] T4CSharpCodeGenerationResult destination,
+			Int32<DocColumn> offset
+		);
 
 		void AppendMappedOrTrimmed(
 			[NotNull] T4CSharpCodeGenerationResult destination,
