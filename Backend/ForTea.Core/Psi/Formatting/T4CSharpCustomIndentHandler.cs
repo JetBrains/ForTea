@@ -26,12 +26,12 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			FmtSettings<CSharpFormatSettingsKey> settings
 		)
 		{
+			var file = node.GetContainingNode<IFile>(true);
+			if (!IsInT4File(file)) return null;
 			if (indentType != CustomIndentType.DirectCalculation) return null;
 			if (!node.IsPhysical()) return null;
 			if (node.GetT4ContainerFromCSharpNode<IT4CodeBlock>() == null) return "";
 
-			var file = node.GetContainingNode<IFile>(true);
-			if (!IsInT4File(file)) return null;
 			if (node is ITokenNode tokenNode
 			    && tokenNode.GetTokenType().IsComment
 			    && tokenNode.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd)
