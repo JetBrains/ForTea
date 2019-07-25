@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Altering.Resources;
 using JetBrains.ReSharper.Host.Features.ProjectModel.CustomTools;
@@ -18,6 +19,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 	[SolutionComponent]
 	public class T4InternalGenerator : ISingleFileCustomTool
 	{
+		private Lifetime Lifetime { get; }
+		
 		[NotNull]
 		private IT4TemplateExecutionManager ExecutionManager { get; }
 
@@ -25,10 +28,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		private IT4TargetFileManager TargetManager { get; }
 
 		public T4InternalGenerator(
+			Lifetime lifetime,
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] IT4TargetFileManager targetManager
 		)
 		{
+			Lifetime = lifetime;
 			ExecutionManager = executionManager;
 			TargetManager = targetManager;
 		}
@@ -54,7 +59,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			AssertOperationValidity(projectFile);
 			var file = AsT4File(projectFile).NotNull("file != null");
-			if (!ExecutionManager.CanExecute(file))
+			if (!ExecutionManager.CanCompile(file))
 			{
 				return new SingleFileCustomToolExecutionResult(
 					new FileSystemPath[] { },
@@ -62,7 +67,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				);
 			}
 
-			var result = ExecutionManager.Execute(file);
+			Assertion.Assert(ExecutionManager.Compile(Lifetime, file), "!ExecutionManager.Compile(Lifetime, file)");
+			var result = ExecutionManager.Execute(Lifetime, file);
 			var affectedFile = TargetManager.SaveResults(result, file);
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);
 		}

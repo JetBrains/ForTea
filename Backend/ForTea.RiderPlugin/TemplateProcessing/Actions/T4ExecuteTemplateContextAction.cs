@@ -25,7 +25,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 		public override bool IsAvailable(IUserDataHolder cache)
 		{
 			var manager = Provider.Solution.GetComponent<IT4TemplateExecutionManager>();
-			return base.IsAvailable(cache) && manager.CanExecute(File);
+			return base.IsAvailable(cache) && manager.CanCompile(File);
 		}
 
 		public T4ExecuteTemplateContextAction([NotNull] LanguageIndependentContextActionDataProvider dataProvider) :
@@ -35,12 +35,26 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 
 		protected override void DoExecute(ISolution solution, IProgressIndicator progress)
 		{
-			var result = solution.GetComponent<IT4TemplateExecutionManager>().Execute(File.NotNull(), progress);
+			LaunchProgress(progress);
+			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
+			Assertion.AssertNotNull(File, "File != null");
+			Assertion.Assert(manager.CanCompile(File), "manager.CanCompile(File)");
+			if (!manager.Compile(solution.GetLifetime(), File)) return;
+			var result = manager.Execute(solution.GetLifetime(), File, progress);
 			var fileManager = solution.GetComponent<IT4TargetFileManager>();
 			using (WriteLockCookie.Create())
 			{
 				fileManager.SaveResults(result, File);
 			}
+		}
+
+		private static void LaunchProgress([CanBeNull] IProgressIndicator indicator)
+		{
+			if (indicator == null) return;
+			indicator.Start(1);
+			indicator.Advance();
+			indicator.TaskName = "Executing T4 Template";
+			indicator.CurrentItemText = "Preparing";
 		}
 
 		public override string Text => Message;

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
@@ -30,14 +29,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 	[SolutionComponent]
 	public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
-		[NotNull] private const string DefaultExecutableExtension = "exe";
-		[NotNull] private const string DefaultExecutableExtensionWithDot = "." + DefaultExecutableExtension;
-		[NotNull] private const string Title = "Executing T4 Template";
-
 		[NotNull]
 		private T4DirectiveInfoManager DirectiveInfoManager { get; }
-
-		private Lifetime SolutionLifetime { get; }
 
 		[NotNull]
 		private IShellLocks Locks { get; }
@@ -52,14 +45,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IT4TargetFileManager Manager { get; }
 
 		public T4TemplateExecutionManager(
-			Lifetime solutionLifetime,
 			[NotNull] IShellLocks locks,
 			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IPsiModules psiModules,
 			[NotNull] ISolutionProcessStartInfoPatcher patcher,
 			[NotNull] IT4TargetFileManager manager)
 		{
-			SolutionLifetime = solutionLifetime;
 			Locks = locks;
 			DirectiveInfoManager = directiveInfoManager;
 			PsiModules = psiModules;
@@ -67,35 +58,37 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Manager = manager;
 		}
 
-		public IT4ExecutionResult Execute(IT4File file, IProgressIndicator progress = null)
+		public bool Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress)
 		{
-			var definition = SolutionLifetime.CreateNested();
-			LaunchProgress(progress);
-			var info = GenerateCode(file, progress);
-			return CompileAndRun(definition, info);
+			var info = GenerateCode(file);
+			if (progress != null) progress.CurrentItemText = "Compiling code";
+			var executablePath = Manager.GetTemporaryExecutableLocation(file);
+			var compilation = CreateCompilation(info, executablePath);
+			var errors = compilation
+				.GetDiagnostics(lifetime)
+				.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
+				.ToList();
+			if (!errors.IsEmpty())
+			{
+				MessageBox.ShowError(errors.Select(error => error.ToString()).Join("\n"), "Could not compile template");
+				return false;
+			}
+
+			executablePath.Parent.CreateDirectory();
+			var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
+			compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: lifetime);
+			CopyAssemblies(info, executablePath);
+			return true;
 		}
 
-		private static void LaunchProgress([CanBeNull] IProgressIndicator indicator)
+		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file)
 		{
-			if (indicator == null) return;
-			indicator.Start(1);
-			indicator.Advance();
-			indicator.TaskName = Title;
-			indicator.CurrentItemText = "Preparing";
-		}
-
-		private T4TemplateExecutionManagerInfo GenerateCode(
-			[NotNull] IT4File file,
-			[CanBeNull] IProgressIndicator progress
-		)
-		{
-			if (progress != null) progress.CurrentItemText = "Generating code";
 			using (ReadLockCookie.Create())
 			{
 				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager);
 				string code = generator.Generate().RawText;
 				var references = ExtractReferences(file);
-				return new T4TemplateExecutionManagerInfo(code, references, file, progress);
+				return new T4TemplateExecutionManagerInfo(code, references, file);
 			}
 		}
 
@@ -116,27 +109,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					.SelectNotNull(it => it.Location)
 					.Select(it => MetadataReference.CreateFromFile(it.FullPath));
 			}
-		}
-
-		private IT4ExecutionResult CompileAndRun(LifetimeDefinition definition, T4TemplateExecutionManagerInfo info)
-		{
-			if (info.ProgressIndicator != null) info.ProgressIndicator.CurrentItemText = "Compiling code";
-			var executablePath = CreateTemporaryExecutable(definition.Lifetime);
-			var compilation = CreateCompilation(info, executablePath);
-			var errors = compilation
-				.GetDiagnostics(definition.Lifetime)
-				.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-				.ToList();
-			if (!errors.IsEmpty())
-			{
-				MessageBox.ShowError(errors.Select(error => error.ToString()).Join("\n"), "Could not compile template");
-				return new T4ExecutionFailure();
-			}
-
-			var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
-			compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: definition.Lifetime);
-			CopyAssemblies(info, executablePath);
-			return Run(info, definition.Lifetime, executablePath);
 		}
 
 		private CSharpCompilation CreateCompilation(T4TemplateExecutionManagerInfo info, FileSystemPath executablePath)
@@ -168,21 +140,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				.SelectNotNull(it => FileSystemPath.TryParse(it));
 			foreach (var path in query)
 			{
-				File.Copy(path.FullPath, folder.Combine(path.Name).FullPath);
+				path.CopyFile(folder.Combine(path.Name), true);
 			}
 		}
 
-		private IT4ExecutionResult Run(
-			T4TemplateExecutionManagerInfo info,
-			Lifetime lifetime,
-			FileSystemPath executablePath
-		)
+		public IT4ExecutionResult Execute(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
-			string targetFileName = Manager.GetTargetFileName(info.File);
+			var executablePath = Manager.GetTemporaryExecutableLocation(file);
+			string targetFileName = Manager.GetTargetFileName(file);
 			var destinationPath = executablePath.Directory.Combine(targetFileName);
 			var process = LaunchProcess(lifetime, executablePath, destinationPath);
 			lifetime.ThrowIfNotAlive();
-			process.WaitForExitSpinning(100, info.ProgressIndicator);
+			process.WaitForExitSpinning(100, progress);
 			lifetime.ThrowIfNotAlive();
 			return new T4ExecutionResultInFile(destinationPath);
 		}
@@ -218,14 +187,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return process;
 		}
 
-		[NotNull]
-		private static FileSystemPath CreateTemporaryExecutable(Lifetime lifetime)
-		{
-			var directory = FileSystemDefinition.CreateTemporaryDirectory();
-			return FileSystemDefinition.CreateTemporaryFile(lifetime, directory, DefaultExecutableExtensionWithDot);
-		}
-
-		public bool CanExecute(IT4File file)
+		public bool CanCompile(IT4File file)
 		{
 			var sourceFile = file.GetSourceFile();
 			var cSharpFile = sourceFile?.GetPsiFiles(CSharpLanguage.Instance).SingleOrDefault();

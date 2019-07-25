@@ -17,20 +17,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		public IT4File File { get; }
 
-		[CanBeNull]
-		public IProgressIndicator ProgressIndicator { get; }
-
 		public T4TemplateExecutionManagerInfo(
 			[NotNull] string code,
 			[NotNull, ItemNotNull] IEnumerable<MetadataReference> references,
-			[NotNull] IT4File file,
-			[CanBeNull] IProgressIndicator progressIndicator
+			[NotNull] IT4File file
 		)
 		{
 			Code = code;
 			References = references;
 			File = file;
-			ProgressIndicator = progressIndicator;
 		}
 	}
 }

@@ -37,6 +37,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Solution = solution;
 		}
 
+		public FileSystemPath GetTemporaryExecutableLocation(IT4File file)
+		{
+			var projectFile = file.GetSourceFile().ToProjectFile();
+			var project = projectFile?.GetProject();
+			if (project == null) return FileSystemPath.Empty;
+			var relativePath = projectFile.Location.MakeRelativeTo(project.Location.Parent);
+			var ttLocation = project.GetIntermediateDirectory(project.GetCurrentTargetFrameworkId())
+				.Combine("TextTemplating")
+				.Combine(relativePath);
+			return ttLocation.Parent.Combine(ttLocation.Name.WithoutExtension()).Combine("GeneratedTransformation.exe");
+		}
+
 		public string GetTargetFileName(IT4File file, string targetExtension = null)
 		{
 			Locks.AssertReadAccessAllowed();
