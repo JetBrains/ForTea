@@ -141,6 +141,15 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			_directiveInfoManager = directiveInfoManager;
 		}
 
+		protected override void AnalyzeFile(IT4File file)
+		{
+			var outputDirective = file.GetDirectives().FirstOrDefault(directive =>
+				directive.IsSpecificDirective(_directiveInfoManager.Output));
+			if (outputDirective?.GetAttribute(_directiveInfoManager.Output.ExtensionAttribute.Name) == null)
+			{
+				// TODO: show notification
+			}
+		}
 	}
 
 }
