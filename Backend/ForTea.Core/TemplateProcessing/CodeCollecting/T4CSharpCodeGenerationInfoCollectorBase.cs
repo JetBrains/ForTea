@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Parsing.Builders;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -9,10 +7,7 @@ using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
-using JetBrains.Diagnostics;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -63,25 +58,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			if (!(element is IT4Include include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			var target = include.Path.Resolve();
-			if (target == null)
+			if (!include.Path.ResolvePath().ExistsFile)
 			{
 				Interrupter.InterruptAfterProblem();
 				return;
 			}
-
-			if (target.LanguageType.Is<T4ProjectFileType>())
-				target.GetPrimaryPsiFile()?.ProcessDescendants(this);
-			else BuildT4Tree(target).ProcessDescendants(this);
-		}
-
-		private IT4File BuildT4Tree(IPsiSourceFile target)
-		{
-			var languageService = T4Language.Instance.LanguageService();
-			Assertion.AssertNotNull(languageService, "languageService != null");
-			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			var environment = File.GetSolution().GetComponent<IT4Environment>();
-			return new T4TreeBuilder(environment, Manager, lexer, target).CreateT4Tree();
+			
+			include.Path.ResolveT4File()?.ProcessDescendants(this);
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)

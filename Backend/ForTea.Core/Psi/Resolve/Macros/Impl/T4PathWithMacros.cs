@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using GammaJul.ForTea.Core.Parsing.Builders;
+using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Modules;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Collections;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
@@ -20,7 +24,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
 		private string RawPath { get; }
-		
+
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
 
@@ -29,7 +33,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		[NotNull]
 		private IT4Environment Environment { get; }
-		
+
+		[NotNull]
+		private T4DirectiveInfoManager Manager { get; }
+
 		[NotNull]
 		private ISolution Solution { get; }
 
@@ -43,6 +50,24 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
+			Manager = Solution.GetComponent<T4DirectiveInfoManager>();
+		}
+
+		public IT4File ResolveT4File()
+		{
+			var target = Resolve();
+			if (target == null) return null;
+			if (target.LanguageType.Is<T4ProjectFileType>())
+				return (IT4File) target.GetPrimaryPsiFile();
+			return BuildT4Tree(target);
+		}
+
+		private IT4File BuildT4Tree(IPsiSourceFile target)
+		{
+			var languageService = T4Language.Instance.LanguageService();
+			Assertion.AssertNotNull(languageService, "languageService != null");
+			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			return new T4TreeBuilder(Environment, Manager, lexer, target).CreateT4Tree();
 		}
 
 		public IPsiSourceFile Resolve() => ResolvePath().FindSourceFileInSolution(Solution);
