@@ -26,22 +26,12 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			FmtSettings<CSharpFormatSettingsKey> settings
 		)
 		{
-			var helper = new T4CSharpIndentHelper(settings.Settings);
-			return IndentHandler(node, indentType, helper);
-		}
-
-		[CanBeNull]
-		private string IndentHandler(ITreeNode node, CustomIndentType indentType, T4CSharpIndentHelper helper)
-		{
 			if (indentType != CustomIndentType.DirectCalculation) return null;
-			bool generated = helper.IsGeneratedMethodMember(node);
-			if (!generated) return "";
 			if (!node.IsPhysical()) return null;
+			if (node.GetT4ContainerFromCSharpNode<IT4CodeBlock>() == null) return "";
 
 			var file = node.GetContainingNode<IFile>(true);
-			var sourceFile = file?.GetSourceFile();
-			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return null;
-
+			if (!IsInT4File(file)) return null;
 			if (node is ITokenNode tokenNode
 			    && tokenNode.GetTokenType().IsComment
 			    && tokenNode.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd)
@@ -72,7 +62,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			// find previous statement
 			for (var nd = node.PrevSibling; nd != null; nd = nd.PrevSibling)
 			{
-				if (!helper.IsStatement(nd))
+				if (!(nd is IStatement))
 					continue;
 				var token = nd.GetFirstTokenIn();
 				var tmpRange = token.GetDocumentRange();
@@ -99,6 +89,13 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 				return "";
 
 			return null;
+		}
+
+		[ContractAnnotation("null => false")]
+		private static bool IsInT4File([CanBeNull] IFile file)
+		{
+			var sourceFile = file?.GetSourceFile();
+			return sourceFile?.LanguageType.Is<T4ProjectFileType>() == true;
 		}
 
 		private static string HandleComment(IFile file, ITokenNode tokenNode)
