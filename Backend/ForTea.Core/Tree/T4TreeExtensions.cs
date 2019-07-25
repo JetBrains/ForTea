@@ -37,6 +37,7 @@ namespace GammaJul.ForTea.Core.Tree {
 			return new Pair<ITreeNode, string>(valueToken, value);
 		}
 
+		[ContractAnnotation("directive:null => false")]
 		public static bool IsSpecificDirective([CanBeNull] this IT4Directive directive, [CanBeNull] DirectiveInfo directiveInfo)
 			=> directive != null
 			&& directiveInfo != null
