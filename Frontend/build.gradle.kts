@@ -1,3 +1,4 @@
+import com.jetbrains.rd.generator.gradle.RdgenParams
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
@@ -7,10 +8,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
   repositories {
+    maven { setUrl("https://www.myget.org/F/rd-snapshots/maven/") }
     maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
     mavenCentral()
   }
   dependencies {
+    classpath("com.jetbrains.rd:rd-gen:0.192.36")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.31")
   }
 }
@@ -22,6 +25,7 @@ plugins {
 
 apply {
   plugin("kotlin")
+  plugin("com.jetbrains.rdgen")
   plugin("org.jetbrains.grammarkit")
 }
 
@@ -100,6 +104,40 @@ fun File.writeTextIfChanged(content: String) {
   if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
     println("Writing $path")
     writeBytes(bytes)
+  }
+}
+
+configure<RdgenParams> {
+  val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Protocol")
+  val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/protocol")
+
+  verbose = true
+  hashFolder = "build/rdgen"
+  logger.info("Configuring rdgen params")
+  classpath({
+    logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
+    val sdkPath = intellij.ideaDependency.classes
+    val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
+
+    "$rdLibDirectory/rider-model.jar"
+  })
+  sources(File(repoRoot, "Frontend/protocol"))
+  packages = "model"
+
+  generator {
+    language = "kotlin"
+    transform = "asis"
+    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+    namespace = "com.jetbrains.rider.model"
+    directory = "$ktOutput"
+  }
+
+  generator {
+    language = "csharp"
+    transform = "reversed"
+    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+    namespace = "JetBrains.Rider.Model"
+    directory = "$csOutput"
   }
 }
 
@@ -197,7 +235,7 @@ tasks {
 
   create("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("writeNuGetConfig", "writeRiderSdkVersionProps")
+    dependsOn("rdgen", "writeNuGetConfig", "writeRiderSdkVersionProps")
     doLast {
       exec {
         executable = "dotnet"
