@@ -24,6 +24,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 				case T4FeatureBlock _:
 					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
+				case T4ExpressionBlock _:
+					Die();
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4Token _: return this;
 				default:
 					Interrupter.InterruptAfterProblem();
