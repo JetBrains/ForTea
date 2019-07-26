@@ -21,9 +21,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			IT4ElementAppendFormatProvider provider
 		)
 		{
-			provider.AppendCompilationOffset(destination, GetOffset(Source));
 			destination.Append(provider.Indent);
 			destination.AppendLine(GetLineDirectiveText(Source));
+			provider.AppendCompilationOffset(destination, GetOffset(Source));
 			destination.Append(provider.CodeCommentStart);
 			if (IsVisible) destination.AppendMapped(Source);
 			else destination.Append(Source.GetText());
