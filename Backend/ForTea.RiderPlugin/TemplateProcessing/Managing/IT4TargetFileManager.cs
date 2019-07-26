@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
@@ -16,5 +17,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 			IT4ExecutionResult result,
 			[NotNull] IT4File file,
 			[CanBeNull] string targetExtension = null);
+
+		IProjectFile GetDestinationFile([NotNull] IT4File file, [CanBeNull] string targetExtension = null);
 	}
 }

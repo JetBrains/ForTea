@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.Tree;
@@ -149,6 +150,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			if (sourceFile != null) SyncSymbolCaches(sourceFile);
 			RefreshFiles(destinationLocation);
 			return destinationLocation;
+		}
+
+		public IProjectFile GetDestinationFile(IT4File file, string targetExtension = null)
+		{
+			var projectFile = file.GetSourceFile().ToProjectFile();
+			return projectFile?.ParentFolder?
+				.FindProjectItemsByLocation(projectFile.Location.Parent.Combine(GetTargetFileName(file)))
+				.OfType<IProjectFile>()
+				.SingleOrDefault();
 		}
 
 		protected virtual void SyncDocuments(FileSystemPath destinationLocation)
