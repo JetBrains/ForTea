@@ -86,7 +86,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 					HandleCodeBlock(codeBlock);
 					break;
 				case IT4Token token:
-					AppendRemainingMessage(element);
 					Result.State.ConsumeToken(token);
 					break;
 			}

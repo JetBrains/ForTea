@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			destination.Append(provider.Indent);
 			destination.Append(provider.ExpressionWritingPrefix);
 			destination.Append("\"");
-			destination.Append(Text.Trim());
+			destination.Append(Text);
 			destination.Append("\"");
 			destination.AppendLine(provider.ExpressionWritingSuffix);
 		}
