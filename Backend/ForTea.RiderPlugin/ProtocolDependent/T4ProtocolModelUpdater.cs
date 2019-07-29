@@ -25,8 +25,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolDependent
 		}
 
 		public void UpdateFileInfo(IT4File file) =>
-			Model.ExecutableConfigurations[file.GetSourceFile().GetLocation().FullPath.Replace("\\", "/")] =
-				new T4DotnetExeConfiguration(
+			Model.Configurations[file.GetSourceFile().GetLocation().FullPath.Replace("\\", "/")] =
+				new T4ConfigurationModel(
 					Manager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),
 					Manager.GetTargetFileName(file)
 				);

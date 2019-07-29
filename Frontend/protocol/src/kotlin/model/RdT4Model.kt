@@ -6,12 +6,12 @@ import com.jetbrains.rd.generator.nova.PredefinedType.*
 
 @Suppress("unused")
 object T4ProtocolModel : Ext(SolutionModel.Solution) {
-  val T4DotnetExeConfiguration = structdef {
+  val T4ConfigurationModel = structdef {
     field("executablePath", string)
     field("outputName", string)
   }
 
   init {
-    map("executableConfigurations", string, T4DotnetExeConfiguration).async
+    map("configurations", string, T4ConfigurationModel).async
   }
 }
