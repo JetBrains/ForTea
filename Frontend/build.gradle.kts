@@ -127,7 +127,7 @@ configure<RdgenParams> {
 
     "$rdLibDirectory/rider-model.jar"
   })
-  sources(File(repoRoot, "Frontend/protocol/src/kotlin/model"))
+  sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
   packages = "model"
 
   generator {

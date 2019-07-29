@@ -13,5 +13,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
 
   init {
     map("configurations", string, T4ConfigurationModel).async
+    // Returns whether or not compilation succeeded
+    call("requestCompilation", string, bool).async
   }
 }
