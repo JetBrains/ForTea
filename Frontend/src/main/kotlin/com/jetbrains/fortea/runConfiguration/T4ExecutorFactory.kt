@@ -12,8 +12,7 @@ import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.util.idea.getComponent
 import com.jetbrains.rider.util.idea.getLogger
 
-class T4ExecutorFactory(project: Project, private val parameters: T4ConfigurationParameters) :
-  IExecutorFactory {
+class T4ExecutorFactory(project: Project, private val parameters: T4ConfigurationParameters) : IExecutorFactory {
 
   private val logger = getLogger<T4ExecutorFactory>()
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()

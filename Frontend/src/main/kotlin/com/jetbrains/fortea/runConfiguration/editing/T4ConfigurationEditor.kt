@@ -60,8 +60,12 @@ class T4ConfigurationEditor(private val project: Project) : SettingsEditor<T4Con
     viewModel = T4ConfigurationViewModel(
       lifetime,
       PathSelector("Exe path:", FileChooserDescriptor(
-        true, false, false,
-        false, false, false
+        true,
+        false,
+        false,
+        false,
+        false,
+        false
       ).withFileFilter { file ->
         Comparing.equal(file.extension, "exe", SystemInfo.isFileSystemCaseSensitive)
           || Comparing.equal(file.extension, "dll", SystemInfo.isFileSystemCaseSensitive)
