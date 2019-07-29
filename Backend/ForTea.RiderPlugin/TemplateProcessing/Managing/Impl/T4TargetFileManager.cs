@@ -20,6 +20,8 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
+	/// Note that this component is overridden in
+	/// <see cref="JetBrains.ForTea.RiderPlugin.ProtocolAware.T4TargetFileManager">protocol</see> namespace 
 	[SolutionComponent]
 	public class T4TargetFileManager : IT4TargetFileManager
 	{

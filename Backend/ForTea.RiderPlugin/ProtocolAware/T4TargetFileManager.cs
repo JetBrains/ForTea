@@ -7,10 +7,10 @@ using JetBrains.ReSharper.Host.Features.Documents;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 
-namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl.Features
+namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
 	[SolutionComponent]
-	public sealed class T4TargetFileManager : Impl.T4TargetFileManager
+	public sealed class T4TargetFileManager : TemplateProcessing.Managing.Impl.T4TargetFileManager
 	{
 		[NotNull]
 		private DocumentHost Host { get; }
@@ -19,10 +19,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl.Features
 			[NotNull] T4DirectiveInfoManager manager,
 			[NotNull] ISolution solution,
 			[NotNull] DocumentHost host
-		) : base(manager, solution)
-		{
-			Host = host;
-		}
+		) : base(manager, solution) => Host = host;
 
 		protected override void SyncDocuments(FileSystemPath destinationLocation) =>
 			Host.SyncDocumentsWithFiles(destinationLocation);

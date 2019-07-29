@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.ProtocolDependent;
+using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;

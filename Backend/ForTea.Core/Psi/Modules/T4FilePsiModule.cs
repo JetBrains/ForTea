@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.ProtocolDependent;
+using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;

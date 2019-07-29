@@ -1,5 +1,5 @@
 using System.Linq;
-using GammaJul.ForTea.Core.ProtocolDependent;
+using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -12,10 +12,10 @@ using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 
-namespace JetBrains.ForTea.RiderPlugin.ProtocolDependent
+namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
 	[SolutionComponent]
-	public class T4ProtocolModelUpdater : IT4ProtocolModelUpdater
+	public sealed class T4ProtocolModelUpdater : GammaJul.ForTea.Core.ProtocolAware.Impl.T4ProtocolModelUpdater
 	{
 		[NotNull]
 		private T4ProtocolModel Model { get; }
@@ -34,7 +34,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolDependent
 			Model.RequestCompilation.Set(Compile);
 		}
 
-		public void UpdateFileInfo(IT4File file) =>
+		public override void UpdateFileInfo(IT4File file) =>
 			Model.Configurations[file.GetSourceFile().GetLocation().FullPath.Replace("\\", "/")] =
 				new T4ConfigurationModel(
 					Manager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),

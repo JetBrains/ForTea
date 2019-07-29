@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.ProtocolDependent;
+using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
