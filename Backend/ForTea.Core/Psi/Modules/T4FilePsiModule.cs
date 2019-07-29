@@ -222,7 +222,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator, [NotNull] IT4ProtocolModelUpdater updater) : base(
+			[NotNull] PsiProjectFileTypeCoordinator coordinator, [NotNull] IT4ProtocolModelManager manager) : base(
 			file.GetProject().NotNull(),
 			file.Location.TryMakeRelativeTo(file.GetProject().NotNull().Location).FullPath,
 			coordinator,
@@ -260,7 +260,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			AddBaseReferences();
 
 			if (!(File.ToSourceFile()?.GetPrimaryPsiFile() is IT4File primaryPsiFile)) return;
-			updater.UpdateFileInfo(primaryPsiFile);
+			manager.UpdateFileInfo(primaryPsiFile);
 		}
 	}
 }

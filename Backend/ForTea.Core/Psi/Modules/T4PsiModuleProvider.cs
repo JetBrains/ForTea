@@ -23,7 +23,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 	/// </summary>
 	internal sealed class T4PsiModuleProvider : IDisposable {
 		[NotNull]
-		private IT4ProtocolModelUpdater Updater { get; }
+		private IT4ProtocolModelManager Manager { get; }
 
 		[NotNull] private readonly Dictionary<IProjectFile, ModuleWrapper> _modules = new Dictionary<IProjectFile, ModuleWrapper>();
 		private readonly Lifetime _lifetime;
@@ -143,7 +143,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_t4Environment,
 				_resolver,
 				_coordinator,
-				Updater
+				Manager
 			);
 			_modules[projectFile] = new ModuleWrapper(psiModule, lifetimeDefinition);
 			changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added);
@@ -196,7 +196,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
-			[NotNull] IT4ProtocolModelUpdater updater)
+			[NotNull] IT4ProtocolModelManager manager)
 		{
 			_lifetime = lifetime;
 			_shellLocks = shellLocks;
@@ -204,7 +204,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 			_coordinator = coordinator;
-			Updater = updater;
+			Manager = manager;
 		}
 
 	}

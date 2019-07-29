@@ -14,7 +14,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 	[SolutionComponent]
 	class T4ProjectPsiModuleProviderFilter : IProjectPsiModuleProviderFilter {
 		[NotNull]
-		public IT4ProtocolModelUpdater Updater { get; }
+		public IT4ProtocolModelManager Manager { get; }
 
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IT4Environment _t4Environment;
@@ -34,7 +34,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				project,
 				_resolver,
 				_coordinator,
-				Updater
+				Manager
 			);
 			return new Tuple<IProjectPsiModuleHandler, IPsiModuleDecorator>(t4ModuleHandler, null);
 		}
@@ -44,12 +44,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
-			[NotNull] IT4ProtocolModelUpdater updater) {
+			[NotNull] IT4ProtocolModelManager manager) {
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 			_coordinator = coordinator;
-			Updater = updater;
+			Manager = manager;
 		}
 
 	}

@@ -1,5 +1,4 @@
 using System.Linq;
-using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -15,7 +14,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
 	[SolutionComponent]
-	public sealed class T4ProtocolModelUpdater : GammaJul.ForTea.Core.ProtocolAware.Impl.T4ProtocolModelUpdater
+	public sealed class T4ProtocolModelManager : GammaJul.ForTea.Core.ProtocolAware.Impl.T4ProtocolModelManager
 	{
 		[NotNull]
 		private T4ProtocolModel Model { get; }
@@ -26,7 +25,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		[NotNull]
 		private IT4TargetFileManager Manager { get; }
 
-		public T4ProtocolModelUpdater([NotNull] ISolution solution, [NotNull] IT4TargetFileManager manager)
+		public T4ProtocolModelManager([NotNull] ISolution solution, [NotNull] IT4TargetFileManager manager)
 		{
 			Solution = solution;
 			Manager = manager;

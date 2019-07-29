@@ -4,7 +4,7 @@ using JetBrains.ProjectModel;
 namespace GammaJul.ForTea.Core.ProtocolAware.Impl
 {
 	[SolutionComponent]
-	public class T4ProtocolModelUpdater : IT4ProtocolModelUpdater
+	public class T4ProtocolModelManager : IT4ProtocolModelManager
 	{
 		public virtual void UpdateFileInfo(IT4File file)
 		{
