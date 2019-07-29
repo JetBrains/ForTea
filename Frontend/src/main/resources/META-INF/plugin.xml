@@ -61,7 +61,7 @@
     <lang.altEnter
         language="T4"
         implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperBulbMenuModelFactory"/>
+    <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
-    <!-- <lineIndentProvider implementation="com.jetbrains.rider.editorActions.XamlDummyLineIndentProvider"/>-->
   </extensions>
 </idea-plugin>
