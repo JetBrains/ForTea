@@ -24,8 +24,10 @@
         language="T4"
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
-    <!-- delegation to backend -->
+    <!-- template execution -->
     <runConfigurationProducer implementation="com.jetbrains.fortea.runConfiguration.T4RunConfigurationProducer"/>
+    <configurationType implementation="com.jetbrains.fortea.runConfiguration.T4ConfigurationType" />
+    <!-- delegation to backend -->
     <rider.debuggerSupportPolicy
         language="T4"
         implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy"/>
