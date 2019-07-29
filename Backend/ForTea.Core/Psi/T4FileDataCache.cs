@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.ProtocolDependent;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -14,6 +15,8 @@ namespace GammaJul.ForTea.Core.Psi {
 	/// <summary>Cache holding <see cref="T4FileData"/> for each T4 file.</summary>
 	[PsiComponent]
 	public sealed class T4FileDataCache {
+		[NotNull]
+		private IT4ProtocolModelUpdater Updater { get; }
 
 		[NotNull] private readonly WeakToStrongDictionary<IPsiSourceFile, T4FileData> _fileDataBySourceFile = new WeakToStrongDictionary<IPsiSourceFile, T4FileData>();
 		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
@@ -51,14 +54,24 @@ namespace GammaJul.ForTea.Core.Psi {
 			T4FileDataDiff diff = newData.DiffWith(existingData);
 			if (diff != null)
 				FileDataChanged.Fire(Pair.Of(sourceFile, diff));
+			
+			Updater.UpdateFileInfo(t4File);
 		}
 
 		/// <summary>Initializes a new instance of the <see cref="T4FileDataCache"/> class.</summary>
 		/// <param name="lifetime">The lifetime of this class.</param>
 		/// <param name="psiFiles">The PSI manager.</param>
 		/// <param name="directiveInfoManager">An instance of <see cref="T4DirectiveInfoManager"/>.</param>
-		public T4FileDataCache(Lifetime lifetime, [NotNull] PsiFiles psiFiles, [NotNull] T4DirectiveInfoManager directiveInfoManager) {
+		/// <param name="updater">The class that updates </param>
+		public T4FileDataCache(
+			Lifetime lifetime,
+			[NotNull] PsiFiles psiFiles,
+			[NotNull] T4DirectiveInfoManager directiveInfoManager,
+			[NotNull] IT4ProtocolModelUpdater updater
+		)
+		{
 			_directiveInfoManager = directiveInfoManager;
+			Updater = updater;
 			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4FileDataDiff>>(lifetime, "T4FileDataCache.FileDataChanged");
 
 			lifetime.Bracket(

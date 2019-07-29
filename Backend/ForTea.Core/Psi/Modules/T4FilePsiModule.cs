@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.ProtocolDependent;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
@@ -14,6 +16,7 @@ using JetBrains.ProjectModel.Build;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Web.Impl.PsiModules;
@@ -22,7 +25,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Psi.Modules {
 
 	/// <summary>PSI module managing a single T4 file.</summary>
-	internal sealed class T4FilePsiModule : ProjectPsiModuleBase, IT4FilePsiModule
+	public class T4FilePsiModule : ProjectPsiModuleBase, IT4FilePsiModule
 	{
 		private readonly Lifetime _lifetime;
 		[NotNull] private readonly T4AssemblyReferenceManager _assemblyReferenceManager;
@@ -219,8 +222,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator
-		) : base(
+			[NotNull] PsiProjectFileTypeCoordinator coordinator, [NotNull] IT4ProtocolModelUpdater updater) : base(
 			file.GetProject().NotNull(),
 			file.Location.TryMakeRelativeTo(file.GetProject().NotNull().Location).FullPath,
 			coordinator,
@@ -256,6 +258,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 			solution.GetComponent<T4FileDataCache>().FileDataChanged.Advise(lifetime, OnDataFileChanged);
 			AddBaseReferences();
+
+			if (!(File.ToSourceFile()?.GetPrimaryPsiFile() is IT4File primaryPsiFile)) return;
+			updater.UpdateFileInfo(primaryPsiFile);
 		}
 	}
 }

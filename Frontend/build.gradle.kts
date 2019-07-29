@@ -8,13 +8,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
   repositories {
-    maven { setUrl("https://www.myget.org/F/rd-snapshots/maven/") }
+    maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
     maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
     mavenCentral()
   }
   dependencies {
     classpath("com.jetbrains.rd:rd-gen:0.192.36")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.31")
+    classpath("org.jetbrains.kotlin:kotlin-reflect:1.3")
   }
 }
 
@@ -32,6 +33,11 @@ apply {
 repositories {
   mavenCentral()
   maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
+}
+
+dependencies {
+  implementation(kotlin("stdlib"))
+  implementation(kotlin("reflect"))
 }
 
 java {
@@ -121,7 +127,7 @@ configure<RdgenParams> {
 
     "$rdLibDirectory/rider-model.jar"
   })
-  sources(File(repoRoot, "Frontend/protocol"))
+  sources(File(repoRoot, "Frontend/protocol/src/kotlin/model"))
   packages = "model"
 
   generator {

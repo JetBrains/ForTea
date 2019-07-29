@@ -12,6 +12,6 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   }
 
   init {
-    map("executableConfigurations", string, T4DotnetExeConfiguration)
+    map("executableConfigurations", string, T4DotnetExeConfiguration).async
   }
 }
