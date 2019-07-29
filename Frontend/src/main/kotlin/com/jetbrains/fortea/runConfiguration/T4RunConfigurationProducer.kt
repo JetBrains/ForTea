@@ -7,6 +7,7 @@ import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.intellij.util.PathUtil
 import com.jetbrains.fortea.psi.T4PsiFile
+import com.jetbrains.fortea.runConfiguration.task.CompileT4BeforeRunTask
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution
 
@@ -33,7 +34,7 @@ class T4RunConfigurationProducer : RunConfigurationProducer<T4Configuration>(
     configuration.parameters.useMonoRuntime = false
     configuration.parameters.envs = emptyMap()
     configuration.parameters.workingDirectory = PathUtil.getParentPath(path)
-    configuration.beforeRunTasks = emptyList()
+    configuration.parameters.initialFilePath = path
 
     return true
   }

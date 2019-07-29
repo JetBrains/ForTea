@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi {
 	
-	internal static class PsiExtensions {
+	public static class PsiExtensions {
 
 		[CanBeNull]
 		public static IPsiSourceFile FindSourceFileInSolution([CanBeNull] this FileSystemPath includePath, [CanBeNull] ISolution solution) {

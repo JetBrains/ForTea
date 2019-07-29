@@ -35,6 +35,7 @@ class T4ConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(typ
     useMonoRuntime = false,
     executeAsIs = false,
     assemblyToDebug = null,
-    runtimeArguments = ""
+    runtimeArguments = "",
+    initialFilePath = ""
   )
 }
