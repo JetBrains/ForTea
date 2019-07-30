@@ -19,7 +19,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 			File = file ?? throw new ArgumentNullException(nameof(file));
 
 		[NotNull]
-		public T4CSharpCodeGenerationResult Generate()
+		public T4CSharpCodeGenerationResult Generate() =>
+			CreateConverter(Collector.Collect()).Convert();
+
+		public T4CSharpCodeGenerationResult GenerateSafe()
 		{
 			try
 			{

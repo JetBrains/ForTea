@@ -60,25 +60,28 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		public bool Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress)
 		{
-			var info = GenerateCode(file);
-			if (progress != null) progress.CurrentItemText = "Compiling code";
-			var executablePath = Manager.GetTemporaryExecutableLocation(file);
-			var compilation = CreateCompilation(info, executablePath);
-			var errors = compilation
-				.GetDiagnostics(lifetime)
-				.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-				.ToList();
-			if (!errors.IsEmpty())
+			try
 			{
-				MessageBox.ShowError(errors.Select(error => error.ToString()).Join("\n"), "Could not compile template");
+				var info = GenerateCode(file);
+				if (progress != null) progress.CurrentItemText = "Compiling code";
+				var executablePath = Manager.GetTemporaryExecutableLocation(file);
+				var compilation = CreateCompilation(info, executablePath);
+				var errors = compilation
+					.GetDiagnostics(lifetime)
+					.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
+					.ToList();
+				if (!errors.IsEmpty()) return false;
+
+				executablePath.Parent.CreateDirectory();
+				var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
+				compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: lifetime);
+				CopyAssemblies(info, executablePath);
+				return true;
+			}
+			catch (T4OutputGenerationException)
+			{
 				return false;
 			}
-
-			executablePath.Parent.CreateDirectory();
-			var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
-			compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: lifetime);
-			CopyAssemblies(info, executablePath);
-			return true;
 		}
 
 		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file)

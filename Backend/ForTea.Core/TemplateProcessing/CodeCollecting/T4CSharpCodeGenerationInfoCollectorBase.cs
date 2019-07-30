@@ -70,7 +70,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (resolved == null)
 			{
 				Interrupter.InterruptAfterProblem();
-				Guard.StartProcessing(include.Path.Resolve().NotNull());
 				return;
 			}
 
@@ -82,10 +81,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			switch (element)
 			{
-				case IT4Include _:
+				case IT4Include include:
 					string suffix = Result.State.ProduceBeforeEof();
 					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
-					Guard.EndProcessing();
+					if (include.Path.ResolveT4File(Guard) != null) Guard.EndProcessing();
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
 					return; // Do not advance state here
