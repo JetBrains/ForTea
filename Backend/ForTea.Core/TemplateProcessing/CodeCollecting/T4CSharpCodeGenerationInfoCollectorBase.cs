@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -21,6 +23,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		[NotNull]
 		private T4DirectiveInfoManager Manager { get; }
+
+		[NotNull]
+		private T4IncludeRecursionGuard Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
@@ -38,6 +43,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
+			Guard = new T4IncludeRecursionGuard();
 			Manager = manager;
 		}
 
@@ -45,9 +51,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public T4CSharpCodeGenerationIntermediateResult Collect()
 		{
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+			Guard.StartProcessing(File.GetSourceFile().NotNull());
 			File.ProcessDescendants(this);
 			string suffix = Result.State.ProduceBeforeEof();
 			if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+			Guard.EndProcessing();
 			return Results.Pop();
 		}
 
@@ -58,13 +66,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			if (!(element is IT4Include include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			if (!include.Path.ResolvePath().ExistsFile)
+			var resolved = include.Path.ResolveT4File(Guard);
+			if (resolved == null)
 			{
 				Interrupter.InterruptAfterProblem();
+				Guard.StartProcessing(include.Path.Resolve().NotNull());
 				return;
 			}
 
-			include.Path.ResolveT4File()?.ProcessDescendants(this);
+			Guard.StartProcessing(include.Path.Resolve().NotNull());
+			resolved.ProcessDescendants(this);
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)
@@ -74,6 +85,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				case IT4Include _:
 					string suffix = Result.State.ProduceBeforeEof();
 					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+					Guard.EndProcessing();
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
 					return; // Do not advance state here

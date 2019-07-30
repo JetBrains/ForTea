@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 
@@ -34,7 +35,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public void Execute(Action<DaemonStageResult> committer)
 		{
-			var visitor = new T4IncludeAwareDaemonProcessVisitor(Manager);
+			var visitor = new T4IncludeAwareDaemonProcessVisitor(Manager, File.GetSourceFile().NotNull());
 			File.ProcessDescendants(visitor);
 			committer(new DaemonStageResult(visitor.Highlightings.ToArray()));
 		}

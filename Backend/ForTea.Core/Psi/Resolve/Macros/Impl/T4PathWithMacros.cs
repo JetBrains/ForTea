@@ -53,10 +53,12 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Manager = Solution.GetComponent<T4DirectiveInfoManager>();
 		}
 
-		public IT4File ResolveT4File()
+		public IT4File ResolveT4File(T4IncludeRecursionGuard guard)
 		{
+			if (!ResolvePath().ExistsFile) return null;
 			var target = Resolve();
 			if (target == null) return null;
+			if (!guard.CanProcess(target)) return null;
 			if (target.LanguageType.Is<T4ProjectFileType>())
 				return (IT4File) target.GetPrimaryPsiFile();
 			return BuildT4Tree(target);
