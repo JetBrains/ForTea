@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -41,16 +40,14 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator,
-			[NotNull] IT4ProtocolModelManager manager
+			[NotNull] PsiProjectFileTypeCoordinator coordinator
 		) => _t4PsiModuleProvider = new T4PsiModuleProvider(
 			lifetime,
 			shellLocks,
 			changeManager,
 			t4Environment,
 			resolver,
-			coordinator,
-			manager
+			coordinator
 		);
 	}
 }

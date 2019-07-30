@@ -15,5 +15,6 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     map("configurations", string, T4ConfigurationModel).async
     // Returns whether or not compilation succeeded
     call("requestCompilation", string, bool).async
+    call("transferResults", string, void).async
   }
 }

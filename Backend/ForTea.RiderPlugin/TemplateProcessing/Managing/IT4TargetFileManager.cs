@@ -13,6 +13,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 		FileSystemPath GetTemporaryExecutableLocation([NotNull] IT4File file);
 
 		[NotNull]
+		FileSystemPath GetTemporaryTargetFileLocation([NotNull] IT4File file);
+
+		[NotNull]
 		FileSystemPath SaveResults(
 			IT4ExecutionResult result,
 			[NotNull] IT4File file,

@@ -52,6 +52,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return ttLocation.Parent.Combine(ttLocation.Name.WithoutExtension()).Combine("GeneratedTransformation.exe");
 		}
 
+		public FileSystemPath GetTemporaryTargetFileLocation(IT4File file) =>
+			GetTemporaryExecutableLocation(file).Parent.Combine(GetTargetFileName(file));
+
 		public string GetTargetFileName(IT4File file, string targetExtension = null)
 		{
 			Locks.AssertReadAccessAllowed();

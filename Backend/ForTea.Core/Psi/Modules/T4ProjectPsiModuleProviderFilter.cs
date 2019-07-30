@@ -1,5 +1,4 @@
 using System;
-using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -13,9 +12,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 	/// <summary>Provides a <see cref="T4ProjectPsiModuleHandler"/> for a given project.</summary>
 	[SolutionComponent]
 	class T4ProjectPsiModuleProviderFilter : IProjectPsiModuleProviderFilter {
-		[NotNull]
-		public IT4ProtocolModelManager Manager { get; }
-
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IT4Environment _t4Environment;
 		[NotNull] private readonly IT4MacroResolver _resolver;
@@ -33,8 +29,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_t4Environment,
 				project,
 				_resolver,
-				_coordinator,
-				Manager
+				_coordinator
 			);
 			return new Tuple<IProjectPsiModuleHandler, IPsiModuleDecorator>(t4ModuleHandler, null);
 		}
@@ -43,13 +38,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator,
-			[NotNull] IT4ProtocolModelManager manager) {
+			[NotNull] PsiProjectFileTypeCoordinator coordinator
+		) {
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 			_coordinator = coordinator;
-			Manager = manager;
 		}
 
 	}
