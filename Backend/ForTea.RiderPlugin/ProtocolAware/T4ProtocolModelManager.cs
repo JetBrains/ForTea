@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Core;
+using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.ProjectModel;
@@ -109,8 +110,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		[CanBeNull]
 		private Unit CopyResults([NotNull] IT4File file)
 		{
-			TargetFileManager.SaveResults(
-				new T4ExecutionResultInFile(TargetFileManager.GetTemporaryTargetFileLocation(file)), file);
+			var temporaryTargetFileLocation = TargetFileManager.GetTemporaryTargetFileLocation(file);
+			Assertion.Assert(temporaryTargetFileLocation.ExistsFile, "temporaryTargetFileLocation.ExistsFile");
+			TargetFileManager.SaveResults(new T4ExecutionResultInFile(temporaryTargetFileLocation), file);
 			return Unit.Instance;
 		}
 

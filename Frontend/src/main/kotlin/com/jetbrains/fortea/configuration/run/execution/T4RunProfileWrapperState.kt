@@ -1,5 +1,6 @@
 package com.jetbrains.fortea.configuration.run.execution
 
+import com.intellij.execution.DefaultExecutionResult
 import com.intellij.execution.ExecutionResult
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.RunProfileState
@@ -13,8 +14,9 @@ class T4RunProfileWrapperState(
   private val parameters: T4RunConfigurationParameters
 ) : RunProfileState {
   override fun execute(executor: Executor?, runner: ProgramRunner<*>): ExecutionResult? {
-    val result = wrappee.execute(executor, runner)
-    model.transferResults.start(parameters.initialFilePath)
+    val result: ExecutionResult? = wrappee.execute(executor, runner)
+    if (result !is DefaultExecutionResult) return result
+    result.processHandler.addProcessListener(T4PostProcessorProcessListener(model, parameters))
     return result
   }
 }

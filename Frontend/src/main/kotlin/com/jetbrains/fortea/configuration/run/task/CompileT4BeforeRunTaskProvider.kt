@@ -46,7 +46,7 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
       }
     }
 
-    finished.waitFor(10000L)
+    finished.waitFor()
     return result
   }
 
