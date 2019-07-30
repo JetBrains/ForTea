@@ -13,7 +13,12 @@ import com.jetbrains.rider.projectView.solution
 class T4RunConfigurationProducer : RunConfigurationProducer<T4RunConfiguration>(
   ConfigurationTypeUtil.findConfigurationType(T4RunConfigurationType::class.java)
 ) {
-  override fun isConfigurationFromContext(configuration: T4RunConfiguration, context: ConfigurationContext) = true
+  override fun isConfigurationFromContext(configuration: T4RunConfiguration, context: ConfigurationContext): Boolean {
+    val parametersPath = configuration.parameters.initialFilePath
+    val t4File = context.psiLocation?.containingFile as? T4PsiFile ?: return false
+    val t4Path = t4File.virtualFile.path
+    return t4Path == parametersPath
+  }
 
   override fun setupConfigurationFromContext(
     configuration: T4RunConfiguration,

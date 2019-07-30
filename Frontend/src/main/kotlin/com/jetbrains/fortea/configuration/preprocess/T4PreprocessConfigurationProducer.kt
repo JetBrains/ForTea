@@ -13,7 +13,12 @@ class T4PreprocessConfigurationProducer : RunConfigurationProducer<T4PreprocessC
   override fun isConfigurationFromContext(
     configuration: T4PreprocessConfiguration,
     context: ConfigurationContext
-  ) = true
+  ): Boolean {
+    val parametersPath = configuration.parameters.initialFilePath
+    val t4File = context.psiLocation?.containingFile as? T4PsiFile ?: return false
+    val t4Path = t4File.virtualFile.path
+    return t4Path == parametersPath
+  }
 
   override fun setupConfigurationFromContext(
     configuration: T4PreprocessConfiguration,
