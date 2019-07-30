@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.runConfiguration.execution
+package com.jetbrains.fortea.configuration.run.execution
 
 import com.intellij.execution.CantRunException
 import com.intellij.execution.configurations.RunProfileState
@@ -6,7 +6,7 @@ import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
-import com.jetbrains.fortea.runConfiguration.T4ConfigurationParameters
+import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.IExecutorFactory
@@ -15,7 +15,7 @@ import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.util.idea.getComponent
 import com.jetbrains.rider.util.idea.getLogger
 
-class T4ExecutorFactory(project: Project, private val parameters: T4ConfigurationParameters) : IExecutorFactory {
+class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
 
   private val logger = getLogger<T4ExecutorFactory>()
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()

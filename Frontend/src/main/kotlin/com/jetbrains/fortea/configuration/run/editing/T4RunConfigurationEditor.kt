@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.runConfiguration.editing
+package com.jetbrains.fortea.configuration.run.editing
 
 import com.intellij.execution.ExecutionBundle
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
@@ -9,16 +9,16 @@ import com.intellij.openapi.rd.createNestedDisposable
 import com.intellij.openapi.util.Comparing
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.FileUtil
-import com.jetbrains.fortea.runConfiguration.T4Configuration
+import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.lifetime.SequentialLifetimes
 import com.jetbrains.rdclient.protocol.IPermittedModalities
 import com.jetbrains.rider.run.configurations.controls.*
 import javax.swing.JComponent
 
-class T4ConfigurationEditor(private val project: Project) : SettingsEditor<T4Configuration>() {
+class T4RunConfigurationEditor(private val project: Project) : SettingsEditor<T4RunConfiguration>() {
 
-  private lateinit var viewModel: T4ConfigurationViewModel
+  private lateinit var viewModel: T4RunConfigurationViewModel
   private val lifetimeDefinition = Lifetime.Eternal.createNested()
   private val editorLifetime = SequentialLifetimes(lifetimeDefinition.lifetime)
 
@@ -27,7 +27,7 @@ class T4ConfigurationEditor(private val project: Project) : SettingsEditor<T4Con
     super.disposeEditor()
   }
 
-  override fun resetEditorFrom(configuration: T4Configuration) {
+  override fun resetEditorFrom(configuration: T4RunConfiguration) {
     configuration.parameters.apply {
       viewModel.reset(
         exePath,
@@ -42,7 +42,7 @@ class T4ConfigurationEditor(private val project: Project) : SettingsEditor<T4Con
     }
   }
 
-  override fun applyEditorTo(configuration: T4Configuration) {
+  override fun applyEditorTo(configuration: T4RunConfiguration) {
     configuration.parameters.exePath = FileUtil.toSystemIndependentName(viewModel.exePathSelector.path.value)
     configuration.parameters.programParameters =
       FileUtil.toSystemIndependentName(viewModel.programParametersEditor.parametersString.value)
@@ -57,7 +57,7 @@ class T4ConfigurationEditor(private val project: Project) : SettingsEditor<T4Con
 
   override fun createEditor(): JComponent {
     val lifetime = editorLifetime.next()
-    viewModel = T4ConfigurationViewModel(
+    viewModel = T4RunConfigurationViewModel(
       lifetime,
       PathSelector("Exe path:", FileChooserDescriptor(
         true,

@@ -25,9 +25,10 @@
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
     <!-- template execution -->
-    <runConfigurationProducer implementation="com.jetbrains.fortea.runConfiguration.T4RunConfigurationProducer"/>
-    <configurationType implementation="com.jetbrains.fortea.runConfiguration.T4ConfigurationType"/>
-    <stepsBeforeRunProvider implementation="com.jetbrains.fortea.runConfiguration.task.CompileT4BeforeRunTaskProvider"/>
+    <runConfigurationProducer implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationProducer"/>
+    <configurationType implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationType"/>
+    <stepsBeforeRunProvider
+        implementation="com.jetbrains.fortea.configuration.run.task.CompileT4BeforeRunTaskProvider"/>
 
     <!-- delegation to backend -->
     <rider.debuggerSupportPolicy

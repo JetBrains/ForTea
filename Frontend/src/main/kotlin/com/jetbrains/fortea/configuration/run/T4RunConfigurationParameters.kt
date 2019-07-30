@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.runConfiguration
+package com.jetbrains.fortea.configuration.run
 
 import com.intellij.execution.configurations.RuntimeConfigurationError
 import com.intellij.openapi.util.JDOMExternalizerUtil
@@ -8,7 +8,7 @@ import com.jetbrains.rider.runtime.DotNetExecutable
 import org.jdom.Element
 import java.io.File
 
-open class T4ConfigurationParameters(
+open class T4RunConfigurationParameters(
   exePath: String,
   programParameters: String,
   workingDirectory: String,

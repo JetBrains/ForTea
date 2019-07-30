@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.runConfiguration.task
+package com.jetbrains.fortea.configuration.run.task
 
 import com.intellij.execution.BeforeRunTaskProvider
 import com.intellij.execution.configurations.RunConfiguration
@@ -6,7 +6,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.util.concurrency.Semaphore
-import com.jetbrains.fortea.runConfiguration.T4Configuration
+import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.lifetime
@@ -17,7 +17,7 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
   override fun getId(): Key<CompileT4BeforeRunTask> = providerId
 
   override fun createTask(runConfiguration: RunConfiguration): CompileT4BeforeRunTask? {
-    if (runConfiguration !is T4Configuration) return null
+    if (runConfiguration !is T4RunConfiguration) return null
     val task = CompileT4BeforeRunTask()
     task.isEnabled = true
     return task
@@ -29,7 +29,7 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
     env: ExecutionEnvironment,
     task: CompileT4BeforeRunTask
   ): Boolean {
-    if (configuration !is T4Configuration) return false
+    if (configuration !is T4RunConfiguration) return false
 
     val finished = Semaphore()
     finished.down()

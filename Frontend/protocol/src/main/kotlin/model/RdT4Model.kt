@@ -16,5 +16,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     // Returns whether or not compilation succeeded
     call("requestCompilation", string, bool).async
     call("transferResults", string, void).async
+    // returns whether or note preprocessing succeeded
+    call("requestPreprocessing", string, bool)
   }
 }

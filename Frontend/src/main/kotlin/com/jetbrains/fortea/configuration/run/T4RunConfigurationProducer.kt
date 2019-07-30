@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.runConfiguration
+package com.jetbrains.fortea.configuration.run
 
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.RunConfigurationProducer
@@ -10,13 +10,13 @@ import com.jetbrains.fortea.psi.T4PsiFile
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution
 
-class T4RunConfigurationProducer : RunConfigurationProducer<T4Configuration>(
-  ConfigurationTypeUtil.findConfigurationType(T4ConfigurationType::class.java)
+class T4RunConfigurationProducer : RunConfigurationProducer<T4RunConfiguration>(
+  ConfigurationTypeUtil.findConfigurationType(T4RunConfigurationType::class.java)
 ) {
-  override fun isConfigurationFromContext(configuration: T4Configuration, context: ConfigurationContext) = true
+  override fun isConfigurationFromContext(configuration: T4RunConfiguration, context: ConfigurationContext) = true
 
   override fun setupConfigurationFromContext(
-    configuration: T4Configuration,
+    configuration: T4RunConfiguration,
     context: ConfigurationContext,
     sourceElement: Ref<PsiElement>
   ): Boolean {

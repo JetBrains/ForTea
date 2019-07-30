@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.runConfiguration.task
+package com.jetbrains.fortea.configuration.run.task
 
 import com.intellij.execution.BeforeRunTask
 

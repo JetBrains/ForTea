@@ -1,11 +1,11 @@
-package com.jetbrains.fortea.runConfiguration.editing
+package com.jetbrains.fortea.configuration.run.editing
 
 import com.intellij.openapi.util.SystemInfo
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rider.run.configurations.controls.*
 import com.jetbrains.rider.run.configurations.exe.ExeConfigurationViewModel
 
-class T4ConfigurationViewModel(
+class T4RunConfigurationViewModel(
   lifetime: Lifetime,
   exePathSelector: PathSelector,
   programParametersEditor: ProgramParametersEditor,
