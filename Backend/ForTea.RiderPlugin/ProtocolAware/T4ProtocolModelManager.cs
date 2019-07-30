@@ -59,7 +59,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			Model.Configurations[file.GetSourceFile().GetLocation().FullPath.Replace("\\", "/")] =
 				new T4ConfigurationModel(
 					TargetFileManager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),
-					TargetFileManager.GetTargetFileName(file)
+					TargetFileManager.GetTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
 				);
 
 		private Func<string, T> WrapClassFunc<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
