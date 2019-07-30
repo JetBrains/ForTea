@@ -24,11 +24,14 @@
         language="T4"
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
-    <!-- template execution -->
+    <!-- template execution & preprocessing -->
     <runConfigurationProducer implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationProducer"/>
     <configurationType implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationType"/>
     <stepsBeforeRunProvider
         implementation="com.jetbrains.fortea.configuration.run.task.CompileT4BeforeRunTaskProvider"/>
+    <runConfigurationProducer
+        implementation="com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationProducer"/>
+    <configurationType implementation="com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationType"/>
 
     <!-- delegation to backend -->
     <rider.debuggerSupportPolicy

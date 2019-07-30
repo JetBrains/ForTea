@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Core;
@@ -19,6 +21,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 	[SolutionComponent]
 	public sealed class T4ProtocolModelManager : GammaJul.ForTea.Core.ProtocolAware.Impl.T4ProtocolModelManager
 	{
+		[NotNull] private const string PreprocessResultExtension = "cs";
+
 		[NotNull]
 		private ILogger Logger { get; }
 
@@ -27,6 +31,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 
 		[NotNull]
 		private ISolution Solution { get; }
+
+		[NotNull]
+		private T4DirectiveInfoManager DirectiveInfoManager { get; }
 
 		[NotNull]
 		private IT4TemplateExecutionManager ExecutionManager { get; }
@@ -38,13 +45,13 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateExecutionManager executionManager,
-			[NotNull] ILogger logger
-		)
+			[NotNull] ILogger logger, [NotNull] T4DirectiveInfoManager directiveInfoManager)
 		{
 			Solution = solution;
 			TargetFileManager = targetFileManager;
 			ExecutionManager = executionManager;
 			Logger = logger;
+			DirectiveInfoManager = directiveInfoManager;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks();
 		}
@@ -53,6 +60,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		{
 			Model.RequestCompilation.Set(WrapStructFunc(Compile, false));
 			Model.TransferResults.Set(WrapClassFunc(CopyResults, Unit.Instance));
+			Model.RequestPreprocessing.Set(WrapStructFunc(Preprocess, false));
 		}
 
 		public override void UpdateFileInfo(IT4File file) =>
@@ -104,6 +112,17 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			TargetFileManager.SaveResults(
 				new T4ExecutionResultInFile(TargetFileManager.GetTemporaryTargetFileLocation(file)), file);
 			return Unit.Instance;
+		}
+
+		private bool? Preprocess([NotNull] IT4File file)
+		{
+			string message = new T4CSharpCodeGenerator(file, DirectiveInfoManager).Generate().RawText;
+			using (WriteLockCookie.Create())
+			{
+				TargetFileManager.SaveResults(new T4ExecutionResultInString(message), file, PreprocessResultExtension);
+			}
+
+			return true;
 		}
 	}
 }
