@@ -3,10 +3,9 @@ package com.jetbrains.fortea.runConfiguration
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.runConfiguration.editing.T4SettingsEditorGroup
+import com.jetbrains.fortea.runConfiguration.execution.T4ExecutorFactory
 import com.jetbrains.rider.debugger.IRiderDebuggable
 import com.jetbrains.rider.run.configurations.RiderRunConfiguration
-import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
-import com.jetbrains.rider.util.idea.getComponent
 import org.jdom.Element
 
 class T4Configuration(
@@ -19,11 +18,9 @@ class T4Configuration(
   T4ExecutorFactory(project, parameters)
 ), IRiderDebuggable {
 
-  private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
-
   override fun checkConfiguration() {
     super.checkConfiguration()
-    parameters.validate(riderDotNetActiveRuntimeHost)
+    parameters.validate()
   }
 
   override fun readExternal(element: Element) {

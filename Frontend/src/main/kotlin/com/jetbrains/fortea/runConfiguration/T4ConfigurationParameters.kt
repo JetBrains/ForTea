@@ -5,8 +5,8 @@ import com.intellij.openapi.util.JDOMExternalizerUtil
 import com.intellij.util.execution.ParametersListUtil
 import com.jetbrains.rider.run.configurations.exe.ExeConfigurationParameters
 import com.jetbrains.rider.runtime.DotNetExecutable
-import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import org.jdom.Element
+import java.io.File
 
 open class T4ConfigurationParameters(
   exePath: String,
@@ -43,11 +43,9 @@ open class T4ConfigurationParameters(
     executeAsIs
   )
 
-  open fun validate(riderDotNetActiveRuntimeHost: RiderDotNetActiveRuntimeHost) {
-    super.validate()
-
-    if (useMonoRuntime && riderDotNetActiveRuntimeHost.monoRuntime == null)
-      throw RuntimeConfigurationError("Mono runtime not found. Please setup Mono path in settings (File | Settings | Build, Execution, Deployment | Toolset and Build)")
+  override fun validate() {
+    if (File(initialFilePath).exists()) return
+    throw RuntimeConfigurationError("Target file does not exist")
   }
 
   override fun readExternal(element: Element) {

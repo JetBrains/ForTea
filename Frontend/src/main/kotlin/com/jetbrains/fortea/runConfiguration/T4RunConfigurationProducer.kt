@@ -7,7 +7,6 @@ import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.intellij.util.PathUtil
 import com.jetbrains.fortea.psi.T4PsiFile
-import com.jetbrains.fortea.runConfiguration.task.CompileT4BeforeRunTask
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution
 
@@ -23,18 +22,18 @@ class T4RunConfigurationProducer : RunConfigurationProducer<T4Configuration>(
   ): Boolean {
     val t4File = sourceElement.get().containingFile as? T4PsiFile ?: return false
     val model = configuration.project.solution.t4ProtocolModel
-    val path = t4File.virtualFile.path
-    val protocolConfiguration = model.configurations[path] ?: return false
+    val t4Path = t4File.virtualFile.path
+    val protocolConfiguration = model.configurations[t4Path] ?: return false
 
     configuration.name = t4File.name
     configuration.parameters.exePath = protocolConfiguration.executablePath
-    configuration.parameters.programParameters = protocolConfiguration.outputName
+    configuration.parameters.programParameters = protocolConfiguration.outputPath
     configuration.parameters.isPassParentEnvs = false
     configuration.parameters.runtimeArguments = ""
     configuration.parameters.useMonoRuntime = false
     configuration.parameters.envs = emptyMap()
-    configuration.parameters.workingDirectory = PathUtil.getParentPath(path)
-    configuration.parameters.initialFilePath = path
+    configuration.parameters.workingDirectory = PathUtil.getParentPath(t4Path)
+    configuration.parameters.initialFilePath = t4Path
 
     return true
   }

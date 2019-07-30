@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.runConfiguration
+package com.jetbrains.fortea.runConfiguration.execution
 
 import com.intellij.execution.CantRunException
 import com.intellij.execution.configurations.RunProfileState
@@ -6,6 +6,9 @@ import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
+import com.jetbrains.fortea.runConfiguration.T4ConfigurationParameters
+import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
@@ -25,10 +28,12 @@ class T4ExecutorFactory(project: Project, private val parameters: T4Configuratio
       dotNetExecutable.useMonoRuntime
     )
     logger.info("Configuration will be executed on ${runtimeToExecute.javaClass.name}")
-    return when (executorId) {
+    val baseState = when (executorId) {
       DefaultRunExecutor.EXECUTOR_ID -> runtimeToExecute.createRunState(dotNetExecutable, environment)
       DefaultDebugExecutor.EXECUTOR_ID -> runtimeToExecute.createDebugState(dotNetExecutable, environment)
       else -> throw CantRunException("Unsupported executor $executorId")
     }
+    val model = environment.project.solution.t4ProtocolModel
+    return T4RunProfileWrapperState(baseState, model, parameters)
   }
 }

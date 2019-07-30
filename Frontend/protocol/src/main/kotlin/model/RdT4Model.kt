@@ -8,7 +8,7 @@ import com.jetbrains.rd.generator.nova.PredefinedType.*
 object T4ProtocolModel : Ext(SolutionModel.Solution) {
   val T4ConfigurationModel = structdef {
     field("executablePath", string)
-    field("outputName", string)
+    field("outputPath", string)
   }
 
   init {
