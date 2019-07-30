@@ -2,6 +2,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
@@ -11,32 +12,18 @@ using JetBrains.ReSharper.Features.Altering.Resources;
 using JetBrains.ReSharper.Host.Features.ProjectModel.CustomTools;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.UI.Icons;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 {
-	[SolutionComponent]
+	[ShellComponent]
 	public class T4InternalGenerator : ISingleFileCustomTool
 	{
 		private Lifetime Lifetime { get; }
 		
-		[NotNull]
-		private IT4TemplateExecutionManager ExecutionManager { get; }
-
-		[NotNull]
-		private IT4TargetFileManager TargetManager { get; }
-
-		public T4InternalGenerator(
-			Lifetime lifetime,
-			[NotNull] IT4TemplateExecutionManager executionManager,
-			[NotNull] IT4TargetFileManager targetManager
-		)
-		{
-			Lifetime = lifetime;
-			ExecutionManager = executionManager;
-			TargetManager = targetManager;
-		}
+		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
 
 		public string Name => "Bundled T4 template executor";
 		public string ActionName => "Execute T4 template";
@@ -59,7 +46,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			AssertOperationValidity(projectFile);
 			var file = AsT4File(projectFile).NotNull("file != null");
-			if (!ExecutionManager.CanCompile(file))
+
+			var solution = file.GetSolution();
+			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
+			var targetManager = solution.GetComponent<IT4TargetFileManager>();
+
+			if (!executionManager.CanCompile(file))
 			{
 				return new SingleFileCustomToolExecutionResult(
 					new FileSystemPath[] { },
@@ -67,9 +59,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				);
 			}
 
-			Assertion.Assert(ExecutionManager.Compile(Lifetime, file), "!ExecutionManager.Compile(Lifetime, file)");
-			var result = ExecutionManager.Execute(Lifetime, file);
-			var affectedFile = TargetManager.SaveResults(result, file);
+			Assertion.Assert(executionManager.Compile(Lifetime, file), "!ExecutionManager.Compile(Lifetime, file)");
+			var result = executionManager.Execute(Lifetime, file);
+			var affectedFile = targetManager.SaveResults(result, file);
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);
 		}
 
