@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
@@ -44,7 +45,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		private IT4TargetFileManager Manager { get; }
 
+		[NotNull]
+		private RoslynMetadataReferenceCache Cache { get; }
+
 		public T4TemplateExecutionManager(
+			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
 			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IPsiModules psiModules,
@@ -56,46 +61,48 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			PsiModules = psiModules;
 			Patcher = patcher;
 			Manager = manager;
+			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
-		public bool Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress)
-		{
-			try
+		public bool Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress) => lifetime.UsingNested(
+			nested =>
 			{
-				var info = GenerateCode(file);
-				if (progress != null) progress.CurrentItemText = "Compiling code";
-				var executablePath = Manager.GetTemporaryExecutableLocation(file);
-				var compilation = CreateCompilation(info, executablePath);
-				var errors = compilation
-					.GetDiagnostics(lifetime)
-					.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-					.ToList();
-				if (!errors.IsEmpty()) return false;
+				try
+				{
+					var info = GenerateCode(file, nested);
+					if (progress != null) progress.CurrentItemText = "Compiling code";
+					var executablePath = Manager.GetTemporaryExecutableLocation(file);
+					var compilation = CreateCompilation(info, executablePath);
+					var errors = compilation
+						.GetDiagnostics(nested)
+						.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
+						.ToList();
+					if (!errors.IsEmpty()) return false;
 
-				executablePath.Parent.CreateDirectory();
-				var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
-				compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: lifetime);
-				CopyAssemblies(info, executablePath);
-				return true;
-			}
-			catch (T4OutputGenerationException)
-			{
-				return false;
-			}
-		}
+					executablePath.Parent.CreateDirectory();
+					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
+					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
+					CopyAssemblies(info, executablePath);
+					return true;
+				}
+				catch (T4OutputGenerationException)
+				{
+					return false;
+				}
+			});
 
-		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file)
+		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file, Lifetime lifetime)
 		{
 			using (ReadLockCookie.Create())
 			{
 				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager);
 				string code = generator.Generate().RawText;
-				var references = ExtractReferences(file);
+				var references = ExtractReferences(file, lifetime);
 				return new T4TemplateExecutionManagerInfo(code, references, file);
 			}
 		}
 
-		private IEnumerable<MetadataReference> ExtractReferences([NotNull] IT4File file)
+		private IEnumerable<MetadataReference> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -110,7 +117,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					.OfType<IAssemblyPsiModule>()
 					.Select(it => it.Assembly)
 					.SelectNotNull(it => it.Location)
-					.Select(it => MetadataReference.CreateFromFile(it.FullPath));
+					.Select(it => Cache.GetMetadataReference(lifetime, it));
 			}
 		}
 
