@@ -6,7 +6,6 @@ using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.TextControl;
 using JetBrains.Util;
@@ -14,30 +13,28 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 {
 	[QuickFix]
-	public class T4RemoveDuplicateDirectiveQuickFix : QuickFixBase
+	public class T4ReplaceWithFeatureBlockQuickFix : QuickFixBase
 	{
 		[NotNull]
-		private T4DuplicateDirectiveHighlighting Highlighting { get; }
+		private StatementAfterFeatureHighlighting Highlighting { get; }
 
-		public T4RemoveDuplicateDirectiveQuickFix([NotNull] T4DuplicateDirectiveHighlighting highlighting) =>
+		public override string Text => "Replace with feature block";
+
+		public T4ReplaceWithFeatureBlockQuickFix([NotNull] StatementAfterFeatureHighlighting highlighting) =>
 			Highlighting = highlighting;
-
-		public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
-		public override string Text => "Remove duplicate directive";
 
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{
 			var node = Highlighting.AssociatedNode;
+			var newNode = T4ElementFactory.CreateFeatureBlock(node.GetCodeText());
 			using (WriteLockCookie.Create(node.IsPhysical()))
 			{
-				var nextToken = node.GetNextToken();
-				ITreeNode end;
-				if (nextToken != null && nextToken.GetTokenType() == T4TokenNodeTypes.NEW_LINE) end = nextToken;
-				else end = node;
-				ModificationUtil.DeleteChildRange(node, end);
+				ModificationUtil.ReplaceChild(node, newNode);
 			}
 
 			return null;
 		}
+
+		public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
 	}
 }
