@@ -21,10 +21,6 @@ namespace GammaJul.ForTea.Core.Tree
 		[CanBeNull]
 		string GetValue();
 
-		/// <summary>Gets the error associated with the value that have been identified at parsing time.</summary>
-		[CanBeNull]
-		string ValueError { get; }
-
 		[CanBeNull]
 		IT4PathWithMacros Reference { get; }
 	}

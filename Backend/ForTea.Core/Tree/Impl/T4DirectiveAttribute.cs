@@ -48,9 +48,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 		public string GetValue()
 			=> GetValueToken()?.GetText();
 
-		/// <summary>Gets or sets the error associated with the value that have been identified at parsing time.</summary>
-		public string ValueError { get; set; }
-
 		public IT4PathWithMacros Reference { get; set; }
 	}
 

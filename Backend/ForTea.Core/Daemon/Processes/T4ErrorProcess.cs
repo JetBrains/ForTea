@@ -85,11 +85,6 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			if (!(valueNode.Parent is IT4DirectiveAttribute attribute))
 				return;
 
-			if (attribute.ValueError != null) {
-				AddHighlighting(valueNode.GetHighlightingRange(), new InvalidAttributeValueHighlighting(valueNode, null, attribute.ValueError));
-				return;
-			}
-
 			if (!(attribute.Parent is IT4Directive directive))
 				return;
 

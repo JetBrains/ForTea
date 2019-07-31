@@ -11,16 +11,18 @@ using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
-
+namespace GammaJul.ForTea.Core.Daemon.QuickFixes
+{
 	[QuickFix]
-	public class ChangeAttributeValueQuickFix : QuickFixBase {
+	public class ChangeAttributeValueQuickFix : QuickFixBase
+	{
+		[NotNull]
+		private InvalidAttributeValueHighlighting Highlighting { get; }
 
-		[NotNull] private readonly InvalidAttributeValueHighlighting _highlighting;
-
-		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress) {
-			string text = _highlighting.AssociatedNode.GetText();
-			DocumentRange range = _highlighting.AssociatedNode.GetDocumentRange();
+		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+		{
+			string text = Highlighting.AssociatedNode.GetText();
+			DocumentRange range = Highlighting.AssociatedNode.GetDocumentRange();
 
 			// create a hotspot around the directive value, with basic completion invoked
 			return textControl =>
@@ -35,16 +37,12 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 					.Execute();
 		}
 
-		public override string Text
-			=> "Fix value";
+		public override string Text => "Change value";
 
-		public override bool IsAvailable(IUserDataHolder cache)
-			=> _highlighting.IsValid() && _highlighting.DirectiveAttributeInfo != null;
+		public override bool IsAvailable(IUserDataHolder cache) =>
+			Highlighting.IsValid() && Highlighting.DirectiveAttributeInfo != null;
 
-		public ChangeAttributeValueQuickFix([NotNull] InvalidAttributeValueHighlighting highlighting) {
-			_highlighting = highlighting;
-		}
-
+		public ChangeAttributeValueQuickFix([NotNull] InvalidAttributeValueHighlighting highlighting) =>
+			Highlighting = highlighting;
 	}
-
 }
