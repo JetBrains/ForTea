@@ -8,6 +8,9 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 	public interface IT4PathWithMacros
 	{
 		[NotNull]
+		string ResolveString();
+
+		[NotNull]
 		FileSystemPath ResolvePath();
 
 		[CanBeNull]

@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.Files;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Tree.Impl {
 
@@ -24,16 +21,8 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 			Path = path;
 		}
 
-		public IEnumerable<IT4Include> GetIncludes()
-			=> this.Children<IT4Include>();
-
 		protected override T4TokenRole GetChildRole(NodeType nodeType)
 			=> T4TokenRole.Unknown;
-
-		public IEnumerable<IT4Directive> GetDirectives()
-			=> this.Children<IT4Directive>();
-
-		public IDocumentRangeTranslator DocumentRangeTranslator => null;
 	}
 
 }

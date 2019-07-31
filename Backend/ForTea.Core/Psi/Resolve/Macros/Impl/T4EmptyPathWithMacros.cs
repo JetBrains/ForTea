@@ -14,6 +14,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		public IPsiSourceFile Resolve() => null;
 		public IT4File ResolveT4File(T4IncludeGuard guard) => null;
 		public FileSystemPath ResolvePath() => FileSystemPath.Empty;
+		public string ResolveString() => "";
 		public bool IsEmpty => true;
 	}
 }

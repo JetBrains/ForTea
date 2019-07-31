@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
-using JetBrains.Collections;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers;
 using JetBrains.Lifetimes;
@@ -35,9 +34,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly IT4Environment _t4Environment;
 		[NotNull] private readonly OutputAssemblies _outputAssemblies;
 		[NotNull] private readonly IT4MacroResolver _resolver;
-		
-		[NotNull] private readonly Dictionary<string, string> _resolvedMacros
-			= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 		[NotNull]
 		private IProjectFile File { get; }
@@ -82,10 +78,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		/// <param name="dataDiff">The difference between the old and new data.</param>
 		private void OnDataFileChanged([NotNull] T4FileDataDiff dataDiff) {
 			_shellLocks.AssertWriteAccessAllowed();
-
-			bool hasMacroChanges = ResolveMacros(dataDiff.AddedMacros);
-			bool hasChanges = hasMacroChanges;
-
+			bool hasChanges = true;
 			_resolver.InvalidateAssemblies(
 				dataDiff,
 				ref hasChanges,
@@ -93,15 +86,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_assemblyReferenceManager
 			);
 			
-			if (!hasChanges)
-				return;
+			if (!hasChanges) return;
 
 			// tells the world the module has changed
 			var changeBuilder = new PsiModuleChangeBuilder();
 			changeBuilder.AddModuleChange(this, PsiModuleChange.ChangeType.Modified);
 
-			if (hasMacroChanges)
-				GetPsiServices().MarkAsDirty(SourceFile);
+			if (true) GetPsiServices().MarkAsDirty(SourceFile);
 
 			_shellLocks.ExecuteOrQueueEx("T4PsiModuleChange",
 				() => _changeManager.ExecuteAfterChange(
@@ -110,29 +101,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					)
 				)
 			);
-		}
-
-		/// <summary>Resolves new VS macros, like $(SolutionDir), found in include or assembly directives.</summary>
-		/// <param name="macros">The list of macro names (eg SolutionDir) to resolve.</param>
-		/// <returns>Whether at least one macro has been processed.</returns>
-		private bool ResolveMacros([NotNull] IEnumerable<string> macros)
-		{
-			var result = _resolver.Resolve(macros, File);
-
-			if (result.IsEmpty())
-			{
-				return false;
-			}
-
-			lock (_resolvedMacros)
-			{
-				foreach (var (key, value) in result)
-				{
-					_resolvedMacros[key] = value;
-				}
-			}
-
-			return true;
 		}
 
 		/// <summary>Gets all modules referenced by this module.</summary>
@@ -164,18 +132,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			}
 
 			return references.GetReferences();
-		}
-
-		[NotNull]
-		public IDictionary<string, string> GetResolvedMacros()
-		{
-			lock (_resolvedMacros)
-			{
-				if (_resolvedMacros.IsEmpty())
-					return EmptyDictionary<string, string>.Instance;
-
-				return new Dictionary<string, string>(_resolvedMacros);
-			}
 		}
 
 		[NotNull]

@@ -28,7 +28,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 				// removes the assembly references from the old assembly directives
 				foreach (string assembly in dataDiff
 					.RemovedAssemblies
-					.Select(it => AssemblyNamePreprocessor.Preprocess(file, it)))
+					.Select(it => AssemblyNamePreprocessor.Preprocess(file, it.ResolveString())))
 				{
 					bool assemblyExisted = referenceManager.References.TryGetValue(assembly, out var cookie);
 					if (!assemblyExisted) continue;
@@ -40,7 +40,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 				// adds assembly references from the new assembly directives
 				foreach (var _ in dataDiff
 					.AddedAssemblies
-					.Select(it => AssemblyNamePreprocessor.Preprocess(file, it))
+					.Select(it => AssemblyNamePreprocessor.Preprocess(file, it.ResolveString()))
 					.Where(addedAssembly => !referenceManager.References.ContainsKey(addedAssembly))
 					.Select(referenceManager.TryAddReference)
 					.Where(cookie => cookie != null))

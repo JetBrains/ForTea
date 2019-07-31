@@ -76,7 +76,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		public FileSystemPath ResolvePath()
 		{
-			string expanded = ExpandMacros();
+			string expanded = ResolveString();
 
 			// search as absolute path
 			var asAbsolutePath = FileSystemPath.TryParse(expanded);
@@ -94,21 +94,17 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			return asGlobalInclude ?? asRelativePath;
 		}
 
-		[NotNull]
-		private string ExpandEnvironmentVariables() => System.Environment.ExpandEnvironmentVariables(RawPath);
-
-		[NotNull]
-		private string ExpandMacros()
+		public string ResolveString()
 		{
 			var module = Module;
 			if (string.IsNullOrEmpty(RawPath) || module == null || !ContainsMacros) return RawPath;
 
 			var macroValues = Resolver.Resolve(RawMacros, SourceFile.ToProjectFile().NotNull());
 
-			var result = new StringBuilder(ExpandEnvironmentVariables());
+			var result = new StringBuilder(System.Environment.ExpandEnvironmentVariables(RawPath));
 			foreach ((string macro, string value) in macroValues)
 			{
-				result.Replace(macro, value);
+				result.Replace($"$({macro})", value);
 			}
 
 			return result.ToString();
@@ -131,7 +127,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			.Select(match => match.Groups[1].Value);
 
 		private bool Equals(T4PathWithMacros other) =>
-			string.Equals(RawPath, other.RawPath) && SourceFile.Equals(other.SourceFile);
+			string.Equals(RawPath, other.RawPath, StringComparison.OrdinalIgnoreCase)
+			&& SourceFile.Equals(other.SourceFile);
 
 		public override bool Equals(object obj) =>
 			ReferenceEquals(this, obj) || obj is T4PathWithMacros other && Equals(other);
