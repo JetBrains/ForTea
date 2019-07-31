@@ -1,4 +1,3 @@
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.Tree
@@ -20,8 +19,5 @@ namespace GammaJul.ForTea.Core.Tree
 		/// <returns>The attribute value, or <c>null</c> if none is available.</returns>
 		[CanBeNull]
 		string GetValue();
-
-		[CanBeNull]
-		IT4PathWithMacros Reference { get; }
 	}
 }

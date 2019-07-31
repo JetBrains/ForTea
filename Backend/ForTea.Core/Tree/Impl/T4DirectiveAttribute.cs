@@ -1,5 +1,4 @@
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace GammaJul.ForTea.Core.Tree.Impl {
@@ -47,8 +46,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 		/// <returns>The attribute value, or <c>null</c> if none is available.</returns>
 		public string GetValue()
 			=> GetValueToken()?.GetText();
-
-		public IT4PathWithMacros Reference { get; set; }
 	}
 
 }

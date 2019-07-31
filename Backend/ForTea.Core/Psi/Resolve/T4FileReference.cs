@@ -31,5 +31,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve
 			this;
 
 		private static TreeTextRange SelectRange(ITreeNode node) => node.GetUnquotedRangeWithin();
+		public override bool IsValid() => true;
 	}
 }
