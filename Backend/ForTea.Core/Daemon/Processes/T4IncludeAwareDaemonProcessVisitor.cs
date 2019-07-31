@@ -80,11 +80,20 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ProcessInclude(IT4Include include)
 		{
 			var sourceFile = include.Path.Resolve();
-			if (sourceFile != null && !Guard.CanProcess(sourceFile))
+			if (sourceFile != null)
 			{
-				HasSeenRecursiveInclude = true;
-				ReportRecursiveInclude(include);
-				return;
+				if (!Guard.CanProcess(sourceFile))
+				{
+					HasSeenRecursiveInclude = true;
+					ReportRecursiveInclude(include);
+					return;
+				}
+
+				if (include.Once && Guard.HasSeenFile(sourceFile))
+				{
+					ReportRedundantInclude(include);
+					return;
+				}
 			}
 
 			var destination = include.Path.ResolveT4File(Guard);
@@ -131,6 +140,15 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			var value = FindIncludeValue(include);
 			if (value == null) return;
 			AddHighlighting(value, new T4RecursiveIncludeHighlighting(value));
+		}
+
+		private void ReportRedundantInclude([NotNull] IT4Include include)
+		{
+			if (!Guard.IsOnTopLevel) return;
+			var value = FindIncludeValue(include);
+			if (value == null) return;
+			var directive = (value.Parent?.Parent as IT4Directive).NotNull();
+			AddHighlighting(value, new T4RedundantIncludeHighlighting(directive));
 		}
 	}
 }

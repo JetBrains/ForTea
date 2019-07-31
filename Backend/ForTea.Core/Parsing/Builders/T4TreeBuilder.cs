@@ -25,9 +25,6 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 		private List<IT4Include> Includes { get; } = new List<IT4Include>();
 
 		[NotNull]
-		private IT4Environment Environment { get; }
-
-		[NotNull]
 		private T4DirectiveInfoManager DirectiveInfoManager { get; }
 
 		[NotNull]
@@ -36,24 +33,18 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 		[CanBeNull]
 		private IPsiSourceFile SourceFile { get; }
 
-		[NotNull]
-		private HashSet<IT4PathWithMacros> ExistingIncludePaths { get; }
-
 		[CanBeNull]
 		private List<T4Directive> NotClosedDirectives { get; set; }
 		#endregion
 
 		internal T4TreeBuilder(
-			[NotNull] IT4Environment environment,
 			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] ILexer lexer,
 			[CanBeNull] IPsiSourceFile sourceFile
 		)
 		{
-			Environment = environment;
 			DirectiveInfoManager = directiveInfoManager;
 			BuilderLexer = new PsiBuilderLexer(lexer, tnt => tnt.IsWhitespace);
-			ExistingIncludePaths = new HashSet<IT4PathWithMacros>();
 			SourceFile = sourceFile;
 		}
 
@@ -244,6 +235,7 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 					break;
 				}
 			}
+
 			return codeBlock;
 		}
 
@@ -296,92 +288,28 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 
 		private void HandleIncludeDirective([NotNull] IT4Directive directive, [NotNull] CompositeElement parentElement)
 		{
-			if (!(directive.GetAttribute(DirectiveInfoManager.Include.FileAttribute.Name) is T4DirectiveAttribute
-				fileAttr))
-			{
-				HandleFailedInclude(parentElement);
-				return;
-			}
-
-			var valueToken = fileAttr.GetValueToken();
-			if (valueToken == null)
-			{
-				HandleFailedInclude(parentElement);
-				return;
-			}
-
-			bool once = false;
-			if (Environment.ShouldSupportOnceAttribute)
-			{
-				string onceString = directive.GetAttributeValue(DirectiveInfoManager.Include.OnceAttribute.Name);
-				once = bool.TrueString.Equals(onceString, StringComparison.OrdinalIgnoreCase);
-			}
-
-			HandleInclude(valueToken.GetText(), fileAttr, parentElement, once);
+			string includeTarget = directive
+				.GetAttribute(DirectiveInfoManager.Include.FileAttribute.Name)
+				?.GetValue();
+			bool? once = directive
+				.GetAttribute(DirectiveInfoManager.Include.OnceAttribute.Name)
+				?.GetValue()
+				?.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase);
+			HandleInclude(includeTarget, once, parentElement);
 		}
 
 		private void HandleInclude(
 			[CanBeNull] string includeFileName,
-			[NotNull] T4DirectiveAttribute fileAttr,
-			[NotNull] CompositeElement parentElement,
-			bool once
+			bool? once,
+			[NotNull] CompositeElement parentElement
 		)
 		{
-			var path = CreateIncludePath(includeFileName);
-			AnalyzeInclude(fileAttr, path, once);
-			var include = new T4Include {Path = path};
+			var include = new T4Include(once ?? false, CreateIncludePath(includeFileName));
 			Includes.Add(include);
-			// do not use AppendNewChild, we don't want the PsiBuilderLexer to move line breaks from the include into the main file.
-			parentElement.AddChild(include);
+			AppendNewChild(parentElement, include);
 		}
 
-		private void HandleFailedInclude([NotNull] CompositeElement element)
-		{
-			var include = new T4Include {Path = T4EmptyPathWithMacros.Instance};
-			Includes.Add(include);
-			element.AddChild(include);
-		}
-
-		// TODO: move to problem analyzer
-		/// <summary>
-		/// Checks whether include contains problems
-		/// </summary>
-		/// <returns>Whether any problems found</returns>
-		private void AnalyzeInclude(
-			[NotNull] T4DirectiveAttribute fileAttr,
-			[NotNull] IT4PathWithMacros path,
-			bool once
-		)
-		{
-			if (path.IsEmpty)
-			{
-				fileAttr.ValueError = $@"Unresolved file ""{path}""";
-				return;
-			}
-
-			fileAttr.Reference = path;
-			if (!ExistingIncludePaths.Add(path))
-			{
-				if (!once) fileAttr.ValueError = $@"Already included file ""{path}""";
-				return;
-			}
-
-			if (path.ResolvePath() == SourceFile.GetLocation())
-			{
-				fileAttr.ValueError = "Recursive include";
-				ExistingIncludePaths.Add(path);
-				return;
-			}
-
-			if (!path.ResolvePath().ExistsFile)
-			{
-				fileAttr.ValueError = $@"File ""{path}"" not found";
-			}
-		}
-
-		private IT4PathWithMacros CreateIncludePath(
-			[CanBeNull] string includeFileName
-		)
+		private IT4PathWithMacros CreateIncludePath([CanBeNull] string includeFileName)
 		{
 			if (includeFileName == null) return T4EmptyPathWithMacros.Instance;
 			if (SourceFile == null) return T4EmptyPathWithMacros.Instance;

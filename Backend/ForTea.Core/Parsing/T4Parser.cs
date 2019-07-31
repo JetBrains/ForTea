@@ -15,7 +15,7 @@ namespace GammaJul.ForTea.Core.Parsing {
 		[CanBeNull] private readonly IPsiSourceFile _sourceFile;
 
 		public IFile ParseFile()
-			=> new T4TreeBuilder(_t4Environment, _directiveInfoManager, _lexer, _sourceFile).CreateT4Tree();
+			=> new T4TreeBuilder(_directiveInfoManager, _lexer, _sourceFile).CreateT4Tree();
 
 		public T4Parser(
 			[NotNull] IT4Environment t4Environment,

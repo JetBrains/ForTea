@@ -73,7 +73,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				return;
 			}
 
-			Guard.StartProcessing(include.Path.Resolve().NotNull());
+			var sourceFile = include.Path.Resolve().NotNull();
+			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
+			Guard.StartProcessing(sourceFile);
 			resolved.ProcessDescendants(this);
 		}
 
@@ -84,7 +86,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				case IT4Include include:
 					string suffix = Result.State.ProduceBeforeEof();
 					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
-					if (include.Path.ResolveT4File(Guard) != null) Guard.EndProcessing();
+					Guard.TryEndProcessing(include.Path.Resolve());
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
 					return; // Do not advance state here
