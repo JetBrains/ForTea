@@ -12,7 +12,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		public static IT4PathWithMacros Instance { get; } = new T4EmptyPathWithMacros();
 		public IPsiSourceFile Resolve() => null;
-		public IT4File ResolveT4File(T4IncludeRecursionGuard guard) => null;
+		public IT4File ResolveT4File(T4IncludeGuard guard) => null;
 		public FileSystemPath ResolvePath() => FileSystemPath.Empty;
 		public bool IsEmpty => true;
 	}

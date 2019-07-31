@@ -53,7 +53,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Manager = Solution.GetComponent<T4DirectiveInfoManager>();
 		}
 
-		public IT4File ResolveT4File(T4IncludeRecursionGuard guard)
+		public IT4File ResolveT4File(T4IncludeGuard guard)
 		{
 			if (!ResolvePath().ExistsFile) return null;
 			var target = Resolve();
@@ -69,7 +69,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			var languageService = T4Language.Instance.LanguageService();
 			Assertion.AssertNotNull(languageService, "languageService != null");
 			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			return new T4TreeBuilder(Environment, Manager, lexer, target).CreateT4Tree();
+			return new T4TreeBuilder(Manager, lexer, target).CreateT4Tree();
 		}
 
 		public IPsiSourceFile Resolve() => ResolvePath().FindSourceFileInSolution(Solution);

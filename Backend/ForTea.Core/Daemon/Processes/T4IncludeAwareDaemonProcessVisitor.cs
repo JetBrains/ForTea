@@ -15,7 +15,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 	public class T4IncludeAwareDaemonProcessVisitor : IRecursiveElementProcessor
 	{
 		[NotNull]
-		private T4IncludeRecursionGuard Guard { get; }
+		private T4IncludeGuard Guard { get; }
 
 		[NotNull]
 		private T4DirectiveInfoManager Manager { get; }
@@ -38,7 +38,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			Manager = manager;
 			HasSeenRecursiveInclude = false;
-			Guard = new T4IncludeRecursionGuard();
+			Guard = new T4IncludeGuard();
 			Guard.StartProcessing(initialFile);
 		}
 

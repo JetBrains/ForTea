@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4DirectiveInfoManager Manager { get; }
 
 		[NotNull]
-		private T4IncludeRecursionGuard Guard { get; }
+		private T4IncludeGuard Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
@@ -43,7 +43,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Guard = new T4IncludeRecursionGuard();
+			Guard = new T4IncludeGuard();
 			Manager = manager;
 		}
 
