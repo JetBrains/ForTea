@@ -60,35 +60,26 @@ namespace GammaJul.ForTea.Core.Psi
 		/// <param name="assemblyNameOrFile">The assembly full name.</param>
 		/// <returns>An instance of <see cref="IAssemblyCookie"/>, or <c>null</c> if none could be created.</returns>
 		[CanBeNull]
-		private IAssemblyCookie CreateCookie(string assemblyNameOrFile)
+		private IAssemblyCookie CreateCookie([NotNull] string assemblyNameOrFile)
 		{
-			if (assemblyNameOrFile == null)
-				return null;
-
 			assemblyNameOrFile = assemblyNameOrFile.Trim();
+			if (assemblyNameOrFile.Length == 0) return null;
+			var target = FindAssemblyReferenceTarget(assemblyNameOrFile);
+			if (target == null) return null;
+			return CreateCookieCore(target);
+		}
 
-			if (assemblyNameOrFile.Length == 0)
-				return null;
-
-			AssemblyReferenceTarget target = null;
-
+		[CanBeNull]
+		public static AssemblyReferenceTarget FindAssemblyReferenceTarget(string assemblyNameOrFile)
+		{
 			// assembly path
-			FileSystemPath path = FileSystemPath.TryParse(assemblyNameOrFile);
-			if (!path.IsEmpty && path.IsAbsolute)
-				target = new AssemblyReferenceTarget(AssemblyNameInfo.Empty, path);
+			var path = FileSystemPath.TryParse(assemblyNameOrFile);
+			if (!path.IsEmpty && path.IsAbsolute) return new AssemblyReferenceTarget(AssemblyNameInfo.Empty, path);
 
 			// assembly name
-			else
-			{
-				AssemblyNameInfo nameInfo = AssemblyNameInfo.TryParse(assemblyNameOrFile);
-				if (nameInfo != null)
-					target = new AssemblyReferenceTarget(nameInfo, FileSystemPath.Empty);
-			}
-
-			if (target == null)
-				return null;
-
-			return CreateCookieCore(target);
+			var nameInfo = AssemblyNameInfo.TryParse(assemblyNameOrFile);
+			if (nameInfo == null) return null;
+			return new AssemblyReferenceTarget(nameInfo, FileSystemPath.Empty);
 		}
 
 		[CanBeNull]
