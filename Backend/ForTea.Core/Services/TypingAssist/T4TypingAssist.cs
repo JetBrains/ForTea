@@ -152,6 +152,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 					textControl.Document.InsertText(offset + 1, "#>");
 					textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
 				}
+
+				SkippingTypingAssist.SetCharsToSkip(textControl.Document, ">");
 			});
 		}
 
