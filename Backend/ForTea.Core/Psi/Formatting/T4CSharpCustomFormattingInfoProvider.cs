@@ -1,6 +1,6 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
-using JetBrains.Application;
 using JetBrains.Application.Settings;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.CSharp.CodeStyle.FormatSettings;
 using JetBrains.ReSharper.Psi.CSharp.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting
 {
-	[ShellComponent]
+	[ProjectFileType(typeof(T4ProjectFileType))]
 	public class T4CSharpCustomFormattingInfoProvider : DummyCSharpCustomFormattingInfoProvider
 	{
 		public override FmtSettings<CSharpFormatSettingsKey> AdjustFormattingSettings(
