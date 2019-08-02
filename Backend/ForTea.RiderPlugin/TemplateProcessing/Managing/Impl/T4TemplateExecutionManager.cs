@@ -102,7 +102,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}
 		}
 
-		private IEnumerable<MetadataReference> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
+		private IEnumerable<T4MetadataReferenceInfo> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -117,7 +117,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					.OfType<IAssemblyPsiModule>()
 					.Select(it => it.Assembly)
 					.SelectNotNull(it => it.Location)
-					.Select(it => Cache.GetMetadataReference(lifetime, it));
+					.SelectNotNull(it => T4MetadataReferenceInfo.FromPath(lifetime, it, Cache))
+					.AsList();
 			}
 		}
 
@@ -135,10 +136,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				executablePath.Name,
 				new[] {syntaxTree},
 				options: options,
-				references: info.References);
+				references: info.References.Select(it => it.Reference));
 		}
 
-		private void CopyAssemblies(
+		private static void CopyAssemblies(
 			T4TemplateExecutionManagerInfo info,
 			[NotNull] FileSystemPath executablePath
 		)
@@ -146,8 +147,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var folder = executablePath.Parent;
 			IEnumerable<FileSystemPath> query = info
 				.References
-				.SelectNotNull(it => it.Display)
-				.SelectNotNull(it => FileSystemPath.TryParse(it));
+				.SelectNotNull(it => it.Path)
+				.Where(it => !it.IsEmpty);
 			foreach (var path in query)
 			{
 				path.CopyFile(folder.Combine(path.Name), true);
