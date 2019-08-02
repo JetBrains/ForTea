@@ -26,7 +26,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
 
 		public string Name => "Bundled T4 template executor";
-		public string ActionName => "Execute T4 template";
+		public string ActionName => "Execute T4 generator";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
 		public string[] CustomTools => new[] {"T4 Generator Custom Tool"};
 		public string[] Extensions => new[] {T4ProjectFileType.MainExtensionNoDot};
