@@ -1,0 +1,6 @@
+Hello!<#
+    {caret}if (true)
+    {
+#>Hello again!<#
+    }
+#>

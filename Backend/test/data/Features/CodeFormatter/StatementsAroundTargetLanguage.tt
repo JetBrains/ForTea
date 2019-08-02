@@ -1,0 +1,7 @@
+<#
+for(int i=0;i<10;i+=1){int j=1;int k=2;{caret}
+#>
+Hello
+<#
+int l=3;}
+#>

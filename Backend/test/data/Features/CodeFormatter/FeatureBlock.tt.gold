@@ -1,0 +1,3 @@
+<#+
+    public static int Whatever(int arg) => arg;{caret}
+#>

@@ -1,0 +1,12 @@
+<#@ output extension="txt" #>
+<#
+    for (int i = 0; i < 10; i += 1)
+    {
+        if {caret}(i % 2 == 0)
+        {
+#>Hello
+<#
+            int j = i;
+        }
+    }
+#>
