@@ -12,17 +12,19 @@ class T4RunConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(
   override fun createTemplateConfiguration(@NotNull project: Project) =
     T4RunConfiguration("T4 Template", project, this, createParameters())
 
-  private fun createParameters() = T4RunConfigurationParameters(
-    exePath = "",
-    programParameters = "",
-    workingDirectory = "",
-    envs = hashMapOf(),
-    isPassParentEnvs = false,
-    useExternalConsole = false,
-    useMonoRuntime = false,
-    executeAsIs = false,
-    assemblyToDebug = null,
-    runtimeArguments = "",
-    initialFilePath = ""
-  )
+  companion object {
+    fun createParameters() = T4RunConfigurationParameters(
+      exePath = "",
+      programParameters = "",
+      workingDirectory = "",
+      envs = hashMapOf(),
+      isPassParentEnvs = false,
+      useExternalConsole = false,
+      useMonoRuntime = false,
+      executeAsIs = false,
+      assemblyToDebug = null,
+      runtimeArguments = "",
+      initialFilePath = ""
+    )
+  }
 }

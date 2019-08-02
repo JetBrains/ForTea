@@ -26,20 +26,32 @@ class T4RunConfigurationProducer : RunConfigurationProducer<T4RunConfiguration>(
     sourceElement: Ref<PsiElement>
   ): Boolean {
     val t4File = sourceElement.get().containingFile as? T4PsiFile ?: return false
-    val model = configuration.project.solution.t4ProtocolModel
-    val t4Path = t4File.virtualFile.path
-    val protocolConfiguration = model.configurations[t4Path] ?: return false
+    return setupFromFile(configuration, t4File)
+  }
 
-    configuration.name = t4File.name
-    configuration.parameters.exePath = protocolConfiguration.executablePath
-    configuration.parameters.programParameters = protocolConfiguration.outputPath
-    configuration.parameters.isPassParentEnvs = false
-    configuration.parameters.runtimeArguments = ""
-    configuration.parameters.useMonoRuntime = false
-    configuration.parameters.envs = emptyMap()
-    configuration.parameters.workingDirectory = PathUtil.getParentPath(t4Path)
-    configuration.parameters.initialFilePath = t4Path
+  companion object {
+    fun setupFromFile(
+      configuration: T4RunConfiguration,
+      t4File: T4PsiFile
+    ): Boolean {
+      val model = configuration.project.solution.t4ProtocolModel
+      val t4Path = t4File.virtualFile.path
+      val protocolConfiguration = model.configurations[t4Path] ?: return false
 
-    return true
+      configuration.name = t4File.name
+      configuration.parameters.exePath = protocolConfiguration.executablePath
+      configuration.parameters.programParameters = protocolConfiguration.outputPath
+      configuration.parameters.isPassParentEnvs = false
+      configuration.parameters.runtimeArguments = ""
+      configuration.parameters.useMonoRuntime = false
+      configuration.parameters.envs = emptyMap()
+      configuration.parameters.workingDirectory = PathUtil.getParentPath(t4Path)
+      configuration.parameters.initialFilePath = t4Path
+
+      return true
+    }
+
+    fun canSetup(t4File: T4PsiFile): Boolean =
+      t4File.project.solution.t4ProtocolModel.configurations.containsKey(t4File.virtualFile.path)
   }
 }

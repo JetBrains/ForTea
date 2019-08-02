@@ -10,7 +10,7 @@ class T4RunConfigurationType : ConfigurationTypeBase(
   null as Icon?
 ) {
 
-  private val factory = T4RunConfigurationFactory(this)
+  val factory = T4RunConfigurationFactory(this)
   override fun getHelpTopic() = "reference.dialogs.rundebug.RunT4"
 
   init {

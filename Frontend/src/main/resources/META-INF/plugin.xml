@@ -25,12 +25,12 @@
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
     <!-- template execution & preprocessing -->
-    <runConfigurationProducer implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationProducer"/>
+    <!--    <runConfigurationProducer implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationProducer"/>-->
     <configurationType implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationType"/>
     <stepsBeforeRunProvider
         implementation="com.jetbrains.fortea.configuration.run.task.CompileT4BeforeRunTaskProvider"/>
-    <runConfigurationProducer
-        implementation="com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationProducer"/>
+    <!--    <runConfigurationProducer-->
+    <!--        implementation="com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationProducer"/>-->
     <configurationType implementation="com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationType"/>
 
     <!-- delegation to backend -->
@@ -70,4 +70,12 @@
     <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
   </extensions>
+  <actions>
+    <action
+        class="com.jetbrains.fortea.configuration.T4ExecuteTemplateAction"
+        id="ExecuteT4Template"
+        text="Execute T4 Template">
+      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
+    </action>
+  </actions>
 </idea-plugin>
