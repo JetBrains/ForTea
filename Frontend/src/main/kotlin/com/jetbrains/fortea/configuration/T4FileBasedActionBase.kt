@@ -1,13 +1,14 @@
 package com.jetbrains.fortea.configuration
 
-import com.intellij.execution.Executor
-import com.intellij.execution.ProgramRunnerUtil
-import com.intellij.execution.RunManager
+import com.intellij.execution.*
 import com.intellij.execution.configurations.ConfigurationTypeUtil
 import com.intellij.execution.configurations.RunConfiguration
+import com.intellij.execution.process.NopProcessHandler
+import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.psi.T4PsiFile
 import com.jetbrains.rider.model.t4ProtocolModel
@@ -22,6 +23,8 @@ abstract class T4FileBasedActionBase<TConfiguration, TConfigurationType>(
   where TConfiguration : RunConfiguration,
         TConfigurationType : T4ConfigurationType,
         TConfigurationType : Any {
+
+  private val logger = Logger.getInstance(javaClass)
   final override fun update(e: AnActionEvent) {
     val t4File = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? T4PsiFile
     val canSetup = t4File != null && canSetup(t4File)
@@ -40,7 +43,31 @@ abstract class T4FileBasedActionBase<TConfiguration, TConfigurationType>(
     setupFromFile(configuration, file)
     val runManager = RunManager.getInstance(project)
     val configurationSettings = runManager.createConfiguration(configuration, configurationType.factory)
-    ProgramRunnerUtil.executeConfiguration(configurationSettings, this.executor)
+    executeConfiguration(configurationSettings, this.executor, project)
+  }
+
+  private fun executeConfiguration(
+    configuration: RunnerAndConfigurationSettings,
+    executor: Executor,
+    project: Project
+  ) {
+    val builder: ExecutionEnvironmentBuilder
+    try {
+      builder = ExecutionEnvironmentBuilder.create(executor, configuration)
+    } catch (e: ExecutionException) {
+      logger.error(e)
+      return
+    }
+
+    val environment = builder.contentToReuse(null).dataContext(null).activeTarget().build()
+    ProgramRunnerUtil.executeConfigurationAsync(
+      environment,
+      true,
+      true
+    ) {
+      val listener = project.messageBus.syncPublisher(ExecutionManager.EXECUTION_TOPIC)
+      listener.processStarted(executor.id, environment, NopProcessHandler())
+    }
   }
 
   protected abstract fun createConfiguration(project: Project, configurationType: TConfigurationType): TConfiguration
