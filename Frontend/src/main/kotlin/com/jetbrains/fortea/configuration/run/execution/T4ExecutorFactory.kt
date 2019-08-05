@@ -27,13 +27,18 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
       dotNetExecutable.exePath,
       dotNetExecutable.useMonoRuntime
     )
+    val model = environment.project.solution.t4ProtocolModel
     logger.info("Configuration will be executed on ${runtimeToExecute.javaClass.name}")
-    val baseState = when (executorId) {
-      DefaultRunExecutor.EXECUTOR_ID -> runtimeToExecute.createRunState(dotNetExecutable, environment)
-      DefaultDebugExecutor.EXECUTOR_ID -> runtimeToExecute.createDebugState(dotNetExecutable, environment)
+    return when (executorId) {
+      DefaultRunExecutor.EXECUTOR_ID -> {
+        val wrappee = runtimeToExecute.createRunState(dotNetExecutable, environment)
+        T4RunProfileWrapperState(wrappee, model, parameters)
+      }
+      DefaultDebugExecutor.EXECUTOR_ID -> {
+        val wrappee = runtimeToExecute.createDebugState(dotNetExecutable, environment)
+        T4DebugProfileWrapperState(wrappee, model, parameters)
+      }
       else -> throw CantRunException("Unsupported executor $executorId")
     }
-    val model = environment.project.solution.t4ProtocolModel
-    return T4RunProfileWrapperState(baseState, model, parameters)
   }
 }
