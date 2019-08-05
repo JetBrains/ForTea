@@ -9,7 +9,7 @@ class T4PreprocessConfigurationType : ConfigurationTypeBase(
   "T4 Template Preprocessing Configuration",
   null as Icon?
 ) {
-  private val factory = T4PreprocessConfigurationFactory(this)
+  val factory = T4PreprocessConfigurationFactory(this)
   override fun getHelpTopic() = "reference.dialogs.rundebug.PreprocessT4"
 
   init {

@@ -77,5 +77,11 @@
         text="Execute T4 Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
+    <action
+        class="com.jetbrains.fortea.configuration.T4PreprocessTemplateAction"
+        id="PreprocessT4Template"
+        text="Preprocess T4 Template">
+      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
+    </action>
   </actions>
 </idea-plugin>

@@ -26,11 +26,15 @@ class T4PreprocessConfigurationProducer : RunConfigurationProducer<T4PreprocessC
     sourceElement: Ref<PsiElement>
   ): Boolean {
     val t4File = sourceElement.get().containingFile as? T4PsiFile ?: return false
-    val t4Path = t4File.virtualFile.path
+    return setupFromFile(configuration, t4File)
+  }
 
-    configuration.name = "Preprocess " + t4File.name
-    configuration.parameters.initialFilePath = t4Path
-
-    return true
+  companion object {
+    fun setupFromFile(configuration: T4PreprocessConfiguration, t4File: T4PsiFile): Boolean {
+      val t4Path = t4File.virtualFile.path
+      configuration.name = "Preprocess " + t4File.name
+      configuration.parameters.initialFilePath = t4Path
+      return true
+    }
   }
 }
