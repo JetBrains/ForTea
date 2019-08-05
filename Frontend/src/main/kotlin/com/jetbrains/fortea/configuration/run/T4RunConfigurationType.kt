@@ -1,6 +1,7 @@
 package com.jetbrains.fortea.configuration.run
 
 import com.intellij.execution.configurations.ConfigurationTypeBase
+import com.jetbrains.fortea.configuration.T4ConfigurationType
 import javax.swing.Icon
 
 class T4RunConfigurationType : ConfigurationTypeBase(
@@ -8,9 +9,8 @@ class T4RunConfigurationType : ConfigurationTypeBase(
   "Run T4 Template",
   "T4 Template Run Configuration",
   null as Icon?
-) {
-
-  val factory = T4RunConfigurationFactory(this)
+), T4ConfigurationType {
+  override val factory = T4RunConfigurationFactory(this)
   override fun getHelpTopic() = "reference.dialogs.rundebug.RunT4"
 
   init {
