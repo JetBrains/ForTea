@@ -11,9 +11,11 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- custom language description -->
-    <fileTypeFactory
-        id="T4"
-        implementation="com.jetbrains.fortea.language.T4FileTypeFactory"/>
+    <fileType
+        name="T4"
+        language="T4"
+        implementationClass="com.jetbrains.fortea.language.T4FileType"
+        extensions="tt;t4;ttinclude"/>
     <lang.parserDefinition
         language="T4"
         implementationClass="com.jetbrains.fortea.parser.T4ParserDefinition"/>
