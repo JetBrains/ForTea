@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.configuration
+package com.jetbrains.fortea.configuration.actions
 
 import com.intellij.openapi.project.Project
 import com.intellij.util.PathUtil

@@ -71,19 +71,19 @@
   </extensions>
   <actions>
     <action
-        class="com.jetbrains.fortea.configuration.T4ExecuteTemplateAction"
+        class="com.jetbrains.fortea.configuration.actions.T4ExecuteTemplateAction"
         id="ExecuteT4Template"
         text="Execute T4 Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
     <action
-        class="com.jetbrains.fortea.configuration.T4DebugTemplateAction"
+        class="com.jetbrains.fortea.configuration.actions.T4DebugTemplateAction"
         id="DebugT4Template"
         text="Debug T4 Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
     </action>
     <action
-        class="com.jetbrains.fortea.configuration.T4PreprocessTemplateAction"
+        class="com.jetbrains.fortea.configuration.actions.T4PreprocessTemplateAction"
         id="PreprocessT4Template"
         text="Preprocess T4 Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="DebugT4Template"/>

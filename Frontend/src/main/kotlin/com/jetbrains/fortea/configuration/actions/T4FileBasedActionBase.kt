@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.configuration
+package com.jetbrains.fortea.configuration.actions
 
 import com.intellij.execution.*
 import com.intellij.execution.configurations.ConfigurationTypeUtil
@@ -10,6 +10,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.jetbrains.fortea.configuration.T4ConfigurationType
 import com.jetbrains.fortea.psi.T4PsiFile
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution

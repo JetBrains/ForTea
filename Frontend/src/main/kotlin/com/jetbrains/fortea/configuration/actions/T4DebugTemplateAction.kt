@@ -1,4 +1,4 @@
-package com.jetbrains.fortea.configuration
+package com.jetbrains.fortea.configuration.actions
 
 import com.intellij.execution.Executor
 import com.intellij.execution.executors.DefaultDebugExecutor
