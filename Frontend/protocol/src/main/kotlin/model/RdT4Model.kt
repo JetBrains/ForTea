@@ -6,28 +6,27 @@ import com.jetbrains.rider.model.nova.ide.SolutionModel
 
 @Suppress("unused")
 object T4ProtocolModel : Ext(SolutionModel.Solution) {
-  val messageKind = enum("T4BuildMessageKind") {
-    +"T4Message"
-    +"T4Success"
-    +"T4Warning"
-    +"T4Error"
+  val T4BuildMessageKind = enum {
+    +"Message"
+    +"Success"
+    +"Warning"
+    +"Error"
   }
 
-  val buildMessage = structdef {
-    field("buildMessageKind", messageKind)
-    field("message", string)
+  val T4BuildMessage = structdef {
+    field("buildMessageKind", T4BuildMessageKind)
+    field("content", string)
   }
 
-  val resultKind = enum("T4BuildResultKind") {
+  val T4BuildResultKind = enum {
     +"HasErrors"
     +"HasWarnings"
     +"Successful"
-    // +"Canceled"
   }
 
-  val buildResult = structdef("T4BuildResult") {
-    field("buildResultKind", resultKind)
-    field("messages", immutableList(buildMessage))
+  val T4BuildResult = structdef {
+    field("buildResultKind", T4BuildResultKind)
+    field("messages", immutableList(T4BuildMessage))
   }
 
   val T4ConfigurationModel = structdef {
@@ -37,7 +36,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
 
   init {
     map("configurations", string, T4ConfigurationModel).async
-    call("requestCompilation", string, buildResult).async
+    call("requestCompilation", string, T4BuildResult).async
     call("transferResults", string, void).async
     call("requestPreprocessing", string, bool)
   }

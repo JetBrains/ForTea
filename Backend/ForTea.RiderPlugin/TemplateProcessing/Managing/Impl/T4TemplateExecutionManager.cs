@@ -26,7 +26,6 @@ using JetBrains.Util;
 using JetBrains.Util.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Collections.Immutable;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
@@ -69,7 +68,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
-			List<BuildMessage> messages = null;
+			List<T4BuildMessage> messages = null;
 			var resultKind = lifetime.UsingNested(nested =>
 			{
 				try
@@ -95,7 +94,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				}
 			});
 
-			return new T4BuildResult(resultKind, messages ?? new List<BuildMessage>());
+			return new T4BuildResult(resultKind, messages ?? new List<T4BuildMessage>());
 		}
 
 		private T4BuildResultKind ToBuildResultKind(IEnumerable<Diagnostic> diagnostics)
@@ -106,21 +105,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		[NotNull]
-		private BuildMessage ToBuildMessage([NotNull] Diagnostic diagnostic) =>
-			new BuildMessage(ToBuildMessageKind(diagnostic.Severity), diagnostic.GetMessage());
+		private T4BuildMessage ToBuildMessage([NotNull] Diagnostic diagnostic) =>
+			new T4BuildMessage(ToBuildMessageKind(diagnostic.Severity), diagnostic.GetMessage());
 
 		private T4BuildMessageKind ToBuildMessageKind(DiagnosticSeverity severity)
 		{
 			switch (severity)
 			{
 				case DiagnosticSeverity.Hidden:
-					return T4BuildMessageKind.T4Message;
+					return T4BuildMessageKind.Message;
 				case DiagnosticSeverity.Info:
-					return T4BuildMessageKind.T4Message;
+					return T4BuildMessageKind.Message;
 				case DiagnosticSeverity.Warning:
-					return T4BuildMessageKind.T4Warning;
+					return T4BuildMessageKind.Warning;
 				case DiagnosticSeverity.Error:
-					return T4BuildMessageKind.T4Error;
+					return T4BuildMessageKind.Error;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(severity), severity, null);
 			}

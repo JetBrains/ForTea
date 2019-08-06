@@ -7,7 +7,7 @@ import com.jetbrains.rd.util.lifetime.isAlive
 import com.jetbrains.rdclient.util.idea.LifetimedProjectService
 import com.jetbrains.rider.build.Diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.Diagnostics.DiagnosticKind
-import com.jetbrains.rider.model.BuildMessage
+import com.jetbrains.rider.model.T4BuildMessage
 import com.jetbrains.rider.model.T4BuildMessageKind
 import com.jetbrains.rider.util.idea.getLogger
 
@@ -21,7 +21,7 @@ class T4BuildSessionView(
     private val myLogger = getLogger<T4BuildSessionView>()
   }
 
-  fun showT4BuildResult(lifetime: Lifetime, buildMessages: List<BuildMessage>, file: String) {
+  fun showT4BuildResult(lifetime: Lifetime, buildMessages: List<T4BuildMessage>, file: String) {
     val context = windowFactory.getOrCreateContext(lifetime)
     context.clear()
     if (!lifetime.isAlive) return
@@ -37,14 +37,14 @@ class T4BuildSessionView(
   }
 
   private fun toBuildDiagnostic(
-    message: BuildMessage,
+    message: T4BuildMessage,
     file: String
-  ) = BuildDiagnostic(toDiagnosticKind(message.buildMessageKind), message.message, "CS0042", 42, file, 0, 0)
+  ) = BuildDiagnostic(toDiagnosticKind(message.buildMessageKind), message.content, "CS0042", 42, file, 0, 0)
 
   private fun toDiagnosticKind(kind: T4BuildMessageKind) = when (kind) {
-    T4BuildMessageKind.T4Error -> DiagnosticKind.Error
-    T4BuildMessageKind.T4Warning -> DiagnosticKind.Warning
-    T4BuildMessageKind.T4Message -> DiagnosticKind.Warning // ?
-    T4BuildMessageKind.T4Success -> DiagnosticKind.Warning // ?
+    T4BuildMessageKind.Error -> DiagnosticKind.Error
+    T4BuildMessageKind.Warning -> DiagnosticKind.Warning
+    T4BuildMessageKind.Message -> DiagnosticKind.Warning // ?
+    T4BuildMessageKind.Success -> DiagnosticKind.Warning // ?
   }
 }

@@ -44,7 +44,7 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
     request.advise(project.lifetime) { rdTaskResult ->
       try {
         val result = rdTaskResult.unwrap()
-        successful = result.buildResultKind != T4BuildResultKind.HasErrors
+        successful = result.buildResultKind.isSuccess
         val view = project.getComponent(T4BuildSessionView::class.java)
         view.showT4BuildResult(project.lifetime, result.messages, configuration.parameters.initialFilePath)
       } finally {
@@ -58,5 +58,12 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
 
   companion object {
     val providerId = Key.create<CompileT4BeforeRunTask>("Compile T4")
+
+    private val T4BuildResultKind.isSuccess
+      get() = when (this) {
+        T4BuildResultKind.HasErrors -> false
+        T4BuildResultKind.HasWarnings -> true
+        T4BuildResultKind.Successful -> true
+      }
   }
 }

@@ -60,8 +60,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 
 		private void RegisterCallbacks()
 		{
-			var defaultBuildMessage = new BuildMessage(T4BuildMessageKind.T4Error, "Internal error");
-			var defaultBuildMessages = new List<BuildMessage>{defaultBuildMessage};
+			var defaultBuildMessage = new T4BuildMessage(T4BuildMessageKind.Error, "Internal error");
+			var defaultBuildMessages = new List<T4BuildMessage>{defaultBuildMessage};
 			var defaultBuildResult = new T4BuildResult(T4BuildResultKind.HasErrors, defaultBuildMessages);
 			Model.RequestCompilation.Set(WrapClassFunc(Compile, defaultBuildResult));
 			Model.TransferResults.Set(WrapClassFunc(CopyResults, Unit.Instance));
