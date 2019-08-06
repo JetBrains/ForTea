@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Host.Features.ProjectModel.CustomTools;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Rider.Model;
 using JetBrains.UI.Icons;
 using JetBrains.Util;
 
@@ -22,9 +23,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 	public class T4InternalGenerator : ISingleFileCustomTool
 	{
 		private Lifetime Lifetime { get; }
-		
 		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
-
 		public string Name => "Bundled T4 template executor";
 		public string ActionName => "Execute T4 generator";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
@@ -59,7 +58,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				);
 			}
 
-			Assertion.Assert(executionManager.Compile(Lifetime, file), "!ExecutionManager.Compile(Lifetime, file)");
+			var buildResult = executionManager.Compile(Lifetime, file);
+			Assertion.Assert(buildResult.BuildResultKind == T4BuildResultKind.Successful,
+				"buildResult.BuildResultKind == T4BuildResultKind.Successful");
 			var result = executionManager.Execute(Lifetime, file);
 			var affectedFile = targetManager.SaveResults(result, file);
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);

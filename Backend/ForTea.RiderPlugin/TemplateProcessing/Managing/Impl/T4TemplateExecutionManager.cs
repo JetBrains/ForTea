@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,10 +21,12 @@ using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Rider.Model;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Collections.Immutable;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
@@ -64,8 +67,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
-		public bool Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress) => lifetime.UsingNested(
-			nested =>
+		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
+		{
+			List<BuildMessage> messages = null;
+			var resultKind = lifetime.UsingNested(nested =>
 			{
 				try
 				{
@@ -73,23 +78,53 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					if (progress != null) progress.CurrentItemText = "Compiling code";
 					var executablePath = Manager.GetTemporaryExecutableLocation(file);
 					var compilation = CreateCompilation(info, executablePath);
-					var errors = compilation
-						.GetDiagnostics(nested)
-						.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-						.ToList();
-					if (!errors.IsEmpty()) return false;
+					var diagnostics = compilation.GetDiagnostics(nested);
+					messages = diagnostics.Select(ToBuildMessage).AsList();
+					var errors = diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+					if (!errors.IsEmpty()) return T4BuildResultKind.HasErrors;
 
 					executablePath.Parent.CreateDirectory();
 					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
 					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
 					CopyAssemblies(info, executablePath);
-					return true;
+					return ToBuildResultKind(diagnostics);
 				}
 				catch (T4OutputGenerationException)
 				{
-					return false;
+					return T4BuildResultKind.HasErrors;
 				}
 			});
+
+			return new T4BuildResult(resultKind, messages ?? new List<BuildMessage>());
+		}
+
+		private T4BuildResultKind ToBuildResultKind(IEnumerable<Diagnostic> diagnostics)
+		{
+			if (diagnostics.Any(it => it.Severity == DiagnosticSeverity.Warning))
+				return T4BuildResultKind.HasWarnings;
+			return T4BuildResultKind.Successful;
+		}
+
+		[NotNull]
+		private BuildMessage ToBuildMessage([NotNull] Diagnostic diagnostic) =>
+			new BuildMessage(ToBuildMessageKind(diagnostic.Severity), diagnostic.GetMessage());
+
+		private T4BuildMessageKind ToBuildMessageKind(DiagnosticSeverity severity)
+		{
+			switch (severity)
+			{
+				case DiagnosticSeverity.Hidden:
+					return T4BuildMessageKind.T4Message;
+				case DiagnosticSeverity.Info:
+					return T4BuildMessageKind.T4Message;
+				case DiagnosticSeverity.Warning:
+					return T4BuildMessageKind.T4Warning;
+				case DiagnosticSeverity.Error:
+					return T4BuildMessageKind.T4Error;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(severity), severity, null);
+			}
+		}
 
 		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file, Lifetime lifetime)
 		{

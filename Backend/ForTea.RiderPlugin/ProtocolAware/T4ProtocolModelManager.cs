@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
@@ -59,7 +60,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 
 		private void RegisterCallbacks()
 		{
-			Model.RequestCompilation.Set(WrapStructFunc(Compile, false));
+			var defaultBuildMessage = new BuildMessage(T4BuildMessageKind.T4Error, "Internal error");
+			var defaultBuildMessages = new List<BuildMessage>{defaultBuildMessage};
+			var defaultBuildResult = new T4BuildResult(T4BuildResultKind.HasErrors, defaultBuildMessages);
+			Model.RequestCompilation.Set(WrapClassFunc(Compile, defaultBuildResult));
 			Model.TransferResults.Set(WrapClassFunc(CopyResults, Unit.Instance));
 			Model.RequestPreprocessing.Set(WrapStructFunc(Preprocess, false));
 		}
@@ -105,7 +109,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 				return result ?? defaultValue;
 			};
 
-		private bool? Compile([NotNull] IT4File t4File) => ExecutionManager.Compile(Solution.GetLifetime(), t4File);
+		private T4BuildResult Compile([NotNull] IT4File t4File) =>
+			ExecutionManager.Compile(Solution.GetLifetime(), t4File);
 
 		[CanBeNull]
 		private Unit CopyResults([NotNull] IT4File file)

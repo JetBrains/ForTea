@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.Lifetimes;
+using JetBrains.Rider.Model;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 {
@@ -10,7 +11,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 	{
 		bool CanCompile([NotNull] IT4File file);
 
-		bool Compile(Lifetime lifetime, [NotNull] IT4File file, [CanBeNull] IProgressIndicator progress = null);
+		T4BuildResult Compile(
+			Lifetime lifetime,
+			[NotNull] IT4File file,
+			[CanBeNull] IProgressIndicator progress = null);
 
 		[Obsolete("Execution has moved to frontend")]
 		IT4ExecutionResult Execute(

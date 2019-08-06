@@ -6,7 +6,9 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.util.concurrency.Semaphore
+import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
+import com.jetbrains.rider.model.T4BuildResultKind
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.lifetime
@@ -33,21 +35,25 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
 
     val finished = Semaphore()
     finished.down()
-    var result = false
+    var successful = false
 
     val project = configuration.project
     val model = project.solution.t4ProtocolModel
 
-    model.requestCompilation.start(configuration.parameters.initialFilePath).result.advise(project.lifetime) { rdTaskResult ->
+    val request = model.requestCompilation.start(configuration.parameters.initialFilePath).result
+    request.advise(project.lifetime) { rdTaskResult ->
       try {
-        result = rdTaskResult.unwrap()
+        val result = rdTaskResult.unwrap()
+        successful = result.buildResultKind != T4BuildResultKind.HasErrors
+        val view = project.getComponent(T4BuildSessionView::class.java)
+        view.showT4BuildResult(project.lifetime, result.messages, configuration.parameters.initialFilePath)
       } finally {
         finished.up()
       }
     }
 
     finished.waitFor()
-    return result
+    return successful
   }
 
   companion object {
