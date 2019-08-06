@@ -23,6 +23,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     field("id", string)
     field("location", T4Location)
     field("content", string)
+    field("projectId", int)
   }
 
   val T4BuildResultKind = enum {

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
@@ -43,28 +42,31 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		[NotNull]
 		private IT4TargetFileManager TargetFileManager { get; }
 
+		[NotNull]
+		private T4BuildMessageConverter Converter { get; }
+
 		public T4ProtocolModelManager(
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateExecutionManager executionManager,
-			[NotNull] ILogger logger, [NotNull] T4DirectiveInfoManager directiveInfoManager)
+			[NotNull] ILogger logger,
+			[NotNull] T4DirectiveInfoManager directiveInfoManager,
+			[NotNull] T4BuildMessageConverter converter
+		)
 		{
 			Solution = solution;
 			TargetFileManager = targetFileManager;
 			ExecutionManager = executionManager;
 			Logger = logger;
 			DirectiveInfoManager = directiveInfoManager;
+			Converter = converter;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks();
 		}
 
 		private void RegisterCallbacks()
 		{
-			var location = new T4Location(0, 0);
-			var defaultBuildMessage = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, "Internal error");
-			var defaultBuildMessages = new List<T4BuildMessage>{defaultBuildMessage};
-			var defaultBuildResult = new T4BuildResult(T4BuildResultKind.HasErrors, defaultBuildMessages);
-			Model.RequestCompilation.Set(WrapClassFunc(Compile, defaultBuildResult));
+			Model.RequestCompilation.Set(WrapClassFunc(Compile, Converter.FailedResult()));
 			Model.TransferResults.Set(WrapClassFunc(CopyResults, Unit.Instance));
 			Model.RequestPreprocessing.Set(WrapStructFunc(Preprocess, false));
 		}

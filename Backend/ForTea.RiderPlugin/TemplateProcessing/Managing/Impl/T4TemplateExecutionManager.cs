@@ -49,26 +49,32 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		private RoslynMetadataReferenceCache Cache { get; }
 
+		[NotNull]
+		private IT4BuildMessageConverter Converter { get; }
+
 		public T4TemplateExecutionManager(
 			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
 			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IPsiModules psiModules,
 			[NotNull] ISolutionProcessStartInfoPatcher patcher,
-			[NotNull] IT4TargetFileManager manager)
+			[NotNull] IT4TargetFileManager manager,
+			[NotNull] IT4BuildMessageConverter converter
+		)
 		{
 			Locks = locks;
 			DirectiveInfoManager = directiveInfoManager;
 			PsiModules = psiModules;
 			Patcher = patcher;
 			Manager = manager;
+			Converter = converter;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
 			List<Diagnostic> messages = null;
-			lifetime.UsingNested(nested =>
+			return lifetime.UsingNested(nested =>
 			{
 				try
 				{
@@ -79,18 +85,19 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					var diagnostics = compilation.GetDiagnostics(nested);
 					messages = diagnostics.AsList();
 					var errors = diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
-					if (!errors.IsEmpty()) return;
+					if (!errors.IsEmpty()) return null;
 
 					executablePath.Parent.CreateDirectory();
 					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
 					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
 					CopyAssemblies(info, executablePath);
+					return null;
 				}
 				catch (T4OutputGenerationException)
 				{
+					return Converter.FailedResult(file);
 				}
-			});
-			return messages.ToT4BuildResult();
+			}) ?? Converter.ToT4BuildResult(messages, file);
 		}
 
 		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file, Lifetime lifetime)
