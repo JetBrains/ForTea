@@ -13,8 +13,15 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     +"Error"
   }
 
+  val T4Location = structdef {
+    field("line", int)
+    field("column", int)
+  }
+
   val T4BuildMessage = structdef {
     field("buildMessageKind", T4BuildMessageKind)
+    field("id", string)
+    field("location", T4Location)
     field("content", string)
   }
 

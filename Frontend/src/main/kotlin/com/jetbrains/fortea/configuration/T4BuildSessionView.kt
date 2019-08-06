@@ -39,7 +39,12 @@ class T4BuildSessionView(
   private fun toBuildDiagnostic(
     message: T4BuildMessage,
     file: String
-  ) = BuildDiagnostic(toDiagnosticKind(message.buildMessageKind), message.content, "CS0042", 42, file, 0, 0)
+  ): BuildDiagnostic {
+    val kind = toDiagnosticKind(message.buildMessageKind)
+    val line = message.location.line + 1
+    val column = message.location.column + 1
+    return BuildDiagnostic(kind, message.content, message.id, 42, file, line, column)
+  }
 
   private fun toDiagnosticKind(kind: T4BuildMessageKind) = when (kind) {
     T4BuildMessageKind.Error -> DiagnosticKind.Error

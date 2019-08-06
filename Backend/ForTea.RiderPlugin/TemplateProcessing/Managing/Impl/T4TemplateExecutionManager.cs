@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -68,8 +67,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
-			List<T4BuildMessage> messages = null;
-			var resultKind = lifetime.UsingNested(nested =>
+			List<Diagnostic> messages = null;
+			lifetime.UsingNested(nested =>
 			{
 				try
 				{
@@ -78,51 +77,20 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					var executablePath = Manager.GetTemporaryExecutableLocation(file);
 					var compilation = CreateCompilation(info, executablePath);
 					var diagnostics = compilation.GetDiagnostics(nested);
-					messages = diagnostics.Select(ToBuildMessage).AsList();
+					messages = diagnostics.AsList();
 					var errors = diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
-					if (!errors.IsEmpty()) return T4BuildResultKind.HasErrors;
+					if (!errors.IsEmpty()) return;
 
 					executablePath.Parent.CreateDirectory();
 					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
 					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
 					CopyAssemblies(info, executablePath);
-					return ToBuildResultKind(diagnostics);
 				}
 				catch (T4OutputGenerationException)
 				{
-					return T4BuildResultKind.HasErrors;
 				}
 			});
-
-			return new T4BuildResult(resultKind, messages ?? new List<T4BuildMessage>());
-		}
-
-		private T4BuildResultKind ToBuildResultKind(IEnumerable<Diagnostic> diagnostics)
-		{
-			if (diagnostics.Any(it => it.Severity == DiagnosticSeverity.Warning))
-				return T4BuildResultKind.HasWarnings;
-			return T4BuildResultKind.Successful;
-		}
-
-		[NotNull]
-		private T4BuildMessage ToBuildMessage([NotNull] Diagnostic diagnostic) =>
-			new T4BuildMessage(ToBuildMessageKind(diagnostic.Severity), diagnostic.GetMessage());
-
-		private T4BuildMessageKind ToBuildMessageKind(DiagnosticSeverity severity)
-		{
-			switch (severity)
-			{
-				case DiagnosticSeverity.Hidden:
-					return T4BuildMessageKind.Message;
-				case DiagnosticSeverity.Info:
-					return T4BuildMessageKind.Message;
-				case DiagnosticSeverity.Warning:
-					return T4BuildMessageKind.Warning;
-				case DiagnosticSeverity.Error:
-					return T4BuildMessageKind.Error;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(severity), severity, null);
-			}
+			return messages.ToT4BuildResult();
 		}
 
 		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file, Lifetime lifetime)
