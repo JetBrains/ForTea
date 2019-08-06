@@ -26,7 +26,7 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("SmallLoop")]
 		[TestCase("StatementAfterTargetLanguage")]
 		[TestCase("StatementsAroundTargetLanguage")]
-		[TestCase("StatementAndFeatureBlocks")]
+		[TestCase("StatementAndFeatureBlocks", Ignore = "Not implemented")]
 		[TestCase("FeatureBlock")]
 		[TestCase("RemovingIndent")]
 		[TestCase("MisplacedBlockEnd")]
