@@ -31,6 +31,8 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("RemovingIndent")]
 		[TestCase("MisplacedBlockEnd")]
 		[TestCase("ExpressionBlock", Ignore = "Not implemented")]
+		[TestCase("ComplexFeatureBlock")]
+		[TestCase("BrokenFeatureBlock")]
 		public void TestFormatter([NotNull] string name) => DoOneTest(name);
 
 		protected override void DoTest(Lifetime lifetime, IProject testProject)
