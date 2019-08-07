@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format
 		public string Indent { get; }
 		public virtual bool ShouldBreakExpressionWithLineDirective => true;
 
-		public void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		public virtual void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
 		{
 			for (var i = Int32<DocColumn>.O; i < offset; i++)
 			{
