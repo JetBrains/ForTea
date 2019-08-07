@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
@@ -64,5 +65,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("using System.Text;");
 		}
+
+		protected override IT4ElementAppendFormatProvider Provider =>
+			new T4RealCodeFormatProvider(new string(' ', CurrentIndent * 4));
 	}
 }

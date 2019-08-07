@@ -160,6 +160,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		// TODO: use user indents?
 		protected override IT4ElementAppendFormatProvider Provider =>
-			new T4RealCodeFormatProvider(new string(' ', CurrentIndent * 4));
+			new T4PreprocessCodeFormatProvider(new string(' ', CurrentIndent * 4));
 	}
 }

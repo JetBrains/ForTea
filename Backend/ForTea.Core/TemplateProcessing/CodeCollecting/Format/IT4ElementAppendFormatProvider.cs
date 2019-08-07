@@ -15,13 +15,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format
 		string CodeCommentStart { get; }
 		string CodeCommentEnd { get; }
 		string Indent { get; }
+		bool ShouldBreakExpressionWithLineDirective { get; }
 
 		void AppendCompilationOffset(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			Int32<DocColumn> offset
 		);
 
-		void AppendMappedOrTrimmed(
+		void AppendMappedIfNeeded(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4Code code
 		);

@@ -2,10 +2,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
-using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
@@ -34,8 +30,5 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			destination.Append(provider.Indent);
 			destination.AppendLine("#line hidden");
 		}
-
-		private static Int32<DocColumn> GetOffset(ITreeNode node) =>
-			node.GetSourceFile().NotNull().Document.GetCoordsByOffset(node.GetTreeStartOffset().Offset).Column;
 	}
 }
