@@ -37,6 +37,11 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     field("messages", immutableList(T4BuildMessage))
   }
 
+  val T4PreprocessingResult = structdef {
+    field("succeeded", bool)
+    field("message", T4BuildMessage.nullable)
+  }
+
   val T4ConfigurationModel = structdef {
     field("executablePath", string)
     field("outputPath", string)
@@ -46,6 +51,6 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     map("configurations", string, T4ConfigurationModel).async
     call("requestCompilation", string, T4BuildResult).async
     call("transferResults", string, void).async
-    call("requestPreprocessing", string, bool)
+    call("requestPreprocessing", string, T4PreprocessingResult).async
   }
 }

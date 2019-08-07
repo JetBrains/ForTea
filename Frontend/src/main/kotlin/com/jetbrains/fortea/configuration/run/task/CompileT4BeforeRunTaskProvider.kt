@@ -11,6 +11,7 @@ import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.rider.model.T4BuildResultKind
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.util.idea.getComponent
 import com.jetbrains.rider.util.idea.lifetime
 
 class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunTask>() {
@@ -45,7 +46,7 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
       try {
         val result = rdTaskResult.unwrap()
         successful = result.buildResultKind.isSuccess
-        val view = project.getComponent(T4BuildSessionView::class.java)
+        val view = project.getComponent<T4BuildSessionView>()
         view.showT4BuildResult(project.lifetime, result.messages, configuration.parameters.initialFilePath)
       } finally {
         finished.up()

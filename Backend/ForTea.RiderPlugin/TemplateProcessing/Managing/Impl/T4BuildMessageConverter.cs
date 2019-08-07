@@ -34,13 +34,22 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public T4BuildResult ToT4BuildResult(T4OutputGenerationException exception) =>
 			ToT4BuildResult(exception.FailureData);
 
+		public T4PreprocessingResult ToT4PreprocessingResult(T4OutputGenerationException exception) =>
+			new T4PreprocessingResult(false, ToT4BuildMessage(exception.FailureData));
+
 		private T4BuildResult ToT4BuildResult(T4FailureRawData data)
+		{
+			var message = ToT4BuildMessage(data);
+			var messages = new List<T4BuildMessage> {message};
+			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
+		}
+
+		private T4BuildMessage ToT4BuildMessage(T4FailureRawData data)
 		{
 			var location = new T4Location(data.Line, data.Column);
 			int projectId = GetProjectId(data.File);
 			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, data.Message, projectId);
-			var messages = new List<T4BuildMessage> {message};
-			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
+			return message;
 		}
 
 		public T4BuildResult FatalError()

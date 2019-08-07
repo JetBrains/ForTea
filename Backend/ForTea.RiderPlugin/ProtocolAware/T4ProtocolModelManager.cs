@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -73,7 +74,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		{
 			Model.RequestCompilation.Set(WrapClassFunc(Compile, Converter.FatalError()));
 			Model.TransferResults.Set(WrapClassFunc(CopyResults, Unit.Instance));
-			Model.RequestPreprocessing.Set(WrapStructFunc(Preprocess, false));
+			Model.RequestPreprocessing.Set(WrapClassFunc(Preprocess, new T4PreprocessingResult(false, null)));
 		}
 
 		public override void UpdateFileInfo(IT4File file) =>
@@ -84,23 +85,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 				);
 
 		private Func<string, T> WrapClassFunc<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
-			rawPath =>
-			{
-				var result = Logger.Catch(() =>
-				{
-					var path = FileSystemPath.Parse(rawPath);
-					using (ReadLockCookie.Create())
-					{
-						var sourceFile = path.FindSourceFileInSolution(Solution);
-						var t4File = sourceFile?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
-						if (t4File == null) return defaultValue;
-						return wrappee(t4File);
-					}
-				});
-				return result ?? defaultValue;
-			};
-
-		private Func<string, T> WrapStructFunc<T>(Func<IT4File, T?> wrappee, T defaultValue) where T : struct =>
 			rawPath =>
 			{
 				var result = Logger.Catch(() =>
@@ -129,15 +113,23 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			return Unit.Instance;
 		}
 
-		private bool? Preprocess([NotNull] IT4File file)
+		[NotNull]
+		private T4PreprocessingResult Preprocess([NotNull] IT4File file)
 		{
-			string message = new T4CSharpCodeGenerator(file, DirectiveInfoManager, Navigator).Generate().RawText;
-			using (WriteLockCookie.Create())
+			try
 			{
-				TargetFileManager.SaveResults(new T4ExecutionResultInString(message), file, PreprocessResultExtension);
+				string message = new T4CSharpCodeGenerator(file, DirectiveInfoManager, Navigator).Generate().RawText;
+				using (WriteLockCookie.Create())
+				{
+					var result = new T4ExecutionResultInString(message);
+					TargetFileManager.SaveResults(result, file, PreprocessResultExtension);
+				}
+				return new T4PreprocessingResult(true, null);
 			}
-
-			return true;
+			catch (T4OutputGenerationException e)
+			{
+				return Converter.ToT4PreprocessingResult(e);
+			}
 		}
 	}
 }
