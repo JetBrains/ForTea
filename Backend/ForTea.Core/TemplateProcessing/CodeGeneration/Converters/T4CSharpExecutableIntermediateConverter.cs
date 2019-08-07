@@ -53,7 +53,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendMainContainer()
 		{
 			var provider = new T4TemplateResourceProvider(SuffixResource, this);
-			string suffix = provider.ProcessResource(GeneratedClassName);
+			string suffix = provider.ProcessResource(GeneratedClassName, IntermediateResult.Encoding);
 			Result.Append(suffix);
 		}
 

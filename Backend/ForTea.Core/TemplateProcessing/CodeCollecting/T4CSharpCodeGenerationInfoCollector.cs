@@ -1,8 +1,7 @@
-using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
@@ -12,9 +11,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public T4CSharpCodeGenerationInfoCollector(
 			[NotNull] IT4File file,
-			[NotNull] T4DirectiveInfoManager manager,
-			[NotNull] T4TreeNavigator navigator
-		) : base(file, manager, navigator)
+			[NotNull] ISolution solution
+		) : base(file, solution)
 		{
 		}
 

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
@@ -35,13 +34,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private ISolution Solution { get; }
 
 		[NotNull]
-		private T4DirectiveInfoManager DirectiveInfoManager { get; }
-
-		[NotNull]
 		private IT4TemplateExecutionManager ExecutionManager { get; }
-
-		[NotNull]
-		private T4TreeNavigator Navigator { get; }
 
 		[NotNull]
 		private IT4TargetFileManager TargetFileManager { get; }
@@ -54,18 +47,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger,
-			[NotNull] T4DirectiveInfoManager directiveInfoManager,
-			[NotNull] T4BuildMessageConverter converter,
-			[NotNull] T4TreeNavigator navigator
+			[NotNull] T4BuildMessageConverter converter
 		)
 		{
 			Solution = solution;
 			TargetFileManager = targetFileManager;
 			ExecutionManager = executionManager;
 			Logger = logger;
-			DirectiveInfoManager = directiveInfoManager;
 			Converter = converter;
-			Navigator = navigator;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks();
 		}
@@ -118,7 +107,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		{
 			try
 			{
-				string message = new T4CSharpCodeGenerator(file, DirectiveInfoManager, Navigator).Generate().RawText;
+				string message = new T4CSharpCodeGenerator(file, Solution).Generate().RawText;
 				using (WriteLockCookie.Create())
 				{
 					var result = new T4ExecutionResultInString(message);

@@ -33,7 +33,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 	public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
 		[NotNull]
-		private T4DirectiveInfoManager DirectiveInfoManager { get; }
+		private ISolution Solution { get; }
 
 		[NotNull]
 		private IShellLocks Locks { get; }
@@ -64,16 +64,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			[NotNull] ISolutionProcessStartInfoPatcher patcher,
 			[NotNull] IT4TargetFileManager manager,
 			[NotNull] IT4BuildMessageConverter converter,
-			[NotNull] T4TreeNavigator navigator
+			[NotNull] T4TreeNavigator navigator,
+			[NotNull] ISolution solution
 		)
 		{
 			Locks = locks;
-			DirectiveInfoManager = directiveInfoManager;
 			PsiModules = psiModules;
 			Patcher = patcher;
 			Manager = manager;
 			Converter = converter;
 			Navigator = navigator;
+			Solution = solution;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
@@ -111,7 +112,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			using (ReadLockCookie.Create())
 			{
-				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager, Navigator);
+				var generator = new T4CSharpExecutableCodeGenerator(file, Solution);
 				string code = generator.Generate().RawText;
 				var references = ExtractReferences(file, lifetime);
 				return new T4TemplateExecutionManagerInfo(code, references, file);

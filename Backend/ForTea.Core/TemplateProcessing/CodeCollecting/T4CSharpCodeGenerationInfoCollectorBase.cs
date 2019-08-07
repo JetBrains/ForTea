@@ -10,6 +10,7 @@ using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Diagnostics;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -29,6 +30,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4TreeNavigator Navigator { get; }
 
 		[NotNull]
+		private T4EncodingsManager EncodingsManager { get; }
+
+		[NotNull]
 		private T4IncludeGuard Guard { get; }
 
 		[NotNull, ItemNotNull]
@@ -42,15 +46,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		protected T4CSharpCodeGenerationInfoCollectorBase(
 			[NotNull] IT4File file,
-			[NotNull] T4DirectiveInfoManager manager,
-			[NotNull] T4TreeNavigator navigator
+			[NotNull] ISolution solution
 		)
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
 			Guard = new T4IncludeGuard();
-			Manager = manager;
-			Navigator = navigator;
+			Manager = solution.GetComponent<T4DirectiveInfoManager>();
+			Navigator = solution.GetComponent<T4TreeNavigator>();
+			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
 		[NotNull]
@@ -135,6 +139,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				HandleTemplateDirective(directive);
 			else if (directive.IsSpecificDirective(Manager.Parameter))
 				HandleParameterDirective(directive);
+			else if (directive.IsSpecificDirective(Manager.Output))
+				HandleOutputDirective(directive);
 		}
 
 		/// <summary>
@@ -159,6 +165,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 					break;
 			}
 		}
+
+		private void HandleOutputDirective([NotNull] IT4Directive directive) =>
+			Result.Encoding = EncodingsManager.FindEncoding(directive, Interrupter);
 
 		/// <summary>Handles an import directive, equivalent of an using directive in C#.</summary>
 		/// <param name="directive">The import directive.</param>

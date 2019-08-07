@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
 		[NotNull]
-		private T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
+		protected T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
 
 		[NotNull]
 		protected T4CSharpCodeGenerationResult Result { get; }

@@ -13,6 +13,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 	{
 		[NotNull]
 		public T4CSharpCodeGenerationResult CollectedBaseClass { get; }
+		
+		[CanBeNull]
+		public string Encoding { get; set; }
 
 		[NotNull, ItemNotNull]
 		private List<T4AppendableElementDescriptionBase> MyTransformationDescriptions { get; }
@@ -78,6 +81,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public void Append([NotNull] T4CSharpCodeGenerationIntermediateResult other)
 		{
 			AppendInvisible(MyImportDescriptions, other.ImportDescriptions);
+			Encoding = Encoding ?? other.Encoding;
 			if (CollectedBaseClass.IsEmpty) CollectedBaseClass.Append(other.CollectedBaseClass);
 			AppendInvisible(MyTransformationDescriptions, other.TransformationDescriptions);
 			AppendInvisible(MyFeatureDescriptions, other.FeatureDescriptions);
