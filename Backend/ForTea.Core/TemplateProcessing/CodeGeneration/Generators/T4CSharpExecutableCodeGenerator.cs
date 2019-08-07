@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
@@ -10,8 +11,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 	{
 		public T4CSharpExecutableCodeGenerator(
 			[NotNull] IT4File file,
-			[NotNull] T4DirectiveInfoManager manager
-		) : base(file, manager)
+			[NotNull] T4DirectiveInfoManager manager,
+			[NotNull] T4TreeNavigator navigator
+		) : base(file, manager, navigator)
 		{
 		}
 

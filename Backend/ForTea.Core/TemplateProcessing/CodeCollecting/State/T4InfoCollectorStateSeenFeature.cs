@@ -27,11 +27,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE)
 						return new T4InfoCollectorStateSeenFeatureAndNewLine(Interrupter);
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
-						return new T4InfoCollectorStateSeenFeatureAndText(
-							new StringBuilder(Convert(LastToken)),
-							Interrupter);
+					{
+						// At this point, LastToken is initialized through ConsumeTokenSafe call
+						var builder = new StringBuilder(Convert(LastToken));
+						return new T4InfoCollectorStateSeenFeatureAndText(builder, Interrupter, element);
+					}
 
-					Interrupter.InterruptAfterProblem();
+					var data = T4FailureRawData.FromElement(element, "Unexpected element after feature");
+					Interrupter.InterruptAfterProblem(data);
 					return this;
 			}
 		}

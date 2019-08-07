@@ -5,6 +5,7 @@ using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -47,6 +48,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IT4TargetFileManager Manager { get; }
 
 		[NotNull]
+		private T4TreeNavigator Navigator { get; }
+
+		[NotNull]
 		private RoslynMetadataReferenceCache Cache { get; }
 
 		[NotNull]
@@ -59,7 +63,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			[NotNull] IPsiModules psiModules,
 			[NotNull] ISolutionProcessStartInfoPatcher patcher,
 			[NotNull] IT4TargetFileManager manager,
-			[NotNull] IT4BuildMessageConverter converter
+			[NotNull] IT4BuildMessageConverter converter,
+			[NotNull] T4TreeNavigator navigator
 		)
 		{
 			Locks = locks;
@@ -68,11 +73,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Patcher = patcher;
 			Manager = manager;
 			Converter = converter;
+			Navigator = navigator;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
+			if (file.ContainsErrorElement()) return Converter.SyntaxError(Navigator.GetErrorElements(file).First());
 			List<Diagnostic> messages = null;
 			return lifetime.UsingNested(nested =>
 			{
@@ -93,9 +100,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					CopyAssemblies(info, executablePath);
 					return null;
 				}
-				catch (T4OutputGenerationException)
+				catch (T4OutputGenerationException e)
 				{
-					return Converter.FailedResult(file);
+					return Converter.ToT4BuildResult(e);
 				}
 			}) ?? Converter.ToT4BuildResult(messages, file);
 		}
@@ -104,7 +111,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			using (ReadLockCookie.Create())
 			{
-				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager);
+				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager, Navigator);
 				string code = generator.Generate().RawText;
 				var references = ExtractReferences(file, lifetime);
 				return new T4TemplateExecutionManagerInfo(code, references, file);

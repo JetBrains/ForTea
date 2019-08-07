@@ -28,14 +28,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
 					{
 						Die();
-						return new T4InfoCollectorStateSeenFeatureAndText(Builder, Interrupter);
+						return new T4InfoCollectorStateSeenFeatureAndText(Builder, Interrupter, element);
 					}
 
-					else
-					{
-						Interrupter.InterruptAfterProblem();
-						return this;
-					}
+					var data = T4FailureRawData.FromElement(element, "Unexpected element after feature");
+					Interrupter.InterruptAfterProblem(data);
+					return this;
 			}
 		}
 

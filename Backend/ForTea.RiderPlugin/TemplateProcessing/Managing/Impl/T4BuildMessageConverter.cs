@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -22,28 +23,36 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		public T4BuildResult ToT4BuildResult(ICollection<Diagnostic> diagnostics, IT4File file)
 		{
-			int id = Host.GetIdByItem(file.GetProject().NotNull());
+			int id = GetProjectId(file);
 			var kind = ToT4BuildResultKind(diagnostics);
 			var messages = diagnostics.Select(diagnostic => ToT4BuildMessage(diagnostic, id)).ToList();
 			return new T4BuildResult(kind, messages);
 		}
 
-		public T4BuildResult FailedResult()
+		private int GetProjectId([NotNull] IT4File file) => Host.GetIdByItem(file.GetProject().NotNull());
+
+		public T4BuildResult ToT4BuildResult(T4OutputGenerationException exception) =>
+			ToT4BuildResult(exception.FailureData);
+
+		private T4BuildResult ToT4BuildResult(T4FailureRawData data)
 		{
-			var location = new T4Location(0, 0);
-			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, "Internal error", -1);
+			var location = new T4Location(data.Line, data.Column);
+			int projectId = GetProjectId(data.File);
+			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, data.Message, projectId);
 			var messages = new List<T4BuildMessage> {message};
 			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
 		}
 
-		public T4BuildResult FailedResult(IT4File file)
+		public T4BuildResult FatalError()
 		{
-			int projectId = Host.GetIdByItem(file.GetProject().NotNull());
-			var location = new T4Location(0, 0);
-			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, "Internal error", projectId);
+			var location = new T4Location(-1, -1);
+			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, "Fatal internal error", -1);
 			var messages = new List<T4BuildMessage> {message};
 			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
 		}
+
+		public T4BuildResult SyntaxError(ITreeNode node) =>
+			ToT4BuildResult(T4FailureRawData.FromElement(node, "Syntax error"));
 
 		private T4BuildResultKind ToT4BuildResultKind([NotNull, ItemNotNull] ICollection<Diagnostic> diagnostics)
 		{

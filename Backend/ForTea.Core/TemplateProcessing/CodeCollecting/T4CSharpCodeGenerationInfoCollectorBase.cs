@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
@@ -25,6 +26,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4DirectiveInfoManager Manager { get; }
 
 		[NotNull]
+		private T4TreeNavigator Navigator { get; }
+
+		[NotNull]
 		private T4IncludeGuard Guard { get; }
 
 		[NotNull, ItemNotNull]
@@ -38,13 +42,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		protected T4CSharpCodeGenerationInfoCollectorBase(
 			[NotNull] IT4File file,
-			[NotNull] T4DirectiveInfoManager manager
+			[NotNull] T4DirectiveInfoManager manager,
+			[NotNull] T4TreeNavigator navigator
 		)
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
 			Guard = new T4IncludeGuard();
 			Manager = manager;
+			Navigator = navigator;
 		}
 
 		[NotNull]
@@ -69,7 +75,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			var resolved = include.Path.ResolveT4File(Guard);
 			if (resolved == null)
 			{
-				Interrupter.InterruptAfterProblem();
+				var target = Navigator.FindIncludeValue(include) ?? element;
+				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target}");
+				Interrupter.InterruptAfterProblem(data);
 				return;
 			}
 

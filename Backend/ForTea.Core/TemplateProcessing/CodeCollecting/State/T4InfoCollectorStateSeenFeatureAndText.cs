@@ -12,10 +12,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		[NotNull]
 		private StringBuilder Builder { get; }
 
+		[NotNull]
+		// Suspect for syntax error
+		private ITreeNode FirstElement { get; }
+
 		public T4InfoCollectorStateSeenFeatureAndText(
 			[NotNull] StringBuilder builder,
-			[NotNull] IT4CodeGenerationInterrupter interrupter
-		) : base(interrupter) => Builder = builder;
+			[NotNull] IT4CodeGenerationInterrupter interrupter,
+			[NotNull] ITreeNode firstElement
+		) : base(interrupter)
+		{
+			Builder = builder;
+			FirstElement = firstElement;
+		}
 
 		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
 		{
@@ -29,7 +38,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4Token _: return this;
 				default:
-					Interrupter.InterruptAfterProblem();
+					var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
+					Interrupter.InterruptAfterProblem(data);
 					return this;
 			}
 		}
@@ -37,9 +47,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		protected override bool FeatureStartedSafe => true;
 		protected override void ConsumeTokenSafe(IT4Token token) => Builder.Append(Convert(token));
 		protected override string ProduceSafe(ITreeNode lookahead) => Builder.ToString();
+
 		protected override string ProduceBeforeEofSafe()
 		{
-			Interrupter.InterruptAfterProblem();
+			var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
+			Interrupter.InterruptAfterProblem(data);
 			return Builder.ToString();
 		}
 	}
