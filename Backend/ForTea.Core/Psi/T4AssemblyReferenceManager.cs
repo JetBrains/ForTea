@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Utils;
 using JetBrains.ProjectModel;
@@ -8,11 +9,15 @@ using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.References;
 using JetBrains.Util;
+using static JetBrains.Util.Logging.ILoggerStructuredEx;
 
 namespace GammaJul.ForTea.Core.Psi
 {
 	public sealed class T4AssemblyReferenceManager
 	{
+		[NotNull]
+		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4AssemblyReferenceManager>();
+
 		[CanBeNull] private IModuleReferenceResolveManager _resolveManager;
 
 		[NotNull]
@@ -87,7 +92,13 @@ namespace GammaJul.ForTea.Core.Psi
 		{
 			// ResolveManager uses providers, not contexts, to resolve references,
 			// so it's safe to provide project's contests
-			var path = ResolveManager.Resolve(target, File.GetProject(), ResolveContext);
+			var loggerWithSeverity = new LoggerWithSeverity(Logger, LoggingLevel.VERBOSE);
+			FileSystemPath path;
+			using (new PhaseCookieDisposable(loggerWithSeverity, target.Name, "Resolution time"))
+			{
+				path = ResolveManager.Resolve(target, File.GetProject(), ResolveContext);
+			}
+
 			return path == null ? null : AssemblyFactory.AddRef(path, "T4", ResolveContext);
 		}
 	}
