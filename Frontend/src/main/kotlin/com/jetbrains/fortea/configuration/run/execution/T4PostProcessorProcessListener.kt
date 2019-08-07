@@ -14,6 +14,7 @@ class T4PostProcessorProcessListener(
   }
 
   override fun processTerminated(p0: ProcessEvent) {
+    if (p0.exitCode != 0) return
     model.transferResults.start(parameters.initialFilePath)
   }
 
