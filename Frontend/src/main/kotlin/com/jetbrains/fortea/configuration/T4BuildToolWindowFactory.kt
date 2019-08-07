@@ -76,6 +76,7 @@ class T4BuildToolWindowFactory(
 
         override fun actionPerformed(e: AnActionEvent) {
           contentManager.removeContent(toolWindowContent, true)
+          context = null
         }
       })
       buildResultPanel.showEvents()
