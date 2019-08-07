@@ -52,7 +52,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 
 			result.Add("Configuration", project.ProjectProperties.ActiveConfigurations.Configurations.Single().Name);
 			result.Add("OutDir", project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent.FullPath);
-			result.Add("ProjectDir", project.Location.Parent.FullPath);
+			result.Add("ProjectDir", project.Location.FullPath);
 			result.Add("ProjectFileName", project.ProjectFileLocation.Name);
 			result.Add("ProjectName", project.Name);
 			result.Add("ProjectPath", project.Location.FullPath);
