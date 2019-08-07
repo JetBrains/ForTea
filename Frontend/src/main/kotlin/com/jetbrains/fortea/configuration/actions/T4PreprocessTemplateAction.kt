@@ -7,11 +7,11 @@ import com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfiguration
 import com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationParameters
 import com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationType
 import com.jetbrains.fortea.psi.T4PsiFile
-import com.jetbrains.rider.icons.ReSharperAssemblyExplorerIcons
+import com.jetbrains.rider.icons.ReSharperLiveTemplatesCSharpIcons
 
 class T4PreprocessTemplateAction : T4FileBasedActionBase<T4PreprocessConfiguration, T4PreprocessConfigurationType>(
-  "Preprocess T4 Template",
-  ReSharperAssemblyExplorerIcons.AddProcess
+  "Generate C# code",
+  ReSharperLiveTemplatesCSharpIcons.ScopeCS
 ) {
   override fun createConfiguration(
     project: Project,
