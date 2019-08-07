@@ -32,7 +32,8 @@ namespace GammaJul.ForTea.Core.Psi {
 			if (!(modificationInfo.NewPsiFile is IT4File t4File)) return null;
 			if (!directiveInfoManager.GetLanguageType(t4File).Is<CSharpLanguage>()) return null;
 
-			var generator = new T4CSharpCodeBehindGenerator(t4File, directiveInfoManager);
+			var navigator = modificationInfo.SourceFile.GetSolution().GetComponent<T4TreeNavigator>();
+			var generator = new T4CSharpCodeBehindGenerator(t4File, directiveInfoManager, navigator);
 			T4CSharpCodeGenerationResult result = generator.GenerateSafe();
 
 			LanguageService csharpLanguageService = CSharpLanguage.Instance.LanguageService();

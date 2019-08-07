@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
@@ -20,6 +21,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		[NotNull]
 		private T4DirectiveInfoManager Manager { get; }
 
+		[NotNull]
+		private T4TreeNavigator Navigator { get; }
+
 		[NotNull, ItemNotNull]
 		private List<HighlightingInfo> MyHighlightings { get; } = new List<HighlightingInfo>();
 
@@ -33,10 +37,12 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public T4IncludeAwareDaemonProcessVisitor(
 			[NotNull] T4DirectiveInfoManager manager,
-			[NotNull] IPsiSourceFile initialFile
+			[NotNull] IPsiSourceFile initialFile,
+			[NotNull] T4TreeNavigator navigator
 		)
 		{
 			Manager = manager;
+			Navigator = navigator;
 			HasSeenRecursiveInclude = false;
 			Guard = new T4IncludeGuard();
 			Guard.StartProcessing(initialFile);
@@ -113,23 +119,13 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			MyHighlightings.Add(new HighlightingInfo(directive.GetHighlightingRange(),
 				new T4DuplicateDirectiveHighlighting(directive)));
 
-		[CanBeNull]
-		private IT4AttributeValue FindIncludeValue([NotNull] IT4Include include)
-		{
-			var directive = include.PrevSibling as IT4Directive;
-			Assertion.Assert(directive.IsSpecificDirective(Manager.Include), "unexpected include position");
-			var attribute = directive.GetAttribute(Manager.Include.FileAttribute.Name);
-			var value = attribute?.GetValueToken();
-			return value;
-		}
-
 		private void AddHighlighting([NotNull] ITreeNode node, IHighlighting highlighting) =>
 			MyHighlightings.Add(new HighlightingInfo(node.GetHighlightingRange(), highlighting));
 
 		private void ReportUnresolvedPath([NotNull] IT4Include include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = FindIncludeValue(include);
+			var value = Navigator.FindIncludeValue(include);
 			if (value == null) return;
 			AddHighlighting(value, new T4UnresolvedIncludeHighlighting(value));
 		}
@@ -137,7 +133,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ReportRecursiveInclude([NotNull] IT4Include include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = FindIncludeValue(include);
+			var value = Navigator.FindIncludeValue(include);
 			if (value == null) return;
 			AddHighlighting(value, new T4RecursiveIncludeHighlighting(value));
 		}
@@ -145,7 +141,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ReportRedundantInclude([NotNull] IT4Include include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = FindIncludeValue(include);
+			var value = Navigator.FindIncludeValue(include);
 			if (value == null) return;
 			var directive = (value.Parent?.Parent as IT4Directive).NotNull();
 			AddHighlighting(value, new T4RedundantIncludeHighlighting(directive));

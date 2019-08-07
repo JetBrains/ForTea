@@ -40,10 +40,13 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private IT4TemplateExecutionManager ExecutionManager { get; }
 
 		[NotNull]
+		private T4TreeNavigator Navigator { get; }
+
+		[NotNull]
 		private IT4TargetFileManager TargetFileManager { get; }
 
 		[NotNull]
-		private T4BuildMessageConverter Converter { get; }
+		private IT4BuildMessageConverter Converter { get; }
 
 		public T4ProtocolModelManager(
 			[NotNull] ISolution solution,
@@ -51,7 +54,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger,
 			[NotNull] T4DirectiveInfoManager directiveInfoManager,
-			[NotNull] T4BuildMessageConverter converter
+			[NotNull] T4BuildMessageConverter converter,
+			[NotNull] T4TreeNavigator navigator
 		)
 		{
 			Solution = solution;
@@ -60,13 +64,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			Logger = logger;
 			DirectiveInfoManager = directiveInfoManager;
 			Converter = converter;
+			Navigator = navigator;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks();
 		}
 
 		private void RegisterCallbacks()
 		{
-			Model.RequestCompilation.Set(WrapClassFunc(Compile, Converter.FailedResult()));
+			Model.RequestCompilation.Set(WrapClassFunc(Compile, Converter.FatalError()));
 			Model.TransferResults.Set(WrapClassFunc(CopyResults, Unit.Instance));
 			Model.RequestPreprocessing.Set(WrapStructFunc(Preprocess, false));
 		}
@@ -126,7 +131,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 
 		private bool? Preprocess([NotNull] IT4File file)
 		{
-			string message = new T4CSharpCodeGenerator(file, DirectiveInfoManager).Generate().RawText;
+			string message = new T4CSharpCodeGenerator(file, DirectiveInfoManager, Navigator).Generate().RawText;
 			using (WriteLockCookie.Create())
 			{
 				TargetFileManager.SaveResults(new T4ExecutionResultInString(message), file, PreprocessResultExtension);
