@@ -17,7 +17,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		// We could have handled include directives here, too,
 		// but it would be way more cumbersome than in T4IncludeAwareDaemonProcessVisitor
 		new[] {typeof(T4UnresolvedAssemblyHighlighting)})]
-	public class T4UnresolvedPathAnalyzer : ElementProblemAnalyzer<IT4AttributeValue>
+	public class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzer
 	{
 		[NotNull]
 		private IModuleReferenceResolveManager ResolveManager { get; }
@@ -25,33 +25,21 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		[NotNull]
 		private IT4AssemblyNamePreprocessor Preprocessor { get; }
 
-		[NotNull]
-		private T4DirectiveInfoManager DirectiveInfoManager { get; }
-
 		public T4UnresolvedPathAnalyzer(
 			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
 			[NotNull] IModuleReferenceResolveManager resolveManager
-		)
+		) : base(directiveInfoManager)
 		{
-			DirectiveInfoManager = directiveInfoManager;
 			Preprocessor = preprocessor;
 			ResolveManager = resolveManager;
 		}
 
-		protected override void Run(
-			IT4AttributeValue element,
-			ElementProblemAnalyzerData data,
-			IHighlightingConsumer consumer
-		)
+		protected override void DoRun(IT4AttributeValue element,
+			IHighlightingConsumer consumer,
+			IT4Directive directive,
+			IT4File t4File)
 		{
-			Assertion.Assert(element.Parent is IT4DirectiveAttribute, "element.Parent is IT4DirectiveAttribute");
-			var attribute = (IT4DirectiveAttribute) element.Parent;
-			Assertion.Assert(attribute.Parent is IT4Directive, "attribute.Parent is IT4Directive");
-			var directive = (IT4Directive) attribute.Parent;
-			if (!directive.IsSpecificDirective(DirectiveInfoManager.Assembly)) return;
-			Assertion.Assert(directive.Parent is IT4File, "directive.Parent is IT4File");
-			var t4File = (IT4File) directive.Parent;
 			var sourceFile = t4File.GetSourceFile().NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			using (Preprocessor.Prepare(projectFile))
@@ -70,5 +58,10 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 				if (fileSystemPath == null) consumer.AddHighlighting(new T4UnresolvedAssemblyHighlighting(element));
 			}
 		}
+
+		protected override DirectiveInfo GetTargetDirective(T4DirectiveInfoManager manager) => manager.Assembly;
+
+		protected override DirectiveAttributeInfo GetTargetAttribute(T4DirectiveInfoManager manager) =>
+			manager.Assembly.NameAttribute;
 	}
 }
