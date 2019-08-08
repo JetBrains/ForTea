@@ -4,9 +4,12 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Host.Features.Notifications;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Rider.Model;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.Processes
@@ -25,12 +28,20 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			AnalyzeEmptyBlock(element);
 			AnalyzeEscapedKeyword(element);
+			AnalyzeOutputDirective(element);
+		}
+
+		private void AnalyzeOutputDirective([NotNull] ITreeNode element)
+		{
+//			var solution = element.GetSolution();
+//			var host = solution.GetComponent<NotificationPanelHost>();
+//			host.AddNotificationPanel(solution.GetLifetime(), null, new NotificationPanel());
 		}
 
 		private void AnalyzeEscapedKeyword([NotNull] ITreeNode element)
 		{
 			if (!(element is T4Token token)) return;
-			if (token.NodeType != T4TokenNodeTypes.Value) return;
+			if (token.NodeType != T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) return;
 			if (!(token.Parent is IT4DirectiveAttribute attribute)) return;
 			if (!(attribute.Parent is IT4Directive directive)) return;
 			if (!directive.IsSpecificDirective(Manager.Parameter)) return;

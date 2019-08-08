@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
@@ -8,9 +7,9 @@ using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Extension;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
@@ -142,7 +141,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		/// <param name="directive">The import directive.</param>
 		private void HandleImportDirective([NotNull] IT4Directive directive)
 		{
-			Pair<IT4Token, string> ns =
+			Pair<ITreeNode, string> ns =
 				directive.GetAttributeValueIgnoreOnlyWhitespace(Manager.Import.NamespaceAttribute.Name);
 
 			if (ns.First == null || ns.Second == null)
@@ -166,7 +165,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			string hostSpecific = directive.GetAttributeValue(Manager.Template.HostSpecificAttribute.Name);
 			if (bool.TrueString.Equals(hostSpecific, StringComparison.OrdinalIgnoreCase)) Result.RequireHost();
 
-			(IT4Token classNameToken, string className) =
+			(ITreeNode classNameToken, string className) =
 				directive.GetAttributeValueIgnoreOnlyWhitespace(Manager.Template.InheritsAttribute.Name);
 			if (classNameToken != null && className != null)
 				Result.CollectedBaseClass.AppendMapped(className, classNameToken.GetTreeTextRange());
@@ -183,7 +182,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		private void AppendExpressionWriting(
 			[NotNull] T4CSharpCodeGenerationResult result,
-			[NotNull] IT4Token token
+			[NotNull] TreeElement token
 		)
 		{
 			result.Append("            this.Write(");
@@ -213,6 +212,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		protected abstract void AppendCode(
 			[NotNull] T4CSharpCodeGenerationResult result,
-			[NotNull] IT4Token token);
+			[NotNull] TreeElement token);
 	}
 }

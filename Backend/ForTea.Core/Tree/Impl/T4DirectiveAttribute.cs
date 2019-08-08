@@ -10,11 +10,11 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 		/// <summary>Gets the role of a child node.</summary>
 		/// <param name="nodeType">The type of the child node</param>
 		protected override T4TokenRole GetChildRole(NodeType nodeType) {
-			if (nodeType == T4TokenNodeTypes.Name)
+			if (nodeType == T4TokenNodeTypes.TOKEN)
 				return T4TokenRole.Name;
-			if (nodeType == T4TokenNodeTypes.Equal)
+			if (nodeType == T4TokenNodeTypes.EQUAL)
 				return T4TokenRole.Separator;
-			if (nodeType == T4TokenNodeTypes.Value)
+			if (nodeType == T4ElementTypes.T4AttributeValue)
 				return T4TokenRole.Value;
 			return T4TokenRole.Unknown;
 		}
@@ -35,8 +35,8 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 
 		/// <summary>Gets the token representing the value of this attribute.</summary>
 		/// <returns>A value token, or <c>null</c> if none is available.</returns>
-		public IT4Token GetValueToken()
-			=> (IT4Token) FindChildByRole((short) T4TokenRole.Value);
+		public TreeElement GetValueToken()
+			=> FindChildByRole((short) T4TokenRole.Value);
 
 		/// <summary>Gets the name of the node.</summary>
 		/// <returns>The node name, or <c>null</c> if none is available.</returns>

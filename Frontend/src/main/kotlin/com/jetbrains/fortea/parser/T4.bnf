@@ -1,0 +1,55 @@
+{
+  parserClass="com.jetbrains.fortea.parser.T4Parser"
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="T4"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.jetbrains.fortea.psi"
+  psiImplPackage="com.jetbrains.fortea.psi.impl"
+
+  elementTypeHolderClass="com.jetbrains.fortea.psi.T4ElementTypes"
+  elementTypeClass="com.jetbrains.fortea.psi.T4ElementType"
+  tokenTypeClass="com.jetbrains.fortea.psi.T4TokenType"
+  psiVisitorName="T4Visitor"
+}
+
+t4File ::= (text|NEW_LINE|block)*
+
+block ::= directive | code_block
+
+// ---- ---- blocks ---- ----
+
+code_block ::= statement_block|expression_block|feature_block
+
+statement_block ::= STATEMENT_BLOCK_START code BLOCK_END
+
+expression_block ::= EXPRESSION_BLOCK_START code BLOCK_END
+
+feature_block ::= FEATURE_BLOCK_START code BLOCK_END
+
+// ---- ---- Directive ---- ----
+
+directive ::= directive_main BLOCK_END
+
+private directive_main ::= DIRECTIVE_START directive_name attribute* {
+  pin=1
+  recoverWhile=not_block_end_or_block_start
+}
+
+directive_name ::= TOKEN
+
+attribute ::= attribute_name EQUAL QUOTE attribute_value QUOTE
+
+attribute_name ::= TOKEN
+
+// ---- ---- Raw ---- ----
+
+text ::= RAW_TEXT+
+
+code ::= RAW_CODE+
+
+attribute_value ::= RAW_ATTRIBUTE_VALUE*
+
+// ---- ---- Recovery ---- ----
+
+private not_block_end_or_block_start ::= !BLOCK_END
