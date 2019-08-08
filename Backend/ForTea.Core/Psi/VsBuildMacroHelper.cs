@@ -6,7 +6,8 @@ using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.Psi {
 
-	internal static class VsBuildMacroHelper {
+	[Obsolete]
+	public static class VsBuildMacroHelper {
 
 		[NotNull] private static readonly Regex _vsMacroRegEx = new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
@@ -52,7 +53,9 @@ namespace GammaJul.ForTea.Core.Psi {
 			=> _vsMacroRegEx.Replace(stringWithMacros, match => {
 				Group group = match.Groups[1];
 				string macro = group.Value;
-				return group.Success && macroValues.TryGetValue(macro, out string value) ? value : macro;
+				if (group.Success && macroValues.TryGetValue(macro, out string value))
+					return value;
+				return macro;
 			});
 
 	}
