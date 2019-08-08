@@ -8,7 +8,6 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Collections;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -102,12 +101,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			var macroValues = Resolver.Resolve(RawMacros, SourceFile.ToProjectFile().NotNull());
 
 			var result = new StringBuilder(System.Environment.ExpandEnvironmentVariables(RawPath));
-			foreach ((string macro, string value) in macroValues)
+			return MacroRegex.Replace(result.ToString(), match =>
 			{
-				result.Replace($"$({macro})", value);
-			}
-
-			return result.ToString();
+				var group = match.Groups[1];
+				string macro = group.Value;
+				if (!group.Success) return macro;
+				if (!macroValues.TryGetValue(macro, out string value)) return macro;
+				return value;
+			});
 		}
 
 		private bool ContainsMacros
