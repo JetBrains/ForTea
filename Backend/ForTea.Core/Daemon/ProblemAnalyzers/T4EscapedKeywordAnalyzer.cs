@@ -2,6 +2,7 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 
@@ -17,8 +18,10 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 
 		protected override void Run(IT4AttributeValue token, ElementProblemAnalyzerData data, IHighlightingConsumer consumer)
 		{
-			if (!(token.Parent is IT4DirectiveAttribute attribute)) return;
-			if (!(attribute.Parent is IT4Directive directive)) return;
+			Assertion.Assert(token.Parent is IT4DirectiveAttribute, "token.Parent is IT4DirectiveAttribute");
+			var attribute = (IT4DirectiveAttribute) token.Parent;
+			Assertion.Assert(attribute.Parent is IT4Directive, "attribute.Parent is IT4Directive");
+			var directive = (IT4Directive) attribute.Parent;
 			if (!directive.IsSpecificDirective(Manager.Parameter)) return;
 			if (attribute.GetName() != Manager.Parameter.TypeAttribute.Name) return;
 			if (!CSharpLexer.IsKeyword(token.GetText())) return;

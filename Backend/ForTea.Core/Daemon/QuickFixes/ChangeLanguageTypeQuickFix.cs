@@ -17,8 +17,8 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 	[QuickFix]
 	public class ChangeLanguageTypeQuickFix : QuickFixBase
 	{
-		private UnsupportedLanguageHighlighting Highlighting { get; }
-		public ChangeLanguageTypeQuickFix(UnsupportedLanguageHighlighting highlighting) => Highlighting = highlighting;
+		private NoSupportForVBHighlighting Highlighting { get; }
+		public ChangeLanguageTypeQuickFix(NoSupportForVBHighlighting highlighting) => Highlighting = highlighting;
 
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{

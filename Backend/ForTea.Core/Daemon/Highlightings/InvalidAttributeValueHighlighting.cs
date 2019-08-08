@@ -13,23 +13,17 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		ShowToolTipInStatusBar = true,
 		AttributeId = HighlightingAttributeIds.ERROR_ATTRIBUTE
 	)]
-	public class InvalidAttributeValueHighlighting : T4HighlightingBase<IT4Token>
+	public class InvalidAttributeValueHighlighting : T4HighlightingBase<IT4AttributeValue>
 	{
 		[CanBeNull]
 		public DirectiveAttributeInfo DirectiveAttributeInfo { get; }
 
 		[NotNull]
-		public override string ToolTip { get; }
+		public override string ToolTip => "Invalid attribute value";
 
 		public InvalidAttributeValueHighlighting(
-			[NotNull] IT4Token associatedNode,
-			[CanBeNull] DirectiveAttributeInfo directiveAttributeInfo,
-			[NotNull] string errorMessage
-		)
-			: base(associatedNode)
-		{
-			DirectiveAttributeInfo = directiveAttributeInfo;
-			ToolTip = errorMessage;
-		}
+			[NotNull] IT4AttributeValue associatedNode,
+			[CanBeNull] DirectiveAttributeInfo directiveAttributeInfo
+		) : base(associatedNode) => DirectiveAttributeInfo = directiveAttributeInfo;
 	}
 }

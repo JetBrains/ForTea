@@ -12,9 +12,9 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		ShowToolTipInStatusBar = true,
 		AttributeId = HighlightingAttributeIds.ERROR_ATTRIBUTE
 	)]
-	public class NoSupportForVBHighlighting : T4HighlightingBase<IT4Token>
+	public class NoSupportForVBHighlighting : T4HighlightingBase<IT4AttributeValue>
 	{
-		public NoSupportForVBHighlighting([NotNull] IT4Token associatedNode) : base(associatedNode)
+		public NoSupportForVBHighlighting([NotNull] IT4AttributeValue associatedNode) : base(associatedNode)
 		{
 		}
 
