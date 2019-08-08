@@ -16,10 +16,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 	[SolutionComponent]
 	public class T4BuildMessageConverter : IT4BuildMessageConverter
 	{
-		[NotNull]
+		[CanBeNull]
 		private ProjectModelViewHost Host { get; }
 
-		public T4BuildMessageConverter([NotNull] ProjectModelViewHost host) => Host = host;
+		public T4BuildMessageConverter([NotNull] ISolution solution) =>
+			Host = solution.TryGetComponent<ProjectModelViewHost>();
 
 		public T4BuildResult ToT4BuildResult(ICollection<Diagnostic> diagnostics, IT4File file)
 		{
@@ -29,7 +30,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return new T4BuildResult(kind, messages);
 		}
 
-		private int GetProjectId([NotNull] IT4File file) => Host.GetIdByItem(file.GetProject().NotNull());
+		private int GetProjectId([NotNull] IT4File file) => Host?.GetIdByItem(file.GetProject().NotNull()) ?? 0;
 
 		public T4BuildResult ToT4BuildResult(T4OutputGenerationException exception) =>
 			ToT4BuildResult(exception.FailureData);

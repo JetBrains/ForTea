@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
@@ -59,7 +58,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public T4TemplateExecutionManager(
 			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
-			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IPsiModules psiModules,
 			[NotNull] ISolutionProcessStartInfoPatcher patcher,
 			[NotNull] IT4TargetFileManager manager,
