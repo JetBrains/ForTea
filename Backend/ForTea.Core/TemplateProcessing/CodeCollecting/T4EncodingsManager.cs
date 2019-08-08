@@ -24,12 +24,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				"directive.IsSpecificDirective(Manager.Output)");
 			var attribute = directive.GetAttribute(Manager.Output.EncodingAttribute.Name);
 			var value = attribute?.GetValueToken();
-			if (value == null) return "utf-8";
+			if (value == null) return "\"utf-8\"";
 			string rawEncoding = value.GetText();
-			if (IsCodePage(rawEncoding)) return rawEncoding;
-			if (IsEncodingName(rawEncoding)) return rawEncoding;
+			if (IsCodePage(rawEncoding)) return rawEncoding; // Insert unquoted
+			if (IsEncodingName(rawEncoding)) return $"\"{rawEncoding}\"";
 			interrupter.InterruptAfterProblem(T4FailureRawData.FromElement(value, "Unknown encoding"));
-			return "utf-8";
+			return "\"utf-8\"";
 		}
 
 		public static bool IsCodePage([NotNull] string rawEncoding)
