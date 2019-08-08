@@ -1,12 +1,9 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Psi.VB;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
@@ -24,11 +21,13 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			IHighlightingConsumer consumer
 		)
 		{
-			if (!(element.Parent is IT4DirectiveAttribute attribute)) return;
-			if (!(attribute.Parent is T4Directive directive)) return;
-			if (!directive.IsSpecificDirective(Manager.Template)) return;
+			Assertion.Assert(element.Parent is IT4DirectiveAttribute, "element.Parent is IT4DirectiveAttribute");
+			var attribute = (IT4DirectiveAttribute) element.Parent;
 			if (attribute.GetName() != Manager.Template.LanguageAttribute.Name) return;
-			if (!Manager.GetLanguageType(element.GetContainingFile() as IT4File).Is<VBLanguage>()) return;
+			Assertion.Assert(attribute.Parent is IT4Directive, "attribute.Parent is T4Directive");
+			var directive = (IT4Directive) attribute.Parent;
+			if (!directive.IsSpecificDirective(Manager.Template)) return;
+			if (element.GetText() != "VB") return;
 			consumer.AddHighlighting(new NoSupportForVBHighlighting(element));
 		}
 	}
