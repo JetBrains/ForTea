@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		public DirectiveAttributeInfo DirectiveAttributeInfo { get; }
 
 		[NotNull]
-		public override string ToolTip => "Invalid attribute value";
+		public override string ToolTip => "Unexpected value";
 
 		public InvalidAttributeValueHighlighting(
 			[NotNull] IT4AttributeValue associatedNode,
