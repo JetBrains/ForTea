@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 		public OutputDirectiveInfo()
 			: base("output") {
 			ExtensionAttribute = new DirectiveAttributeInfo("extension", DirectiveAttributeOptions.None);
-			EncodingAttribute = new EncodingDirectiveAttributeInfo("encoding", DirectiveAttributeOptions.None);
+			EncodingAttribute = new EncodingDirectiveAttributeInfo(DirectiveAttributeOptions.None);
 			SupportedAttributes = ImmutableArray.FromArguments(ExtensionAttribute, EncodingAttribute);
 		}
 

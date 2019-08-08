@@ -32,7 +32,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			return "utf-8";
 		}
 
-		private bool IsCodePage([NotNull] string rawEncoding)
+		public static bool IsCodePage([NotNull] string rawEncoding)
 		{
 			if (!int.TryParse(rawEncoding, out int codePage)) return false;
 			try
@@ -51,7 +51,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			}
 		}
 
-		private bool IsEncodingName([NotNull] string rawEncoding)
+		public static bool IsEncodingName([NotNull] string rawEncoding)
 		{
 			try
 			{
