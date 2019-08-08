@@ -1,0 +1,4 @@
+﻿<#@ template hostspecific="|mystery|(0)" #>
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Unexpected value

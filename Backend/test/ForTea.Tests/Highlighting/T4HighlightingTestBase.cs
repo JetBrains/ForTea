@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.Tests.Highlighting
 {
-	public abstract class T4ErrorHighlightingTestBase : HighlightingTestBase
+	public abstract class T4HighlightingTestBase : HighlightingTestBase
 	{
 		protected sealed override bool HighlightingPredicate(
 			IHighlighting highlighting,
@@ -16,9 +16,10 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		{
 			var instance = HighlightingSettingsManager.Instance;
 			var severity = instance.GetSeverity(highlighting, sourceFile, Solution, settingsStore);
-			return severity == Severity.ERROR;
+			return severity == Target;
 		}
 
+		protected abstract Severity Target { get; }
 		protected sealed override PsiLanguageType CompilerIdsLanguage => T4Language.Instance;
 	}
 }

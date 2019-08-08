@@ -10,10 +10,10 @@ namespace JetBrains.ForTea.Tests.Highlighting
 {
 	[Ignore("Highlighting is delegated to frontend")]
 	[TestFileExtension(T4ProjectFileType.MainExtension)]
-	public sealed class T4HighlightingTest : HighlightingTestBase
+	public sealed class T4CSharpHighlightingTest : HighlightingTestBase
 	{
 		protected override PsiLanguageType CompilerIdsLanguage => T4Language.Instance;
-		protected override string RelativeTestDataPath => @"Highlighting";
+		protected override string RelativeTestDataPath => @"Highlighting\CSharp";
 
 		protected override bool ColorIdentifiers => true;
 		protected override bool InplaceUsageAnalysis => true;
@@ -24,7 +24,6 @@ namespace JetBrains.ForTea.Tests.Highlighting
 			IContextBoundSettingsStore settingsStore
 		) => true;
 
-		[TestCase("Simple")]
 		[TestCase("CSharp")]
 		[TestCase("VB")]
 		public void TestHighlighting(string name) => DoOneTest(name);

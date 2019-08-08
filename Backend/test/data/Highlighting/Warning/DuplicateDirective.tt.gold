@@ -1,0 +1,8 @@
+﻿<#@ template language="C#" #>
+|<#@ template language="C#" #>|(0)
+<#@ output extension="txt" #>
+|<#@ output extension="cshtml" #>|(1)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Duplicate directive
+(1): ReSharper Dead Code: Duplicate directive

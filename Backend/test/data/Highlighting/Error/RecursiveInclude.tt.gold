@@ -1,0 +1,4 @@
+﻿<#@ include file="|RecursiveInclude.tt|(0)" #>
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cycle in includes

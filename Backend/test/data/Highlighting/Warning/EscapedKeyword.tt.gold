@@ -1,0 +1,5 @@
+﻿<#@ parameter name="|Foo|(0)" type="|string|(1)" #>
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Property 'Foo' is never used
+(1): ReSharper Warning: In T4, keywords are automatically escaped, which causes errors in generated code
