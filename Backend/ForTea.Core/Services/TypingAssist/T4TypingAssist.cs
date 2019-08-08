@@ -1,9 +1,11 @@
+using System;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Services.CodeCompletion;
 using JetBrains.Annotations;
 using JetBrains.Application.CommandProcessing;
 using JetBrains.Application.Settings;
+using JetBrains.Application.UI.ActionSystem.Text;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
@@ -52,8 +54,10 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
 
 			// insert ""
-			context.QueueCommand(() => {
-				using (CommandProcessor.UsingCommand("Inserting \"\"")) {
+			context.QueueCommand(() =>
+			{
+				using (CommandProcessor.UsingCommand("Inserting \"\""))
+				{
 					textControl.Document.InsertText(offset + 1, "\"\"");
 					textControl.Caret.MoveTo(offset + 2, CaretVisualPlacement.DontScrollIfVisible);
 				}
@@ -62,7 +66,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 				SkippingTypingAssist.SetCharsToSkip(textControl.Document, "\"");
 
 				// popup auto completion
-				_codeCompletionSessionManager.ExecuteAutoCompletion<T4AutopopupSettingsKey>(textControl, Solution, key => key.InDirectives);
+				_codeCompletionSessionManager.ExecuteAutoCompletion<T4AutopopupSettingsKey>(textControl, Solution,
+					key => key.InDirectives);
 			});
 
 			return true;
@@ -117,24 +122,56 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			return true;
 		}
 
-		/// <summary>When a # is typed, insert ></summary>
+		/// <summary>When a # is typed, complete code block</summary>
 		private bool OnOctothorpeTyped(ITypingContext context)
 		{
+			if (IsInsertingBlockStart(context))
+			{
+				InsertBlock(context);
+				return true;
+			}
+
+			if (IsInsertingBlockEnd(context))
+			{
+				InsertBlockEnd(context);
+				return true;
+			}
+
+			return false;
+		}
+
+		private void InsertBlock([NotNull] ITypingContext context)
+		{
 			var textControl = context.TextControl;
+			int offset = textControl.GetOffset();
+			InsertOctothorpe(textControl);
+			context.QueueCommand(() =>
+			{
+				using (CommandProcessor.UsingCommand("Inserting T4 Code Block"))
+				{
+					textControl.Document.InsertText(offset + 1, "#>");
+					textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+				}
+			});
+		}
 
-			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
+		private bool IsInsertingBlockStart([NotNull] ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			var lexer = GetCachingLexer(textControl);
+			if (lexer == null) return false;
+			int offset = textControl.GetOffset();
+			if (!lexer.FindTokenAt(offset - 1)) return false;
+			string tokenText = lexer.GetTokenText();
+			return tokenText.EndsWith("<", StringComparison.Ordinal)
+			       && !tokenText.EndsWith("\\<", StringComparison.Ordinal);
+		}
 
-			// If we are not in code block, just let it be typed
-			var previousToken = FindPreviousToken(GetCachingLexer(textControl), offset);
-			if (previousToken is T4TokenNodeType) return false;
-
-			// insert #
-			textControl.Selection.Delete();
-			textControl.FillVirtualSpaceUntilCaret();
-			textControl.Document.InsertText(offset, "#");
-			textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
-
-			// insert >
+		private void InsertBlockEnd([NotNull] ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			int offset = textControl.GetOffset();
+			InsertOctothorpe(textControl);
 			context.QueueCommand(() =>
 			{
 				using (CommandProcessor.UsingCommand("Inserting >"))
@@ -143,18 +180,41 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 					textControl.Caret.MoveTo(offset + 2, CaretVisualPlacement.DontScrollIfVisible);
 				}
 
-				// ignore if a subsequent " is typed by the user
 				SkippingTypingAssist.SetCharsToSkip(textControl.Document, ">");
 			});
+		}
 
-			return true;
+		private bool IsInsertingBlockEnd([NotNull] ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			var lexer = GetCachingLexer(textControl);
+			if (lexer == null) return false;
+			int offset = textControl.GetOffset();
+			var previousToken = FindPreviousToken(GetCachingLexer(textControl), offset);
+			switch (previousToken)
+			{
+				case null:
+				case T4TokenNodeType _:
+					return false;
+				default:
+					return true;
+			}
+		}
+
+		private static void InsertOctothorpe(ITextControl textControl)
+		{
+			int offset = textControl.GetOffset();
+			textControl.Selection.Delete();
+			textControl.FillVirtualSpaceUntilCaret();
+			textControl.Document.InsertText(offset, "#");
+			textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
 		}
 
 		[CanBeNull]
 		private TokenNodeType FindPreviousToken([CanBeNull] CachingLexer lexer, int initialOffset)
 		{
 			if (lexer == null) return null;
-			for (int offset = initialOffset; offset > 0; offset -= 1)
+			for (int offset = initialOffset; offset >= 0; offset -= 1)
 			{
 				if (!lexer.FindTokenAt(offset)) continue;
 				var tokenType = lexer.TokenType;
@@ -164,6 +224,39 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 
 			return null;
 		}
+
+		private bool OnEnterPressed(IActionContext context)
+		{
+			var textControl = context.TextControl;
+			int charPos;
+			var lexer = GetCachingLexer(textControl);
+			if (lexer == null) return false;
+			if (!CheckAndDeleteSelectionIfNeeded(textControl,
+				selection =>
+				{
+					charPos = TextControlToLexer(textControl, selection.StartOffset);
+					if (charPos <= 0) return false;
+					if (!lexer.FindTokenAt(charPos - 1)) return false;
+					if (!IsBlockStart(lexer)) return false;
+					if (!lexer.FindTokenAt(charPos)) return false;
+					if (!IsBlockEnd(lexer)) return false;
+					return true;
+				})
+			) return false;
+			int offset = textControl.GetOffset();
+			var psiSourceFile = textControl.Document.GetPsiSourceFile(Solution);
+			// Only insert one newline, as another gets inserted automatically
+			textControl.Document.InsertText(offset, GetNewLineText(psiSourceFile));
+			textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible);
+			return false;
+		}
+
+		private bool IsBlockEnd(CachingLexer lexer) => lexer.TokenType == T4TokenNodeTypes.BLOCK_END;
+
+		private bool IsBlockStart([NotNull] CachingLexer lexer) =>
+			lexer.TokenType == T4TokenNodeTypes.STATEMENT_BLOCK_START ||
+			lexer.TokenType == T4TokenNodeTypes.EXPRESSION_BLOCK_START ||
+			lexer.TokenType == T4TokenNodeTypes.FEATURE_BLOCK_START;
 
 		public T4TypingAssist(
 			Lifetime lifetime,
@@ -184,6 +277,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			typingAssistManager.AddTypingHandler(lifetime, '=', this, OnEqualTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '"', this, OnQuoteTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '#', this, OnOctothorpeTyped, IsTypingSmartParenthesisHandlerAvailable);
+			typingAssistManager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, OnEnterPressed, IsActionHandlerAvailable);
 		}
 
 	}

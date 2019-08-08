@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Progress;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.Util;
 
@@ -10,7 +12,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 {
 	public static class T4CSharpCodeGenerationUtils
 	{
-		[NotNull] public const string DefaultTargetExtension = "txt";
+		[NotNull] public const string DefaultTargetExtension = "cs";
 
 		[NotNull]
 		// name is NOT supposed to contain extension
@@ -61,7 +63,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 			var query = file
 				.GetDirectives(output)
 				.SelectMany(outputDirective => outputDirective.GetAttributes())
-				.Where(attribute => string.Equals(attribute.GetName(), output.EncodingAttribute.Name))
+				.Where(attribute => string.Equals(attribute.GetName(), output.ExtensionAttribute.Name))
 				.Select(attribute => attribute.GetValue());
 
 			string targetExtension = query.FirstOrDefault();
@@ -81,22 +83,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 			return first.IsEmpty() ? second : first;
 		}
 
-		[NotNull]
-		public static FileSystemPath SelectFreshName(
-			[NotNull] this FileSystemPath path,
-			[NotNull] string fileName,
-			[NotNull] string fileExtension
+		public static void WaitForExitSpinning(
+			[NotNull] this Process process,
+			int interval,
+			[CanBeNull] IProgressIndicator indicator
 		)
 		{
-			// First, try simplest option
-			var fullPath = path.Combine(fileName.WithExtension(fileExtension));
-			if (!fullPath.ExistsFile) return fullPath;
-
-			for (int index = 2;; index += 1)
+			if (process == null) throw new ArgumentNullException(nameof(process));
+			while (!process.WaitForExit(interval))
 			{
-				string newName = (fileName + index).WithExtension(fileExtension);
-				fullPath = path.Combine(newName);
-				if (!fullPath.ExistsFile) return fullPath;
+				if (indicator?.IsCanceled != true) continue;
+				process.KillTree();
+				throw new OperationCanceledException();
 			}
 		}
 	}
