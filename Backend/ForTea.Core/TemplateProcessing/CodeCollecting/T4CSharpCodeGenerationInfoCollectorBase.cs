@@ -76,17 +76,27 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			if (!(element is IT4Include include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			var resolved = include.Path.ResolveT4File(Guard);
-			if (resolved == null)
+			var sourceFile = include.Path.Resolve();
+			if (sourceFile == null)
 			{
 				var target = Navigator.FindIncludeValue(include) ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target}");
 				Interrupter.InterruptAfterProblem(data);
+				Guard.StartProcessing(null);
 				return;
 			}
 
-			var sourceFile = include.Path.Resolve().NotNull();
 			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
+			if (!Guard.CanProcess(sourceFile))
+			{
+				var target = Navigator.FindIncludeValue(include) ?? element;
+				var data = T4FailureRawData.FromElement(target, "Recursion in includes");
+				Interrupter.InterruptAfterProblem(data);
+				Guard.StartProcessing(sourceFile);
+				return;
+			}
+
+			var resolved = include.Path.ResolveT4File(Guard).NotNull();
 			Guard.StartProcessing(sourceFile);
 			resolved.ProcessDescendants(this);
 		}

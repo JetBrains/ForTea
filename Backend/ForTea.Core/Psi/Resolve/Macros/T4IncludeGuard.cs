@@ -6,9 +6,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 {
 	public sealed class T4IncludeGuard
 	{
+		[NotNull, ItemCanBeNull]
 		private ISet<IPsiSourceFile> SeenFiles { get; }
 
-		[NotNull, ItemNotNull]
+		[NotNull, ItemCanBeNull]
 		private Stack<IPsiSourceFile> FilesBeingProcessed { get; }
 
 		public T4IncludeGuard()
@@ -19,7 +20,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 
 		public bool CanProcess([NotNull] IPsiSourceFile file) => !FilesBeingProcessed.Contains(file);
 
-		public void StartProcessing([NotNull] IPsiSourceFile file)
+		public void StartProcessing([CanBeNull] IPsiSourceFile file)
 		{
 			FilesBeingProcessed.Push(file);
 			SeenFiles.Add(file);
