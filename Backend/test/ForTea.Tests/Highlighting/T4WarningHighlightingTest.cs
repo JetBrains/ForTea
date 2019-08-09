@@ -14,6 +14,8 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("EscapedKeyword")]
 		[TestCase("DuplicateDirective")]
 		[TestCase("RedundantInclude", Ignore="Includes are not resolved in tests")]
+		[TestCase("UnexpectedAttribute")]
+		[TestCase("UnexpectedDirective")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.WARNING;
