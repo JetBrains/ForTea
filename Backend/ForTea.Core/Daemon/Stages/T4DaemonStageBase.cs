@@ -18,10 +18,14 @@ namespace GammaJul.ForTea.Core.Daemon.Stages
 			DaemonProcessKind processKind
 		)
 			=> process.SourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File
-				? new[] {CreateProcess(process, t4File)}
+				? new[] {CreateProcess(process, t4File, settings)}
 				: EmptyList<IDaemonStageProcess>.InstanceList;
 
 		[NotNull]
-		protected abstract IDaemonStageProcess CreateProcess([NotNull] IDaemonProcess process, [NotNull] IT4File file);
+		protected abstract IDaemonStageProcess CreateProcess(
+			[NotNull] IDaemonProcess process,
+			[NotNull] IT4File file,
+			[NotNull] IContextBoundSettingsStore settings
+		);
 	}
 }

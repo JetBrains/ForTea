@@ -12,9 +12,9 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		ShowToolTipInStatusBar = true,
 		AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE
 	)]
-	public class EscapedKeywordHighlighting : T4HighlightingBase<IT4Token>
+	public class EscapedKeywordHighlighting : T4HighlightingBase<IT4AttributeValue>
 	{
-		public EscapedKeywordHighlighting([NotNull] IT4Token associatedNode) : base(associatedNode)
+		public EscapedKeywordHighlighting([NotNull] IT4AttributeValue associatedNode) : base(associatedNode)
 		{
 		}
 		

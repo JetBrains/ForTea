@@ -56,10 +56,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendNamespaceContents()
 		{
 			AppendImports();
-			AppendClasses();
+			AppendClasses(IntermediateResult.HasHost);
 		}
 
-		protected virtual void AppendClasses()
+		protected virtual void AppendClasses(bool hostspecific)
 		{
 			AppendClass();
 			AppendBaseClass();
@@ -73,13 +73,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			string ns = projectFile.GetCustomToolNamespace();
 			string ns2 = sourceFile?.Properties.GetDefaultNamespace();
-			return T4CSharpCodeGenerationUtils.ChooseBetterNamespace(ns, ns2);
+			if (ns == null) return ns2;
+			if (ns2 == null) return ns;
+			return ns.IsEmpty() ? ns2 : ns;
 		}
 
-		private void AppendImports()
+		protected virtual void AppendImports()
 		{
 			AppendIndent();
 			Result.AppendLine("using System;");
+			if (IntermediateResult.HasHost)
+			{
+				AppendIndent();
+				Result.AppendLine("using System.CodeDom.Compiler;");
+			}
+
 			Result.Append(IntermediateResult.CollectedImports); // TODO: Indent these, too
 		}
 
@@ -93,12 +101,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
-			if (IntermediateResult.HasHost)
-			{
-				AppendIndent();
-				Result.AppendLine(
-					"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
-			}
+			if (IntermediateResult.HasHost) AppendHost();
 
 			AppendTransformMethod();
 			Result.Append(IntermediateResult.CollectedFeatures);
@@ -181,6 +184,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine(provider.ProcessResource(GeneratedBaseClassName));
 		}
 
+		protected abstract void AppendHost();
 		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
 
 		[NotNull]

@@ -98,6 +98,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine(";");
 		}
 
+		protected override void AppendHost()
+		{
+			// Host directive does not work for runtime templates
+		}
+
 		protected override void AppendIndent(int size)
 		{
 			// TODO: use user indents?

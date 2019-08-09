@@ -49,10 +49,10 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 				? null
 				: AllDirectives.FirstOrDefault(di => di.Name.Equals(directiveName, StringComparison.OrdinalIgnoreCase));
 
-		public PsiLanguageType GetLanguageType(IT4File file)
+		public PsiLanguageType GetLanguageType([CanBeNull] IT4File file)
 		{
 			string name = file
-				.GetDirectives()
+				?.GetDirectives()
 				.FirstOrDefault(directive => directive.IsSpecificDirective(Template))
 				?.GetAttribute(Template.LanguageAttribute.Name)
 				?.GetValue();

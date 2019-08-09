@@ -45,7 +45,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
 			
-			string result = executionManager.Execute(file); // Write to buffer
+			var result = executionManager.Execute(file); // Write to buffer
 			var affectedFile = targetFileManager.SaveResults(result, file); // Write disk entry
 
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);

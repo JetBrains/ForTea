@@ -5,7 +5,7 @@
     /// <summary>
     /// Base class for this transformation
     /// </summary>
-    public class TEMPLATE_PLACEHOLDER_BASE_CLASS
+    public class $(PARAMETER_0)
     {
     	#region Fields
     	private global::System.Text.StringBuilder generationEnvironmentField;

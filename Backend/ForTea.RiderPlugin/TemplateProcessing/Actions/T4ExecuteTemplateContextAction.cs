@@ -4,6 +4,7 @@ using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
+using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 {
@@ -24,9 +25,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Actions
 
 		protected override void DoExecute(ISolution solution, IProgressIndicator progress)
 		{
-			string result = solution.GetComponent<IT4TemplateExecutionManager>().Execute(File.NotNull(), progress);
+			var result = solution.GetComponent<IT4TemplateExecutionManager>().Execute(File.NotNull(), progress);
 			var fileManager = solution.GetComponent<IT4TargetFileManager>();
-			fileManager.SaveResults(result, File);
+			using (WriteLockCookie.Create())
+			{
+				fileManager.SaveResults(result, File);
+			}
 		}
 
 		public override string Text => Message;

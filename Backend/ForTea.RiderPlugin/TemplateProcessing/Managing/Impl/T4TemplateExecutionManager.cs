@@ -29,7 +29,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull] private const string DefaultExecutableExtension = "exe";
 		[NotNull] private const string DefaultExecutableExtensionWithDot = "." + DefaultExecutableExtension;
 		[NotNull] private const string Title = "Executing T4 Template";
-		[NotNull] private const string ErrorMessage = "ErrorGeneratingOutput";
 
 		[NotNull]
 		private T4DirectiveInfoManager DirectiveInfoManager { get; }
@@ -44,26 +43,29 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		[NotNull]
 		private ISolutionProcessStartInfoPatcher Patcher { get; }
+		
+		[NotNull]
+		private IT4TargetFileManager Manager { get; }
 
 		public T4TemplateExecutionManager(
 			Lifetime solutionLifetime,
 			[NotNull] IShellLocks locks,
 			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IPsiModules psiModules,
-			[NotNull] ISolutionProcessStartInfoPatcher patcher
-		)
+			[NotNull] ISolutionProcessStartInfoPatcher patcher,
+			[NotNull] IT4TargetFileManager manager)
 		{
 			SolutionLifetime = solutionLifetime;
 			Locks = locks;
 			DirectiveInfoManager = directiveInfoManager;
 			PsiModules = psiModules;
 			Patcher = patcher;
+			Manager = manager;
 		}
 
-		public string Execute(IT4File file, IProgressIndicator progress = null, Lifetime? outerLifetime = null)
+		public IT4ExecutionResult Execute(IT4File file, IProgressIndicator progress = null)
 		{
-			var baseLifetime = outerLifetime ?? SolutionLifetime;
-			var definition = baseLifetime.CreateNested();
+			var definition = SolutionLifetime.CreateNested();
 			LaunchProgress(progress);
 			var info = GenerateCode(file, progress);
 			return CompileAndRun(definition, info);
@@ -90,7 +92,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager);
 				string code = generator.Generate().RawText;
 				var references = ExtractReferences(file);
-				return new T4TemplateExecutionManagerInfo(timeStamp, code, references, file, progress);
+				return new T4TemplateExecutionManagerInfo(code, references, file, progress);
 			}
 		}
 
@@ -113,7 +115,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}
 		}
 
-		private string CompileAndRun(LifetimeDefinition definition, T4TemplateExecutionManagerInfo info)
+		private IT4ExecutionResult CompileAndRun(LifetimeDefinition definition, T4TemplateExecutionManagerInfo info)
 		{
 			if (info.ProgressIndicator != null) info.ProgressIndicator.CurrentItemText = "Compiling code";
 			var executablePath = CreateTemporaryExecutable(definition.Lifetime);
@@ -125,12 +127,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			if (!errors.IsEmpty())
 			{
 				MessageBox.ShowError(errors.Select(error => error.ToString()).Join("\n"), "Could not compile template");
-				return ErrorMessage;
+				return new T4ExecutionFailure();
 			}
 
 			compilation.Emit(executablePath.FullPath, cancellationToken: definition.Lifetime);
 			CopyAssemblies(info, executablePath);
-			return Run(info, definition, executablePath);
+			return Run(info, definition.Lifetime, executablePath);
 		}
 
 		private CSharpCompilation CreateCompilation(T4TemplateExecutionManagerInfo info)
@@ -167,34 +169,33 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}
 		}
 
-		private string Run(
+		private IT4ExecutionResult Run(
 			T4TemplateExecutionManagerInfo info,
-			LifetimeDefinition definition,
+			Lifetime lifetime,
 			FileSystemPath executablePath
 		)
 		{
-			var lifetime = definition.Lifetime;
-			var process = LaunchProcess(lifetime, executablePath);
+			string targetFileName = Manager.GetTargetFileName(info.File);
+			var destinationPath = executablePath.Directory.Combine(targetFileName);
+			var process = LaunchProcess(lifetime, executablePath, destinationPath);
 			lifetime.ThrowIfNotAlive();
 			process.WaitForExitSpinning(100, info.ProgressIndicator);
 			lifetime.ThrowIfNotAlive();
-			string stdout = process.StandardOutput.ReadToEnd();
-			lifetime.ThrowIfNotAlive();
-			string stderr = process.StandardError.ReadToEnd();
-			lifetime.ThrowIfNotAlive();
-			string result = stderr.IsNullOrEmpty() ? stdout : ErrorMessage;
-			return result;
+			return new T4ExecutionResultInFile(destinationPath);
 		}
 
-		private Process LaunchProcess(Lifetime lifetime, FileSystemPath executablePath)
+		private Process LaunchProcess(
+			Lifetime lifetime,
+			[NotNull] FileSystemPath executablePath,
+			[NotNull] FileSystemPath destinationPath
+		)
 		{
 			var startInfo = new JetProcessStartInfo(new ProcessStartInfo
 			{
 				UseShellExecute = false,
-				RedirectStandardOutput = true,
-				RedirectStandardError = true,
 				FileName = executablePath.FullPath,
-				CreateNoWindow = true
+				CreateNoWindow = true,
+				Arguments = destinationPath.FullPath
 			});
 
 			var request = JetProcessRuntimeRequest.CreateFramework();
