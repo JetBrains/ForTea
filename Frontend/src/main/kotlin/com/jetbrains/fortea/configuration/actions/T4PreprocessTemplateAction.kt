@@ -10,7 +10,7 @@ import com.jetbrains.fortea.psi.T4PsiFile
 import com.jetbrains.rider.icons.ReSharperLiveTemplatesCSharpIcons
 
 class T4PreprocessTemplateAction : T4FileBasedActionBase<T4PreprocessConfiguration, T4PreprocessConfigurationType>(
-  "Generate C# code",
+  "Generate code",
   ReSharperLiveTemplatesCSharpIcons.ScopeCS
 ) {
   override fun createConfiguration(
