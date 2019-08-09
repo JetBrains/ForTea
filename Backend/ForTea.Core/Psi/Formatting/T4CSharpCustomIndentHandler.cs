@@ -20,6 +20,7 @@ using JetBrains.ReSharper.Psi.Impl.Shared;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
 using JetBrains.RiderTutorials.Utils;
+using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting
 {
@@ -124,7 +125,10 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			.Where(token => !token.IsWhitespaceToken())
 			.Select(token => token.GetTreeTextRange())
 			.Select(rangeTranslator.GeneratedToOriginal)
-			.Any(originalRange => originalRange.IsValid());
+			.Where(originalRange => originalRange.IsValid())
+			.SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
+			.SelectNotNull(it => it.GetParentOfType<IT4CodeBlock>())
+			.Any();
 
 		[Pure]
 		private static bool HasLineBreak([NotNull] IT4CodeBlock codeBlock, int nodeStart, TreeOffset blockStart) =>
