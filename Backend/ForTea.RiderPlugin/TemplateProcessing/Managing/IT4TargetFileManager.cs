@@ -1,26 +1,24 @@
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 {
 	public interface IT4TargetFileManager
 	{
-		string GetTargetFileName([NotNull] IT4File file, [CanBeNull] string targetExtension = null);
+		[NotNull]
+		string GetExpectedTargetFileName([NotNull] IT4File file);
 
 		[NotNull]
 		FileSystemPath GetTemporaryExecutableLocation([NotNull] IT4File file);
 
 		[NotNull]
-		FileSystemPath GetTemporaryTargetFileLocation([NotNull] IT4File file);
+		FileSystemPath GetExpectedTemporaryTargetFileLocation([NotNull] IT4File file);
 
 		[NotNull]
-		FileSystemPath SaveResults(
-			IT4ExecutionResult result,
-			[NotNull] IT4File file,
-			[CanBeNull] string targetExtension = null);
+		FileSystemPath SaveExecutionResults([NotNull] IT4File file);
 
-		IProjectFile GetDestinationFile([NotNull] IT4File file, [CanBeNull] string targetExtension = null);
+		[NotNull]
+		FileSystemPath SavePreprocessResults([NotNull] IT4File file, [NotNull] string text);
 	}
 }

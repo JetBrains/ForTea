@@ -17,21 +17,29 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public T4EncodingsManager([NotNull] T4DirectiveInfoManager manager) => Manager = manager;
 
-		[NotNull]
+		[CanBeNull]
 		public string FindEncoding([NotNull] IT4Directive directive, [NotNull] IT4CodeGenerationInterrupter interrupter)
 		{
 			Assertion.Assert(directive.IsSpecificDirective(Manager.Output),
 				"directive.IsSpecificDirective(Manager.Output)");
 			var attribute = directive.GetAttribute(Manager.Output.EncodingAttribute.Name);
 			var value = attribute?.GetValueToken();
-			if (value == null) return "\"utf-8\"";
+			if (value == null) return null;
 			string rawEncoding = value.GetText();
 			if (IsCodePage(rawEncoding)) return rawEncoding; // Insert unquoted
 			if (IsEncodingName(rawEncoding)) return $"\"{rawEncoding}\"";
 			interrupter.InterruptAfterProblem(T4FailureRawData.FromElement(value, "Unknown encoding"));
-			return "\"utf-8\"";
+			return null;
 		}
 
+		[NotNull]
+		public static string GetEncoding([NotNull] IT4File file)
+		{
+			var sourceFile = file.GetSourceFile();
+			if (sourceFile == null) return Encoding.UTF8.CodePage.ToString();
+			return sourceFile.Document.Encoding.CodePage.ToString();
+		}
+		
 		public static bool IsCodePage([NotNull] string rawEncoding)
 		{
 			if (!int.TryParse(rawEncoding, out int codePage)) return false;

@@ -11,6 +11,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] private const string SuffixResource =
 			"GammaJul.ForTea.Core.Resources.TemplateBaseFullExecutableSuffix.cs";
 
+		[NotNull] private const string HostspecificSuffixResource =
+			"GammaJul.ForTea.Core.Resources.HostspecificTemplateBaseFullExecutableSuffix.cs";
+
 		[NotNull] private const string HostResource = "GammaJul.ForTea.Core.Resources.Host.cs";
 
 		public T4CSharpExecutableIntermediateConverter(
@@ -52,8 +55,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		private void AppendMainContainer()
 		{
-			var provider = new T4TemplateResourceProvider(SuffixResource, this);
-			string suffix = provider.ProcessResource(GeneratedClassName, IntermediateResult.Encoding);
+			string resource = IntermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
+			var provider = new T4TemplateResourceProvider(resource, this);
+			string encoding = IntermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
+			string suffix = provider.ProcessResource(GeneratedClassName, encoding);
 			Result.Append(suffix);
 		}
 

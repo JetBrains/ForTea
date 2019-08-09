@@ -170,16 +170,16 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}
 		}
 
-		public IT4ExecutionResult Execute(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
+		public bool Execute(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
 			var executablePath = Manager.GetTemporaryExecutableLocation(file);
-			string targetFileName = Manager.GetTargetFileName(file);
+			string targetFileName = Manager.GetExpectedTargetFileName(file);
 			var destinationPath = executablePath.Directory.Combine(targetFileName);
 			var process = LaunchProcess(lifetime, executablePath, destinationPath);
 			lifetime.ThrowIfNotAlive();
-			process.WaitForExitSpinning(100, progress);
+			int code = process.WaitForExitSpinning(100, progress);
 			lifetime.ThrowIfNotAlive();
-			return new T4ExecutionResultInFile(destinationPath);
+			return code == 0;
 		}
 
 		private Process LaunchProcess(

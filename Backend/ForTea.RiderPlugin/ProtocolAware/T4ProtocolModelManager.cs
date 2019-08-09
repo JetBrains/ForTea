@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Core;
-using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.ProjectModel;
@@ -22,8 +21,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 	[SolutionComponent]
 	public sealed class T4ProtocolModelManager : GammaJul.ForTea.Core.ProtocolAware.Impl.T4ProtocolModelManager
 	{
-		[NotNull] private const string PreprocessResultExtension = "cs";
-
 		[NotNull]
 		private ILogger Logger { get; }
 
@@ -70,7 +67,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			Model.Configurations[file.GetSourceFile().GetLocation().FullPath.Replace("\\", "/")] =
 				new T4ConfigurationModel(
 					TargetFileManager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),
-					TargetFileManager.GetTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
+					TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
 				);
 
 		private Func<string, T> Wrap<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
@@ -96,9 +93,11 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		[CanBeNull]
 		private Unit CopyResults([NotNull] IT4File file)
 		{
-			var temporaryTargetFileLocation = TargetFileManager.GetTemporaryTargetFileLocation(file);
-			Assertion.Assert(temporaryTargetFileLocation.ExistsFile, "temporaryTargetFileLocation.ExistsFile");
-			TargetFileManager.SaveResults(new T4ExecutionResultInFile(temporaryTargetFileLocation), file);
+			using (WriteLockCookie.Create())
+			{
+				TargetFileManager.SaveExecutionResults(file);
+			}
+
 			return Unit.Instance;
 		}
 
@@ -110,8 +109,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 				string message = new T4CSharpCodeGenerator(file, Solution).Generate().RawText;
 				using (WriteLockCookie.Create())
 				{
-					var result = new T4ExecutionResultInString(message);
-					TargetFileManager.SaveResults(result, file, PreprocessResultExtension);
+					TargetFileManager.SavePreprocessResults(file, message);
 				}
 				return new T4PreprocessingResult(true, null);
 			}

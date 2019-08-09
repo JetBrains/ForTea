@@ -1,53 +1,53 @@
 namespace Microsoft.VisualStudio.TextTemplating
 {
-	public class ITextTemplatingEngineHost
-	{
-		public bool LoadIncludeText(string requestFileName, out string content, out string location)
-		{
-			content = null;
-			location = null;
-			return false;
-		}
+    public class ITextTemplatingEngineHost
+    {
+        public Encoding Encoding { get; private set; }
+        public string FileExtension { get; private set; }
 
-		public string ResolveAssemblyReference(string assemblyReference) => assemblyReference;
+        public bool LoadIncludeText(string requestFileName, out string content, out string location)
+        {
+            content = null;
+            location = null;
+            return false;
+        }
 
-		public IList<string> StandardAssemblyReferences => new string[] {typeof(System.Uri).Assembly.Location};
+        public string ResolveAssemblyReference(string assemblyReference) => assemblyReference;
 
-		public IList<string> StandardImports => new string[] {"System"};
+        public System.Collections.Generic.IList<string> StandardAssemblyReferences =>
+            new[] {typeof(System.Uri).Assembly.Location};
 
-		public Type ResolveDirectiveProcessor(string processorName) =>
-			throw new Exception("Directive Processor not found");
+        public System.Collections.Generic.IList<string> StandardImports => new[] {"System"};
 
-		public string ResolvePath(string path) => path;
+        public Type ResolveDirectiveProcessor(string processorName) =>
+            throw new Exception("Directive Processor not found");
 
-		public string ResolveParameterValue(string directiveId, string processorName, string parameterName) =>
-			String.Empty;
+        public string ResolvePath(string path) => path;
 
-		public AppDomain ProvideTemplatingAppDomain(string content) => AppDomain.CreateDomain("Generation App Domain");
+        public string ResolveParameterValue(string directiveId, string processorName, string parameterName) =>
+            String.Empty;
 
-		public void LogErrors(CompilerErrorCollection errors)
-		{
-		}
+        public AppDomain ProvideTemplatingAppDomain(string content) => AppDomain.CreateDomain("Generation App Domain");
 
-		public void SetFileExtension(string extension)
-		{
-		}
+        public void LogErrors(CompilerErrorCollection errors)
+        {
+        }
 
-		public void SetOutputEncoding(Encoding encoding, bool fromOutputDirective)
-		{
-		}
+        public void SetFileExtension(string extension) => FileExtension = extension;
 
-		public string TemplateFile => @"$(PARAMETER_0)";
+        public void SetOutputEncoding(Encoding encoding, bool fromOutputDirective) => Encoding = encoding;
 
-		public object GetHostOption(string optionName)
-		{
-			switch (optionName)
-			{
-				case "CacheAssemblies":
-					return true;
-				default:
-					return null;
-			}
-		}
-	}
+        public string TemplateFile => @"$(PARAMETER_0)";
+
+        public object GetHostOption(string optionName)
+        {
+            switch (optionName)
+            {
+                case "CacheAssemblies":
+                    return true;
+                default:
+                    return null;
+            }
+        }
+    }
 }

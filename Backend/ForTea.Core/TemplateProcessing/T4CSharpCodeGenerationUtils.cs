@@ -20,7 +20,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 		{
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			if (extension == null) throw new ArgumentNullException(nameof(extension));
-			return name + '.' + extension;
+			return name + '.' + extension.WithoutLeadingDot();
+		}
+
+		[NotNull]
+		public static string WithoutLeadingDot([NotNull] this string extension)
+		{
+			if (extension == null) throw new ArgumentNullException(nameof(extension));
+			if (!extension.StartsWith(".", StringComparison.Ordinal)) return extension;
+			return extension.Substring(1);
 		}
 
 		[NotNull]
@@ -75,7 +83,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 				: targetExtension;
 		}
 
-		public static void WaitForExitSpinning(
+		public static int WaitForExitSpinning(
 			[NotNull] this Process process,
 			int interval,
 			[CanBeNull] IProgressIndicator indicator
@@ -88,6 +96,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 				process.KillTree();
 				throw new OperationCanceledException();
 			}
+
+			return process.ExitCode;
 		}
 	}
 }

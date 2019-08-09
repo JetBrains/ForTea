@@ -1,7 +1,9 @@
     public class TemplateBaseFullExecutableSuffix____GeneratedClass___LetsHopeNoOneEverNamesAClassLikeThat__IfYouNameClassLikeThatWeAreNotResponsibleForIncorrectBehaviour
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            File.WriteAllText(args[0], new $(PARAMETER_0)().TransformText(), Encoding.GetEncoding($(PARAMETER_1)));
+            string result = new $(PARAMETER_0)().TransformText();
+            var encoding = Encoding.GetEncoding($(PARAMETER_1));
+            File.WriteAllText(args[0], result, encoding);
         }
     }
