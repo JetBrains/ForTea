@@ -35,10 +35,11 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			ResolveManager = resolveManager;
 		}
 
-		protected override void DoRun(IT4AttributeValue element,
+		protected override void DoRun(
+			IT4AttributeValue element,
 			IHighlightingConsumer consumer,
-			IT4Directive directive,
-			IT4File t4File)
+			IT4File t4File
+		)
 		{
 			var sourceFile = t4File.GetSourceFile().NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();

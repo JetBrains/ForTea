@@ -28,7 +28,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			if (!directive.IsSpecificDirective(GetTargetDirective(DirectiveInfoManager))) return;
 			Assertion.Assert(directive.Parent is IT4File, "directive.Parent is IT4File");
 			var t4File = (IT4File) directive.Parent;
-			DoRun(element, consumer, directive, t4File);
+			DoRun(element, consumer, t4File);
 		}
 
 		[NotNull]
@@ -37,9 +37,9 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		[NotNull]
 		protected abstract DirectiveAttributeInfo GetTargetAttribute([NotNull] T4DirectiveInfoManager manager);
 
-		protected abstract void DoRun([NotNull] IT4AttributeValue element,
+		protected abstract void DoRun(
+			[NotNull] IT4AttributeValue element,
 			[NotNull] IHighlightingConsumer consumer,
-			[NotNull] IT4Directive directive,
 			[NotNull] IT4File t4File);
 	}
 }

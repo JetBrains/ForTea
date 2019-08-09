@@ -27,7 +27,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		{
 			try
 			{
-				return CreateConverter(Collector.Collect()).Convert();
+				return Generate();
 			}
 			catch (T4OutputGenerationException)
 			{
