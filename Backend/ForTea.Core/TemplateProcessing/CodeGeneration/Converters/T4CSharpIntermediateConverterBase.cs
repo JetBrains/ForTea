@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -13,7 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
 		[NotNull]
-		private T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
+		protected T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
 
 		[NotNull]
 		protected T4CSharpCodeGenerationResult Result { get; }
@@ -34,6 +37,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull]
 		public T4CSharpCodeGenerationResult Convert()
 		{
+			AppendGeneratedMessage();
 			string ns = GetNamespace();
 			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
@@ -62,6 +66,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual void AppendClasses(bool hostspecific)
 		{
 			AppendClass();
+			AppendIndent();
+			Result.AppendLine();
 			AppendBaseClass();
 		}
 
@@ -80,31 +86,40 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected virtual void AppendImports()
 		{
-			AppendIndent();
-			Result.AppendLine("using System;");
-			if (IntermediateResult.HasHost)
+			foreach (var description in IntermediateResult.ImportDescriptions)
 			{
 				AppendIndent();
-				Result.AppendLine("using System.CodeDom.Compiler;");
+				Result.Append("using ");
+				if (description.IsVisible)
+					Result.AppendMapped(description.Presentation, description.Source.GetTreeTextRange());
+				else Result.Append(description.Presentation);
+				Result.AppendLine(";");
 			}
 
-			Result.Append(IntermediateResult.CollectedImports); // TODO: Indent these, too
+			AppendIndent();
+			Result.AppendLine("using System;");
+			if (!IntermediateResult.HasHost) return;
+			AppendIndent();
+			Result.AppendLine("using System.CodeDom.Compiler;");
 		}
 
-		protected void AppendClass()
+		protected virtual void AppendClass()
 		{
 			AppendSyntheticAttribute();
 			AppendIndent();
-			Result.Append($"public class {GeneratedClassName} : ");
+			Result.Append($"public partial class {GeneratedClassName} : ");
 			AppendBaseClassName();
 			Result.AppendLine();
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
 			if (IntermediateResult.HasHost) AppendHost();
-
 			AppendTransformMethod();
-			Result.Append(IntermediateResult.CollectedFeatures);
+			foreach (var description in IntermediateResult.FeatureDescriptions)
+			{
+				description.AppendContent(Result, Provider);
+			}
+
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
 			AppendTemplateInitialization(IntermediateResult.ParameterDescriptions);
 			PopIndent();
@@ -151,7 +166,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine("}");
 		}
 
-		private void AppendTransformMethod()
+		protected virtual void AppendTransformMethod()
 		{
 			AppendSyntheticAttribute();
 			AppendIndent();
@@ -161,11 +176,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
-			AppendTransformationPrefix();
-			Result.Append(IntermediateResult.CollectedTransformation);
-			Result.AppendLine();
 			AppendIndent();
-			Result.AppendLine("return GenerationEnvironment.ToString();");
+			Result.AppendLine();
+			AppendTransformationPrefix();
+			foreach (var description in IntermediateResult.TransformationDescriptions)
+			{
+				description.AppendContent(Result, Provider);
+			}
+
+			AppendIndent();
+			Result.AppendLine("return this.GenerationEnvironment.ToString();");
 			PopIndent();
 			AppendIndent();
 			Result.AppendLine("}");
@@ -181,7 +201,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			if (IntermediateResult.HasBaseClass) return;
 			var provider = new T4TemplateResourceProvider(ResourceName, this);
-			Result.AppendLine(provider.ProcessResource(GeneratedBaseClassName));
+			Result.Append(provider.ProcessResource(GeneratedBaseClassName));
 		}
 
 		protected abstract void AppendHost();
@@ -201,12 +221,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
 
+		[NotNull]
+		protected abstract IT4ElementAppendFormatProvider Provider { get; }
+
 		protected virtual void AppendTransformationPrefix()
 		{
 		}
 
+		protected virtual void AppendGeneratedMessage()
+		{
+		}
+
 		#region Indentation
-		private int CurrentIndent { get; set; }
+		protected int CurrentIndent { get; set; }
 		protected void PushIndent() => CurrentIndent += 1;
 		protected void PopIndent() => CurrentIndent -= 1;
 		protected void AppendIndent() => AppendIndent(CurrentIndent);

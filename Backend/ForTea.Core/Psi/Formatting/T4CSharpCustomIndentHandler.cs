@@ -1,167 +1,200 @@
+using System;
+using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
+using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Asp.Impl.Tree;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.CSharp.CodeStyle;
 using JetBrains.ReSharper.Psi.CSharp.CodeStyle.FormatSettings;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
+using JetBrains.ReSharper.Psi.Impl.Shared;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
+using JetBrains.RiderTutorials.Utils;
+using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting
 {
 	[ShellComponent]
 	public class T4CSharpCustomIndentHandler : ICustomIndentHandler
 	{
+		[CanBeNull]
 		public string Indent(
-			ITreeNode node,
+			[NotNull] ITreeNode node,
 			CustomIndentType indentType,
-			FmtSettings<CSharpFormatSettingsKey> settings
+			[NotNull] FmtSettings<CSharpFormatSettingsKey> settings
 		)
 		{
-			var helper = new T4CSharpIndentHelper(settings.Settings);
-			return IndentHandler(node, indentType, helper);
+			if (node == null) throw new ArgumentNullException(nameof(node));
+			if (settings == null) throw new ArgumentNullException(nameof(settings));
+			if (!node.IsPhysical()) return null;
+			if (!IsInT4File(node)) return null;
+			if (indentType == CustomIndentType.RelativeNodeCalculation) return node.GetIndentViaDocument();
+			if (IsEndComment(node)) return IndentBlockEnd();
+			if (IsTransformTextMember(node)) return IndentTransformTextMember(node, indentType);
+			if (IsFeatureBlockMember(node)) return IndentFeatureBlockMember(node);
+			return null;
 		}
 
-		private string IndentHandler(ITreeNode node, CustomIndentType indentType, T4CSharpIndentHelper helper)
+		[Pure]
+		[CanBeNull]
+		private string IndentFeatureBlockMember([NotNull] ITreeNode node)
 		{
-			if (!node.IsPhysical()) return null;
+			if (!IsTypeMemberLikeNode(node)) return null;
+			return "    ";
+		}
 
-			var file = node.GetContainingNode<IFile>(true);
-			var sourceFile = file?.GetSourceFile();
-			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return null;
+		[Pure]
+		[NotNull]
+		private static string IndentBlockEnd() => "";
 
-			if (indentType == CustomIndentType.RelativeNodeCalculation) return node.GetIndentViaDocument();
+		[Pure]
+		[CanBeNull]
+		private string IndentTransformTextMember(
+			[NotNull] ITreeNode node,
+			CustomIndentType indentType
+		)
+		{
+			var rangeTranslator = GetRangeTranslator(node);
 
-			if (node is ITokenNode tokenNode
-			    && tokenNode.GetTokenType().IsComment
-			    && tokenNode.GetText() == T4CSharpCodeBehindGenerationInfoCollector.CodeCommentEnd)
-				return HandleComment(indentType, file, tokenNode);
-			if (helper.IsGeneratedMethodMember(node))
-			{
-				var rangeTranslator = file.GetRangeTranslator();
-				var originalFile = rangeTranslator.OriginalFile;
-				if (indentType == CustomIndentType.RelativeLineCalculation)
-				{
-					var firstToken = node.GetFirstTokenIn();
-					var generatedTreeRange1 = new TreeTextRange(firstToken.GetTreeStartOffset());
-					var originalRange1 = rangeTranslator.GeneratedToOriginal(generatedTreeRange1);
-					if (!originalRange1.IsValid())
-						return null;
+			if (indentType == CustomIndentType.RelativeLineCalculation)
+				return CalculateRelativeIndentInTransformText(node, rangeTranslator);
 
-					var t4Element1 = originalFile.FindNodeAt(originalRange1);
-					return t4Element1?.GetLineIndentFromOriginalNode(
-						n => n is IT4Token token && token.GetTokenType() == T4TokenNodeTypes.RAW_CODE,
-						originalRange1.StartOffset);
-				}
+			var statement = node as ICSharpStatement;
+			if (node.GetTokenType() == CSharpTokenType.LBRACE)
+				statement = node.Parent as IBlock;
+			var block = BlockNavigator.GetByStatement(statement);
+			if (node is IComment || node is IStartRegion || node is IEndRegion)
+				block = node.GetContainingNode<ITreeNode>() as IBlock;
+			if (block == null) return null;
 
-				var statement = node as ICSharpStatement;
-				if (node.GetTokenType() == CSharpTokenType.LBRACE)
-					statement = node.Parent as IBlock;
-				var block = BlockNavigator.GetByStatement(statement);
-				if (node is IComment || node is IStartRegion || node is IEndRegion)
-					block = node.GetContainingNode<ITreeNode>() as IBlock;
-				if (block == null)
-					return null;
+			var generatedTreeRange = new TreeTextRange(node.GetTreeStartOffset());
+			var blockGeneratedTreeRange = new TreeTextRange(block.GetTreeStartOffset());
+			var originalRange = rangeTranslator.GeneratedToOriginal(generatedTreeRange);
+			var blockOriginalRange = rangeTranslator.GeneratedToOriginal(blockGeneratedTreeRange);
+			if (!originalRange.IsValid()) return null;
 
-				var generatedTreeRange = new TreeTextRange(node.GetTreeStartOffset());
-				var blockGeneratedTreeRange = new TreeTextRange(block.GetTreeStartOffset());
-				var originalRange = rangeTranslator.GeneratedToOriginal(generatedTreeRange);
-				var blockOriginalRange = rangeTranslator.GeneratedToOriginal(blockGeneratedTreeRange);
-				if (!originalRange.IsValid())
-					return null;
+			var t4Element = rangeTranslator.OriginalFile.FindNodeAt(originalRange);
+			var codeBlock = t4Element?.GetParentOfType<IT4CodeBlock>();
+			if (codeBlock == null) return null;
 
-				//var originalFileText = originalFile.GetText();
-				var aspElement = originalFile.FindNodeAt(originalRange);
+			string indentFromPreviousStatement = GetIndentFromPreviousStatement(node, rangeTranslator);
+			if (indentFromPreviousStatement != null) return indentFromPreviousStatement;
 
-				if (!(aspElement?.Parent?.Parent is T4CodeBlock codeBlock)) return null;
-				// find previuos statement
-				for (var nd = node.PrevSibling; nd != null; nd = nd.PrevSibling)
-				{
-					if (!helper.IsStatement(nd))
-						continue;
-					var token = nd.GetFirstTokenIn();
-					var tmpRange = token.GetDocumentRange();
-					if (!tmpRange.IsValid() || tmpRange.TextRange.EndOffset >= originalFile.GetTextLength())
-						continue;
-
-					var generatedTreeRange1 = new TreeTextRange(token.GetTreeStartOffset());
-					var originalRange1 = rangeTranslator.GeneratedToOriginal(generatedTreeRange1);
-					var aspElement1 = originalFile.FindNodeAt(originalRange1);
-					var codeBlock1 = aspElement1?.Parent as AspRenderBlock;
-					if (codeBlock1 == null || codeBlock.Parent != codeBlock1.Parent)
-						break;
-
-					return tmpRange.GetIndentFromDocumentRange();
-					//var indent = GetIndent(originalFileText, tmpRange.TextRange.StartOffset, helper.TabSize);
-					//return FixIndent(originalFileText, originalRange.StartOffset.Offset, helper.TabSize, indent);
-				}
-
-				// if no statement before
-				if (blockOriginalRange.IsValid() && codeBlock.GetTreeTextRange().Contains(blockOriginalRange))
-					return null;
-				var blockStart = codeBlock.GetTreeStartOffset();
-				var nodeStart = originalRange.StartOffset.Offset;
-				var hasLineBreak =
-					codeBlock.GetText().Substring(0, nodeStart - blockStart.Offset).IndexOf('\n') >= 0;
-				//originalFileText.Substring(blockStart.Offset, nodeStart - blockStart.Offset).IndexOf('\n') >= 0;
-				if (hasLineBreak)
-					return "";
-
+			if (blockOriginalRange.IsValid() && codeBlock.GetTreeTextRange().Contains(blockOriginalRange))
 				return null;
-			}
+			var blockStart = codeBlock.GetTreeStartOffset();
+			int nodeStart = originalRange.StartOffset.Offset;
+			if (!HasLineBreak(codeBlock, nodeStart, blockStart)) return null;
+			if (HasVisibleTokenBefore(rangeTranslator, node)) return null;
+			return "    "; // TODO: use settings
+		}
 
-			if (helper.IsTypeMemberLikeNode(node, sourceFile) || node is IStartRegion || node is IEndRegion)
+		private static RangeTranslatorWithGeneratedRangeMap GetRangeTranslator(ITreeNode node) =>
+			node.GetContainingNode<IFile>(true).NotNull().GetRangeTranslator();
+
+		private static string CalculateRelativeIndentInTransformText(
+			[NotNull] ITreeNode node,
+			[NotNull] ISecondaryRangeTranslator rangeTranslator
+		)
+		{
+			var firstToken = node.GetFirstTokenIn();
+			var generatedTreeRange1 = new TreeTextRange(firstToken.GetTreeStartOffset());
+			var originalRange = rangeTranslator.GeneratedToOriginal(generatedTreeRange1);
+			if (!originalRange.IsValid()) return null;
+			var t4Element = rangeTranslator.OriginalFile.FindNodeAt(originalRange);
+			return t4Element?.GetLineIndentFromOriginalNode(n =>
+				n is IT4Token token && token.GetTokenType() == T4TokenNodeTypes.RAW_CODE, originalRange.StartOffset);
+		}
+
+		[Pure]
+		private static bool HasVisibleTokenBefore(
+			[NotNull] ISecondaryRangeTranslator rangeTranslator,
+			[NotNull] ITreeNode node
+		) => node.GetFirstTokenIn()
+			.PrevTokens()
+			.Where(token => !token.IsWhitespaceToken())
+			.Select(token => token.GetTreeTextRange())
+			.Select(rangeTranslator.GeneratedToOriginal)
+			.Where(originalRange => originalRange.IsValid())
+			.SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
+			.SelectNotNull(it => it.GetParentOfType<IT4CodeBlock>())
+			.Any();
+
+		[Pure]
+		private static bool HasLineBreak([NotNull] IT4CodeBlock codeBlock, int nodeStart, TreeOffset blockStart) =>
+			codeBlock.GetText().Substring(0, nodeStart - blockStart.Offset).IndexOf('\n') >= 0;
+
+		[Pure]
+		private static string GetIndentFromPreviousStatement(
+			[NotNull] ITreeNode node,
+			[NotNull] RangeTranslatorWithGeneratedRangeMap rangeTranslator
+		)
+		{
+			for (var currentNode = node.PrevSibling; currentNode != null; currentNode = currentNode.PrevSibling)
 			{
-				if (indentType == CustomIndentType.RelativeLineCalculation)
-				{
-					var firstToken = node.GetFirstTokenIn();
-					return firstToken.GetIndentViaDocument();
-				}
-
-				var rangeTranslator = file.GetRangeTranslator();
-				var generatedTreeRange = new TreeTextRange(node.GetTreeStartOffset());
-				var originalTreeRange = rangeTranslator.GeneratedToOriginal(generatedTreeRange);
-				if (!originalTreeRange.IsValid()) return null;
-
-				var t4File = rangeTranslator.OriginalFile;
-
-				var block = t4File.FindNodeAt(originalTreeRange)?.GetContainingNode<IT4CodeBlock>(true);
-				if (block == null) return null;
-
-				// if no member before
-				var blockStart = block.GetTreeStartOffset();
-				var nodeStart = originalTreeRange.StartOffset.Offset;
-				var hasLineBreak =
-					t4File.GetText().Substring(blockStart.Offset, nodeStart - blockStart.Offset).IndexOf('\n') >= 0;
-				if (hasLineBreak)
-					return FormatterImplHelper.AddIndent(block.GetIndentViaDocument(), helper.IndentStr);
-
-				return helper.IndentStr; //new string(' ', helper.TabSize);
+				string indent = TryGetIndentFromStatement(rangeTranslator, currentNode);
+				if (indent != null) return indent;
 			}
 
 			return null;
 		}
 
-		private static string HandleComment(CustomIndentType indentType, IFile file, ITokenNode tokenNode)
+		[Pure]
+		[CanBeNull]
+		private static string TryGetIndentFromStatement(
+			[NotNull] ISecondaryRangeTranslator rangeTranslator,
+			[NotNull] ITreeNode currentNode
+		)
 		{
-			if (indentType != CustomIndentType.DirectCalculation) return null;
-			var rangeTranslator = file.GetRangeTranslator();
-			var startOffset = tokenNode.GetTreeStartOffset();
-			var generatedTreeRange = new TreeTextRange(startOffset - 1, startOffset);
-			var originalTreeRange = rangeTranslator.GeneratedToOriginal(generatedTreeRange);
-			if (!originalTreeRange.IsValid()) return null;
-			var t4File = rangeTranslator.OriginalFile;
-			var t4Element = t4File.FindNodeAt(originalTreeRange);
-			var block = t4Element?.GetContainingNode<ITreeNode>(n => n is IT4CodeBlock, true);
-			return block?.GetIndentViaDocument();
+			if (!(currentNode is IStatement)) return null;
+			var token = currentNode.GetFirstTokenIn();
+			var tokenRange = token.GetDocumentRange();
+			if (!tokenRange.IsValid()) return null;
+			if (tokenRange.TextRange.EndOffset >= rangeTranslator.OriginalFile.GetTextLength()) return null;
+			var generatedTokenRange = new TreeTextRange(token.GetTreeStartOffset());
+			var originalTokenRange = rangeTranslator.GeneratedToOriginal(generatedTokenRange);
+			var t4Element = rangeTranslator.OriginalFile.FindNodeAt(originalTokenRange);
+			var otherCodeBlock = t4Element?.GetParentOfType<T4CodeBlock>();
+			if (otherCodeBlock == null) return null;
+			return tokenRange.GetIndentFromDocumentRange();
 		}
+
+		[Pure]
+		private static bool IsTransformTextMember([NotNull] ITreeNode node)
+		{
+			var block = node.GetFirstTokenIn().GetT4ContainerFromCSharpNode<IT4CodeBlock>();
+			return block != null && !(block is T4FeatureBlock);
+		}
+
+		[Pure]
+		private static bool IsFeatureBlockMember([NotNull] ITreeNode node) =>
+			node.GetFirstTokenIn().GetT4ContainerFromCSharpNode<T4FeatureBlock>() != null;
+
+		[Pure]
+		private static bool IsEndComment([NotNull] ITreeNode node) =>
+			node is ITokenNode tokenNode
+			&& tokenNode.GetTokenType().IsComment
+			&& tokenNode.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd;
+
+		[Pure]
+		private static bool IsTypeMemberLikeNode([NotNull] ITreeNode node) =>
+			(node is ITypeMemberDeclaration || node is IMultipleFieldDeclaration || node is IMultipleEventDeclaration)
+			&& !(node is IEventDeclaration)
+			&& node.GetContainingNode<IClassLikeDeclaration>() != null;
+
+		[Pure]
+		[ContractAnnotation("null => false")]
+		private static bool IsInT4File([CanBeNull] ITreeNode file) =>
+			file?.GetSourceFile()?.LanguageType.Is<T4ProjectFileType>() == true;
 	}
 }

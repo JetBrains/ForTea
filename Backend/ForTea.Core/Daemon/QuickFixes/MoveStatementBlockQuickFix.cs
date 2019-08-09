@@ -51,8 +51,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 			};
 		}
 
-		public override string Text
-			=> "Move statement block before first class feature block";
+		public override string Text => "Place before first feature block";
 
 		public override bool IsAvailable(IUserDataHolder cache)
 			=> _highlighting.IsValid();

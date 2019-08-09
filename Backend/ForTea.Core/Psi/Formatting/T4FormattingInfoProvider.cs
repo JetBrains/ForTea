@@ -1,6 +1,4 @@
-using JetBrains.Application.Progress;
 using JetBrains.Application.Settings;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
@@ -16,34 +14,13 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		{
 		}
 
-		public override IndentingStage<CodeFormattingContext, T4FormatterSettingsKey> CreateIndentingStage(
-			CodeFormattingContext context,
-			FmtSettings<T4FormatterSettingsKey> settings,
-			IProgressIndicator progress,
-			SequentialNodeIterator<CodeFormattingContext, T4FormatterSettingsKey> iterator = null)
-		{
-			TryFinishAddingRules();
-			return new T4IndentingStage(
-				context,
-				settings,
-				this,
-				progress,
-				iterator);
-		}
-
 		public override void ModifyIndent(
-			ITreeNode nodeToIndent, ref Whitespace? indent, CodeFormattingContext context,
-			IIndentingStage<T4FormatterSettingsKey> callback, IndentType indentType)
-		{
-			var t4IndentingStage = callback as T4IndentingStage;
-			indent = t4IndentingStage.NotNull("wrong callback").CalcCustomIndent();
-
-			base.ModifyIndent(nodeToIndent,
-				ref indent,
-				context,
-				callback,
-				indentType);
-		}
+			ITreeNode nodeToIndent,
+			ref Whitespace? indent,
+			CodeFormattingContext context,
+			IIndentingStage<T4FormatterSettingsKey> callback,
+			IndentType indentType
+		) => indent = Whitespace.Empty;
 
 		public override ProjectFileType MainProjectFileType => T4ProjectFileType.Instance;
 	}

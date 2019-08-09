@@ -1,4 +1,5 @@
 using System.Text;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -11,7 +12,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		[NotNull]
 		private StringBuilder Builder { get; }
 
-		public T4InfoCollectorStateSeenFeatureAndText([NotNull] StringBuilder builder) => Builder = builder;
+		[NotNull]
+		// Suspect for syntax error
+		private ITreeNode FirstElement { get; }
+
+		public T4InfoCollectorStateSeenFeatureAndText(
+			[NotNull] StringBuilder builder,
+			[NotNull] IT4CodeGenerationInterrupter interrupter,
+			[NotNull] ITreeNode firstElement
+		) : base(interrupter)
+		{
+			Builder = builder;
+			FirstElement = firstElement;
+		}
 
 		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
 		{
@@ -19,15 +32,27 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			{
 				case T4FeatureBlock _:
 					Die();
-					return new T4InfoCollectorStateSeenFeature();
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
+				case T4ExpressionBlock _:
+					Die();
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4Token _: return this;
-				default: throw new T4OutputGenerationException();
+				default:
+					var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
+					Interrupter.InterruptAfterProblem(data);
+					return this;
 			}
 		}
 
 		protected override bool FeatureStartedSafe => true;
 		protected override void ConsumeTokenSafe(IT4Token token) => Builder.Append(Convert(token));
 		protected override string ProduceSafe(ITreeNode lookahead) => Builder.ToString();
-		protected override string ProduceBeforeEofSafe() => throw new T4OutputGenerationException();
+
+		protected override string ProduceBeforeEofSafe()
+		{
+			var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
+			Interrupter.InterruptAfterProblem(data);
+			return Builder.ToString();
+		}
 	}
 }

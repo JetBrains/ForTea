@@ -1,5 +1,6 @@
 using System.Text;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -12,7 +13,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		[NotNull]
 		private StringBuilder Builder { get; }
 
-		public T4InfoCollectorStateSeenFeatureAndNewLine() => Builder = new StringBuilder();
+		public T4InfoCollectorStateSeenFeatureAndNewLine([NotNull] IT4CodeGenerationInterrupter interrupter) :
+			base(interrupter) => Builder = new StringBuilder();
 
 		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
 		{
@@ -20,16 +22,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			{
 				case T4FeatureBlock _:
 					Die();
-					return new T4InfoCollectorStateSeenFeature();
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				default:
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE) return this;
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
 					{
 						Die();
-						return new T4InfoCollectorStateSeenFeatureAndText(Builder);
+						return new T4InfoCollectorStateSeenFeatureAndText(Builder, Interrupter, element);
 					}
 
-					throw new T4OutputGenerationException();
+					var data = T4FailureRawData.FromElement(element, "Unexpected element after feature");
+					Interrupter.InterruptAfterProblem(data);
+					return this;
 			}
 		}
 

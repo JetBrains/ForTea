@@ -32,8 +32,9 @@ namespace GammaJul.ForTea.Core.Psi {
 			if (!(modificationInfo.NewPsiFile is IT4File t4File)) return null;
 			if (!directiveInfoManager.GetLanguageType(t4File).Is<CSharpLanguage>()) return null;
 
-			var generator = new T4CSharpCodeBehindGenerator(t4File, directiveInfoManager);
-			T4CSharpCodeGenerationResult result = generator.Generate();
+			var solution = modificationInfo.SourceFile.GetSolution();
+			var generator = new T4CSharpCodeBehindGenerator(t4File, solution);
+			T4CSharpCodeGenerationResult result = generator.GenerateSafe();
 
 			LanguageService csharpLanguageService = CSharpLanguage.Instance.LanguageService();
 			if (csharpLanguageService == null)
@@ -42,7 +43,6 @@ namespace GammaJul.ForTea.Core.Psi {
 			var includedFiles = new OneToSetMap<FileSystemPath, FileSystemPath>();
 			includedFiles.AddRange(modificationInfo.SourceFile.GetLocation(), t4File.GetNonEmptyIncludePaths());
 
-			ISolution solution = modificationInfo.SourceFile.GetSolution();
 			var t4FileDependencyManager = solution.GetComponent<T4FileDependencyManager>();
 
 			return new T4SecondaryDocumentGenerationResult(

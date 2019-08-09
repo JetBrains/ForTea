@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application.Progress;
-using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
@@ -11,26 +9,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		public string Code { get; }
 
-		[NotNull, ItemNotNull]
-		public IEnumerable<MetadataReference> References { get; }
+		[NotNull]
+		public IEnumerable<T4MetadataReferenceInfo> References { get; }
 
 		[NotNull]
 		public IT4File File { get; }
 
-		[CanBeNull]
-		public IProgressIndicator ProgressIndicator { get; }
-
 		public T4TemplateExecutionManagerInfo(
 			[NotNull] string code,
-			[NotNull, ItemNotNull] IEnumerable<MetadataReference> references,
-			[NotNull] IT4File file,
-			[CanBeNull] IProgressIndicator progressIndicator
+			[NotNull] IEnumerable<T4MetadataReferenceInfo> references,
+			[NotNull] IT4File file
 		)
 		{
 			Code = code;
 			References = references;
 			File = file;
-			ProgressIndicator = progressIndicator;
 		}
 	}
 }

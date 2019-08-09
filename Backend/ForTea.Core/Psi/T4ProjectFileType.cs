@@ -7,6 +7,7 @@ namespace GammaJul.ForTea.Core.Psi {
 	/// <summary>Represents a T4 project file type.</summary>
 	[ProjectFileTypeDefinition(Name)]
 	public class T4ProjectFileType : KnownProjectFileType {
+		public static readonly string[] AllExtensions = { MainExtension, ".ttinclude", ".t4" };
 		public const string MainExtensionNoDot = "tt";
 		public const string MainExtension = "." + MainExtensionNoDot;
 
@@ -19,7 +20,7 @@ namespace GammaJul.ForTea.Core.Psi {
 
 
 		private T4ProjectFileType()
-			: base(Name, Name, new[] { MainExtension, ".ttinclude", ".t4" }) {
+			: base(Name, Name, AllExtensions) {
 		}
 
 		protected T4ProjectFileType([NotNull] string name, [NotNull] string presentableName, [NotNull] IEnumerable<string> extensions)

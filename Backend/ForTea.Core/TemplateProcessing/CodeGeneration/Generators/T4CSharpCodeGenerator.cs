@@ -1,8 +1,8 @@
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -14,8 +14,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 	{
 		public T4CSharpCodeGenerator(
 			[NotNull] IT4File file,
-			[NotNull] T4DirectiveInfoManager manager
-		) : base(file) => Collector = new T4CSharpCodeGenerationInfoCollector(file, manager);
+			[NotNull] ISolution solution
+		) : base(file) => Collector = new T4CSharpCodeGenerationInfoCollector(file, solution);
 
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
 

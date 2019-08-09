@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Directives;
+using Debugger.Common.MetadataAndPdb;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -14,8 +15,12 @@ using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CSharp;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Rider.Model;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 using Microsoft.CodeAnalysis;
@@ -26,14 +31,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 	[SolutionComponent]
 	public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
-		[NotNull] private const string DefaultExecutableExtension = "exe";
-		[NotNull] private const string DefaultExecutableExtensionWithDot = "." + DefaultExecutableExtension;
-		[NotNull] private const string Title = "Executing T4 Template";
-
 		[NotNull]
-		private T4DirectiveInfoManager DirectiveInfoManager { get; }
-
-		private Lifetime SolutionLifetime { get; }
+		private ISolution Solution { get; }
 
 		[NotNull]
 		private IShellLocks Locks { get; }
@@ -43,60 +42,82 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		[NotNull]
 		private ISolutionProcessStartInfoPatcher Patcher { get; }
-		
+
 		[NotNull]
 		private IT4TargetFileManager Manager { get; }
 
+		[NotNull]
+		private T4TreeNavigator Navigator { get; }
+
+		[NotNull]
+		private RoslynMetadataReferenceCache Cache { get; }
+
+		[NotNull]
+		private IT4BuildMessageConverter Converter { get; }
+
 		public T4TemplateExecutionManager(
-			Lifetime solutionLifetime,
+			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
-			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IPsiModules psiModules,
 			[NotNull] ISolutionProcessStartInfoPatcher patcher,
-			[NotNull] IT4TargetFileManager manager)
+			[NotNull] IT4TargetFileManager manager,
+			[NotNull] IT4BuildMessageConverter converter,
+			[NotNull] T4TreeNavigator navigator,
+			[NotNull] ISolution solution
+		)
 		{
-			SolutionLifetime = solutionLifetime;
 			Locks = locks;
-			DirectiveInfoManager = directiveInfoManager;
 			PsiModules = psiModules;
 			Patcher = patcher;
 			Manager = manager;
+			Converter = converter;
+			Navigator = navigator;
+			Solution = solution;
+			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
-		public IT4ExecutionResult Execute(IT4File file, IProgressIndicator progress = null)
+		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
-			var definition = SolutionLifetime.CreateNested();
-			LaunchProgress(progress);
-			var info = GenerateCode(file, progress);
-			return CompileAndRun(definition, info);
+			if (file.ContainsErrorElement()) return Converter.SyntaxError(Navigator.GetErrorElements(file).First());
+			List<Diagnostic> messages = null;
+			return lifetime.UsingNested(nested =>
+			{
+				try
+				{
+					var info = GenerateCode(file, nested);
+					if (progress != null) progress.CurrentItemText = "Compiling code";
+					var executablePath = Manager.GetTemporaryExecutableLocation(file);
+					var compilation = CreateCompilation(info, executablePath);
+					var diagnostics = compilation.GetDiagnostics(nested);
+					messages = diagnostics.AsList();
+					var errors = diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+					if (!errors.IsEmpty()) return null;
+
+					executablePath.Parent.CreateDirectory();
+					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
+					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
+					CopyAssemblies(info, executablePath);
+					return null;
+				}
+				catch (T4OutputGenerationException e)
+				{
+					return Converter.ToT4BuildResult(e);
+				}
+			}) ?? Converter.ToT4BuildResult(messages, file);
 		}
 
-		private static void LaunchProgress([CanBeNull] IProgressIndicator indicator)
+		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file, Lifetime lifetime)
 		{
-			if (indicator == null) return;
-			indicator.Start(1);
-			indicator.Advance();
-			indicator.TaskName = Title;
-			indicator.CurrentItemText = "Preparing";
-		}
-
-		private T4TemplateExecutionManagerInfo GenerateCode(
-			[NotNull] IT4File file,
-			[CanBeNull] IProgressIndicator progress
-		)
-		{
-			if (progress != null) progress.CurrentItemText = "Generating code";
 			using (ReadLockCookie.Create())
 			{
-				var timeStamp = file.GetSourceFile().NotNull().LastWriteTimeUtc;
-				var generator = new T4CSharpExecutableCodeGenerator(file, DirectiveInfoManager);
+				var generator = new T4CSharpExecutableCodeGenerator(file, Solution);
 				string code = generator.Generate().RawText;
-				var references = ExtractReferences(file);
-				return new T4TemplateExecutionManagerInfo(code, references, file, progress);
+				var references = ExtractReferences(file, lifetime);
+				return new T4TemplateExecutionManagerInfo(code, references, file);
 			}
 		}
 
-		private IEnumerable<MetadataReference> ExtractReferences([NotNull] IT4File file)
+		private IEnumerable<T4MetadataReferenceInfo> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -111,31 +132,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					.OfType<IAssemblyPsiModule>()
 					.Select(it => it.Assembly)
 					.SelectNotNull(it => it.Location)
-					.Select(it => MetadataReference.CreateFromFile(it.FullPath));
+					.SelectNotNull(it => T4MetadataReferenceInfo.FromPath(lifetime, it, Cache))
+					.AsList();
 			}
 		}
 
-		private IT4ExecutionResult CompileAndRun(LifetimeDefinition definition, T4TemplateExecutionManagerInfo info)
-		{
-			if (info.ProgressIndicator != null) info.ProgressIndicator.CurrentItemText = "Compiling code";
-			var executablePath = CreateTemporaryExecutable(definition.Lifetime);
-			var compilation = CreateCompilation(info);
-			var errors = compilation
-				.GetDiagnostics(definition.Lifetime)
-				.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-				.ToList();
-			if (!errors.IsEmpty())
-			{
-				MessageBox.ShowError(errors.Select(error => error.ToString()).Join("\n"), "Could not compile template");
-				return new T4ExecutionFailure();
-			}
-
-			compilation.Emit(executablePath.FullPath, cancellationToken: definition.Lifetime);
-			CopyAssemblies(info, executablePath);
-			return Run(info, definition.Lifetime, executablePath);
-		}
-
-		private CSharpCompilation CreateCompilation(T4TemplateExecutionManagerInfo info)
+		private CSharpCompilation CreateCompilation(T4TemplateExecutionManagerInfo info, FileSystemPath executablePath)
 		{
 			var options = new CSharpCompilationOptions(OutputKind.ConsoleApplication)
 				.WithOptimizationLevel(OptimizationLevel.Debug)
@@ -145,15 +147,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				info.Code,
 				CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
 
-			// TODO: use actual name
 			return CSharpCompilation.Create(
-				"T4CompilationAssemblyName.exe",
+				executablePath.Name,
 				new[] {syntaxTree},
 				options: options,
-				references: info.References);
+				references: info.References.Select(it => it.Reference));
 		}
 
-		private void CopyAssemblies(
+		private static void CopyAssemblies(
 			T4TemplateExecutionManagerInfo info,
 			[NotNull] FileSystemPath executablePath
 		)
@@ -161,27 +162,24 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var folder = executablePath.Parent;
 			IEnumerable<FileSystemPath> query = info
 				.References
-				.SelectNotNull(it => it.Display)
-				.SelectNotNull(it => FileSystemPath.TryParse(it));
+				.SelectNotNull(it => it.Path)
+				.Where(it => !it.IsEmpty);
 			foreach (var path in query)
 			{
-				File.Copy(path.FullPath, folder.Combine(path.Name).FullPath);
+				path.CopyFile(folder.Combine(path.Name), true);
 			}
 		}
 
-		private IT4ExecutionResult Run(
-			T4TemplateExecutionManagerInfo info,
-			Lifetime lifetime,
-			FileSystemPath executablePath
-		)
+		public bool Execute(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
-			string targetFileName = Manager.GetTargetFileName(info.File);
+			var executablePath = Manager.GetTemporaryExecutableLocation(file);
+			string targetFileName = Manager.GetExpectedTargetFileName(file);
 			var destinationPath = executablePath.Directory.Combine(targetFileName);
 			var process = LaunchProcess(lifetime, executablePath, destinationPath);
 			lifetime.ThrowIfNotAlive();
-			process.WaitForExitSpinning(100, info.ProgressIndicator);
+			int code = process.WaitForExitSpinning(100, progress);
 			lifetime.ThrowIfNotAlive();
-			return new T4ExecutionResultInFile(destinationPath);
+			return code == 0;
 		}
 
 		private Process LaunchProcess(
@@ -215,11 +213,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return process;
 		}
 
-		[NotNull]
-		private static FileSystemPath CreateTemporaryExecutable(Lifetime lifetime)
+		public bool CanCompile(IT4File file)
 		{
-			var directory = FileSystemDefinition.CreateTemporaryDirectory();
-			return FileSystemDefinition.CreateTemporaryFile(lifetime, directory, DefaultExecutableExtensionWithDot);
+			var sourceFile = file.GetSourceFile();
+			var cSharpFile = sourceFile?.GetPsiFiles(CSharpLanguage.Instance).SingleOrDefault();
+			var t4File = sourceFile?.GetPsiFiles(T4Language.Instance).SingleOrDefault();
+			if (cSharpFile?.ContainsErrorElement() != false) return false;
+			if (t4File?.ContainsErrorElement() != false) return false;
+			return true;
 		}
 	}
 }

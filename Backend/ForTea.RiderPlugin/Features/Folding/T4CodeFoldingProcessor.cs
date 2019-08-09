@@ -62,7 +62,7 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 					continue;
 				}
 
-				if (node.NodeType == T4TokenNodeTypes.NEW_LINE) continue;
+				if (node is IT4Include || node.NodeType == T4TokenNodeTypes.NEW_LINE) continue;
 				if (directiveStart == null) continue;
 
 				yield return new DocumentRange(

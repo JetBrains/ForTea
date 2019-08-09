@@ -1,7 +1,9 @@
 using System.Text;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
@@ -9,7 +11,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 	public sealed class T4InfoCollectorSateSeenDirectiveOrStatementBlock : T4InfoCollectorStateBase
 	{
 		private StringBuilder Builder { get; }
-		public T4InfoCollectorSateSeenDirectiveOrStatementBlock() => Builder = new StringBuilder();
+
+		public T4InfoCollectorSateSeenDirectiveOrStatementBlock([NotNull] IT4CodeGenerationInterrupter interrupter) :
+			base(interrupter) => Builder = new StringBuilder();
 
 		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
 		{
@@ -19,10 +23,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 				case T4StatementBlock _: return this;
 				case T4FeatureBlock _:
 					Die();
-					return new T4InfoCollectorStateSeenFeature();
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				default:
 					Die();
-					return new T4InfoCollectorStateInitial(Builder);
+					return new T4InfoCollectorStateInitial(Builder, Interrupter);
 			}
 		}
 

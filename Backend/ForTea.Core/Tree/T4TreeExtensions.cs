@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -37,6 +38,7 @@ namespace GammaJul.ForTea.Core.Tree {
 			return new Pair<ITreeNode, string>(valueToken, value);
 		}
 
+		[ContractAnnotation("directive:null => false")]
 		public static bool IsSpecificDirective([CanBeNull] this IT4Directive directive, [CanBeNull] DirectiveInfo directiveInfo)
 			=> directive != null
 			&& directiveInfo != null
@@ -122,13 +124,22 @@ namespace GammaJul.ForTea.Core.Tree {
 			return Pair.Of(existingDirectives.Last(), BeforeOrAfter.After);
 		}
 
-		[NotNull]
-		[ItemNotNull]
-		public static IEnumerable<IT4Include> GetRecursiveIncludes([NotNull] this IT4IncludeOwner owner) {
-			foreach (IT4Include include in owner.GetIncludes()) {
-				yield return include;
-				foreach (IT4Include recursiveInclude in GetRecursiveIncludes(include))
+		[NotNull, ItemNotNull]
+		public static IEnumerable<IT4File> GetIncludedFilesRecursive([NotNull] this IT4File file, [NotNull] T4IncludeGuard guard)
+		{
+			var sourceFile = file.GetSourceFile();
+			if (sourceFile == null || guard.CanProcess(sourceFile)) yield break;
+			guard.StartProcessing(sourceFile);
+			var includedFiles = file.GetIncludes()
+				.Select(include => include.Path.ResolveT4File(guard))
+				.Where(resolution => resolution != null);
+			foreach (var includedFile in includedFiles)
+			{
+				yield return includedFile;
+				foreach (var recursiveInclude in includedFile.GetIncludedFilesRecursive(guard))
+				{
 					yield return recursiveInclude;
+				}
 			}
 		}
 

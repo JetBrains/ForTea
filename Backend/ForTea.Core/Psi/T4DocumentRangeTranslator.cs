@@ -74,8 +74,6 @@ namespace GammaJul.ForTea.Core.Psi {
 
 			// recursive includes
 			if (include != null) {
-				if (include.DocumentRangeTranslator != null)
-					return include.DocumentRangeTranslator.Translate(range);
 				return DocumentRange.InvalidRange;
 			}
 			
@@ -92,13 +90,6 @@ namespace GammaJul.ForTea.Core.Psi {
 				return TreeTextRange.InvalidRange;
 
 			if (documentRange.Document != _sourceFile.Document) {
-				foreach (IT4Include include in _includes) {
-					if (include.DocumentRangeTranslator != null) {
-						TreeTextRange textRange = include.DocumentRangeTranslator.Translate(documentRange);
-						if (textRange.IsValid())
-							return textRange;
-					}
-				}
 				return TreeTextRange.InvalidRange;
 			}
 

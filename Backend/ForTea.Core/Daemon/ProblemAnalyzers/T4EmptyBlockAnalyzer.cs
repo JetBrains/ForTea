@@ -1,12 +1,14 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4CodeBlock), HighlightingTypes = new[] {typeof(EmptyBlockHighlighting)})]
+	[ElementProblemAnalyzer(typeof(IT4CodeBlock),
+		HighlightingTypes = new[] {typeof(EmptyBlockHighlighting), typeof(T4EmptyExpressionBlockHighlighting)})]
 	public class T4EmptyBlockAnalyzer : ElementProblemAnalyzer<IT4CodeBlock>
 	{
 		protected override void Run(
@@ -15,10 +17,14 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			IHighlightingConsumer consumer
 		)
 		{
-			if (element is T4FeatureBlock) return;
-			if (!(element is T4CodeBlock block)) return;
-			if (!block.GetCodeText().IsNullOrWhitespace()) return;
-			consumer.AddHighlighting(new EmptyBlockHighlighting(block));
+			if (!element.GetCodeText().IsNullOrWhitespace()) return;
+			consumer.AddHighlighting(CreateHighlighting(element));
+		}
+
+		private static IHighlighting CreateHighlighting([NotNull] IT4CodeBlock element)
+		{
+			if (element is T4ExpressionBlock block) return new T4EmptyExpressionBlockHighlighting(block);
+			return new EmptyBlockHighlighting(element);
 		}
 	}
 }

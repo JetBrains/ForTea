@@ -17,10 +17,8 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		/// <summary>
 		/// Gets the T4 file icon.
-		/// TODO: add an image.
 		/// </summary>
-		public override IconId Icon
-			=> null;
+		public override IconId Icon => T4.Id;
 
 		public override IPsiSourceFileProperties GetPsiProperties(IProjectFile projectFile, IPsiSourceFile sourceFile, IsCompileService isCompileService)
 			=> new T4PsiProjectFileProperties(projectFile, sourceFile, _t4Environment.IsSupported);

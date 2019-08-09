@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using GammaJul.ForTea.Core.Parsing.Builders;
+using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Modules;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Collections;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
@@ -20,7 +23,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
 		private string RawPath { get; }
-		
+
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
 
@@ -29,7 +32,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		[NotNull]
 		private IT4Environment Environment { get; }
-		
+
+		[NotNull]
+		private T4DirectiveInfoManager Manager { get; }
+
 		[NotNull]
 		private ISolution Solution { get; }
 
@@ -43,13 +49,33 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
+			Manager = Solution.GetComponent<T4DirectiveInfoManager>();
+		}
+
+		public IT4File ResolveT4File(T4IncludeGuard guard)
+		{
+			if (!ResolvePath().ExistsFile) return null;
+			var target = Resolve();
+			if (target == null) return null;
+			if (!guard.CanProcess(target)) return null;
+			if (target.LanguageType.Is<T4ProjectFileType>())
+				return (IT4File) target.GetPrimaryPsiFile();
+			return BuildT4Tree(target);
+		}
+
+		private IT4File BuildT4Tree(IPsiSourceFile target)
+		{
+			var languageService = T4Language.Instance.LanguageService();
+			Assertion.AssertNotNull(languageService, "languageService != null");
+			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			return new T4TreeBuilder(Manager, lexer, target).CreateT4Tree();
 		}
 
 		public IPsiSourceFile Resolve() => ResolvePath().FindSourceFileInSolution(Solution);
 
 		public FileSystemPath ResolvePath()
 		{
-			string expanded = ExpandMacros();
+			string expanded = ResolveString();
 
 			// search as absolute path
 			var asAbsolutePath = FileSystemPath.TryParse(expanded);
@@ -67,24 +93,22 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			return asGlobalInclude ?? asRelativePath;
 		}
 
-		[NotNull]
-		private string ExpandEnvironmentVariables() => System.Environment.ExpandEnvironmentVariables(RawPath);
-
-		[NotNull]
-		private string ExpandMacros()
+		public string ResolveString()
 		{
 			var module = Module;
 			if (string.IsNullOrEmpty(RawPath) || module == null || !ContainsMacros) return RawPath;
 
 			var macroValues = Resolver.Resolve(RawMacros, SourceFile.ToProjectFile().NotNull());
 
-			var result = new StringBuilder(ExpandEnvironmentVariables());
-			foreach ((string macro, string value) in macroValues)
+			var result = new StringBuilder(System.Environment.ExpandEnvironmentVariables(RawPath));
+			return MacroRegex.Replace(result.ToString(), match =>
 			{
-				result.Replace(macro, value);
-			}
-
-			return result.ToString();
+				var group = match.Groups[1];
+				string macro = group.Value;
+				if (!group.Success) return macro;
+				if (!macroValues.TryGetValue(macro, out string value)) return macro;
+				return value;
+			});
 		}
 
 		private bool ContainsMacros
@@ -104,7 +128,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			.Select(match => match.Groups[1].Value);
 
 		private bool Equals(T4PathWithMacros other) =>
-			string.Equals(RawPath, other.RawPath) && SourceFile.Equals(other.SourceFile);
+			string.Equals(RawPath, other.RawPath, StringComparison.OrdinalIgnoreCase)
+			&& SourceFile.Equals(other.SourceFile);
 
 		public override bool Equals(object obj) =>
 			ReferenceEquals(this, obj) || obj is T4PathWithMacros other && Equals(other);

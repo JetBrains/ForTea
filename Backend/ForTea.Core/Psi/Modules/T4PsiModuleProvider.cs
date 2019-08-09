@@ -21,7 +21,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 	/// and <see cref="T4MiscFilesProjectPsiModuleProvider"/>.
 	/// </summary>
 	internal sealed class T4PsiModuleProvider : IDisposable {
-
 		[NotNull] private readonly Dictionary<IProjectFile, ModuleWrapper> _modules = new Dictionary<IProjectFile, ModuleWrapper>();
 		private readonly Lifetime _lifetime;
 		[NotNull] private readonly IShellLocks _shellLocks;

@@ -34,8 +34,13 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public virtual void Execute(Action<DaemonStageResult> commiter)
 		{
+			AnalyzeFile(File);
 			File.ProcessDescendants(this);
 			commiter(new DaemonStageResult(_highlightings.ToArray()));
+		}
+
+		protected virtual void AnalyzeFile([NotNull] IT4File file)
+		{
 		}
 
 		protected void AddHighlighting(DocumentRange range, [NotNull] IHighlighting highlighting)

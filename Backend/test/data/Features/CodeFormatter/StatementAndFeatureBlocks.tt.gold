@@ -1,0 +1,14 @@
+<#
+    for (int {caret}i = 0; i < 10; i += 1)
+    {
+#>
+Hello
+<#
+    }
+#>
+
+<#+
+    public void Foo()
+    {
+    }
+#>

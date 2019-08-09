@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
@@ -62,8 +61,8 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			}
 
 			// verify that a directive attribute value is valid
-			if (element.GetTokenType() == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) {
-				ProcessAttributeValue((T4Token) element);
+			if (element is IT4AttributeValue value) {
+				ProcessAttributeValue(value);
 				return;
 			}
 
@@ -81,14 +80,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			_afterLastFeatureErrorAdded = true;
 		}
 
-		private void ProcessAttributeValue([NotNull] T4Token valueNode) {
+		private void ProcessAttributeValue([NotNull] IT4AttributeValue valueNode) {
 			if (!(valueNode.Parent is IT4DirectiveAttribute attribute))
 				return;
-
-			if (attribute.ValueError != null) {
-				AddHighlighting(valueNode.GetHighlightingRange(), new InvalidAttributeValueHighlighting(valueNode, null, attribute.ValueError));
-				return;
-			}
 
 			if (!(attribute.Parent is IT4Directive directive))
 				return;
@@ -97,7 +91,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			if (attributeInfo == null || attributeInfo.IsValid(valueNode.GetText()))
 				return;
 
-			AddHighlighting(valueNode.GetHighlightingRange(), new InvalidAttributeValueHighlighting(valueNode, attributeInfo, "Invalid attribute value"));
+			AddHighlighting(valueNode.GetHighlightingRange(), new InvalidAttributeValueHighlighting(valueNode, attributeInfo));
 		}
 
 		private void ProcessDirective([NotNull] IT4Directive directive) {
@@ -141,6 +135,15 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			_directiveInfoManager = directiveInfoManager;
 		}
 
+		protected override void AnalyzeFile(IT4File file)
+		{
+			var outputDirective = file.GetDirectives().FirstOrDefault(directive =>
+				directive.IsSpecificDirective(_directiveInfoManager.Output));
+			if (outputDirective?.GetAttribute(_directiveInfoManager.Output.ExtensionAttribute.Name) == null)
+			{
+				// TODO: show notification
+			}
+		}
 	}
 
 }

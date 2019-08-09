@@ -1,7 +1,5 @@
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Tree.Impl {
 
@@ -36,8 +34,8 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 
 		/// <summary>Gets the token representing the value of this attribute.</summary>
 		/// <returns>A value token, or <c>null</c> if none is available.</returns>
-		public TreeElement GetValueToken()
-			=> FindChildByRole((short) T4TokenRole.Value);
+		public IT4AttributeValue GetValueToken()
+			=> FindChildByRole((short) T4TokenRole.Value) as IT4AttributeValue;
 
 		/// <summary>Gets the name of the node.</summary>
 		/// <returns>The node name, or <c>null</c> if none is available.</returns>
@@ -48,11 +46,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 		/// <returns>The attribute value, or <c>null</c> if none is available.</returns>
 		public string GetValue()
 			=> GetValueToken()?.GetText();
-
-		/// <summary>Gets or sets the error associated with the value that have been identified at parsing time.</summary>
-		public string ValueError { get; set; }
-
-		public IT4PathWithMacros Reference { get; set; }
 	}
 
 }

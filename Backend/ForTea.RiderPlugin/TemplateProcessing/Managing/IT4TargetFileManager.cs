@@ -6,12 +6,19 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 {
 	public interface IT4TargetFileManager
 	{
-		string GetTargetFileName([NotNull] IT4File file, [CanBeNull] string targetExtension = null);
-		
 		[NotNull]
-		FileSystemPath SaveResults(
-			IT4ExecutionResult result,
-			[NotNull] IT4File file,
-			[CanBeNull] string targetExtension = null);
+		string GetExpectedTargetFileName([NotNull] IT4File file);
+
+		[NotNull]
+		FileSystemPath GetTemporaryExecutableLocation([NotNull] IT4File file);
+
+		[NotNull]
+		FileSystemPath GetExpectedTemporaryTargetFileLocation([NotNull] IT4File file);
+
+		[NotNull]
+		FileSystemPath SaveExecutionResults([NotNull] IT4File file);
+
+		[NotNull]
+		FileSystemPath SavePreprocessResults([NotNull] IT4File file, [NotNull] string text);
 	}
 }

@@ -1,13 +1,10 @@
 using System;
 using System.IO;
-using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using JetBrains.Application;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi.Modules;
 
 namespace JetBrains.ForTea.RiderPlugin
 {
@@ -16,7 +13,6 @@ namespace JetBrains.ForTea.RiderPlugin
 	{
 		public string Preprocess(IProjectFile file, string assemblyName)
 		{
-			assemblyName = VsBuildMacroHelper.ResolveMacros(assemblyName, (IT4FilePsiModule) file.GetPsiModule());
 			// If the argument is the fully qualified path of an existing file, then we are done.
 			if (File.Exists(assemblyName)) return assemblyName;
 

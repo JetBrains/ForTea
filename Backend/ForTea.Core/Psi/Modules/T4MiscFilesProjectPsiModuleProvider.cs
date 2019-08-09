@@ -13,7 +13,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 {
 	/// <summary>Provides <see cref="IT4FilePsiModule"/> for T4 files opened outside of the solution.</summary>
 	[MiscFilesProjectPsiModuleProvider]
-	public sealed class T4MiscFilesProjectPsiModuleProvider : IMiscFilesProjectPsiModuleProvider
+	public class T4MiscFilesProjectPsiModuleProvider : IMiscFilesProjectPsiModuleProvider
 	{
 		[NotNull] private readonly T4PsiModuleProvider _t4PsiModuleProvider;
 

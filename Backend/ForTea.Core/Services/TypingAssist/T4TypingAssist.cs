@@ -152,6 +152,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 					textControl.Document.InsertText(offset + 1, "#>");
 					textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
 				}
+
+				SkippingTypingAssist.SetCharsToSkip(textControl.Document, ">");
 			});
 		}
 
@@ -258,6 +260,40 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			lexer.TokenType == T4TokenNodeTypes.EXPRESSION_BLOCK_START ||
 			lexer.TokenType == T4TokenNodeTypes.FEATURE_BLOCK_START;
 
+		private bool OnDollarTyped(ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			if (!IsInAttributeValue(textControl)) return false;
+			
+			int offset = textControl.GetOffset();
+			textControl.Selection.Delete();
+			textControl.Document.InsertText(offset, "$");
+			textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+			context.QueueCommand(() =>
+			{
+				using (CommandProcessor.UsingCommand("Inserting T4 Macro Parenthesis"))
+				{
+					textControl.Document.InsertText(offset + 1, "()");
+					textControl.Caret.MoveTo(offset + 2, CaretVisualPlacement.DontScrollIfVisible);
+				}
+				
+				SkippingTypingAssist.SetCharsToSkip(textControl.Document, "(");
+			});
+			return true;
+		}
+
+		private bool IsInAttributeValue([NotNull] ITextControl textControl)
+		{
+			var lexer = GetCachingLexer(textControl);
+			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
+			if (lexer == null || offset <= 1) return false;
+			if (!lexer.FindTokenAt(offset - 1)) return false;
+			if (lexer.TokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) return true;
+			if (lexer.TokenType != T4TokenNodeTypes.QUOTE) return false;
+			if (!lexer.FindTokenAt(offset)) return false;
+			return lexer.TokenType == T4TokenNodeTypes.QUOTE || lexer.TokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
+		}
+
 		public T4TypingAssist(
 			Lifetime lifetime,
 			[NotNull] ISolution solution,
@@ -277,9 +313,9 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			typingAssistManager.AddTypingHandler(lifetime, '=', this, OnEqualTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '"', this, OnQuoteTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '#', this, OnOctothorpeTyped, IsTypingSmartParenthesisHandlerAvailable);
+			typingAssistManager.AddTypingHandler(lifetime, '$', this, OnDollarTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, OnEnterPressed, IsActionHandlerAvailable);
 		}
-
 	}
 
 }

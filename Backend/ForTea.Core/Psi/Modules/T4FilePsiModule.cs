@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.ProtocolAware;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
-using JetBrains.Collections;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers;
 using JetBrains.Lifetimes;
@@ -14,6 +15,7 @@ using JetBrains.ProjectModel.Build;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Web.Impl.PsiModules;
@@ -22,7 +24,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Psi.Modules {
 
 	/// <summary>PSI module managing a single T4 file.</summary>
-	internal sealed class T4FilePsiModule : ProjectPsiModuleBase, IT4FilePsiModule
+	public class T4FilePsiModule : ProjectPsiModuleBase, IT4FilePsiModule
 	{
 		private readonly Lifetime _lifetime;
 		[NotNull] private readonly T4AssemblyReferenceManager _assemblyReferenceManager;
@@ -32,9 +34,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly IT4Environment _t4Environment;
 		[NotNull] private readonly OutputAssemblies _outputAssemblies;
 		[NotNull] private readonly IT4MacroResolver _resolver;
-		
-		[NotNull] private readonly Dictionary<string, string> _resolvedMacros
-			= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 		[NotNull]
 		private IProjectFile File { get; }
@@ -79,10 +78,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		/// <param name="dataDiff">The difference between the old and new data.</param>
 		private void OnDataFileChanged([NotNull] T4FileDataDiff dataDiff) {
 			_shellLocks.AssertWriteAccessAllowed();
-
-			bool hasMacroChanges = ResolveMacros(dataDiff.AddedMacros);
-			bool hasChanges = hasMacroChanges;
-
+			bool hasChanges = true;
 			_resolver.InvalidateAssemblies(
 				dataDiff,
 				ref hasChanges,
@@ -90,15 +86,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_assemblyReferenceManager
 			);
 			
-			if (!hasChanges)
-				return;
+			if (!hasChanges) return;
 
 			// tells the world the module has changed
 			var changeBuilder = new PsiModuleChangeBuilder();
 			changeBuilder.AddModuleChange(this, PsiModuleChange.ChangeType.Modified);
 
-			if (hasMacroChanges)
-				GetPsiServices().MarkAsDirty(SourceFile);
+			if (true) GetPsiServices().MarkAsDirty(SourceFile);
 
 			_shellLocks.ExecuteOrQueueEx("T4PsiModuleChange",
 				() => _changeManager.ExecuteAfterChange(
@@ -107,29 +101,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					)
 				)
 			);
-		}
-
-		/// <summary>Resolves new VS macros, like $(SolutionDir), found in include or assembly directives.</summary>
-		/// <param name="macros">The list of macro names (eg SolutionDir) to resolve.</param>
-		/// <returns>Whether at least one macro has been processed.</returns>
-		private bool ResolveMacros([NotNull] IEnumerable<string> macros)
-		{
-			var result = _resolver.Resolve(macros, File);
-
-			if (result.IsEmpty())
-			{
-				return false;
-			}
-
-			lock (_resolvedMacros)
-			{
-				foreach (var (key, value) in result)
-				{
-					_resolvedMacros[key] = value;
-				}
-			}
-
-			return true;
 		}
 
 		/// <summary>Gets all modules referenced by this module.</summary>
@@ -161,18 +132,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			}
 
 			return references.GetReferences();
-		}
-
-		[NotNull]
-		public IDictionary<string, string> GetResolvedMacros()
-		{
-			lock (_resolvedMacros)
-			{
-				if (_resolvedMacros.IsEmpty())
-					return EmptyDictionary<string, string>.Instance;
-
-				return new Dictionary<string, string>(_resolvedMacros);
-			}
 		}
 
 		[NotNull]
@@ -256,6 +215,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 			solution.GetComponent<T4FileDataCache>().FileDataChanged.Advise(lifetime, OnDataFileChanged);
 			AddBaseReferences();
+
+			if (!(File.ToSourceFile()?.GetPrimaryPsiFile() is IT4File primaryPsiFile)) return;
+			solution.GetComponent<IT4ProtocolModelManager>().UpdateFileInfo(primaryPsiFile);
 		}
 	}
 }

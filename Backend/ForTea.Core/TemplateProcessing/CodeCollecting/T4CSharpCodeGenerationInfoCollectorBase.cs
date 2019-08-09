@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Parsing.Builders;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -11,8 +12,6 @@ using JetBrains.Application;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -27,6 +26,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		[NotNull]
 		private T4DirectiveInfoManager Manager { get; }
 
+		[NotNull]
+		private T4TreeNavigator Navigator { get; }
+
+		[NotNull]
+		private T4EncodingsManager EncodingsManager { get; }
+
+		[NotNull]
+		private T4IncludeGuard Guard { get; }
+
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
 
@@ -38,21 +46,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		protected T4CSharpCodeGenerationInfoCollectorBase(
 			[NotNull] IT4File file,
-			[NotNull] T4DirectiveInfoManager manager
+			[NotNull] ISolution solution
 		)
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Manager = manager;
+			Guard = new T4IncludeGuard();
+			Manager = solution.GetComponent<T4DirectiveInfoManager>();
+			Navigator = solution.GetComponent<T4TreeNavigator>();
+			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
 		[NotNull]
 		public T4CSharpCodeGenerationIntermediateResult Collect()
 		{
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File));
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+			Guard.StartProcessing(File.GetSourceFile().NotNull());
 			File.ProcessDescendants(this);
 			string suffix = Result.State.ProduceBeforeEof();
 			if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+			Guard.EndProcessing();
 			return Results.Pop();
 		}
 
@@ -62,38 +75,49 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public void ProcessBeforeInterior(ITreeNode element)
 		{
 			if (!(element is IT4Include include)) return;
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File));
-			var target = include.Path.Resolve();
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+			var sourceFile = include.Path.Resolve();
+			if (sourceFile == null)
+			{
+				var target = Navigator.FindIncludeValue(include) ?? element;
+				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target}");
+				Interrupter.InterruptAfterProblem(data);
+				Guard.StartProcessing(null);
+				return;
+			}
 
-			if (target?.LanguageType.Is<T4ProjectFileType>() == true)
-				target.GetPrimaryPsiFile()?.ProcessDescendants(this);
-			else BuildT4Tree(target).ProcessDescendants(this);
-		}
+			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
+			if (!Guard.CanProcess(sourceFile))
+			{
+				var target = Navigator.FindIncludeValue(include) ?? element;
+				var data = T4FailureRawData.FromElement(target, "Recursion in includes");
+				Interrupter.InterruptAfterProblem(data);
+				Guard.StartProcessing(sourceFile);
+				return;
+			}
 
-		private IT4File BuildT4Tree(IPsiSourceFile target)
-		{
-			var languageService = T4Language.Instance.LanguageService();
-			Assertion.AssertNotNull(languageService, "languageService != null");
-			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			var environment = File.GetSolution().GetComponent<IT4Environment>();
-			return new T4TreeBuilder(environment, Manager, lexer, target).CreateT4Tree();
+			var resolved = include.Path.ResolveT4File(Guard).NotNull();
+			Guard.StartProcessing(sourceFile);
+			resolved.ProcessDescendants(this);
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)
 		{
-			AppendRemainingMessage(element);
 			switch (element)
 			{
-				case IT4Include _:
+				case IT4Include include:
 					string suffix = Result.State.ProduceBeforeEof();
 					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+					Guard.TryEndProcessing(include.Path.Resolve());
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
 					return; // Do not advance state here
 				case IT4Directive directive:
+					AppendRemainingMessage(element);
 					HandleDirective(directive);
 					break;
 				case IT4CodeBlock codeBlock:
+					AppendRemainingMessage(element);
 					HandleCodeBlock(codeBlock);
 					break;
 				case IT4Token token:
@@ -125,6 +149,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				HandleTemplateDirective(directive);
 			else if (directive.IsSpecificDirective(Manager.Parameter))
 				HandleParameterDirective(directive);
+			else if (directive.IsSpecificDirective(Manager.Output))
+				HandleOutputDirective(directive);
 		}
 
 		/// <summary>
@@ -134,41 +160,32 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		/// <param name="codeBlock">The code block.</param>
 		private void HandleCodeBlock([NotNull] IT4CodeBlock codeBlock)
 		{
-			var codeToken = codeBlock.GetCodeToken();
-			if (codeToken == null) return;
+			if (!(codeBlock.GetCodeToken() is T4Code codeToken)) return;
 			switch (codeBlock)
 			{
 				case T4ExpressionBlock _:
-					var result = Result.FeatureStarted
-						? Result.CollectedFeatures
-						: Result.CollectedTransformation;
-					AppendExpressionWriting(result, codeToken);
-					result.AppendLine();
+					if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(codeToken));
+					else Result.AppendTransformation(new T4ExpressionDescription(codeToken));
 					break;
 				case T4FeatureBlock _:
-					AppendCode(Result.CollectedFeatures, codeToken);
-					Result.CollectedFeatures.AppendLine();
+					Result.AppendFeature(new T4CodeDescription(codeToken));
 					break;
 				default:
-					AppendCode(Result.CollectedTransformation, codeToken);
-					Result.CollectedTransformation.AppendLine();
+					Result.AppendTransformation(new T4CodeDescription(codeToken));
 					break;
 			}
 		}
+
+		private void HandleOutputDirective([NotNull] IT4Directive directive) =>
+			Result.Encoding = EncodingsManager.FindEncoding(directive, Interrupter);
 
 		/// <summary>Handles an import directive, equivalent of an using directive in C#.</summary>
 		/// <param name="directive">The import directive.</param>
 		private void HandleImportDirective([NotNull] IT4Directive directive)
 		{
-			Pair<ITreeNode, string> ns =
-				directive.GetAttributeValueIgnoreOnlyWhitespace(Manager.Import.NamespaceAttribute.Name);
-
-			if (ns.First == null || ns.Second == null)
-				return;
-
-			Result.CollectedImports.Append("using ");
-			Result.CollectedImports.AppendMapped(ns.Second, ns.First.GetTreeTextRange());
-			Result.CollectedImports.AppendLine(";");
+			var description = T4ImportDescription.FromDirective(directive, Manager);
+			if (description == null) return;
+			Result.Append(description);
 		}
 
 		/// <summary>
@@ -199,38 +216,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			Result.Append(description);
 		}
 
-		private void AppendExpressionWriting(
-			[NotNull] T4CSharpCodeGenerationResult result,
-			[NotNull] TreeElement token
-		)
-		{
-			result.Append("            this.Write(");
-			result.Append(ToStringConversionStart);
-			AppendCode(result, token);
-			result.Append(ToStringConversionEnd);
-			result.Append(");");
-		}
-
 		private void AppendRemainingMessage([NotNull] ITreeNode lookahead)
 		{
 			if (lookahead is IT4Token) return;
 			string produced = Result.State.Produce(lookahead);
 			if (produced.IsNullOrEmpty()) return;
-			// ReSharper disable once AssignNullToNotNullAttribute
 			AppendTransformation(produced);
 		}
 		#endregion Utils
 
 		protected abstract void AppendTransformation([NotNull] string message);
-
-		[NotNull]
-		protected abstract string ToStringConversionStart { get; }
-
-		[NotNull]
-		protected virtual string ToStringConversionEnd => ")";
-
-		protected abstract void AppendCode(
-			[NotNull] T4CSharpCodeGenerationResult result,
-			[NotNull] TreeElement token);
+		protected abstract IT4CodeGenerationInterrupter Interrupter { get; }
 	}
 }

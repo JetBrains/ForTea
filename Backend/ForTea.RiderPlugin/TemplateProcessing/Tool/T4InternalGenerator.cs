@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
@@ -6,21 +7,26 @@ using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Altering.Resources;
 using JetBrains.ReSharper.Host.Features.ProjectModel.CustomTools;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Rider.Model;
 using JetBrains.UI.Icons;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 {
-	[ShellComponent] // TODO: make SolutionComponent
+	[ShellComponent]
 	public class T4InternalGenerator : ISingleFileCustomTool
 	{
+		private Lifetime Lifetime { get; }
+		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
 		public string Name => "Bundled T4 template executor";
-		public string ActionName => "Execute T4 template";
+		public string ActionName => "Execute T4 generator";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
 		public string[] CustomTools => new[] {"T4 Generator Custom Tool"};
 		public string[] Extensions => new[] {T4ProjectFileType.MainExtensionNoDot};
@@ -30,24 +36,40 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			using (projectFile.Locks.UsingReadLock())
 			{
+				// .ttinclude and .t4 files exist for being included and should not be auto-executed
+				if (projectFile.Location.ExtensionWithDot != T4ProjectFileType.MainExtension) return false;
 				return projectFile.LanguageType.Is<T4ProjectFileType>();
 			}
 		}
 
-		public string[] Keywords => new[] {"tt", "t4", "template"};
+		public string[] Keywords => new[] {"tt", "t4", "template", "generator"};
 
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
 			AssertOperationValidity(projectFile);
-
 			var file = AsT4File(projectFile).NotNull("file != null");
-			var solution = projectFile.GetSolution();
-			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
-			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
-			
-			var result = executionManager.Execute(file); // Write to buffer
-			var affectedFile = targetFileManager.SaveResults(result, file); // Write disk entry
 
+			var solution = file.GetSolution();
+			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
+			var targetManager = solution.GetComponent<IT4TargetFileManager>();
+
+			if (!executionManager.CanCompile(file))
+			{
+				return new SingleFileCustomToolExecutionResult(
+					new FileSystemPath[] { },
+					new[] {"File contains syntax errors"}
+				);
+			}
+
+			var buildResult = executionManager.Compile(Lifetime, file);
+			Assertion.Assert(buildResult.BuildResultKind == T4BuildResultKind.Successful,
+				"buildResult.BuildResultKind == T4BuildResultKind.Successful");
+			bool succeeded = executionManager.Execute(Lifetime, file);
+			if (!succeeded)
+				return new SingleFileCustomToolExecutionResult(
+					EmptyList<FileSystemPath>.Collection,
+					new List<string> {"Execution error"});
+			var affectedFile = targetManager.SaveExecutionResults(file);
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);
 		}
 

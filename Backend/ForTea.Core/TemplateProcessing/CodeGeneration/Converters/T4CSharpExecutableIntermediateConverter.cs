@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
@@ -9,6 +10,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	{
 		[NotNull] private const string SuffixResource =
 			"GammaJul.ForTea.Core.Resources.TemplateBaseFullExecutableSuffix.cs";
+
+		[NotNull] private const string HostspecificSuffixResource =
+			"GammaJul.ForTea.Core.Resources.HostspecificTemplateBaseFullExecutableSuffix.cs";
 
 		[NotNull] private const string HostResource = "GammaJul.ForTea.Core.Resources.Host.cs";
 
@@ -51,8 +55,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		private void AppendMainContainer()
 		{
-			var provider = new T4TemplateResourceProvider(SuffixResource, this);
-			string suffix = provider.ProcessResource(GeneratedClassName);
+			string resource = IntermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
+			var provider = new T4TemplateResourceProvider(resource, this);
+			string encoding = IntermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
+			string suffix = provider.ProcessResource(GeneratedClassName, encoding);
 			Result.Append(suffix);
 		}
 
@@ -64,5 +70,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("using System.Text;");
 		}
+
+		protected override IT4ElementAppendFormatProvider Provider =>
+			new T4RealCodeFormatProvider(new string(' ', CurrentIndent * 4));
 	}
 }

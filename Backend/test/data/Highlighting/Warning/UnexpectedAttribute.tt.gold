@@ -1,0 +1,4 @@
+﻿<#@ output |once|(0)="true" #>
+
+---------------------------------------------------------
+(0): ReSharper Warning: Unexpected attribute

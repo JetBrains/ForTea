@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -11,7 +12,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
 	public abstract class T4InfoCollectorStateBase : IT4InfoCollectorState
 	{
+		[NotNull]
+		protected IT4CodeGenerationInterrupter Interrupter { get; }
+
 		// This property is only required for ensuring correctness of state management code
+		protected T4InfoCollectorStateBase([NotNull] IT4CodeGenerationInterrupter interrupter) =>
+			Interrupter = interrupter;
+
 		private bool IsAlive { get; set; } = true;
 
 		[Conditional("JET_MODE_ASSERT")]
@@ -67,9 +74,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		protected abstract IT4InfoCollectorState GetNextStateSafe([NotNull] ITreeNode element);
 
 		[NotNull]
-		protected static string Convert([NotNull] IT4Token token) => StringLiteralConverter.EscapeToRegular(
-			token.NodeType == T4TokenNodeTypes.NEW_LINE
+		protected static string Convert([CanBeNull] IT4Token token) => StringLiteralConverter.EscapeToRegular(
+			token?.NodeType == T4TokenNodeTypes.NEW_LINE
 				? Environment.NewLine // todo: use \n and change it to environmental newline later
-				: token.GetText());
+				: token?.GetText());
 	}
 }

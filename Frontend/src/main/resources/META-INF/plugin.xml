@@ -11,9 +11,11 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- custom language description -->
-    <fileTypeFactory
-        id="T4"
-        implementation="com.jetbrains.fortea.language.T4FileTypeFactory"/>
+    <fileType
+        name="T4"
+        language="T4"
+        implementationClass="com.jetbrains.fortea.language.T4FileType"
+        extensions="tt;t4;ttinclude"/>
     <lang.parserDefinition
         language="T4"
         implementationClass="com.jetbrains.fortea.parser.T4ParserDefinition"/>
@@ -24,7 +26,16 @@
         language="T4"
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
+    <!-- template execution & preprocessing -->
+    <configurationType implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationType"/>
+    <stepsBeforeRunProvider
+        implementation="com.jetbrains.fortea.configuration.run.task.CompileT4BeforeRunTaskProvider"/>
+    <configurationType implementation="com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationType"/>
+
     <!-- delegation to backend -->
+    <rider.debuggerSupportPolicy
+        language="T4"
+        implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy"/>
     <lang.documentationProvider
         language="T4"
         implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
@@ -55,7 +66,33 @@
     <lang.altEnter
         language="T4"
         implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperBulbMenuModelFactory"/>
+    <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
-    <!-- <lineIndentProvider implementation="com.jetbrains.rider.editorActions.XamlDummyLineIndentProvider"/>-->
+    <projectService serviceImplementation="com.jetbrains.fortea.configuration.T4BuildToolWindowFactory"/>
   </extensions>
+  <actions>
+    <action
+        class="com.jetbrains.fortea.configuration.actions.T4ExecuteTemplateAction"
+        id="ExecuteT4Template"
+        text="Execute T4 Template">
+      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
+    </action>
+    <action
+        class="com.jetbrains.fortea.configuration.actions.T4DebugTemplateAction"
+        id="DebugT4Template"
+        text="Debug T4 Template">
+      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
+    </action>
+    <action
+        class="com.jetbrains.fortea.configuration.actions.T4PreprocessTemplateAction"
+        id="PreprocessT4Template"
+        text="Preprocess T4 Template">
+      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="DebugT4Template"/>
+    </action>
+  </actions>
+  <project-components>
+    <component>
+      <implementation-class>com.jetbrains.fortea.configuration.T4BuildSessionView</implementation-class>
+    </component>
+  </project-components>
 </idea-plugin>

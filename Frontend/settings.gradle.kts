@@ -6,4 +6,4 @@ pluginManagement {
 
 rootProject.name = "ForTea.Frontend"
 
-include("protocol")
+include(":protocol")

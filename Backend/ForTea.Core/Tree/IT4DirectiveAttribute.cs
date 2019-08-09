@@ -1,7 +1,4 @@
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Tree
 {
@@ -16,18 +13,11 @@ namespace GammaJul.ForTea.Core.Tree
 		/// <summary>Gets the token representing the value of this attribute.</summary>
 		/// <returns>A value token, or <c>null</c> if none is available.</returns>
 		[CanBeNull]
-		TreeElement GetValueToken();
+		IT4AttributeValue GetValueToken();
 
 		/// <summary>Gets the value of this attribute.</summary>
 		/// <returns>The attribute value, or <c>null</c> if none is available.</returns>
 		[CanBeNull]
 		string GetValue();
-
-		/// <summary>Gets the error associated with the value that have been identified at parsing time.</summary>
-		[CanBeNull]
-		string ValueError { get; }
-
-		[CanBeNull]
-		IT4PathWithMacros Reference { get; }
 	}
 }

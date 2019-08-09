@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.Psi {
@@ -9,26 +10,19 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <summary>Gets an enumeration of all added assemblies.</summary>
 		[NotNull]
 		[ItemNotNull]
-		public IEnumerable<string> AddedAssemblies { get; }
+		public IEnumerable<IT4PathWithMacros> AddedAssemblies { get; }
 
 		/// <summary>Gets an enumeration of all removed assemblies.</summary>
 		[NotNull]
 		[ItemNotNull]
-		public IEnumerable<string> RemovedAssemblies { get; }
-
-		/// <summary>Gets en enumeration of all added macros.</summary>
-		[NotNull]
-		[ItemNotNull]
-		public IEnumerable<string> AddedMacros { get; }
+		public IEnumerable<IT4PathWithMacros> RemovedAssemblies { get; }
 
 		public T4FileDataDiff(
-			[NotNull] [ItemNotNull] IEnumerable<string> addedAssemblies,
-			[NotNull] [ItemNotNull] IEnumerable<string> removedAssemblies,
-			[NotNull] [ItemNotNull] IEnumerable<string> addedMacros
+			[NotNull] [ItemNotNull] IEnumerable<IT4PathWithMacros> addedAssemblies,
+			[NotNull] [ItemNotNull] IEnumerable<IT4PathWithMacros> removedAssemblies
 		) {
 			AddedAssemblies = addedAssemblies;
 			RemovedAssemblies = removedAssemblies;
-			AddedMacros = addedMacros;
 		}
 
 	}
