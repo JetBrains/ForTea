@@ -61,9 +61,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 
 		private void RegisterCallbacks()
 		{
-			Model.RequestCompilation.Set(WrapClassFunc(Compile, Converter.FatalError()));
-			Model.TransferResults.Set(WrapClassFunc(CopyResults, Unit.Instance));
-			Model.RequestPreprocessing.Set(WrapClassFunc(Preprocess, new T4PreprocessingResult(false, null)));
+			Model.RequestCompilation.Set(Wrap(Compile, Converter.FatalError()));
+			Model.TransferResults.Set(Wrap(CopyResults, Unit.Instance));
+			Model.RequestPreprocessing.Set(Wrap(Preprocess, new T4PreprocessingResult(false, null)));
 		}
 
 		public override void UpdateFileInfo(IT4File file) =>
@@ -73,7 +73,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 					TargetFileManager.GetTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
 				);
 
-		private Func<string, T> WrapClassFunc<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
+		private Func<string, T> Wrap<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
 			rawPath =>
 			{
 				var result = Logger.Catch(() =>
