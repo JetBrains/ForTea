@@ -1,0 +1,11 @@
+<{caret:first}#@ template language="C#" #>
+<#{caret:second}
+    if (2 + 2 == 4)
+    {
+#>Hello, <#= 2 #>{caret:third}
+<#
+    }
+#>
+{caret:fourth}<#+
+    private const int x = 2;
+#>

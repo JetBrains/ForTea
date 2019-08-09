@@ -1,0 +1,19 @@
+﻿|<|(0:first)#@ template language="C#" #|>|(1:first)
+<#
+    if (2 + 2 == 4)
+    {
+#>Hello, |<|(2:third)#= 2 #|>|(3:third)
+<#
+    }
+#>
+|<|(4:fourth)#+
+    private const int x = 2;
+#|>|(5:fourth)
+
+---------------------------------------------------------
+(0:first): ReSharper Matched Brace
+(1:first): ReSharper Matched Brace
+(2:third): ReSharper Matched Brace
+(3:third): ReSharper Matched Brace
+(4:fourth): ReSharper Matched Brace
+(5:fourth): ReSharper Matched Brace
