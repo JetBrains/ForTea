@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi {
@@ -24,15 +25,17 @@ namespace GammaJul.ForTea.Core.Psi {
 				bool markedAsDirty = false;
 
 				// Mark includers file as dirty if their included files have changed.
-				foreach (FileSystemPath committedFilePath in _committedFilePaths.ToArray()) {
-					foreach (FileSystemPath includer in _fileDependencyManager.GetIncluders(committedFilePath)) {
-						if (!_committedFilePaths.Add(includer))
-							continue;
+				using (WriteLockCookie.Create()) {
+					foreach (FileSystemPath committedFilePath in _committedFilePaths.ToArray()) {
+						foreach (FileSystemPath includer in _fileDependencyManager.GetIncluders(committedFilePath)) {
+							if (!_committedFilePaths.Add(includer))
+								continue;
 
-						foreach (IProjectItem includerProjectItem in _psiServices.Solution.FindProjectItemsByLocation(includer)) {
-							if (includerProjectItem is IProjectFile includerProjectFile) {
-								_psiServices.MarkAsDirty(includerProjectFile);
-								markedAsDirty = true;
+							foreach (IProjectItem includerProjectItem in _psiServices.Solution.FindProjectItemsByLocation(includer)) {
+								if (includerProjectItem is IProjectFile includerProjectFile) {
+									_psiServices.MarkAsDirty(includerProjectFile);
+									markedAsDirty = true;
+								}
 							}
 						}
 					}
