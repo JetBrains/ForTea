@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
@@ -35,11 +36,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			using (projectFile.Locks.UsingReadLock())
 			{
+				// .ttinclude and .t4 files exist for being included and should not be auto-executed
+				if (projectFile.Location.ExtensionWithDot != T4ProjectFileType.MainExtension) return false;
 				return projectFile.LanguageType.Is<T4ProjectFileType>();
 			}
 		}
 
-		public string[] Keywords => new[] {"tt", "t4", "template"};
+		public string[] Keywords => new[] {"tt", "t4", "template", "generator"};
 
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
@@ -61,8 +64,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 			var buildResult = executionManager.Compile(Lifetime, file);
 			Assertion.Assert(buildResult.BuildResultKind == T4BuildResultKind.Successful,
 				"buildResult.BuildResultKind == T4BuildResultKind.Successful");
-			var result = executionManager.Execute(Lifetime, file);
-			var affectedFile = targetManager.SaveResults(result, file);
+			bool succeeded = executionManager.Execute(Lifetime, file);
+			if (!succeeded)
+				return new SingleFileCustomToolExecutionResult(
+					EmptyList<FileSystemPath>.Collection,
+					new List<string> {"Execution error"});
+			var affectedFile = targetManager.SaveExecutionResults(file);
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);
 		}
 
