@@ -56,7 +56,7 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 				if (existingNames.Contains(attributeName))
 					continue;
 				
-				var item = new TextLookupItem(attributeName);
+				var item = new TextLookupItem(attributeName, T4.Id);
 				item.InitializeRanges(ranges, context.BasicContext);
 				collector.Add(item);
 			}
