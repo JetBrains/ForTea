@@ -165,8 +165,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		}
 
 		private void AddBaseReferences() {
-			_assemblyReferenceManager.TryAddReference("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
-			_assemblyReferenceManager.TryAddReference("System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+			_assemblyReferenceManager.TryAddReference("mscorlib");
+			_assemblyReferenceManager.TryAddReference("System");
 			foreach (string assemblyName in _t4Environment.TextTemplatingAssemblyNames)
 				_assemblyReferenceManager.TryAddReference(assemblyName);
 		}
