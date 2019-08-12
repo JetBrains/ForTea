@@ -93,9 +93,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		[CanBeNull]
 		private Unit CopyResults([NotNull] IT4File file)
 		{
+			var destination = TargetFileManager.CopyExecutionResults(file);
 			using (WriteLockCookie.Create())
 			{
-				var destination = TargetFileManager.CopyExecutionResults(file);
 				TargetFileManager.UpdateProjectModel(file, destination);
 			}
 
@@ -112,6 +112,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 				{
 					TargetFileManager.SavePreprocessResults(file, message);
 				}
+
 				return new T4PreprocessingResult(true, null);
 			}
 			catch (T4OutputGenerationException e)
