@@ -14,6 +14,7 @@ using JetBrains.ReSharper.Host.Features.ProjectModel.CustomTools;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.UI.Icons;
 using JetBrains.Util;
@@ -21,7 +22,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 {
 	[ShellComponent]
-	public class T4InternalGenerator : ISingleFileCustomTool
+	public sealed class T4InternalGenerator : ISingleFileCustomTool
 	{
 		private Lifetime Lifetime { get; }
 		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
@@ -69,7 +70,16 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				return new SingleFileCustomToolExecutionResult(
 					EmptyList<FileSystemPath>.Collection,
 					new List<string> {"Execution error"});
-			var affectedFile = targetManager.SaveExecutionResults(file);
+
+			var affectedFile = targetManager.CopyExecutionResults(file);
+			solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "Saving T4 results", () =>
+			{
+				using (WriteLockCookie.Create())
+				{
+					targetManager.UpdateProjectModel(file, affectedFile);
+				}
+			});
+
 			return new SingleFileCustomToolExecutionResult(new[] {affectedFile}, EmptyList<string>.Collection);
 		}
 

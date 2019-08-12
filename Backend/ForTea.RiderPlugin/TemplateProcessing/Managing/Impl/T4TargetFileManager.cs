@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
@@ -63,7 +64,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return name.WithOtherExtension(targetExtension);
 		}
 
-		private FileSystemPath GetTemporaryTargetFileFolder(IT4File file) => GetTemporaryExecutableLocation(file).Parent;
+		private FileSystemPath GetTemporaryTargetFileFolder(IT4File file) =>
+			GetTemporaryExecutableLocation(file).Parent;
 
 		private FileSystemPath FindTemporaryTargetFile(IT4File file)
 		{
@@ -133,24 +135,36 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return candidates.SingleOrDefault();
 		}
 
-		public FileSystemPath SaveExecutionResults(IT4File file)
+		[NotNull]
+		private FileSystemPath GetDestinationLocation([NotNull] IT4File file, [NotNull] string temporaryName)
+		{
+			Locks.AssertReadAccessAllowed();
+			var sourceFile = file.GetSourceFile().NotNull();
+			return sourceFile.ToProjectFile().NotNull().Location.Parent.Combine(temporaryName);
+		}
+
+		public FileSystemPath CopyExecutionResults(IT4File file)
+		{
+			Locks.AssertReadAccessAllowed();
+			Locks.AssertWriteAccessForbidden();
+			var temporary = FindTemporaryTargetFile(file);
+			var destinationLocation = GetDestinationLocation(file, temporary.Name);
+			File.Replace(temporary.FullPath, destinationLocation.FullPath, null);
+			return destinationLocation;
+		}
+
+		public void UpdateProjectModel(IT4File file, FileSystemPath result)
 		{
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
-			FileSystemPath destinationLocation = null;
 			IProjectFile destination = null;
-			var temporary = FindTemporaryTargetFile(file);
-			Solution.InvokeUnderTransaction(cookie =>
-			{
-				destination = GetOrCreateSameDestinationFile(cookie, file, temporary);
-				destinationLocation = destination.Location;
-				temporary.MoveFile(destinationLocation, true);
-			});
-			SyncDocuments(destinationLocation);
+			Solution.InvokeUnderTransaction(
+				cookie => destination = GetOrCreateSameDestinationFile(cookie, file, result));
+			// TODO: Do I really need that?
+			SyncDocuments(destination.Location);
 			var sourceFile = destination.ToSourceFile();
 			if (sourceFile != null) SyncSymbolCaches(sourceFile);
-			RefreshFiles(destinationLocation);
-			return destinationLocation;
+			RefreshFiles(destination.Location);
 		}
 
 		public FileSystemPath SavePreprocessResults(IT4File file, string text)

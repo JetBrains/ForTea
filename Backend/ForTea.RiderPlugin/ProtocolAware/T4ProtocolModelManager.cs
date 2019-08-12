@@ -95,7 +95,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		{
 			using (WriteLockCookie.Create())
 			{
-				TargetFileManager.SaveExecutionResults(file);
+				var destination = TargetFileManager.CopyExecutionResults(file);
+				TargetFileManager.UpdateProjectModel(file, destination);
 			}
 
 			return Unit.Instance;
