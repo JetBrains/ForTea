@@ -13,7 +13,7 @@
   psiVisitorName="T4Visitor"
 }
 
-t4File ::= (text|NEW_LINE|block)*
+t4File ::= (RAW_TEXT|NEW_LINE|block)*
 
 block ::= directive | code_block
 
@@ -21,11 +21,11 @@ block ::= directive | code_block
 
 code_block ::= statement_block|expression_block|feature_block
 
-statement_block ::= STATEMENT_BLOCK_START code? BLOCK_END
+statement_block ::= STATEMENT_BLOCK_START RAW_CODE? BLOCK_END
 
-expression_block ::= EXPRESSION_BLOCK_START code? BLOCK_END
+expression_block ::= EXPRESSION_BLOCK_START RAW_CODE? BLOCK_END
 
-feature_block ::= FEATURE_BLOCK_START code? BLOCK_END
+feature_block ::= FEATURE_BLOCK_START RAW_CODE? BLOCK_END
 
 // ---- ---- Directive ---- ----
 
@@ -38,17 +38,9 @@ private directive_main ::= DIRECTIVE_START directive_name attribute* {
 
 directive_name ::= TOKEN
 
-attribute ::= attribute_name EQUAL QUOTE attribute_value QUOTE
+attribute ::= attribute_name EQUAL QUOTE RAW_ATTRIBUTE_VALUE? QUOTE
 
 attribute_name ::= TOKEN
-
-// ---- ---- Raw ---- ----
-
-text ::= RAW_TEXT+
-
-code ::= RAW_CODE+
-
-attribute_value ::= RAW_ATTRIBUTE_VALUE*
 
 // ---- ---- Recovery ---- ----
 
