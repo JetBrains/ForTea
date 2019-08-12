@@ -1,4 +1,4 @@
-    public class TemplateBaseFullExecutableSuffix____GeneratedClass___LetsHopeNoOneEverNamesAClassLikeThat__IfYouNameClassLikeThatWeAreNotResponsibleForIncorrectBehaviour
+    public static class ReSharperGeneratedTransformationExecutor
     {
         public static int Main(string[] args)
         {
