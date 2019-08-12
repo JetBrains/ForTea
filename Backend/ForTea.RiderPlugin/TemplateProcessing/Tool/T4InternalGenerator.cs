@@ -3,7 +3,6 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
@@ -21,11 +20,28 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 {
-	[ShellComponent]
+	[SolutionComponent]
 	public sealed class T4InternalGenerator : ISingleFileCustomTool
 	{
 		private Lifetime Lifetime { get; }
-		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
+
+		[NotNull]
+		private IT4TemplateExecutionManager ExecutionManager { get; }
+
+		[NotNull]
+		private IT4TargetFileManager TargetFileManager { get; }
+
+		public T4InternalGenerator(
+			Lifetime lifetime,
+			[NotNull] IT4TemplateExecutionManager executionManager,
+			[NotNull] IT4TargetFileManager targetFileManager
+		)
+		{
+			Lifetime = lifetime;
+			ExecutionManager = executionManager;
+			TargetFileManager = targetFileManager;
+		}
+
 		public string Name => "Bundled T4 template executor";
 		public string ActionName => "Execute T4 generator";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
@@ -48,13 +64,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
 			AssertOperationValidity(projectFile);
-			var file = AsT4File(projectFile).NotNull("file != null");
+			var file = AsT4File(projectFile).NotNull();
 
-			var solution = file.GetSolution();
-			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
-			var targetManager = solution.GetComponent<IT4TargetFileManager>();
-
-			if (!executionManager.CanCompile(file))
+			if (!ExecutionManager.CanCompile(file))
 			{
 				return new SingleFileCustomToolExecutionResult(
 					new FileSystemPath[] { },
@@ -62,21 +74,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				);
 			}
 
-			var buildResult = executionManager.Compile(Lifetime, file);
+			var buildResult = ExecutionManager.Compile(Lifetime, file);
 			Assertion.Assert(buildResult.BuildResultKind == T4BuildResultKind.Successful,
 				"buildResult.BuildResultKind == T4BuildResultKind.Successful");
-			bool succeeded = executionManager.Execute(Lifetime, file);
+			bool succeeded = ExecutionManager.Execute(Lifetime, file);
 			if (!succeeded)
 				return new SingleFileCustomToolExecutionResult(
 					EmptyList<FileSystemPath>.Collection,
 					new List<string> {"Execution error"});
 
-			var affectedFile = targetManager.CopyExecutionResults(file);
-			solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "Saving T4 results", () =>
+			var affectedFile = TargetFileManager.CopyExecutionResults(file);
+			file.GetSolution().Locks.ExecuteOrQueueEx(file.GetSolution().GetLifetime(), "Saving T4 results", () =>
 			{
 				using (WriteLockCookie.Create())
 				{
-					targetManager.UpdateProjectModel(file, affectedFile);
+					TargetFileManager.UpdateProjectModel(file, affectedFile);
 				}
 			});
 
