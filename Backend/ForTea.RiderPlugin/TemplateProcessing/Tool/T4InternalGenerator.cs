@@ -77,8 +77,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 
 			InterruptableActivityCookie.CheckAndThrow();
 			var buildResult = ExecutionManager.Compile(Lifetime, file);
-			Assertion.Assert(buildResult.BuildResultKind == T4BuildResultKind.Successful,
-				"buildResult.BuildResultKind == T4BuildResultKind.Successful");
+			Assertion.Assert(buildResult.BuildResultKind != T4BuildResultKind.HasErrors,
+				"buildResult.BuildResultKind != T4BuildResultKind.HasErrors");
 			InterruptableActivityCookie.CheckAndThrow();
 			bool succeeded = ExecutionManager.Execute(Lifetime, file);
 			if (!succeeded)

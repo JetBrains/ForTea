@@ -10,7 +10,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public class T4CSharpIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		protected const string DefaultGeneratedClassName = "GeneratedTransformation";
+		private const string DefaultGeneratedClassName = "GeneratedTransformation";
 
 		public T4CSharpIntermediateConverter(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,

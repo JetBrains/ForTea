@@ -2,6 +2,8 @@ namespace Microsoft.VisualStudio.TextTemplating
 {
     public class ITextTemplatingEngineHost
     {
+        private $(PARAMETER_1) transformation;
+        
         public Encoding Encoding { get; private set; }
         public string FileExtension { get; private set; }
 
@@ -29,9 +31,8 @@ namespace Microsoft.VisualStudio.TextTemplating
 
         public AppDomain ProvideTemplatingAppDomain(string content) => AppDomain.CreateDomain("Generation App Domain");
 
-        public void LogErrors(CompilerErrorCollection errors)
-        {
-        }
+        public void LogErrors(CompilerErrorCollection errors) =>
+            transformation.Errors.AddRange(errors);
 
         public void SetFileExtension(string extension) => FileExtension = extension;
 

@@ -23,10 +23,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 		}
 
-		// Avoid name clash
-		protected override string GeneratedClassName =>
-			"__" + base.GeneratedClassName + "__" + DefaultGeneratedClassName + "__";
-
 		// When creating executable, it is better to put base class first,
 		// to make error messages more informative
 		protected override void AppendClasses(bool hostspecific)
@@ -49,7 +45,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendHostDefinition()
 		{
 			var provider = new T4TemplateResourceProvider(HostResource, this);
-			string host = provider.ProcessResource(File.GetSourceFile().GetLocation().FullPath);
+			string host = provider.ProcessResource(File.GetSourceFile().GetLocation().FullPath, GeneratedClassName);
 			Result.Append(host);
 		}
 

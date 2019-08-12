@@ -9,6 +9,12 @@
             var encoding = transformation.Host.Encoding;
             string extension = transformation.Host.FileExtension;
             if (extension != null) destination = destination.WithExtension__Generated(extension);
+            foreach (CompilerError error in transformation.Errors)
+            {
+                Console.Error.WriteLine(error);
+            }
+
+            if (transformation.Errors.HasErrors) return 1;
             File.WriteAllText(destination, text, encoding);
             return 0;
         }
