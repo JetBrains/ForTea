@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
@@ -65,7 +66,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			AssertOperationValidity(projectFile);
 			var file = AsT4File(projectFile).NotNull();
-
+			InterruptableActivityCookie.CheckAndThrow();
 			if (!ExecutionManager.CanCompile(file))
 			{
 				return new SingleFileCustomToolExecutionResult(
@@ -74,15 +75,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				);
 			}
 
+			InterruptableActivityCookie.CheckAndThrow();
 			var buildResult = ExecutionManager.Compile(Lifetime, file);
 			Assertion.Assert(buildResult.BuildResultKind == T4BuildResultKind.Successful,
 				"buildResult.BuildResultKind == T4BuildResultKind.Successful");
+			InterruptableActivityCookie.CheckAndThrow();
 			bool succeeded = ExecutionManager.Execute(Lifetime, file);
 			if (!succeeded)
 				return new SingleFileCustomToolExecutionResult(
 					EmptyList<FileSystemPath>.Collection,
 					new List<string> {"Execution error"});
 
+			InterruptableActivityCookie.CheckAndThrow();
 			var affectedFile = TargetFileManager.CopyExecutionResults(file);
 			file.GetSolution().Locks.ExecuteOrQueueEx(file.GetSolution().GetLifetime(), "Saving T4 results", () =>
 			{
