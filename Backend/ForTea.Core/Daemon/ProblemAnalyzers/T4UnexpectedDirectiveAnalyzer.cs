@@ -23,7 +23,8 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		)
 		{
 			if (Manager.GetDirectiveByName(element.GetName()) != null) return;
-			var nameToken = element.GetNameToken().NotNull();
+			var nameToken = element.GetNameToken();
+			if (nameToken == null) return;
 			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(nameToken));
 		}
 	}
