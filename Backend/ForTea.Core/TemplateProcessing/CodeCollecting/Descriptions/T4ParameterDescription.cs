@@ -1,6 +1,8 @@
+using FluentAssertions;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -27,7 +29,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			[NotNull] ITreeNode typeToken,
 			[NotNull] ITreeNode nameToken,
 			[NotNull] string typeString,
-			[NotNull] string nameString)
+			[NotNull] string nameString
+		) : base(typeToken.GetContainingFile().As<IT4File>().NotNull())
 		{
 			TypeToken = typeToken;
 			NameToken = nameToken;

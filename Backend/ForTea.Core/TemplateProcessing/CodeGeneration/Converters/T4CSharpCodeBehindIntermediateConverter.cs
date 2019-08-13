@@ -53,7 +53,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 
 			Result.Append("        private global::");
-			if (description.IsVisible)
+			if (description.HasSameSource(File))
 			{
 				var type = description.TypeToken;
 				if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
@@ -62,7 +62,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			else Result.Append(description.TypeString);
 
 			Result.Append(" ");
-			if (description.IsVisible)
+			if (description.HasSameSource(File))
 			{
 				var name = description.NameToken;
 				if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");

@@ -90,7 +90,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			{
 				AppendIndent();
 				Result.Append("using ");
-				if (description.IsVisible)
+				if (description.HasSameSource(File))
 					Result.AppendMapped(description.Presentation, description.Source.GetTreeTextRange());
 				else Result.Append(description.Presentation);
 				Result.AppendLine(";");
@@ -117,7 +117,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformMethod();
 			foreach (var description in IntermediateResult.FeatureDescriptions)
 			{
-				description.AppendContent(Result, Provider);
+				description.AppendContent(Result, Provider, File);
 			}
 
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
@@ -181,7 +181,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformationPrefix();
 			foreach (var description in IntermediateResult.TransformationDescriptions)
 			{
-				description.AppendContent(Result, Provider);
+				description.AppendContent(Result, Provider, File);
 			}
 
 			AppendIndent();
