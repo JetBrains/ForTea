@@ -1,0 +1,3 @@
+﻿<#@ assembly name="|DoesNotExist.dll|(0)" #>
+---------------------------------------------------------
+(0): ReSharper Warning: Unresolved assembly

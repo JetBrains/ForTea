@@ -6,11 +6,11 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 namespace GammaJul.ForTea.Core.Daemon.Highlightings
 {
 	[StaticSeverityHighlighting(
-		Severity.ERROR,
+		Severity.WARNING,
 		T4Language.Name,
-		OverlapResolve = OverlapResolveKind.UNRESOLVED_ERROR,
+		OverlapResolve = OverlapResolveKind.WARNING,
 		ShowToolTipInStatusBar = true,
-		AttributeId = HighlightingAttributeIds.UNRESOLVED_ERROR_ATTRIBUTE
+		AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE
 	)]
 	public class T4UnresolvedAssemblyHighlighting : T4HighlightingBase<IT4AttributeValue>
 	{
