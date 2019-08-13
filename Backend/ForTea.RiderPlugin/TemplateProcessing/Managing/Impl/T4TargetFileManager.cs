@@ -149,7 +149,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertWriteAccessForbidden();
 			var temporary = FindTemporaryTargetFile(file);
 			var destinationLocation = GetDestinationLocation(file, temporary.Name);
-			File.Replace(temporary.FullPath, destinationLocation.FullPath, null);
+			// There seems to be no method with 'move-and-overwrite' semantics
+			File.Copy(temporary.FullPath, destinationLocation.FullPath, true);
+			File.Delete(temporary.FullPath);
 			return destinationLocation;
 		}
 
