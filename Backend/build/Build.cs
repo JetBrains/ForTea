@@ -114,12 +114,17 @@ internal class Build : NukeBuild {
 			.JoinNewLine();
 
 	private string GetWaveVersion()
-		=> NuGetPackageResolver.GetLocalInstalledPackages(MainProjectDirectory / (MainProjectName + ".csproj"))
-			.SingleOrDefault(x => x.Id == "Wave")
+	{
+		var installedPackages = NuGetPackageResolver
+			.GetLocalInstalledPackages(MainProjectDirectory / (MainProjectName + ".csproj"))
+			.FirstOrDefault(x => x.Id == "Wave");
+		Console.WriteLine($"Selected wave location: {installedPackages?.FileName ?? "null"}");
+		return installedPackages
 			.NotNull("fullWaveVersion != null")
 			.Version
 			.Version
 			.ToString(2);
+	}
 
 	public static int Main()
 		=> Execute<Build>(x => x.Compile);
