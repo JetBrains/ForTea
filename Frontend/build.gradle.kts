@@ -51,7 +51,7 @@ version = "0.01"
 
 intellij {
   type = "RD"
-  version = "$baseVersion-SNAPSHOT"
+  version = "$baseVersion"
   instrumentCode = false
   downloadSources = false
   updateSinceUntilBuild = false
