@@ -31,7 +31,6 @@ object T4SyntaxHighlighter : SyntaxHighlighterBase() {
     T4ElementTypes.EXPRESSION_BLOCK_START -> BLOCK_MARKER_KEYS
     T4ElementTypes.FEATURE_BLOCK_START -> BLOCK_MARKER_KEYS
     T4ElementTypes.QUOTE -> QUOTE_KEYS
-    T4ElementTypes.TOKEN -> TextAttributesKey.EMPTY_ARRAY
     else -> TextAttributesKey.EMPTY_ARRAY
   }
 
