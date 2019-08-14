@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using GammaJul.ForTea.Core.Parsing.Builders;
 using GammaJul.ForTea.Core.Psi.Directives;
@@ -100,8 +99,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 			var macroValues = Resolver.Resolve(RawMacros, SourceFile.ToProjectFile().NotNull());
 
-			var result = new StringBuilder(System.Environment.ExpandEnvironmentVariables(RawPath));
-			return MacroRegex.Replace(result.ToString(), match =>
+			string result = System.Environment.ExpandEnvironmentVariables(RawPath);
+			return MacroRegex.Replace(result, match =>
 			{
 				var group = match.Groups[1];
 				string macro = group.Value;
