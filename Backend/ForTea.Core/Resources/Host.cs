@@ -24,7 +24,16 @@ namespace Microsoft.VisualStudio.TextTemplating
         public Type ResolveDirectiveProcessor(string processorName) =>
             throw new Exception("Directive Processor not found");
 
-        public string ResolvePath(string path) => path;
+        public string ResolvePath(string path)
+        {
+            if (global::System.String.IsNullOrEmpty(path)) return path;
+            if (global::System.IO.File.Exists(path)) return path;
+            string directoryName = global::System.IO.Path.GetDirectoryName(this.TemplateFile);
+            string str = global::System.IO.Path.Combine(directoryName, path);
+            if (global::System.IO.File.Exists(str)) return str;
+            if (global::System.IO.Directory.Exists(str)) return str;
+            throw new global::System.IO.FileNotFoundException();
+        }
 
         public string ResolveParameterValue(string directiveId, string processorName, string parameterName) =>
             String.Empty;
