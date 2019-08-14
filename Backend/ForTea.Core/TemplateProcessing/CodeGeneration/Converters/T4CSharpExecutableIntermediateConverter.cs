@@ -1,8 +1,13 @@
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
+using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -45,8 +50,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendHostDefinition()
 		{
 			var provider = new T4TemplateResourceProvider(HostResource, this);
-			string host = provider.ProcessResource(File.GetSourceFile().GetLocation().FullPath, GeneratedClassName);
+			string filePath = File.GetSourceFile().GetLocation().FullPath;
+			string macros = GenerateExpandableMacros();
+			string host = provider.ProcessResource(filePath, GeneratedClassName, macros);
 			Result.Append(host);
+		}
+
+		[NotNull]
+		private string GenerateExpandableMacros()
+		{
+			var projectFile = File.GetSourceFile().ToProjectFile();
+			if (projectFile == null) return "";
+			var resolver = File.GetSolution().GetComponent<IT4MacroResolver>();
+			var macros = resolver.Resolve(EmptyArray.GetInstance<string>(), projectFile);
+			return macros.AggregateString(",\n", (builder, pair) => builder
+				.Append("{\"")
+				.Append(StringLiteralConverter.EscapeToRegular(pair.Key))
+				.Append("\", \"")
+				.Append(StringLiteralConverter.EscapeToRegular(pair.Value))
+				.Append("\"}")
+			);
 		}
 
 		private void AppendMainContainer()

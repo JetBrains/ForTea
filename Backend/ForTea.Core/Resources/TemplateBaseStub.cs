@@ -6,12 +6,12 @@
     	/// <summary>
     	/// The string builder that generation-time code is using to assemble generated output
     	/// </summary>
-    	protected System.Text.StringBuilder GenerationEnvironment { get; set; }
+    	protected global::System.Text.StringBuilder GenerationEnvironment { get; set; }
 
         /// <summary>
         /// The error collection for the generation process
         /// </summary>
-        public System.CodeDom.Compiler.CompilerErrorCollection Errors => null;
+        public global::System.CodeDom.Compiler.CompilerErrorCollection Errors => null;
 
         /// <summary>
         /// Gets the current indent we use when adding lines to the output

@@ -9,23 +9,56 @@ namespace Microsoft.VisualStudio.TextTemplating
 
         public bool LoadIncludeText(string requestFileName, out string content, out string location)
         {
-            content = null;
-            location = null;
+            Console.WriteLine($"Starting LoadIncludeText {requestFileName}");
+            if (string.IsNullOrEmpty(requestFileName))
+            {
+                content = string.Empty;
+                location = string.Empty;
+                return false;
+            }
+
+            requestFileName = MacroResolveHelper.ExpandMacrosAndVariables(requestFileName);
+            if (global::System.IO.Path.IsPathRooted(requestFileName))
+            {
+                location = requestFileName;
+                content = this.LoadContent(requestFileName);
+                return true;
+            }
+
+            string folderPath = global::System.IO.Path.GetDirectoryName(this.TemplateFile);
+            string candidate = global::System.IO.Path.Combine(folderPath, requestFileName);
+            if (System.IO.Path.IsPathRooted(candidate))
+            {
+                location = candidate;
+                content = this.LoadContent(candidate);
+                return true;
+            }
+
+            location = string.Empty;
+            content = string.Empty;
             return false;
+        }
+
+        private string LoadContent(string path)
+        {
+            using (global::System.IO.StreamReader streamReader = new StreamReader(path))
+            {
+                return streamReader.ReadToEnd();
+            }
         }
 
         public string ResolveAssemblyReference(string assemblyReference)
         {
             assemblyReference = MacroResolveHelper.ExpandMacrosAndVariables(assemblyReference);
-            if (System.IO.File.Exists(assemblyReference)) return assemblyReference;
+            if (global::System.IO.Path.IsPathRooted(assemblyReference)) return assemblyReference;
             // TODO: search GAC
             return assemblyReference;
         }
 
-        public System.Collections.Generic.IList<string> StandardAssemblyReferences =>
-            new[] {typeof(System.Uri).Assembly.Location};
+        public global::System.Collections.Generic.IList<string> StandardAssemblyReferences =>
+            new[] {typeof(global::System.Uri).Assembly.Location};
 
-        public System.Collections.Generic.IList<string> StandardImports => new[] {"System"};
+        public global::System.Collections.Generic.IList<string> StandardImports => new[] {"System"};
 
         public global::System.Type ResolveDirectiveProcessor(string processorName) =>
             throw new global::System.Exception("Directive Processor not found");
@@ -33,18 +66,17 @@ namespace Microsoft.VisualStudio.TextTemplating
         public string ResolvePath(string path)
         {
             if (global::System.String.IsNullOrEmpty(path)) return path;
-            if (global::System.IO.File.Exists(path)) return path;
+            if (global::System.IO.Path.IsPathRooted(path)) return path;
             string directoryName = global::System.IO.Path.GetDirectoryName(this.TemplateFile);
-            string str = global::System.IO.Path.Combine(directoryName, path);
-            if (global::System.IO.File.Exists(str)) return str;
-            if (global::System.IO.Directory.Exists(str)) return str;
+            string candidate = global::System.IO.Path.Combine(directoryName, path);
+            if (global::System.IO.Path.IsPathRooted(candidate)) return candidate;
             throw new global::System.IO.FileNotFoundException();
         }
 
         public string ResolveParameterValue(string directiveId, string processorName, string parameterName) =>
-            String.Empty;
+            string.Empty;
 
-        public AppDomain ProvideTemplatingAppDomain(string content) => AppDomain.CreateDomain("Generation App Domain");
+        public global::System.AppDomain ProvideTemplatingAppDomain(string content) => AppDomain.CreateDomain("Generation App Domain");
 
         public void LogErrors(CompilerErrorCollection errors) =>
             transformation.Errors.AddRange(errors);
@@ -74,18 +106,16 @@ namespace Microsoft.VisualStudio.TextTemplating
                 global::System.Text.RegularExpressions.RegexOptions.Compiled |
                 global::System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace);
 
-        private global::System.Collections.Generic.IDictionary<string, string> KnownMacros { get; } =
+        private static global::System.Collections.Generic.IDictionary<string, string> KnownMacros { get; } =
             new global::System.Collections.Generic.Dictionary<string, string>
             {
-                $(PARAMETER_2)
+$(PARAMETER_2)
             };
         
-        public string ExpandMacrosAndVariables(string s)
+        public static string ExpandMacrosAndVariables(string s)
         {
-            s = global::System.Environment.ExpandEnvironmentVariables(path)
             if (string.IsNullOrEmpty(s)) return s;
-            var result = global::System.Environment.ExpandEnvironmentVariables(RawPath);
-            return MacroRegex.Replace(result.ToString(), match =>
+            return MacroRegex.Replace(global::System.Environment.ExpandEnvironmentVariables(s), match =>
             {
                 var group = match.Groups[1];
                 string macro = group.Value;
