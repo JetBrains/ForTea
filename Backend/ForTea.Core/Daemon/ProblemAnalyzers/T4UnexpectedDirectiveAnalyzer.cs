@@ -2,7 +2,6 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
