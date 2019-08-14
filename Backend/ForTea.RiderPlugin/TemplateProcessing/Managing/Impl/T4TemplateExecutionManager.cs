@@ -19,7 +19,6 @@ using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
@@ -78,16 +77,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
+			Locks.AssertReadAccessAllowed();
 			if (file.ContainsErrorElement()) return Converter.SyntaxError(Navigator.GetErrorElements(file).First());
 			List<Diagnostic> messages = null;
 			return lifetime.UsingNested(nested =>
 			{
 				try
 				{
-					var info = GenerateCode(file, nested);
+					var references = ExtractReferences(file, lifetime);
+					string code = GenerateCode(file);
 					if (progress != null) progress.CurrentItemText = "Compiling code";
 					var executablePath = Manager.GetTemporaryExecutableLocation(file);
-					var compilation = CreateCompilation(info, executablePath);
+					var compilation = CreateCompilation(code, references, executablePath);
 					var diagnostics = compilation.GetDiagnostics(nested);
 					messages = diagnostics.AsList();
 					var errors = diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
@@ -96,7 +97,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					executablePath.Parent.CreateDirectory();
 					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
 					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
-					CopyAssemblies(info, executablePath);
+					CopyAssemblies(references, executablePath);
 					return null;
 				}
 				catch (T4OutputGenerationException e)
@@ -106,18 +107,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}) ?? Converter.ToT4BuildResult(messages, file);
 		}
 
-		private T4TemplateExecutionManagerInfo GenerateCode([NotNull] IT4File file, Lifetime lifetime)
+		private string GenerateCode([NotNull] IT4File file)
 		{
-			using (ReadLockCookie.Create())
-			{
-				var generator = new T4CSharpExecutableCodeGenerator(file, Solution);
-				string code = generator.Generate().RawText;
-				var references = ExtractReferences(file, lifetime);
-				return new T4TemplateExecutionManagerInfo(code, references, file);
-			}
+			Locks.AssertReadAccessAllowed();
+			var generator = new T4CSharpExecutableCodeGenerator(file, Solution);
+			string code = generator.Generate().RawText;
+			return code;
 		}
 
-		private IEnumerable<T4MetadataReferenceInfo> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
+		private List<T4MetadataReferenceInfo> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -137,31 +135,34 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}
 		}
 
-		private CSharpCompilation CreateCompilation(T4TemplateExecutionManagerInfo info, FileSystemPath executablePath)
+		private static CSharpCompilation CreateCompilation(
+			[NotNull] string code,
+			[NotNull] IEnumerable<T4MetadataReferenceInfo> references,
+			[NotNull] FileSystemPath executablePath
+		)
 		{
 			var options = new CSharpCompilationOptions(OutputKind.ConsoleApplication)
 				.WithOptimizationLevel(OptimizationLevel.Debug)
 				.WithMetadataImportOptions(MetadataImportOptions.Public);
 
 			var syntaxTree = SyntaxFactory.ParseSyntaxTree(
-				info.Code,
+				code,
 				CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
 
 			return CSharpCompilation.Create(
 				executablePath.Name,
 				new[] {syntaxTree},
 				options: options,
-				references: info.References.Select(it => it.Reference));
+				references: references.Select(it => it.Reference));
 		}
 
 		private static void CopyAssemblies(
-			T4TemplateExecutionManagerInfo info,
+			IEnumerable<T4MetadataReferenceInfo> references,
 			[NotNull] FileSystemPath executablePath
 		)
 		{
 			var folder = executablePath.Parent;
-			IEnumerable<FileSystemPath> query = info
-				.References
+			IEnumerable<FileSystemPath> query = references
 				.SelectNotNull(it => it.Path)
 				.Where(it => !it.IsEmpty);
 			foreach (var path in query)
