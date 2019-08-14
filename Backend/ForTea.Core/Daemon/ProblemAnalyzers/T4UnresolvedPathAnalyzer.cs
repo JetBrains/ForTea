@@ -57,7 +57,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 				}
 
 				var fileSystemPath = ResolveManager.Resolve(target, projectFile.GetProject(), resolveContext);
-				if (fileSystemPath == null) consumer.AddHighlighting(new T4UnresolvedAssemblyHighlighting(element));
+				if (fileSystemPath?.ExistsFile != true) consumer.AddHighlighting(new T4UnresolvedAssemblyHighlighting(element));
 			}
 		}
 
