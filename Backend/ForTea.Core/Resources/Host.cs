@@ -4,7 +4,7 @@ namespace Microsoft.VisualStudio.TextTemplating
     {
         private $(PARAMETER_1) transformation;
         
-        public Encoding Encoding { get; private set; }
+        public global::System.Text.Encoding Encoding { get; private set; }
         public string FileExtension { get; private set; }
 
         public bool LoadIncludeText(string requestFileName, out string content, out string location)
@@ -14,15 +14,21 @@ namespace Microsoft.VisualStudio.TextTemplating
             return false;
         }
 
-        public string ResolveAssemblyReference(string assemblyReference) => assemblyReference;
+        public string ResolveAssemblyReference(string assemblyReference)
+        {
+            assemblyReference = MacroResolveHelper.ExpandMacrosAndVariables(assemblyReference);
+            if (System.IO.File.Exists(assemblyReference)) return assemblyReference;
+            // TODO: search GAC
+            return assemblyReference;
+        }
 
         public System.Collections.Generic.IList<string> StandardAssemblyReferences =>
             new[] {typeof(System.Uri).Assembly.Location};
 
         public System.Collections.Generic.IList<string> StandardImports => new[] {"System"};
 
-        public Type ResolveDirectiveProcessor(string processorName) =>
-            throw new Exception("Directive Processor not found");
+        public global::System.Type ResolveDirectiveProcessor(string processorName) =>
+            throw new global::System.Exception("Directive Processor not found");
 
         public string ResolvePath(string path)
         {
@@ -58,6 +64,35 @@ namespace Microsoft.VisualStudio.TextTemplating
                 default:
                     return null;
             }
+        }
+    }
+
+    public static class MacroResolveHelper
+    {
+        private static global::System.Text.RegularExpressions.Regex MacroRegex { get; } =
+            new global::System.Text.RegularExpressions.Regex(@"\$\((\w+)\)",
+                global::System.Text.RegularExpressions.RegexOptions.Compiled |
+                global::System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace);
+
+        private global::System.Collections.Generic.IDictionary<string, string> KnownMacros { get; } =
+            new global::System.Collections.Generic.Dictionary<string, string>
+            {
+                $(PARAMETER_2)
+            };
+        
+        public string ExpandMacrosAndVariables(string s)
+        {
+            s = global::System.Environment.ExpandEnvironmentVariables(path)
+            if (string.IsNullOrEmpty(s)) return s;
+            var result = global::System.Environment.ExpandEnvironmentVariables(RawPath);
+            return MacroRegex.Replace(result.ToString(), match =>
+            {
+                var group = match.Groups[1];
+                string macro = group.Value;
+                if (!group.Success) return macro;
+                if (!KnownMacros.TryGetValue(macro, out string value)) return macro;
+                return value;
+            });
         }
     }
 }
