@@ -76,7 +76,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private void RegisterCallbacks()
 		{
 			Model.RequestCompilation.Set(Wrap(Compile, Converter.FatalError()));
-			Model.TransferResults.Set(Wrap(CopyResults, Unit.Instance));
+			Model.ExecutionSucceeded.Set(Wrap(HandleSuccess, Unit.Instance));
+			Model.ExecutionFailed.Set(Wrap(HandleFailure, Unit.Instance));
 			Model.RequestPreprocessing.Set(Wrap(Preprocess, new T4PreprocessingResult(false, null)));
 		}
 
@@ -120,7 +121,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			ExecutionManager.Compile(Solution.GetLifetime(), t4File);
 
 		[CanBeNull]
-		private Unit CopyResults([NotNull] IT4File file)
+		private Unit HandleSuccess([NotNull] IT4File file)
 		{
 			var destination = TargetFileManager.CopyExecutionResults(file);
 			using (WriteLockCookie.Create())
@@ -128,6 +129,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 				TargetFileManager.UpdateProjectModel(file, destination);
 			}
 
+			return Unit.Instance;
+		}
+
+		[CanBeNull]
+		private Unit HandleFailure(IT4File arg)
+		{
 			return Unit.Instance;
 		}
 

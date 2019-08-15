@@ -48,9 +48,10 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   }
 
   init {
-    map("configurations", string, T4ConfigurationModel).async
+    map("configurations", string, T4ConfigurationModel)
     call("requestCompilation", string, T4BuildResult).async
-    call("transferResults", string, void).async
+    call("executionSucceeded", string, void).async
+    call("executionFailed", string, void).async
     call("requestPreprocessing", string, T4PreprocessingResult).async
   }
 }

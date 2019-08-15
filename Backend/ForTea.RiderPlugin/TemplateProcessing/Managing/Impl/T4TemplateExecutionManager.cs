@@ -14,6 +14,7 @@ using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.Rd.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.Files;
@@ -124,7 +125,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var resolveContext = psiModule.GetResolveContextEx(projectFile);
 			using (CompilationContextCookie.GetOrCreate(resolveContext))
 			{
-				return PsiModules
+				var references = PsiModules
 					.GetModuleReferences(psiModule)
 					.Select(it => it.Module)
 					.OfType<IAssemblyPsiModule>()
@@ -132,6 +133,16 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					.SelectNotNull(it => it.Location)
 					.SelectNotNull(it => T4MetadataReferenceInfo.FromPath(lifetime, it, Cache))
 					.AsList();
+				references.AddRange(new[]
+					{
+						typeof(SocketWire.Server),
+						typeof(NotNullAttribute),
+						typeof(Lifetime)
+					}.Select(it => it.Assembly)
+					.Select(it => it.Location)
+					.Select(it => FileSystemPath.Parse(it))
+					.SelectNotNull(it => T4MetadataReferenceInfo.FromPath(lifetime, it, Cache)));
+				return references;
 			}
 		}
 

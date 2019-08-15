@@ -11,6 +11,25 @@ namespace Microsoft.VisualStudio.TextTemplating
         {
             if (string.IsNullOrEmpty(requestFileName))
             {
+                global::JetBrains.Collections.Viewable.SingleThreadScheduler.RunInSeparateThread(
+                    global::JetBrains.Lifetimes.Lifetime.Eternal,
+                    "Worker", scheduler => scheduler.Queue(() =>
+                    {
+                        var client = new global::JetBrains.Rd.Impl.SocketWire.Server(
+                            global::JetBrains.Lifetimes.Lifetime.Eternal, scheduler);
+                        var serializers = new Serializers();
+                        var Protocol = new Protocol(
+                            "Server",
+                            serializers,
+                            new global::JetBrains.Rd.Impl.Identities(global::JetBrains.Rd.IdKind.Server),
+                            scheduler,
+                            client,
+                            global::JetBrains.Lifetimes.Lifetime.Eternal);
+                        /*var model = new T4SubprocessProtocolModel(Lifetime.Eternal, Protocol);
+                        model.ResolveAssembly.Set(ResolveAssembly);
+                        model.ResolvePath.Set(rawPath =>
+                            new T4PathWithMacros(rawPath, SourceFile).ResolvePath().FullPath);*/
+                    }));
                 content = string.Empty;
                 location = string.Empty;
                 return false;
