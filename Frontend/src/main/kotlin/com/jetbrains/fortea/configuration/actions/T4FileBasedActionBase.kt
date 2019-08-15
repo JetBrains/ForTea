@@ -12,8 +12,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.T4ConfigurationType
 import com.jetbrains.fortea.psi.T4PsiFile
-import com.jetbrains.rider.model.t4ProtocolModel
-import com.jetbrains.rider.projectView.solution
 import javax.swing.Icon
 import kotlin.reflect.KClass
 
@@ -28,12 +26,8 @@ abstract class T4FileBasedActionBase<TConfiguration, TConfigurationType>(
   private val logger = Logger.getInstance(javaClass)
   final override fun update(e: AnActionEvent) {
     val t4File = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? T4PsiFile
-    val canSetup = t4File != null && canSetup(t4File)
-    e.presentation.isEnabledAndVisible = canSetup
+    e.presentation.isEnabledAndVisible = t4File != null
   }
-
-  private fun canSetup(file: T4PsiFile) =
-    file.project.solution.t4ProtocolModel.configurations.containsKey(file.virtualFile.path)
 
 
   final override fun actionPerformed(e: AnActionEvent) {
