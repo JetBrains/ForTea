@@ -98,7 +98,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					executablePath.Parent.CreateDirectory();
 					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
 					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
-					CopyAssemblies(references, executablePath);
 					return null;
 				}
 				catch (T4OutputGenerationException e)
@@ -116,7 +115,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return code;
 		}
 
-		private List<T4MetadataReferenceInfo> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
+		private List<MetadataReference> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -131,7 +130,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					.OfType<IAssemblyPsiModule>()
 					.Select(it => it.Assembly)
 					.SelectNotNull(it => it.Location)
-					.SelectNotNull(it => T4MetadataReferenceInfo.FromPath(lifetime, it, Cache))
+					.SelectNotNull(it => Cache.GetMetadataReference(lifetime, it))
 					.AsList();
 				references.AddRange(new[]
 					{
@@ -141,14 +140,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					}.Select(it => it.Assembly)
 					.Select(it => it.Location)
 					.Select(it => FileSystemPath.Parse(it))
-					.SelectNotNull(it => T4MetadataReferenceInfo.FromPath(lifetime, it, Cache)));
+					.SelectNotNull(it => Cache.GetMetadataReference(lifetime, it)));
 				return references;
 			}
 		}
 
 		private static CSharpCompilation CreateCompilation(
 			[NotNull] string code,
-			[NotNull] IEnumerable<T4MetadataReferenceInfo> references,
+			[NotNull] IEnumerable<MetadataReference> references,
 			[NotNull] FileSystemPath executablePath
 		)
 		{
@@ -164,22 +163,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				executablePath.Name,
 				new[] {syntaxTree},
 				options: options,
-				references: references.Select(it => it.Reference));
-		}
-
-		private static void CopyAssemblies(
-			IEnumerable<T4MetadataReferenceInfo> references,
-			[NotNull] FileSystemPath executablePath
-		)
-		{
-			var folder = executablePath.Parent;
-			IEnumerable<FileSystemPath> query = references
-				.SelectNotNull(it => it.Path)
-				.Where(it => !it.IsEmpty);
-			foreach (var path in query)
-			{
-				path.CopyFile(folder.Combine(path.Name), true);
-			}
+				references: references);
 		}
 
 		public bool Execute(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)

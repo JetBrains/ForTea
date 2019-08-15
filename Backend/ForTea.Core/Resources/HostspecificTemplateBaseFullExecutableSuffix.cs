@@ -2,6 +2,7 @@
     {
         public static int Main(string[] args)
         {
+            RegisterAssemblyLocations__Generated();
             var transformation = new $(PARAMETER_0)();
             transformation.Host.SetOutputEncoding(Encoding.GetEncoding($(PARAMETER_1)), true);
             string destination = args[0];
@@ -11,7 +12,7 @@
             if (extension != null) destination = destination.WithExtension__Generated(extension);
             foreach (CompilerError error in transformation.Errors)
             {
-                Console.Error.WriteLine(error);
+                global::System.Console.Error.WriteLine(error);
             }
 
             if (transformation.Errors.HasErrors) return 1;
@@ -25,5 +26,19 @@
             int dotIndex = source.LastIndexOf('.');
             if (dotIndex < 0) return source;
             return source.Substring(0, dotIndex + 1) + newExtension;
+        }
+
+        private static void RegisterAssemblyLocations__Generated()
+        {
+            global::System.Collections.Generic.IDictionary<string, string> assembliesToLoad =
+                new global::System.Collections.Generic.Dictionary<string, string>
+                {
+$(PARAMETER_2)
+                };
+            global::System.AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                if (!assembliesToLoad.ContainsKey(args.Name)) return null;
+                return global::System.Reflection.Assembly.LoadFrom(assembliesToLoad[args.Name]);
+            };
         }
     }

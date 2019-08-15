@@ -1,10 +1,13 @@
+using System.Linq;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
@@ -78,8 +81,37 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			string resource = IntermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
 			var provider = new T4TemplateResourceProvider(resource, this);
 			string encoding = IntermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
-			string suffix = provider.ProcessResource(GeneratedClassName, encoding);
+			string suffix = provider.ProcessResource(GeneratedClassName, encoding, GetReferences());
 			Result.Append(suffix);
+		}
+
+		private string GetReferences()
+		{
+			var sourceFile = File.GetSourceFile().NotNull();
+			var projectFile = sourceFile.ToProjectFile().NotNull();
+			var psiModule = sourceFile.PsiModule;
+			var resolveContext = psiModule.GetResolveContextEx(projectFile);
+			using (CompilationContextCookie.GetOrCreate(resolveContext))
+			{
+				return File
+					.GetSolution()
+					.GetComponent<PsiModules>()
+					.GetModuleReferences(psiModule)
+					.Select(it => it.Module)
+					.OfType<IAssemblyPsiModule>()
+					.Select(it => it.Assembly)
+					.Where(it => it.Location != null)
+					.Select(it => new
+					{
+						FullName = StringLiteralConverter.EscapeToRegular(it.AssemblyName.FullName),
+						Location = StringLiteralConverter.EscapeToRegular(it.Location.FullPath)
+					}).AggregateString(", ", (builder, it) => builder
+						.Append("{\"")
+						.Append(it.FullName)
+						.Append("\", \"")
+						.Append(it.Location)
+						.Append("\"}"));
+			}
 		}
 
 		protected override void AppendImports()
