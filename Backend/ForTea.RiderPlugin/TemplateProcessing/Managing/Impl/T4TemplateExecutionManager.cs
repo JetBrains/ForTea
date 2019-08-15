@@ -6,16 +6,14 @@ using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
-using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.Rd.Impl;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Modules;
@@ -85,7 +83,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			{
 				try
 				{
-					var references = ExtractReferences(file, lifetime);
+					var references = file.ExtractReferences(lifetime, Locks, PsiModules, Cache);
 					string code = GenerateCode(file);
 					if (progress != null) progress.CurrentItemText = "Compiling code";
 					var executablePath = Manager.GetTemporaryExecutableLocation(file);
@@ -113,36 +111,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var generator = new T4CSharpExecutableCodeGenerator(file, Solution);
 			string code = generator.Generate().RawText;
 			return code;
-		}
-
-		private List<MetadataReference> ExtractReferences([NotNull] IT4File file, Lifetime lifetime)
-		{
-			Locks.AssertReadAccessAllowed();
-			var sourceFile = file.GetSourceFile().NotNull();
-			var projectFile = sourceFile.ToProjectFile().NotNull();
-			var psiModule = sourceFile.PsiModule;
-			var resolveContext = psiModule.GetResolveContextEx(projectFile);
-			using (CompilationContextCookie.GetOrCreate(resolveContext))
-			{
-				var references = PsiModules
-					.GetModuleReferences(psiModule)
-					.Select(it => it.Module)
-					.OfType<IAssemblyPsiModule>()
-					.Select(it => it.Assembly)
-					.SelectNotNull(it => it.Location)
-					.SelectNotNull(it => Cache.GetMetadataReference(lifetime, it))
-					.AsList();
-				references.AddRange(new[]
-					{
-						typeof(SocketWire.Server),
-						typeof(NotNullAttribute),
-						typeof(Lifetime)
-					}.Select(it => it.Assembly)
-					.Select(it => it.Location)
-					.Select(it => FileSystemPath.Parse(it))
-					.SelectNotNull(it => Cache.GetMetadataReference(lifetime, it)));
-				return references;
-			}
 		}
 
 		private static CSharpCompilation CreateCompilation(
