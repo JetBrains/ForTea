@@ -2,6 +2,11 @@ namespace Microsoft.VisualStudio.TextTemplating
 {
     public class ITextTemplatingEngineHost
     {
+        private const string RelativeUnsupportedMessage =
+            "Relative include include path resolution is not supported yet.\n" +
+            "Please, provide absolute path, use macros like $(SolutionDir) or\n" +
+            "contact support at https://youtrack.jetbrains.com";
+        
         private $(PARAMETER_1) transformation;
         
         public global::System.Text.Encoding Encoding { get; private set; }
@@ -11,25 +16,6 @@ namespace Microsoft.VisualStudio.TextTemplating
         {
             if (string.IsNullOrEmpty(requestFileName))
             {
-                global::JetBrains.Collections.Viewable.SingleThreadScheduler.RunInSeparateThread(
-                    global::JetBrains.Lifetimes.Lifetime.Eternal,
-                    "Worker", scheduler => scheduler.Queue(() =>
-                    {
-                        var client = new global::JetBrains.Rd.Impl.SocketWire.Server(
-                            global::JetBrains.Lifetimes.Lifetime.Eternal, scheduler);
-                        var serializers = new Serializers();
-                        var Protocol = new Protocol(
-                            "Server",
-                            serializers,
-                            new global::JetBrains.Rd.Impl.Identities(global::JetBrains.Rd.IdKind.Server),
-                            scheduler,
-                            client,
-                            global::JetBrains.Lifetimes.Lifetime.Eternal);
-                        /*var model = new T4SubprocessProtocolModel(Lifetime.Eternal, Protocol);
-                        model.ResolveAssembly.Set(ResolveAssembly);
-                        model.ResolvePath.Set(rawPath =>
-                            new T4PathWithMacros(rawPath, SourceFile).ResolvePath().FullPath);*/
-                    }));
                 content = string.Empty;
                 location = string.Empty;
                 return false;
@@ -52,6 +38,7 @@ namespace Microsoft.VisualStudio.TextTemplating
                 return true;
             }
 
+            transformation.Warning(RelativeUnsupportedMessage);
             location = string.Empty;
             content = string.Empty;
             return false;
@@ -69,7 +56,7 @@ namespace Microsoft.VisualStudio.TextTemplating
         {
             assemblyReference = MacroResolveHelper.ExpandMacrosAndVariables(assemblyReference);
             if (global::System.IO.Path.IsPathRooted(assemblyReference)) return assemblyReference;
-            // TODO: search GAC
+            transformation.Warning(RelativeUnsupportedMessage);
             return assemblyReference;
         }
 
