@@ -21,12 +21,4 @@
   <ItemGroup>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="TemplateProcessing\Protocol\SubprocessProtocol\T4SubprocessProtocolModel.Generated.cs" />
-    <Compile Remove="TemplateProcessing\Protocol\SubprocessProtocol\T4SubprocessProtocolRoot.Generated.cs" />
-
-    <EmbeddedResource Include="TemplateProcessing\Protocol\SubprocessProtocol\T4SubprocessProtocolModel.Generated.cs" />
-    <EmbeddedResource Include="TemplateProcessing\Protocol\SubprocessProtocol\T4SubprocessProtocolRoot.Generated.cs" />
-  </ItemGroup>
 </Project>
