@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TextTemplating
             "Please, provide absolute path, use macros like $(SolutionDir) or\n" +
             "contact support at https://youtrack.jetbrains.com";
         
-        private $(PARAMETER_1) transformation;
+        public $(PARAMETER_1) transformation;
         
         public global::System.Text.Encoding Encoding { get; private set; }
         public string FileExtension { get; private set; }

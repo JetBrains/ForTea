@@ -4,6 +4,7 @@
         {
             RegisterAssemblyLocations__Generated();
             var transformation = new $(PARAMETER_0)();
+            transformation.Host.transformation = transformation;
             transformation.Host.SetOutputEncoding(Encoding.GetEncoding($(PARAMETER_1)), true);
             string destination = args[0];
             string text = transformation.TransformText();
