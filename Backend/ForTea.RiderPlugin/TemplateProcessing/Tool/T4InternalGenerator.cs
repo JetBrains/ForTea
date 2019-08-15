@@ -21,27 +21,12 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 {
-	[SolutionComponent]
+	[ShellComponent]
 	public sealed class T4InternalGenerator : ISingleFileCustomTool
 	{
 		private Lifetime Lifetime { get; }
 
-		[NotNull]
-		private IT4TemplateExecutionManager ExecutionManager { get; }
-
-		[NotNull]
-		private IT4TargetFileManager TargetFileManager { get; }
-
-		public T4InternalGenerator(
-			Lifetime lifetime,
-			[NotNull] IT4TemplateExecutionManager executionManager,
-			[NotNull] IT4TargetFileManager targetFileManager
-		)
-		{
-			Lifetime = lifetime;
-			ExecutionManager = executionManager;
-			TargetFileManager = targetFileManager;
-		}
+		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
 
 		public string Name => "Bundled T4 template executor";
 		public string ActionName => "Execute T4 generator";
@@ -66,8 +51,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			AssertOperationValidity(projectFile);
 			var file = AsT4File(projectFile).NotNull();
+			var solution = file.GetSolution();
+			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
+			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
 			InterruptableActivityCookie.CheckAndThrow();
-			if (!ExecutionManager.CanCompile(file))
+			if (!executionManager.CanCompile(file))
 			{
 				return new SingleFileCustomToolExecutionResult(
 					new FileSystemPath[] { },
@@ -76,23 +64,23 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 			}
 
 			InterruptableActivityCookie.CheckAndThrow();
-			var buildResult = ExecutionManager.Compile(Lifetime, file);
+			var buildResult = executionManager.Compile(Lifetime, file);
 			Assertion.Assert(buildResult.BuildResultKind != T4BuildResultKind.HasErrors,
 				"buildResult.BuildResultKind != T4BuildResultKind.HasErrors");
 			InterruptableActivityCookie.CheckAndThrow();
-			bool succeeded = ExecutionManager.Execute(Lifetime, file);
+			bool succeeded = executionManager.Execute(Lifetime, file);
 			if (!succeeded)
 				return new SingleFileCustomToolExecutionResult(
 					EmptyList<FileSystemPath>.Collection,
 					new List<string> {"Execution error"});
 
 			InterruptableActivityCookie.CheckAndThrow();
-			var affectedFile = TargetFileManager.CopyExecutionResults(file);
-			file.GetSolution().Locks.ExecuteOrQueueEx(file.GetSolution().GetLifetime(), "Saving T4 results", () =>
+			var affectedFile = targetFileManager.CopyExecutionResults(file);
+			solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "Saving T4 results", () =>
 			{
 				using (WriteLockCookie.Create())
 				{
-					TargetFileManager.UpdateProjectModel(file, affectedFile);
+					targetFileManager.UpdateProjectModel(file, affectedFile);
 				}
 			});
 
