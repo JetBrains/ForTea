@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -163,8 +164,23 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 		}
 
-		// TODO: use user indents?
-		protected override IT4ElementAppendFormatProvider Provider =>
-			new T4PreprocessCodeFormatProvider(new string(' ', CurrentIndent * 4));
+		#region IT4ElementAppendFormatProvider
+		public override string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
+		public override string ToStringConversionSuffix => ")";
+		public override string ExpressionWritingPrefix => "this.Write(";
+		public override string ExpressionWritingSuffix => ");";
+		public override string CodeCommentStart => "";
+		public override string CodeCommentEnd => "";
+		public override string Indent => new string(' ', CurrentIndent * 4); // TODO: use user indents?
+		public override bool ShouldBreakExpressionWithLineDirective => false;
+
+		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		{
+			// In preprocessed file, behave like VS
+		}
+
+		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>
+			destination.Append(code.GetText().Trim());
+		#endregion IT4ElementAppendFormatProvider
 	}
 }

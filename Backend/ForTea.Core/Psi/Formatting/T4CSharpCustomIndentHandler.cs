@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -184,7 +184,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		private static bool IsEndComment([NotNull] ITreeNode node) =>
 			node is ITokenNode tokenNode
 			&& tokenNode.GetTokenType().IsComment
-			&& tokenNode.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd;
+			&& tokenNode.GetText() == T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
 
 		[Pure]
 		private static bool IsTypeMemberLikeNode([NotNull] ITreeNode node) =>

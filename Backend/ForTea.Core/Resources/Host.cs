@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TextTemplating
 
         public bool LoadIncludeText(string requestFileName, out string content, out string location)
         {
-            Console.WriteLine($"Starting LoadIncludeText {requestFileName}");
             if (string.IsNullOrEmpty(requestFileName))
             {
                 content = string.Empty;

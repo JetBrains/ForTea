@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.CSharp.CodeStyle.FormatSettings;
@@ -37,13 +37,13 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		private static bool IsCodeEndComment(ITreeNode rightChild)
 		{
 			if (!(rightChild is ICommentNode)) return false;
-			return rightChild.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentEnd;
+			return rightChild.GetText() == T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
 		}
 
 		private static bool IsCodeStartComment(ITreeNode candidate)
 		{
 			if (!(candidate is ICommentNode)) return false;
-			return candidate.GetText() == T4CodeBehindFormatProvider.Instance.CodeCommentStart;
+			return candidate.GetText() == T4CSharpCodeBehindIntermediateConverter.CodeCommentStartText;
 		}
 	}
 }

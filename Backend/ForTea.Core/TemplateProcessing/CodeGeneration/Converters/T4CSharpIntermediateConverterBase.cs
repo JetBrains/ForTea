@@ -2,16 +2,17 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
-	public abstract class T4CSharpIntermediateConverterBase
+	public abstract class T4CSharpIntermediateConverterBase : IT4ElementAppendFormatProvider
 	{
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
@@ -117,7 +118,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformMethod();
 			foreach (var description in IntermediateResult.FeatureDescriptions)
 			{
-				description.AppendContent(Result, Provider, File);
+				description.AppendContent(Result, this, File);
 			}
 
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
@@ -181,7 +182,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformationPrefix();
 			foreach (var description in IntermediateResult.TransformationDescriptions)
 			{
-				description.AppendContent(Result, Provider, File);
+				description.AppendContent(Result, this, File);
 			}
 
 			AppendIndent();
@@ -221,9 +222,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
 
-		[NotNull]
-		protected abstract IT4ElementAppendFormatProvider Provider { get; }
-
 		protected virtual void AppendTransformationPrefix()
 		{
 		}
@@ -233,11 +231,24 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		#region Indentation
-		protected int CurrentIndent { get; set; }
+		protected int CurrentIndent { get; private set; }
 		protected void PushIndent() => CurrentIndent += 1;
 		protected void PopIndent() => CurrentIndent -= 1;
 		protected void AppendIndent() => AppendIndent(CurrentIndent);
 		protected abstract void AppendIndent(int size);
 		#endregion Indentation
+
+		#region IT4ElementAppendFormatProvider
+		public abstract string ToStringConversionPrefix { get; }
+		public abstract string ToStringConversionSuffix { get; }
+		public abstract string ExpressionWritingPrefix { get; }
+		public abstract string ExpressionWritingSuffix { get; }
+		public abstract string CodeCommentStart { get; }
+		public abstract string CodeCommentEnd { get; }
+		public abstract string Indent { get; }
+		public abstract bool ShouldBreakExpressionWithLineDirective { get; }
+		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset);
+		public abstract void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code);
+		#endregion IT4ElementAppendFormatProvider
 	}
 }

@@ -1,13 +1,14 @@
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -90,7 +91,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine("using System.Text;");
 		}
 
-		protected override IT4ElementAppendFormatProvider Provider =>
-			new T4RealCodeFormatProvider(new string(' ', CurrentIndent * 4));
+		#region IT4ElementAppendFormatProvider
+		public override bool ShouldBreakExpressionWithLineDirective => true;
+
+		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>
+			destination.Append(code.GetText());
+
+		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		{
+			for (var i = Int32<DocColumn>.O; i < offset; i++)
+			{
+				destination.Append(" ");
+			}
+		}
+		#endregion IT4ElementAppendFormatProvider
 	}
 }

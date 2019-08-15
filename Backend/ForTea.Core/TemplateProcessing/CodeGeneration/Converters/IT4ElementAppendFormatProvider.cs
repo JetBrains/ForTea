@@ -1,10 +1,9 @@
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format
+namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public interface IT4ElementAppendFormatProvider
 	{
