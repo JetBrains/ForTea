@@ -3,7 +3,6 @@ using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.Diagnostics;
@@ -24,11 +23,11 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress) {
 
-			T4StatementBlock statementBlock = _highlighting.AssociatedNode;
+			IT4StatementBlock statementBlock = _highlighting.AssociatedNode;
 			var file = statementBlock.GetContainingFile() as IT4File;
 			Assertion.AssertNotNull(file, "file != null");
 
-			T4FeatureBlock feature = file.GetFeatureBlocks().First();
+			IT4FeatureBlock feature = file.Blocks.OfType<IT4FeatureBlock>().First();
 
 			ITreeNode featureBlock;
 			using (WriteLockCookie.Create(file.IsPhysical())) {

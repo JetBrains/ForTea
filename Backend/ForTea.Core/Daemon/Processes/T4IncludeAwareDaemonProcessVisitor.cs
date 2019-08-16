@@ -60,7 +60,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			switch (element)
 			{
-				case IT4Include include:
+				case IT4IncludeDirective include:
 					ProcessInclude(include);
 					break;
 				case IT4Directive directive:
@@ -83,7 +83,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			}
 		}
 
-		private void ProcessInclude(IT4Include include)
+		private void ProcessInclude(IT4IncludeDirective include)
 		{
 			var sourceFile = include.Path.Resolve();
 			if (sourceFile != null)
@@ -122,7 +122,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void AddHighlighting([NotNull] ITreeNode node, IHighlighting highlighting) =>
 			MyHighlightings.Add(new HighlightingInfo(node.GetHighlightingRange(), highlighting));
 
-		private void ReportUnresolvedPath([NotNull] IT4Include include)
+		private void ReportUnresolvedPath([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
 			var value = Navigator.FindIncludeValue(include);
@@ -130,7 +130,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			AddHighlighting(value, new T4UnresolvedIncludeHighlighting(value));
 		}
 
-		private void ReportRecursiveInclude([NotNull] IT4Include include)
+		private void ReportRecursiveInclude([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
 			var value = Navigator.FindIncludeValue(include);
@@ -138,7 +138,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			AddHighlighting(value, new T4RecursiveIncludeHighlighting(value));
 		}
 
-		private void ReportRedundantInclude([NotNull] IT4Include include)
+		private void ReportRedundantInclude([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
 			var value = Navigator.FindIncludeValue(include);

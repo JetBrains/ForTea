@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Translation
@@ -20,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.Translation
 		private IPsiSourceFile SourceFile => InitialFile.GetSourceFile().NotNull();
 
 		[NotNull, ItemNotNull]
-		private IEnumerable<IT4Include> Includes => InitialFile.GetIncludes();
+		private IEnumerable<IT4Include> Includes => InitialFile.Children<IT4Include>();
 
 		public T4DocumentRangeTranslator([NotNull] IT4File initialFile) => InitialFile = initialFile;
 

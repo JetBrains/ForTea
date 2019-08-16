@@ -23,9 +23,9 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			if (!(element.Parent is IT4DirectiveAttribute attribute)) return;
 			Assertion.Assert(attribute.Parent is IT4Directive, "attribute.Parent is IT4Directive");
 			var directive = (IT4Directive) attribute.Parent;
-			var directiveInfo = Manager.GetDirectiveByName(directive.GetName());
+			var directiveInfo = Manager.GetDirectiveByName(directive.Name.GetText());
 			if (directiveInfo == null) return;
-			var attributeInfo = directiveInfo.GetAttributeByName(attribute.GetName());
+			var attributeInfo = directiveInfo.GetAttributeByName(attribute.Name.GetText());
 			if (attributeInfo != null) return;
 			consumer.AddHighlighting(new T4UnexpectedAttributeHighlighting(element));
 		}

@@ -160,18 +160,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		/// <param name="codeBlock">The code block.</param>
 		private void HandleCodeBlock([NotNull] IT4CodeBlock codeBlock)
 		{
-			if (!(codeBlock.GetCodeToken() is T4Code codeToken)) return;
+			var code = codeBlock.Code;
+			if (code == null) return;
 			switch (codeBlock)
 			{
 				case T4ExpressionBlock _:
-					if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(codeToken));
-					else Result.AppendTransformation(new T4ExpressionDescription(codeToken));
+					if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
+					else Result.AppendTransformation(new T4ExpressionDescription(code));
 					break;
 				case T4FeatureBlock _:
-					Result.AppendFeature(new T4CodeDescription(codeToken));
+					Result.AppendFeature(new T4CodeDescription(code));
 					break;
 				default:
-					Result.AppendTransformation(new T4CodeDescription(codeToken));
+					Result.AppendTransformation(new T4CodeDescription(code));
 					break;
 			}
 		}

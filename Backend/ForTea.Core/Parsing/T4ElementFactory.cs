@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Text;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
@@ -20,29 +19,29 @@ namespace GammaJul.ForTea.Core.Parsing {
 		/// <param name="code">The code that will be contained in the block.</param>
 		/// <returns>A new instance of <see cref="T4StatementBlock"/>.</returns>
 		[NotNull]
-		public static T4StatementBlock CreateStatementBlock([CanBeNull] string code)
+		public static IT4StatementBlock CreateStatementBlock([CanBeNull] string code)
 			=> (T4StatementBlock) CreateTreeAndGetFirstChild("<#" + code + "#>");
 
 		/// <summary>Creates a new feature block (&lt;#+ ... #&gt;).</summary>
 		/// <param name="code">The code that will be contained in the block.</param>
 		/// <returns>A new instance of <see cref="T4FeatureBlock"/>.</returns>
 		[NotNull]
-		public static T4FeatureBlock CreateFeatureBlock([CanBeNull] string code)
+		public static IT4FeatureBlock CreateFeatureBlock([CanBeNull] string code)
 			=> (T4FeatureBlock) CreateTreeAndGetFirstChild("<#+" + code + "#>");
 
 		/// <summary>Creates a new expression block (&lt;#= ... #&gt;).</summary>
 		/// <param name="code">The code that will be contained in the block.</param>
 		/// <returns>A new instance of <see cref="T4ExpressionBlock"/>.</returns>
 		[NotNull]
-		public static T4ExpressionBlock CreateExpressionBlock([CanBeNull] string code)
+		public static IT4ExpressionBlock CreateExpressionBlock([CanBeNull] string code)
 			=> (T4ExpressionBlock) CreateTreeAndGetFirstChild("<#=" + code + "#>");
 
 		/// <summary>Creates a new directive (&lt;#@ ... #&gt;).</summary>
 		/// <param name="directiveName">Name of the directive.</param>
 		/// <param name="attributes">The directive attributes.</param>
-		/// <returns>A new instance of <see cref="T4Directive"/>.</returns>
+		/// <returns>A new instance of <see cref="IT4Directive"/>.</returns>
 		[NotNull]
-		public static T4Directive CreateDirective([CanBeNull] string directiveName, [CanBeNull] params Pair<string, string>[] attributes) {
+		public static IT4Directive CreateDirective([CanBeNull] string directiveName, [CanBeNull] params Pair<string, string>[] attributes) {
 			var builder = new StringBuilder("<#@ ");
 			builder.Append(directiveName);
 			if (attributes != null) {
@@ -50,11 +49,11 @@ namespace GammaJul.ForTea.Core.Parsing {
 					builder.AppendFormat(" {0}=\"{1}\"", pair.First, pair.Second);
 			}
 			builder.Append(" #>");
-			return (T4Directive) CreateTreeAndGetFirstChild(builder.ToString());
+			return (IT4Directive) CreateTreeAndGetFirstChild(builder.ToString());
 		}
 
 		public static ITreeNode CreateAttributeValue([NotNull] string text) =>
-			CreateDirectiveAttribute("attributeName", text).GetValueToken();
+			CreateDirectiveAttribute("attributeName", text).Value;
 
 		/// <summary>Creates a new directive attribute.</summary>
 		/// <param name="name">The name of the attribute.</param>
@@ -62,8 +61,8 @@ namespace GammaJul.ForTea.Core.Parsing {
 		/// <returns>A new instance of <see cref="IT4DirectiveAttribute"/>.</returns>
 		[NotNull]
 		public static IT4DirectiveAttribute CreateDirectiveAttribute([CanBeNull] string name, [CanBeNull] string value) {
-			T4Directive directive = CreateDirective("dummy", Pair.Of(name, value));
-			return directive.GetAttributes().First();
+			var directive = CreateDirective("dummy", Pair.Of(name, value));
+			return directive.Attributes.First();
 		}
 
 		[NotNull]

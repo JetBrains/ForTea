@@ -29,7 +29,7 @@ using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi {
-
+// TODO: cleanup
 	/// <summary>
 	/// C# custom modification handler that allows the T4 files to be modified in response to C# actions or quickfixes.
 	/// (eg: adding a using statement translates to an import directive).
@@ -67,7 +67,7 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="codeBlock">The code block.</param>
 		/// <returns>A <see cref="TreeTextRange"/> representing the code range in <paramref name="codeBlock"/>.</returns>
 		protected override TreeTextRange GetCodeTreeTextRange(IT4CodeBlock codeBlock)
-			=> codeBlock.GetCodeToken()?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
+			=> codeBlock.Code?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 
 		/// <summary>Creates a T4 import directive instead of a C# using directive.</summary>
 		/// <param name="before"><c>true</c> to create the directive before <paramref name="anchor"/>; <c>false</c> to create it after.</param>
@@ -80,7 +80,7 @@ namespace GammaJul.ForTea.Core.Psi {
 			string ns = GetNamespaceFromUsingDirective(usingDirective);
 			IT4Directive directive = _directiveInfoManager.Import.CreateDirective(ns);
 
-			if (anchor != null && anchor.GetContainingNode<IT4Include>() == null)
+			if (anchor != null && anchor.GetContainingNode<IT4IncludeDirective>() == null)
 				directive = before ? t4File.AddDirectiveBefore(directive, anchor) : t4File.AddDirectiveAfter(directive, anchor);
 			else
 				directive = t4File.AddDirective(directive, _directiveInfoManager);
@@ -124,9 +124,9 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="last">The last node.</param>
 		/// <returns>A <see cref="TreeTextRange"/> representing the code range in the newly created feature block.</returns>
 		protected override TreeTextRange CreateTypeMemberNode(IFile originalFile, string text, ITreeNode first, ITreeNode last) {
-			T4FeatureBlock featureBlock = T4ElementFactory.CreateFeatureBlock(text);
+			IT4FeatureBlock featureBlock = T4ElementFactory.CreateFeatureBlock(text);
 			featureBlock = ((IT4File) originalFile).AddFeatureBlock(featureBlock);
-			return featureBlock.GetCodeToken().GetTreeTextRange();
+			return featureBlock.Code.GetTreeTextRange();
 		}
 
 		/// <summary>Creates a new line token.</summary>
@@ -139,8 +139,8 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="originalFile">The original T4 file.</param>
 		/// <returns>A valid <see cref="TreeTextRange"/> if a feature block existed, <see cref="TreeTextRange.InvalidRange"/> otherwise.</returns>
 		protected override TreeTextRange GetExistingTypeMembersRange(IFile originalFile) {
-			T4FeatureBlock lastFeatureBlock = ((IT4File) originalFile).GetFeatureBlocks().LastOrDefault();
-			return lastFeatureBlock?.GetCodeToken().GetTreeTextRange() ?? TreeTextRange.InvalidRange;
+			IT4FeatureBlock lastFeatureBlock = ((IT4File) originalFile).GetFeatureBlocks().LastOrDefault();
+			return lastFeatureBlock?.Code.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 		}
 
 
@@ -259,7 +259,7 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		private static void RemoveContainingBlockIfEmpty([CanBeNull] ITreeNode node) {
 			var block = node.GetT4ContainerFromCSharpNode<IT4CodeBlock>();
-			string code = block?.GetCodeText();
+			string code = block?.Code.GetText();
 			if (code == null || code.Trim().Length == 0)
 				return;
 

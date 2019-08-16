@@ -54,8 +54,10 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 			string name = file
 				?.GetDirectives()
 				.FirstOrDefault(directive => directive.IsSpecificDirective(Template))
-				?.GetAttribute(Template.LanguageAttribute.Name)
-				?.GetValue();
+				?.GetAttributes(Template.LanguageAttribute.Name)
+				?.FirstOrDefault()
+				?.Value
+				.GetText();
 			switch (name)
 			{
 				case null:

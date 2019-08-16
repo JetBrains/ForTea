@@ -26,7 +26,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{
 			var node = Highlighting.AssociatedNode;
-			var newNode = T4ElementFactory.CreateFeatureBlock(node.GetCodeText());
+			var newNode = T4ElementFactory.CreateFeatureBlock(node.Code.GetText());
 			using (WriteLockCookie.Create(node.IsPhysical()))
 			{
 				ModificationUtil.ReplaceChild(node, newNode);

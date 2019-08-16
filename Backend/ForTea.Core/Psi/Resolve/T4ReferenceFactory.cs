@@ -24,8 +24,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve
 			Assertion.Assert(attribute.Parent is IT4Directive, "attribute.Parent is IT4Directive");
 			var directive = (IT4Directive) attribute.Parent;
 			if (!directive.IsSpecificDirective(Manager.Include)) return ReferenceCollection.Empty;
-			Assertion.Assert(directive.NextSibling is IT4Include, "directive.NextSibling is IT4Include");
-			var include = (IT4Include) directive.NextSibling;
+			Assertion.Assert(directive.NextSibling is IT4IncludeDirective, "directive.NextSibling is IT4Include");
+			var include = (IT4IncludeDirective) directive.NextSibling;
 			var path = include.Path;
 			var resolvedPath = path.ResolvePath();
 			if (path.IsEmpty) return ReferenceCollection.Empty;

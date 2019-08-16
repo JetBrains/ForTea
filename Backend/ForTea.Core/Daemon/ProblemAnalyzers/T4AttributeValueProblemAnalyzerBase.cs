@@ -1,4 +1,3 @@
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -23,9 +22,8 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		{
 			if (!element.IsSpecificDirective(GetTargetDirective(DirectiveInfoManager))) return;
 			var values = element
-				.GetAttributes()
-				.Where(it => it.GetName() == GetTargetAttribute(DirectiveInfoManager).Name)
-				.SelectNotNull(it => it.GetValueToken());
+				.GetAttributes(GetTargetAttribute(DirectiveInfoManager).Name)
+				.SelectNotNull(it => it.Value);
 			foreach (var value in values)
 			{
 				DoRun(value, consumer);

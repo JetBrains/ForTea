@@ -21,8 +21,8 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			IHighlightingConsumer consumer
 		)
 		{
-			if (Manager.GetDirectiveByName(element.GetName()) != null) return;
-			var nameToken = element.GetNameToken();
+			if (Manager.GetDirectiveByName(element.Name.GetText()) != null) return;
+			var nameToken = element.Name;
 			if (nameToken == null) return;
 			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(nameToken));
 		}

@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace GammaJul.ForTea.Core.Tree.Impl
 {
-	public abstract class T4CompositeElement : CompositeElement, IT4TreeNode
+	public abstract class T4FileBase : FileElementBase, IT4TreeNode
 	{
 		public override PsiLanguageType Language => T4Language.Instance;
 		public abstract void Accept(TreeNodeVisitor visitor);

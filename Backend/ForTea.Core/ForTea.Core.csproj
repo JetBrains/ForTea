@@ -11,9 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +35,8 @@
       <Visible>False</Visible>
     </PsiLanguageNames>
     <CsLex Include="Parsing\Lexing\T4Lexer.lex" />
-    <Compile Remove="obj\Debug\CsLex\Parsing\Lexing\T4Lexer_lex.cs" />
+    <ParserGen Include="Parsing\T4.psi" />
+    <None Include="Parsing\T4.psi" />
   </ItemGroup>
 
   <ItemGroup>
