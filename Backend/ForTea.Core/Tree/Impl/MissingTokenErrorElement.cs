@@ -22,10 +22,8 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 		}
 		
 		/// <summary>Initializes a new instance of the <see cref="MissingTokenErrorElement"/> class.</summary>
-		public MissingTokenErrorElement(MissingTokenType missingTokenType)
-			: base(GetErrorMessage(missingTokenType)) {
+		public MissingTokenErrorElement(MissingTokenType missingTokenType) : base(GetErrorMessage(missingTokenType)) =>
 			MissingTokenType = missingTokenType;
-		}
 	}
 
 }

@@ -39,11 +39,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 		public IEnumerable<IT4Directive> GetDirectives()
 			=> this.Children<IT4Directive>();
 
-		/// <summary>Gets a list of statement blocks contained in the file.</summary>
-		/// <returns>A collection of <see cref="T4StatementBlock"/>.</returns>
-		public IEnumerable<T4StatementBlock> GetStatementBlocks()
-			=> this.Children<T4StatementBlock>();
-
 		/// <summary>Gets a list of feature blocks contained in the file.</summary>
 		/// <returns>A collection of <see cref="T4FeatureBlock"/>.</returns>
 		public IEnumerable<T4FeatureBlock> GetFeatureBlocks()
@@ -126,18 +121,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 			}
 		}
 
-		/// <summary>Adds a new statement block.</summary>
-		/// <param name="statementBlock">The statement block to add.</param>
-		/// <returns>A new instance of <see cref="T4StatementBlock"/>, representing <paramref name="statementBlock"/> in the T4 file.</returns>
-		public T4StatementBlock AddStatementBlock(T4StatementBlock statementBlock) {
-			T4StatementBlock anchor = GetStatementBlocks().LastOrDefault();
-			using (WriteLockCookie.Create(IsPhysical())) {
-				return anchor == null
-					? ModificationUtil.AddChild(this, statementBlock)
-					: ModificationUtil.AddChildAfter(anchor, statementBlock);
-			}
-		}
-
 		/// <summary>Adds a new feature block.</summary>
 		/// <param name="featureBlock">The feature block to add.</param>
 		/// <returns>A new instance of <see cref="T4FeatureBlock"/>, representing <paramref name="featureBlock"/> in the T4 file.</returns>
@@ -157,7 +140,9 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 				return;
 
 			using (WriteLockCookie.Create(IsPhysical()))
+			{
 				ModificationUtil.DeleteChild(node);
+			}
 		}
 
 		/// <summary>Obtains the caching lexer on file text.</summary>

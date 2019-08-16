@@ -27,11 +27,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl {
 		public IT4Token GetNameToken()
 			=> (IT4Token) FindChildByRole((short) T4TokenRole.Name);
 
-		/// <summary>Gets the token representing the equal sign between the name and the value of this attribute.</summary>
-		/// <returns>An equal token, or <c>null</c> if none is available.</returns>
-		public IT4Token GetEqualToken()
-			=> (IT4Token) FindChildByRole((short) T4TokenRole.Separator);
-
 		/// <summary>Gets the token representing the value of this attribute.</summary>
 		/// <returns>A value token, or <c>null</c> if none is available.</returns>
 		public IT4AttributeValue GetValueToken()

@@ -20,12 +20,6 @@ namespace GammaJul.ForTea.Core.Tree {
 		[ItemNotNull]
 		IEnumerable<FileSystemPath> GetNonEmptyIncludePaths();
 
-		/// <summary>Gets a list of statement blocks contained in the file.</summary>
-		/// <returns>A collection of <see cref="T4StatementBlock"/>.</returns>
-		[NotNull]
-		[ItemNotNull]
-		IEnumerable<T4StatementBlock> GetStatementBlocks();
-
 		/// <summary>Gets a list of feature blocks contained in the file.</summary>
 		/// <returns>A collection of <see cref="T4FeatureBlock"/>.</returns>
 		[NotNull]
@@ -55,12 +49,6 @@ namespace GammaJul.ForTea.Core.Tree {
 		/// <summary>Removes a directive.</summary>
 		/// <param name="directive">The directive to remove.</param>
 		void RemoveDirective([CanBeNull] IT4Directive directive);
-
-		/// <summary>Adds a new statement block.</summary>
-		/// <param name="statementBlock">The statement block to add.</param>
-		/// <returns>A new instance of <see cref="T4StatementBlock"/>, representing <paramref name="statementBlock"/> in the T4 file.</returns>
-		[NotNull]
-		T4StatementBlock AddStatementBlock([NotNull] T4StatementBlock statementBlock);
 
 		/// <summary>Adds a new feature block.</summary>
 		/// <param name="featureBlock">The feature block to add.</param>

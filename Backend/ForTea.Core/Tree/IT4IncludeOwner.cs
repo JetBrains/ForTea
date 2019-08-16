@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.Files;
 
 namespace GammaJul.ForTea.Core.Tree {
 
@@ -12,10 +11,6 @@ namespace GammaJul.ForTea.Core.Tree {
 		[NotNull]
 		[ItemNotNull]
 		IEnumerable<IT4Include> GetIncludes();
-
-		[CanBeNull]
-		IDocumentRangeTranslator DocumentRangeTranslator { get; }
-
 	}
 
 }
