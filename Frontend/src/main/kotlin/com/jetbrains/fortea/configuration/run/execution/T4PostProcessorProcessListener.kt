@@ -15,7 +15,7 @@ class T4PostProcessorProcessListener(
 
   override fun processTerminated(p0: ProcessEvent) {
     val call = if (p0.exitCode == 0) model.executionSucceeded else model.executionFailed
-    call.start(parameters.initialFilePath)
+    call.start(parameters.initialFileLocation)
   }
 
   override fun processWillTerminate(p0: ProcessEvent, p1: Boolean) {

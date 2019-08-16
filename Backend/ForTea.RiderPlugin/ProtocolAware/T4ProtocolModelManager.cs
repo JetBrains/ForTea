@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using FluentAssertions;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
@@ -8,8 +9,11 @@ using JetBrains.Annotations;
 using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
+using JetBrains.ForTea.RiderPlugin.Utils;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
+using JetBrains.ReSharper.Host.Features.ProjectModel.View;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
@@ -38,12 +42,16 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		[NotNull]
 		private IT4BuildMessageConverter Converter { get; }
 
+		[NotNull]
+		private ProjectModelViewHost Host { get; }
+
 		public T4ProtocolModelManager(
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger,
-			[NotNull] T4BuildMessageConverter converter
+			[NotNull] T4BuildMessageConverter converter,
+			[NotNull] ProjectModelViewHost host
 		)
 		{
 			Solution = solution;
@@ -51,6 +59,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			ExecutionManager = executionManager;
 			Logger = logger;
 			Converter = converter;
+			Host = host;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks();
 		}
@@ -69,18 +78,27 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
 		);
 
-		private Func<string, T> Wrap<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
-			rawPath =>
+		private Func<T4FileLocation, T> Wrap<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
+			location =>
 			{
 				var result = Logger.Catch(() =>
 				{
-					var path = FileSystemPath.Parse(rawPath);
+					var path = FileSystemPath.Parse(location.Location);
+					if (path.IsNullOrEmpty()) return defaultValue;
 					using (ReadLockCookie.Create())
 					{
-						var sourceFile = path.FindSourceFileInSolution(Solution);
-						var t4File = sourceFile?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
-						if (t4File == null) return defaultValue;
-						return wrappee(t4File);
+						return Host
+							.GetItemById<IProject>(location.ProjectId)
+							?.GetSubItemsRecursively(path.Name)
+							.Where(it => it.Location == path)
+							.AsList()
+							.SingleItem()
+							.As<IProjectFile>()
+							?.ToSourceFile()
+							?.GetPsiFiles(T4Language.Instance)
+							.OfType<IT4File>()
+							.SingleItem()
+							?.Let(wrappee);
 					}
 				});
 				return result ?? defaultValue;
@@ -102,10 +120,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		}
 
 		[CanBeNull]
-		private Unit HandleFailure(IT4File arg)
-		{
-			return Unit.Instance;
-		}
+		private Unit HandleFailure(IT4File arg) => Unit.Instance;
 
 		[NotNull]
 		private T4PreprocessingResult Preprocess([NotNull] IT4File file)

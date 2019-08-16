@@ -1,6 +1,5 @@
 package com.jetbrains.fortea.configuration
 
-import com.intellij.notification.NotificationGroup
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.lifetime.isAlive
@@ -9,18 +8,11 @@ import com.jetbrains.rider.build.Diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.Diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.T4BuildMessage
 import com.jetbrains.rider.model.T4BuildMessageKind
-import com.jetbrains.rider.util.idea.getLogger
 
 class T4BuildSessionView(
   project: Project,
   private val windowFactory: T4BuildToolWindowFactory
 ) : LifetimedProjectService(project) {
-  companion object {
-    val BUILD_NOTIFICATION_GROUP =
-      NotificationGroup.toolWindowGroup("T4 Build Messages", T4BuildToolWindowFactory.TOOLWINDOW_ID)
-    private val myLogger = getLogger<T4BuildSessionView>()
-  }
-
   fun showT4BuildResult(lifetime: Lifetime, buildMessages: List<T4BuildMessage>, file: String) {
     val context = windowFactory.getOrCreateContext(lifetime)
     context.clear()

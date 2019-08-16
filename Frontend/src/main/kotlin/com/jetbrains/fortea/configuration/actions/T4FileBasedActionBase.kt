@@ -12,6 +12,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.T4ConfigurationType
 import com.jetbrains.fortea.psi.T4PsiFile
+import com.jetbrains.rider.projectView.nodes.containingProject
+import com.jetbrains.rider.projectView.nodes.getProjectModelNode
 import javax.swing.Icon
 import kotlin.reflect.KClass
 
@@ -26,16 +28,19 @@ abstract class T4FileBasedActionBase<TConfiguration, TConfigurationType>(
   private val logger = Logger.getInstance(javaClass)
   final override fun update(e: AnActionEvent) {
     val t4File = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? T4PsiFile
-    e.presentation.isEnabledAndVisible = t4File != null
+    e.presentation.isEnabledAndVisible = t4File != null && e.canGetProjectId
   }
 
+  private val AnActionEvent.canGetProjectId
+    get() = this.dataContext.getProjectModelNode()?.containingProject()?.id != null
 
   final override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
+    val projectId = e.dataContext.getProjectModelNode()?.containingProject()?.id ?: return
     val file = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? T4PsiFile ?: return
     val configurationType = ConfigurationTypeUtil.findConfigurationType(configurationTypeClass.java)
     val configuration = createConfiguration(project, configurationType)
-    setupFromFile(configuration, file)
+    setupFromFile(configuration, file, projectId)
     val runManager = RunManager.getInstance(project)
     val configurationSettings = runManager.createConfiguration(configuration, configurationType.factory)
     executeConfiguration(configurationSettings, this.executor, project)
@@ -66,7 +71,7 @@ abstract class T4FileBasedActionBase<TConfiguration, TConfigurationType>(
   }
 
   protected abstract fun createConfiguration(project: Project, configurationType: TConfigurationType): TConfiguration
-  protected abstract fun setupFromFile(configuration: TConfiguration, file: T4PsiFile)
+  protected abstract fun setupFromFile(configuration: TConfiguration, file: T4PsiFile, projectId: Int)
   protected abstract val configurationTypeClass: KClass<TConfigurationType>
   protected abstract val executor: Executor
 }

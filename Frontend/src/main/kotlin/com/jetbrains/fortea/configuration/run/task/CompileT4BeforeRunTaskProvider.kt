@@ -41,13 +41,13 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
     val project = configuration.project
     val model = project.solution.t4ProtocolModel
 
-    val request = model.requestCompilation.start(configuration.parameters.initialFilePath).result
+    val request = model.requestCompilation.start(configuration.parameters.initialFileLocation).result
     request.advise(project.lifetime) { rdTaskResult ->
       try {
         val result = rdTaskResult.unwrap()
         successful = result.buildResultKind.isSuccess
         val view = project.getComponent<T4BuildSessionView>()
-        view.showT4BuildResult(project.lifetime, result.messages, configuration.parameters.initialFilePath)
+        view.showT4BuildResult(project.lifetime, result.messages, configuration.parameters.initialFileLocation.location)
       } finally {
         finished.up()
       }

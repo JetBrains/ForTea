@@ -23,9 +23,9 @@ class T4PreprocessRunProfileState(
 ) : RunProfileState {
   override fun execute(executor: Executor?, runner: ProgramRunner<*>): ExecutionResult? {
     val console = ConsoleViewImpl(project, false)
-    console.print("Preprocessing ${parameters.initialFilePath}\n", ConsoleViewContentType.SYSTEM_OUTPUT)
+    console.print("Preprocessing ${parameters.initialFileLocation.location}\n", ConsoleViewContentType.SYSTEM_OUTPUT)
     val handler = NopProcessHandler() // Pretend to be working
-    model.requestPreprocessing.start(parameters.initialFilePath).result.advise(project.lifetime) {
+    model.requestPreprocessing.start(parameters.initialFileLocation).result.advise(project.lifetime) {
       val result = it.unwrap()
       if (!result.succeeded) console.printT4ErrorMessage(result)
       else console.print("Done\n", ConsoleViewContentType.NORMAL_OUTPUT)
@@ -44,7 +44,7 @@ class T4PreprocessRunProfileState(
     get() {
 
       val message = message ?: return "unknown error"
-      val fileName = PathUtil.getFileName(parameters.initialFilePath)
+      val fileName = PathUtil.getFileName(parameters.initialFileLocation.location)
       return "$fileName${message.location.writeableMessage}: ${message.content}"
     }
 
