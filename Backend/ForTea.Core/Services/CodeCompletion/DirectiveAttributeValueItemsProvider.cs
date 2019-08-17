@@ -52,8 +52,8 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			var directive = attribute.GetContainingNode<IT4Directive>();
 			Assertion.AssertNotNull(directive, "directive != null");
 
-			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(directive.GetName());
-			DirectiveAttributeInfo attributeInfo = directiveInfo?.GetAttributeByName(attribute.GetName());
+			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(directive.Name.GetText());
+			DirectiveAttributeInfo attributeInfo = directiveInfo?.GetAttributeByName(attribute.Name.GetText());
 			if (attributeInfo == null)
 				return false;
 			

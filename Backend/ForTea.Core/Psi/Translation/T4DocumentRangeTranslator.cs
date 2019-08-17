@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Translation
@@ -12,13 +14,13 @@ namespace GammaJul.ForTea.Core.Psi.Translation
 	public sealed class T4DocumentRangeTranslator : IDocumentRangeTranslator
 	{
 		[NotNull]
-		private IT4IncludeOwner InitialFile { get; }
+		private IT4File InitialFile { get; }
 
 		[NotNull]
 		private IPsiSourceFile SourceFile => InitialFile.GetSourceFile().NotNull();
 
 		[NotNull, ItemNotNull]
-		private IEnumerable<IT4Include> Includes => InitialFile.Children<IT4Include>();
+		private IEnumerable<IT4IncludeDirective> Includes => InitialFile.Blocks.OfType<IT4IncludeDirective>();
 
 		public T4DocumentRangeTranslator([NotNull] IT4File initialFile) => InitialFile = initialFile;
 

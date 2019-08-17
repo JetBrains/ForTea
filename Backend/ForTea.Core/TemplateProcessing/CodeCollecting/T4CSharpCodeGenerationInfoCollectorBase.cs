@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi;
+using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
@@ -20,14 +20,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 	public abstract class T4CSharpCodeGenerationInfoCollectorBase : IRecursiveElementProcessor
 	{
 		#region Properties
+
 		[NotNull]
 		private IT4File File { get; }
 
 		[NotNull]
 		private T4DirectiveInfoManager Manager { get; }
-
-		[NotNull]
-		private T4TreeNavigator Navigator { get; }
 
 		[NotNull]
 		private T4EncodingsManager EncodingsManager { get; }
@@ -42,6 +40,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		[NotNull]
 		protected T4CSharpCodeGenerationIntermediateResult Result => Results.Peek();
+
 		#endregion Properties
 
 		protected T4CSharpCodeGenerationInfoCollectorBase(
@@ -53,7 +52,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
 			Guard = new T4IncludeGuard();
 			Manager = solution.GetComponent<T4DirectiveInfoManager>();
-			Navigator = solution.GetComponent<T4TreeNavigator>();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
@@ -70,16 +68,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		}
 
 		#region Interface Members
-		public bool InteriorShouldBeProcessed(ITreeNode element) => element is IT4Include;
+
+		public bool InteriorShouldBeProcessed(ITreeNode element) => false;
 
 		public void ProcessBeforeInterior(ITreeNode element)
 		{
-			if (!(element is IT4Include include)) return;
+			if (!(element is IT4IncludeDirective include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
 			var sourceFile = include.Path.Resolve();
 			if (sourceFile == null)
 			{
-				var target = Navigator.FindIncludeValue(include) ?? element;
+				var target = include.GetAttributes(Manager.Include.FileAttribute.Name)?.FirstOrDefault()?.Value ??
+				             element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target}");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(null);
@@ -89,7 +89,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
 			if (!Guard.CanProcess(sourceFile))
 			{
-				var target = Navigator.FindIncludeValue(include) ?? element;
+				var target = include.GetAttributes(Manager.Include.FileAttribute.Name)?.FirstOrDefault()?.Value ??
+				             element;
 				var data = T4FailureRawData.FromElement(target, "Recursion in includes");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(sourceFile);
@@ -105,7 +106,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			switch (element)
 			{
-				case IT4Include include:
+				case IT4IncludeDirective include:
 					string suffix = Result.State.ProduceBeforeEof();
 					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
 					Guard.TryEndProcessing(include.Path.Resolve());
@@ -136,9 +137,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				return false;
 			}
 		}
+
 		#endregion Interface Members
 
 		#region Utils
+
 		/// <summary>Handles a directive in the tree.</summary>
 		/// <param name="directive">The directive.</param>
 		private void HandleDirective([NotNull] IT4Directive directive)
@@ -224,6 +227,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (produced.IsNullOrEmpty()) return;
 			AppendTransformation(produced);
 		}
+
 		#endregion Utils
 
 		protected abstract void AppendTransformation([NotNull] string message);

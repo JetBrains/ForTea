@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -22,8 +23,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			Assertion.Assert(directive.IsSpecificDirective(Manager.Output),
 				"directive.IsSpecificDirective(Manager.Output)");
-			var attribute = directive.GetAttribute(Manager.Output.EncodingAttribute.Name);
-			var value = attribute?.GetValueToken();
+			var attribute = directive.GetAttributes(Manager.Output.EncodingAttribute.Name).FirstOrDefault();
+			var value = attribute?.Value;
 			if (value == null) return null;
 			string rawEncoding = value.GetText();
 			if (IsCodePage(rawEncoding)) return rawEncoding; // Insert unquoted

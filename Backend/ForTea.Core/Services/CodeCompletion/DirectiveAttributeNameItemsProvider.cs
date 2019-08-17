@@ -43,13 +43,13 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 
 			var directive = node.GetContainingNode<IT4Directive>();
 			Assertion.AssertNotNull(directive, "directive != null");
-			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(directive.GetName());
+			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(directive.Name.GetText());
 			if (directiveInfo == null)
 				return false;
 
 			JetHashSet<string> existingNames = directive
-				.GetAttributes()
-				.Select(attr => attr.GetName())
+				.Attributes
+				.Select(attr => attr.Name.GetText())
 				.ToJetHashSet(s => s, StringComparer.OrdinalIgnoreCase);
 
 			foreach (string attributeName in directiveInfo.SupportedAttributes.Select(attr => attr.Name)) {

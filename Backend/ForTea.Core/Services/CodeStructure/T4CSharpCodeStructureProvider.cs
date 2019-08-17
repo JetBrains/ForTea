@@ -71,7 +71,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 			[NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
 			[NotNull] CSharpCodeStructureProcessingState state
 		) {
-			TreeTextRange t4Range = featureBlock.GetCodeToken().GetTreeTextRange();
+			TreeTextRange t4Range = featureBlock.Code.GetTreeTextRange();
 			TreeTextRange cSharpRange = secondaryRangeTranslator.OriginalToGenerated(t4Range);
 			if (!cSharpRange.IsValid())
 				return;

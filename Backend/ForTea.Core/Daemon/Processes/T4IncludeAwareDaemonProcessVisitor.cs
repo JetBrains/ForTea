@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
@@ -21,9 +21,6 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		[NotNull]
 		private T4DirectiveInfoManager Manager { get; }
 
-		[NotNull]
-		private T4TreeNavigator Navigator { get; }
-
 		[NotNull, ItemNotNull]
 		private List<HighlightingInfo> MyHighlightings { get; } = new List<HighlightingInfo>();
 
@@ -37,12 +34,10 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public T4IncludeAwareDaemonProcessVisitor(
 			[NotNull] T4DirectiveInfoManager manager,
-			[NotNull] IPsiSourceFile initialFile,
-			[NotNull] T4TreeNavigator navigator
+			[NotNull] IPsiSourceFile initialFile
 		)
 		{
 			Manager = manager;
-			Navigator = navigator;
 			HasSeenRecursiveInclude = false;
 			Guard = new T4IncludeGuard();
 			Guard.StartProcessing(initialFile);
@@ -125,7 +120,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ReportUnresolvedPath([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = Navigator.FindIncludeValue(include);
+			var value = include.GetAttributes(Manager.Include.FileAttribute.Name)?.FirstOrDefault()?.Value;
 			if (value == null) return;
 			AddHighlighting(value, new T4UnresolvedIncludeHighlighting(value));
 		}
@@ -133,7 +128,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ReportRecursiveInclude([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = Navigator.FindIncludeValue(include);
+			var value = include.GetAttributes(Manager.Include.FileAttribute.Name)?.FirstOrDefault()?.Value;
 			if (value == null) return;
 			AddHighlighting(value, new T4RecursiveIncludeHighlighting(value));
 		}
@@ -141,7 +136,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ReportRedundantInclude([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = Navigator.FindIncludeValue(include);
+			var value = include.GetAttributes(Manager.Include.FileAttribute.Name)?.FirstOrDefault()?.Value;
 			if (value == null) return;
 			var directive = (value.Parent?.Parent as IT4Directive).NotNull();
 			AddHighlighting(value, new T4RedundantIncludeHighlighting(directive));

@@ -7,7 +7,7 @@ options {
   parserClassName="T4ParserGenerated";
 
   // Strongly type the lexer we're using. ILexer<int> is the caching lexer instance
-  "lexerClassName"="GammaJul.ForTea.Core.Parsing.T4Lexer";
+  "lexerClassName"="JetBrains.ReSharper.Psi.Parsing.ILexer";
 
   // FQN of (non-generated) class that provides messages for the parser
   parserMessagesClass="GammaJul.ForTea.Core.Parsing.ParserMessages";
@@ -16,7 +16,7 @@ options {
   parserTargetSubdir="Parsing";
 
   // Don't generate a bitset unless there's 4 or more comparisons to be made
-  tokenBitsetThreshold=4;
+  tokenBitsetThreshold=100; // TODO: once debugging is over, set back to 4
 
   // Composite node type/element generation options
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -102,7 +102,12 @@ t4FeatureBlock:
 
 // ---- ---- ---- ---- directives ---- ---- ---- ----
 
-interface t4Directive:
+// All these directives have same start,
+// and generated parser seems to only take into account one lookahead token,
+// so we have to do that manually.
+// I really wish there was a simpler way of doing that
+
+interface t4Directive options { customParseFunction; noInternalParseFunction; }:
       t4TemplateDirective
     | t4ParameterDirective
     | t4OutputDirective

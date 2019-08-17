@@ -71,9 +71,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 			OutputDirectiveInfo output = manager.Output;
 			var attributes = file
 				.GetDirectives(output)
-				.SelectMany(outputDirective => outputDirective.GetAttributes())
-				.Where(attribute => string.Equals(attribute.GetName(), output.ExtensionAttribute.Name));
-			var query = attributes.Select(attribute => attribute.GetValue());
+				.SelectMany(outputDirective => outputDirective.Attributes)
+				.Where(attribute => string.Equals(attribute.Name.GetText(), output.ExtensionAttribute.Name));
+			var query = attributes.Select(attribute => attribute.Value.GetText());
 
 			string targetExtension = query.FirstOrDefault();
 

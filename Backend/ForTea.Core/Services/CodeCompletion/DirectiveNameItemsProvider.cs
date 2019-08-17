@@ -28,9 +28,8 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			if (!(node?.Parent is IT4Directive directive))
 				return false;
 
-			TokenNodeType tokenType = node.GetTokenType();
-			IT4Token nameToken = directive.GetNameToken();
-			return tokenType == T4TokenNodeTypes.TOKEN
+			var nameToken = directive.Name;
+			return node.GetTokenType() == T4TokenNodeTypes.TOKEN
 				? nameToken == node
 				: nameToken == null && node.SelfAndLeftSiblings().All(IsWhitespaceOrDirectiveStart);
 		}

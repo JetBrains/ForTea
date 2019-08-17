@@ -166,13 +166,23 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		private static void ModifyFile([NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)
 			=> changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Modified);
 
-		private void InvalidateFilesHavingInclude([NotNull] FileSystemPath includeLocation, [NotNull] IPsiServices psiServices) {
-			psiServices.GetComponent<T4FileDependencyManager>().UpdateIncludes(includeLocation, EmptyList<FileSystemPath>.InstanceList);
-			foreach (ModuleWrapper moduleWrapper in _modules.Values) {
-				IPsiSourceFile sourceFile = moduleWrapper.Module.SourceFile;
-				if (sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File 
-				&& t4File.GetNonEmptyIncludePaths().Any(path => path == includeLocation))
-					psiServices.MarkAsDirty(sourceFile);
+		private void InvalidateFilesHavingInclude(
+			[NotNull] FileSystemPath includeLocation,
+			[NotNull] IPsiServices psiServices
+		)
+		{
+			psiServices
+				.GetComponent<T4FileDependencyManager>()
+				.UpdateIncludes(includeLocation, EmptyList<FileSystemPath>.InstanceList);
+			foreach (var sourceFile in _modules.Values.Select(moduleWrapper => moduleWrapper.Module.SourceFile))
+			{
+				if (!(sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File)) continue;
+				bool hasUpdatedDependency = t4File.Blocks
+					.OfType<IT4IncludeDirective>()
+					.Select(include => include.Path.ResolvePath())
+					.Where(path => !path.IsEmpty)
+					.Any(path => path == includeLocation);
+				if (hasUpdatedDependency) psiServices.MarkAsDirty(sourceFile);
 			}
 		}
 		

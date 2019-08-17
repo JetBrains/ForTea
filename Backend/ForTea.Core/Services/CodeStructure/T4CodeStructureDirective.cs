@@ -10,6 +10,7 @@ using JetBrains.Application.UI.TreeModels;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.CodeStructure;
 using JetBrains.ReSharper.Psi.Resources;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Services.CodeStructure {
@@ -21,7 +22,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 		[NotNull]
 		private string GetDirectiveText() {
 			IT4Directive directive = GetTreeNode();
-			string name = directive?.GetName();
+			string name = directive?.Name.GetText();
 			if (name == null)
 				return "???";
 
@@ -31,15 +32,15 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 			// display the directive with the attributes that are marked with DisplayInCodeStructure
 			var builder = new StringBuilder(name);
-			foreach (IT4DirectiveAttribute attribute in directive.GetAttributes()) {
-				DirectiveAttributeInfo attributeInfo = directiveInfo.GetAttributeByName(attribute.GetName());
+			foreach (IT4DirectiveAttribute attribute in directive?.Attributes) {
+				DirectiveAttributeInfo attributeInfo = directiveInfo.GetAttributeByName(attribute.Name.GetText());
 				if (attributeInfo == null || !attributeInfo.IsDisplayedInCodeStructure)
 					continue;
 
 				builder.Append(' ');
 				builder.Append(attributeInfo.Name);
 				builder.Append("=\"");
-				builder.Append(attribute.GetValue());
+				builder.Append(attribute.Value.GetText());
 				builder.Append('"');
 			}
 			return builder.ToString();
@@ -64,7 +65,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 				if (directive == null)
 					return DocumentRange.InvalidRange;
 
-				IT4Token nameToken = directive.GetNameToken();
+				ITokenNode nameToken = directive.Name;
 				if (nameToken == null)
 					return directive.GetNavigationRange();
 
@@ -73,7 +74,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 		}
 
 		public override IList<string> GetQuickSearchTexts() {
-			string name = GetTreeNode()?.GetName();
+			string name = GetTreeNode()?.Name.GetText();
 			return name != null ? new[] { name } : EmptyList<string>.InstanceList;
 		}
 

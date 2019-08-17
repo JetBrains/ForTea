@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Tree;
@@ -65,8 +66,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		{
 			var languageService = T4Language.Instance.LanguageService();
 			Assertion.AssertNotNull(languageService, "languageService != null");
-			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			return new T4TreeBuilder(Manager, lexer, target).CreateT4Tree();
+			var lexer = (T4Lexer) languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			return new T4Parser(lexer).Parse();
 		}
 
 		public IPsiSourceFile Resolve() => ResolvePath().FindSourceFileInSolution(Solution);

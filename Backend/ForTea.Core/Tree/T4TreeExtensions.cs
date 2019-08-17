@@ -4,7 +4,9 @@ using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
@@ -142,6 +144,7 @@ namespace GammaJul.ForTea.Core.Tree
 			return Pair.Of(existingDirectives.First(), BeforeOrAfter.Before);
 		}
 
+		[NotNull]
 		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
 			[NotNull] this IT4Directive directive,
 			[NotNull] string name
@@ -263,6 +266,59 @@ namespace GammaJul.ForTea.Core.Tree
 					ModificationUtil.AddChildBefore(directive, T4TokenNodeTypes.NEW_LINE.CreateLeafElement());
 
 				return directive;
+			}
+		}
+
+		public static void RemoveDirective([NotNull] this IT4File file, [CanBeNull] IT4Directive directive)
+		{
+			if (directive == null) return;
+			using (WriteLockCookie.Create(file.IsPhysical()))
+			{
+				// remove the optional end line after the directive
+				var sibling = directive.NextSibling;
+				var endNode = sibling?.GetTokenType() == T4TokenNodeTypes.NEW_LINE ? sibling : directive;
+				ModificationUtil.DeleteChildRange(directive, endNode);
+			}
+		}
+
+		[NotNull]
+		public static IT4FeatureBlock AddFeatureBlock([NotNull] this IT4File file,
+			[NotNull] IT4FeatureBlock featureBlock)
+		{
+			var anchor = file.Blocks.OfType<IT4FeatureBlock>().LastOrDefault();
+			using (WriteLockCookie.Create(file.IsPhysical()))
+			{
+				if (anchor == null)
+					return ModificationUtil.AddChild(file, featureBlock);
+				return ModificationUtil.AddChildAfter(anchor, featureBlock);
+			}
+		}
+
+		[NotNull]
+		public static IT4DirectiveAttribute AddAttribute(
+			[NotNull] this IT4Directive directive,
+			[NotNull] IT4DirectiveAttribute attribute
+		)
+		{
+			using (WriteLockCookie.Create(directive.IsPhysical()))
+			{
+				var lastNode = directive.LastChild;
+				Assertion.AssertNotNull(lastNode, "lastNode != null");
+
+				var anchor = lastNode.GetTokenType() == T4TokenNodeTypes.BLOCK_END ? lastNode.PrevSibling : lastNode;
+				Assertion.AssertNotNull(anchor, "anchor != null");
+				bool addSpaceAfter = anchor.GetTokenType() == T4TokenNodeTypes.WHITE_SPACE;
+				bool addSpaceBefore = !addSpaceAfter;
+
+				if (addSpaceBefore)
+					anchor = ModificationUtil.AddChildAfter(anchor, T4TokenNodeTypes.WHITE_SPACE.CreateLeafElement());
+
+				IT4DirectiveAttribute result = ModificationUtil.AddChildAfter(anchor, attribute);
+
+				if (addSpaceAfter)
+					ModificationUtil.AddChildAfter(result, T4TokenNodeTypes.WHITE_SPACE.CreateLeafElement());
+
+				return result;
 			}
 		}
 	}

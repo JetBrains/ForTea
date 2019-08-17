@@ -26,6 +26,7 @@ using JetBrains.ReSharper.Psi.Transactions;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi {
@@ -139,7 +140,7 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="originalFile">The original T4 file.</param>
 		/// <returns>A valid <see cref="TreeTextRange"/> if a feature block existed, <see cref="TreeTextRange.InvalidRange"/> otherwise.</returns>
 		protected override TreeTextRange GetExistingTypeMembersRange(IFile originalFile) {
-			IT4FeatureBlock lastFeatureBlock = ((IT4File) originalFile).GetFeatureBlocks().LastOrDefault();
+			var lastFeatureBlock = ((IT4File) originalFile).Blocks.OfType<IT4FeatureBlock>().LastOrDefault();
 			return lastFeatureBlock?.Code.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 		}
 
@@ -153,7 +154,7 @@ namespace GammaJul.ForTea.Core.Psi {
 			if (directive == null) {
 				directive = _directiveInfoManager.Template.CreateDirective(Pair.Of(_directiveInfoManager.Template.InheritsAttribute.Name, superClassName));
 				directive = t4File.AddDirective(directive, _directiveInfoManager);
-				attribute = directive.GetAttributes().First();
+				attribute = directive.Attributes.First();
 			}
 			else {
 				attribute = directive.AddAttribute(_directiveInfoManager.Template.InheritsAttribute.CreateDirectiveAttribute(superClassName));
@@ -161,7 +162,7 @@ namespace GammaJul.ForTea.Core.Psi {
 
 			superClassGeneratedNode.GetRangeTranslator().AddProjectionItem(
 				new TreeTextRange<Generated>(superClassGeneratedNode.GetTreeTextRange()),
-				new TreeTextRange<Original>(attribute.GetValueToken().GetTreeTextRange()));
+				new TreeTextRange<Original>(attribute.Value.GetTreeTextRange()));
 		}
 
 		protected override ITreeNode GetSuperClassNodeFromOriginalFile(IFile originalFile) {
@@ -263,8 +264,11 @@ namespace GammaJul.ForTea.Core.Psi {
 			if (code == null || code.Trim().Length == 0)
 				return;
 
-			var file = block.GetContainingFile() as IT4File;
-			file?.RemoveChild(block);
+			if (!(block.GetContainingFile() is IT4File file) || node == null) return;
+			using (WriteLockCookie.Create(file.IsPhysical()))
+			{
+				ModificationUtil.DeleteChild(node);
+			}
 		}
 
 		/// <summary>Gets the body of a method that is visible for user.</summary>
