@@ -37,9 +37,6 @@ namespace GammaJul.ForTea.Core.Psi {
 	/// </summary>
 	[ProjectFileType(typeof(T4ProjectFileType))]
 	public class T4CSharpCustomModificationHandler : CustomModificationHandler<IT4CodeBlock, IT4Directive>, ICSharpCustomModificationHandler {
-
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
-
 		/// <summary>Determines whether namespace aliases can be used.</summary>
 		/// <returns>Always <c>false</c> since T4 files does not support aliases.</returns>
 		public bool CanUseAliases
@@ -79,12 +76,12 @@ namespace GammaJul.ForTea.Core.Psi {
 		protected override bool CreateAndMapUsingNode(bool before, IT4Directive anchor, ITreeNode usingDirective, IFile originalFile) {
 			var t4File = (IT4File) originalFile;
 			string ns = GetNamespaceFromUsingDirective(usingDirective);
-			IT4Directive directive = _directiveInfoManager.Import.CreateDirective(ns);
+			IT4Directive directive = T4DirectiveInfoManager.Import.CreateDirective(ns);
 
 			if (anchor != null && anchor.GetContainingNode<IT4IncludeDirective>() == null)
 				directive = before ? t4File.AddDirectiveBefore(directive, anchor) : t4File.AddDirectiveAfter(directive, anchor);
 			else
-				directive = t4File.AddDirective(directive, _directiveInfoManager);
+				directive = t4File.AddDirective(directive);
 
 			IFile csharpFile = usingDirective.GetContainingFile();
 			if (csharpFile != null) {
@@ -93,7 +90,7 @@ namespace GammaJul.ForTea.Core.Psi {
 				if (!csharpUsingRange.IsValid())
 					return false;
 
-				var t4AttributeValueRange = directive.GetAttributeValueToken(_directiveInfoManager.Import.NamespaceAttribute.Name).GetTreeTextRange();
+				var t4AttributeValueRange = directive.GetAttributeValueToken(T4DirectiveInfoManager.Import.NamespaceAttribute.Name).GetTreeTextRange();
 				if (!t4AttributeValueRange.IsValid())
 					return false;
 
@@ -147,17 +144,17 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		protected override void AddSuperClassDirectiveToOriginalFile(IFile originalFile, ITreeNode anchor, ITreeNode superClassGeneratedNode) {
 			var t4File = (IT4File) originalFile;
-			IT4Directive directive = t4File.GetDirectives(_directiveInfoManager.Template).FirstOrDefault();
+			IT4Directive directive = t4File.GetDirectives(T4DirectiveInfoManager.Template).FirstOrDefault();
 			IT4DirectiveAttribute attribute;
 			string superClassName = superClassGeneratedNode.GetText();
 
 			if (directive == null) {
-				directive = _directiveInfoManager.Template.CreateDirective(Pair.Of(_directiveInfoManager.Template.InheritsAttribute.Name, superClassName));
-				directive = t4File.AddDirective(directive, _directiveInfoManager);
+				directive = T4DirectiveInfoManager.Template.CreateDirective(Pair.Of(T4DirectiveInfoManager.Template.InheritsAttribute.Name, superClassName));
+				directive = t4File.AddDirective(directive);
 				attribute = directive.Attributes.First();
 			}
 			else {
-				attribute = directive.AddAttribute(_directiveInfoManager.Template.InheritsAttribute.CreateDirectiveAttribute(superClassName));
+				attribute = directive.AddAttribute(T4DirectiveInfoManager.Template.InheritsAttribute.CreateDirectiveAttribute(superClassName));
 			}
 
 			superClassGeneratedNode.GetRangeTranslator().AddProjectionItem(
@@ -167,8 +164,8 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		protected override ITreeNode GetSuperClassNodeFromOriginalFile(IFile originalFile) {
 			var t4File = (IT4File) originalFile;
-			foreach (IT4Directive templateDirective in t4File.GetDirectives(_directiveInfoManager.Template)) {
-				var inheritsToken = templateDirective.GetAttributeValueToken(_directiveInfoManager.Template.InheritsAttribute.Name);
+			foreach (IT4Directive templateDirective in t4File.GetDirectives(T4DirectiveInfoManager.Template)) {
+				var inheritsToken = templateDirective.GetAttributeValueToken(T4DirectiveInfoManager.Template.InheritsAttribute.Name);
 				if (inheritsToken != null)
 					return inheritsToken;
 			}
@@ -315,10 +312,8 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		/// <summary>Initializes a new instance of the <see cref="T4CSharpCustomModificationHandler"/> class.</summary>
 		/// <param name="languageManager">The language manager.</param>
-		/// <param name="directiveInfoManager">An instance of <see cref="T4DirectiveInfoManager"/>.</param>
-		public T4CSharpCustomModificationHandler([NotNull] ILanguageManager languageManager, [NotNull] T4DirectiveInfoManager directiveInfoManager)
+		public T4CSharpCustomModificationHandler([NotNull] ILanguageManager languageManager)
 			: base(languageManager) {
-			_directiveInfoManager = directiveInfoManager;
 		}
 
 	}

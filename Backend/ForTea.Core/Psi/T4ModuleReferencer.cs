@@ -19,7 +19,6 @@ namespace GammaJul.ForTea.Core.Psi {
 	public class T4ModuleReferencer : IModuleReferencer {
 
 		[NotNull] private readonly IT4Environment _environment;
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
 
 		private bool CanReferenceModule([CanBeNull] IPsiModule module, [CanBeNull] IPsiModule moduleToReference)
 			=> module is T4FilePsiModule t4PsiModule
@@ -51,12 +50,12 @@ namespace GammaJul.ForTea.Core.Psi {
 			Action action = () => {
 
 				// add assembly directive
-				t4File.AddDirective(_directiveInfoManager.Assembly.CreateDirective(assembly.FullAssemblyName), _directiveInfoManager);
+				t4File.AddDirective(T4DirectiveInfoManager.Assembly.CreateDirective(assembly.FullAssemblyName));
 
 				// add import directive if necessary
 				if (!String.IsNullOrEmpty(ns)
-				&& !t4File.GetDirectives(_directiveInfoManager.Import).Any(d => String.Equals(ns, d.GetAttributeValue(_directiveInfoManager.Import.NamespaceAttribute.Name), StringComparison.Ordinal)))
-					t4File.AddDirective(_directiveInfoManager.Import.CreateDirective(ns), _directiveInfoManager);
+				&& !t4File.GetDirectives(T4DirectiveInfoManager.Import).Any(d => String.Equals(ns, d.GetAttributeValueByName(T4DirectiveInfoManager.Import.NamespaceAttribute.Name), StringComparison.Ordinal)))
+					t4File.AddDirective(T4DirectiveInfoManager.Import.CreateDirective(ns));
 
 			};
 
@@ -72,11 +71,7 @@ namespace GammaJul.ForTea.Core.Psi {
 			return transactions.Execute("T4 Assembly Reference", action).Succeded;
 		}
 
-		public T4ModuleReferencer([NotNull] IT4Environment environment, [NotNull] T4DirectiveInfoManager directiveInfoManager) {
-			_environment = environment;
-			_directiveInfoManager = directiveInfoManager;
-		}
-
+		public T4ModuleReferencer([NotNull] IT4Environment environment) => _environment = environment;
 	}
 
 }

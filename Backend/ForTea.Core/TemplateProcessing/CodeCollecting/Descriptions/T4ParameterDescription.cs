@@ -40,14 +40,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		}
 
 		[CanBeNull]
-		public static T4ParameterDescription FromDirective(
-			[NotNull] IT4Directive directive,
-			[NotNull] T4DirectiveInfoManager manager
-		)
+		public static T4ParameterDescription FromDirective([NotNull] IT4Directive directive)
 		{
-			var typeToken = directive.GetAttributeValueToken(manager.Parameter.TypeAttribute.Name);
+			var typeToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.TypeAttribute.Name);
 			string typeText = typeToken?.GetText();
-			var nameToken = directive.GetAttributeValueToken(manager.Parameter.NameAttribute.Name);
+			var nameToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.NameAttribute.Name);
 			string nameText = nameToken?.GetText();
 			if (typeText?.IsNullOrEmpty() != false) return null;
 			if (nameText?.IsNullOrEmpty() != false) return null;

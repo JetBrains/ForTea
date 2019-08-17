@@ -16,9 +16,6 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 	internal sealed class T4CodeStructureDirective : T4CodeStructureElement<IT4Directive> {
-
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
-
 		[NotNull]
 		private string GetDirectiveText() {
 			IT4Directive directive = GetTreeNode();
@@ -26,7 +23,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 			if (name == null)
 				return "???";
 
-			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(name);
+			DirectiveInfo directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(name);
 			if (directiveInfo == null)
 				return name;
 
@@ -80,11 +77,8 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 		public T4CodeStructureDirective(
 			[NotNull] CodeStructureElement parent,
-			[NotNull] IT4Directive directive,
-			[NotNull] T4DirectiveInfoManager directiveInfoManager
-		)
-			: base(parent, directive) {
-			_directiveInfoManager = directiveInfoManager;
+			[NotNull] IT4Directive directive
+		) : base(parent, directive) {
 		}
 
 	}

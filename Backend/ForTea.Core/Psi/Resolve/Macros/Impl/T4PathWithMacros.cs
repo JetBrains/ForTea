@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -33,9 +32,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private IT4Environment Environment { get; }
 
 		[NotNull]
-		private T4DirectiveInfoManager Manager { get; }
-
-		[NotNull]
 		private ISolution Solution { get; }
 
 		[CanBeNull]
@@ -48,7 +44,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
-			Manager = Solution.GetComponent<T4DirectiveInfoManager>();
 		}
 
 		public IT4File ResolveT4File(T4IncludeGuard guard)

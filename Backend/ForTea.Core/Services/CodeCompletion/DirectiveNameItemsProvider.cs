@@ -3,7 +3,6 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
-using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
@@ -17,9 +16,6 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 
 	[Language(typeof(T4Language))]
 	public class DirectiveNameItemsProvider : ItemsProviderOfSpecificContext<T4CodeCompletionContext> {
-
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
-
 		protected override LookupFocusBehaviour GetLookupFocusBehaviour(T4CodeCompletionContext context)
 			=> LookupFocusBehaviour.SoftWhenEmpty;
 
@@ -36,8 +32,7 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 
 		private static bool IsWhitespaceOrDirectiveStart(ITreeNode node) {
 			TokenNodeType tokenType = node.GetTokenType();
-			return tokenType == null
-				|| (tokenType.IsWhitespace || tokenType == T4TokenNodeTypes.DIRECTIVE_START);
+			return tokenType?.IsWhitespace != false || tokenType == T4TokenNodeTypes.DIRECTIVE_START;
 		}
 
 		protected override bool AddLookupItems(T4CodeCompletionContext context, IItemsCollector collector) {
@@ -46,7 +41,7 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			var ranges = context.BasicContext.GetRanges(node);
 			collector.AddRanges(ranges);
 
-			foreach (string directiveName in _directiveInfoManager.AllDirectives.Select(di => di.Name)) {
+			foreach (string directiveName in T4DirectiveInfoManager.AllDirectives.Select(di => di.Name)) {
 				var item = new TextLookupItem(directiveName);
 				item.InitializeRanges(ranges, context.BasicContext);
 				collector.Add(item);
@@ -54,11 +49,6 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			
 			return true;
 		}
-
-		public DirectiveNameItemsProvider([NotNull] T4DirectiveInfoManager directiveInfoManager) {
-			_directiveInfoManager = directiveInfoManager;
-		}
-
 	}
 
 }

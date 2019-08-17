@@ -60,15 +60,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 		/// Target extension. Leading dot, if any, is removed.
 		/// </returns>
 		[NotNull]
-		public static string GetTargetExtension(
-			[NotNull] this IT4File file,
-			[NotNull] T4DirectiveInfoManager manager
-		)
+		public static string GetTargetExtension([NotNull] this IT4File file)
 		{
 			if (file == null) throw new ArgumentNullException(nameof(file));
-			if (manager == null) throw new ArgumentNullException(nameof(manager));
 
-			OutputDirectiveInfo output = manager.Output;
+			var output = T4DirectiveInfoManager.Output;
 			var attributes = file
 				.GetDirectives(output)
 				.SelectMany(outputDirective => outputDirective.Attributes)

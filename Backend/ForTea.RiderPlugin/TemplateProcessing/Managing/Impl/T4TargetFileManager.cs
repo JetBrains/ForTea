@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -26,19 +25,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 	public class T4TargetFileManager : IT4TargetFileManager
 	{
 		[NotNull]
-		private T4DirectiveInfoManager Manager { get; }
-
-		[NotNull]
 		protected ISolution Solution { get; }
 
 		[NotNull]
 		private IShellLocks Locks => Solution.Locks;
 
-		public T4TargetFileManager([NotNull] T4DirectiveInfoManager manager, [NotNull] ISolution solution)
-		{
-			Manager = manager;
-			Solution = solution;
-		}
+		public T4TargetFileManager([NotNull] ISolution solution) => Solution = solution;
 
 		public FileSystemPath GetTemporaryExecutableLocation(IT4File file)
 		{
@@ -60,7 +52,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
 			string name = sourceFile.Name;
-			string targetExtension = file.GetTargetExtension(Manager);
+			string targetExtension = file.GetTargetExtension();
 			return name.WithOtherExtension(targetExtension);
 		}
 

@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
-using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
@@ -18,9 +17,6 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 
 	[Language(typeof(T4Language))]
 	public class DirectiveAttributeNameItemsProvider : ItemsProviderOfSpecificContext<T4CodeCompletionContext> {
-
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
-
 		protected override LookupFocusBehaviour GetLookupFocusBehaviour(T4CodeCompletionContext context)
 			=> LookupFocusBehaviour.SoftWhenEmpty;
 
@@ -43,7 +39,7 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 
 			var directive = node.GetContainingNode<IT4Directive>();
 			Assertion.AssertNotNull(directive, "directive != null");
-			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(directive.Name.GetText());
+			DirectiveInfo directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name.GetText());
 			if (directiveInfo == null)
 				return false;
 
@@ -63,11 +59,6 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			
 			return true;
 		}
-
-		public DirectiveAttributeNameItemsProvider([NotNull] T4DirectiveInfoManager directiveInfoManager) {
-			_directiveInfoManager = directiveInfoManager;
-		}
-
 	}
 
 }

@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -20,9 +19,6 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 	[ProjectFileType(typeof(T4ProjectFileType))]
 	public class T4CSharpCodeStructureProvider : IProjectFileCodeStructureProvider {
-
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
-
 		public CodeStructureRootElement Build(IPsiSourceFile sourceFile, CodeStructureOptions options) {
 			if (!(sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File))
 				return null;
@@ -62,7 +58,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 		[SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
 		private void ProcessT4Directive([NotNull] IT4Directive directive, [NotNull] CodeStructureElement parentElement)
-			=> new T4CodeStructureDirective(parentElement, directive, _directiveInfoManager);
+			=> new T4CodeStructureDirective(parentElement, directive);
 
 		private static void ProcessT4FeatureBlock(
 			[NotNull] T4FeatureBlock featureBlock,
@@ -184,11 +180,6 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 					break;
 			}
 		}
-
-		public T4CSharpCodeStructureProvider([NotNull] T4DirectiveInfoManager directiveInfoManager) {
-			_directiveInfoManager = directiveInfoManager;
-		}
-
 	}
 
 }

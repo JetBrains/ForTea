@@ -18,7 +18,6 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 {
 	internal sealed class T4ErrorProcess : T4DaemonStageProcessBase
 	{
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
 		[CanBeNull] private IT4FeatureBlock _lastFeature;
 		private bool _gotFeature;
 		private bool _gotLastFeature;
@@ -79,7 +78,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			if (!(attribute.Parent is IT4Directive directive))
 				return;
 
-			var attributeInfo = _directiveInfoManager.GetDirectiveByName(directive.Name.GetText())
+			var attributeInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name.GetText())
 				?.GetAttributeByName(attribute.Name.GetText());
 			if (attributeInfo?.IsValid(valueNode.GetText()) != false)
 				return;
@@ -94,7 +93,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			if (nameToken == null)
 				return;
 
-			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(nameToken.GetText());
+			DirectiveInfo directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(nameToken.GetText());
 			if (directiveInfo == null)
 				return;
 
@@ -112,7 +111,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			}
 
 			// Assembly attributes in preprocessed templates are useless.
-			if (directiveInfo == _directiveInfoManager.Assembly &&
+			if (directiveInfo == T4DirectiveInfoManager.Assembly &&
 			    DaemonProcess.SourceFile.ToProjectFile().IsPreprocessedT4Template())
 				AddHighlighting(directive.GetHighlightingRange(), new IgnoredAssemblyDirectiveHighlighting(directive));
 		}
@@ -132,20 +131,18 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		/// <summary>Initializes a new instance of the <see cref="T4DaemonStageProcessBase"/> class.</summary>
 		/// <param name="file">The associated T4 file.</param>
 		/// <param name="daemonProcess">The associated daemon process.</param>
-		/// <param name="directiveInfoManager">An instance of <see cref="T4DirectiveInfoManager"/>.</param>
 		public T4ErrorProcess(
 			[NotNull] IT4File file,
-			[NotNull] IDaemonProcess daemonProcess,
-			[NotNull] T4DirectiveInfoManager directiveInfoManager
-		) : base(file, daemonProcess) => _directiveInfoManager = directiveInfoManager;
+			[NotNull] IDaemonProcess daemonProcess
+		) : base(file, daemonProcess)
+		{
+		}
 
 		protected override void AnalyzeFile(IT4File file)
 		{
-			var outputDirective = file.GetDirectives().FirstOrDefault(directive =>
-				directive.IsSpecificDirective(_directiveInfoManager.Output));
+			var outputDirective = file.Blocks.OfType<IT4OutputDirective>().FirstOrDefault();
 			var extensionAttribute = outputDirective
-				?.GetAttributes(_directiveInfoManager.Output.ExtensionAttribute.Name)
-				?.FirstOrDefault();
+				?.GetFirstAttribute(T4DirectiveInfoManager.Output.ExtensionAttribute);
 			if (extensionAttribute == null)
 			{
 				// TODO: show notification

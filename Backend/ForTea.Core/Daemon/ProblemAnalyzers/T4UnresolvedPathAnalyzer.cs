@@ -18,7 +18,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		// We could have handled include directives here, too,
 		// but it would be way more cumbersome than in T4IncludeAwareDaemonProcessVisitor
 		new[] {typeof(T4UnresolvedAssemblyHighlighting)})]
-	public class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzerBase
+	public sealed class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4AssemblyDirective>
 	{
 		[NotNull]
 		private IModuleReferenceResolveManager ResolveManager { get; }
@@ -27,10 +27,9 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		private IT4AssemblyNamePreprocessor Preprocessor { get; }
 
 		public T4UnresolvedPathAnalyzer(
-			[NotNull] T4DirectiveInfoManager directiveInfoManager,
 			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
 			[NotNull] IModuleReferenceResolveManager resolveManager
-		) : base(directiveInfoManager)
+		)
 		{
 			Preprocessor = preprocessor;
 			ResolveManager = resolveManager;
@@ -61,9 +60,6 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			}
 		}
 
-		protected override DirectiveInfo GetTargetDirective(T4DirectiveInfoManager manager) => manager.Assembly;
-
-		protected override DirectiveAttributeInfo GetTargetAttribute(T4DirectiveInfoManager manager) =>
-			manager.Assembly.NameAttribute;
+		protected override DirectiveAttributeInfo GetTargetAttribute() => T4DirectiveInfoManager.Assembly.NameAttribute;
 	}
 }

@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
@@ -13,17 +12,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 	[SolutionComponent]
 	public class T4EncodingsManager
 	{
-		[NotNull]
-		private T4DirectiveInfoManager Manager { get; }
-
-		public T4EncodingsManager([NotNull] T4DirectiveInfoManager manager) => Manager = manager;
-
 		[CanBeNull]
-		public string FindEncoding([NotNull] IT4Directive directive, [NotNull] IT4CodeGenerationInterrupter interrupter)
+		public string FindEncoding([NotNull] IT4OutputDirective directive, [NotNull] IT4CodeGenerationInterrupter interrupter)
 		{
-			Assertion.Assert(directive.IsSpecificDirective(Manager.Output),
-				"directive.IsSpecificDirective(Manager.Output)");
-			var attribute = directive.GetAttributes(Manager.Output.EncodingAttribute.Name).FirstOrDefault();
+			var attribute = directive.GetAttributes(T4DirectiveInfoManager.Output.EncodingAttribute).FirstOrDefault();
 			var value = attribute?.Value;
 			if (value == null) return null;
 			string rawEncoding = value.GetText();

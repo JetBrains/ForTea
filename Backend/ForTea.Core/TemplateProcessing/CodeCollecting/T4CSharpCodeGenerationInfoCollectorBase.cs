@@ -17,15 +17,13 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
+	// TODO: use generated visitor
 	public abstract class T4CSharpCodeGenerationInfoCollectorBase : IRecursiveElementProcessor
 	{
 		#region Properties
 
 		[NotNull]
 		private IT4File File { get; }
-
-		[NotNull]
-		private T4DirectiveInfoManager Manager { get; }
 
 		[NotNull]
 		private T4EncodingsManager EncodingsManager { get; }
@@ -51,7 +49,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
 			Guard = new T4IncludeGuard();
-			Manager = solution.GetComponent<T4DirectiveInfoManager>();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
@@ -78,8 +75,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			var sourceFile = include.Path.Resolve();
 			if (sourceFile == null)
 			{
-				var target = include.GetAttributes(Manager.Include.FileAttribute.Name)?.FirstOrDefault()?.Value ??
-				             element;
+				var target =
+					include.GetAttributes(T4DirectiveInfoManager.Include.FileAttribute).FirstOrDefault()?.Value ??
+					element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target}");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(null);
@@ -89,8 +87,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
 			if (!Guard.CanProcess(sourceFile))
 			{
-				var target = include.GetAttributes(Manager.Include.FileAttribute.Name)?.FirstOrDefault()?.Value ??
-				             element;
+				var target =
+					include.GetAttributes(T4DirectiveInfoManager.Include.FileAttribute).FirstOrDefault()?.Value ??
+					element;
 				var data = T4FailureRawData.FromElement(target, "Recursion in includes");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(sourceFile);
@@ -146,14 +145,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		/// <param name="directive">The directive.</param>
 		private void HandleDirective([NotNull] IT4Directive directive)
 		{
-			if (directive.IsSpecificDirective(Manager.Import))
-				HandleImportDirective(directive);
-			else if (directive.IsSpecificDirective(Manager.Template))
-				HandleTemplateDirective(directive);
-			else if (directive.IsSpecificDirective(Manager.Parameter))
-				HandleParameterDirective(directive);
-			else if (directive.IsSpecificDirective(Manager.Output))
-				HandleOutputDirective(directive);
+			switch (directive)
+			{
+				case IT4ImportDirective _:
+					HandleImportDirective(directive);
+					break;
+				case IT4TemplateDirective _:
+					HandleTemplateDirective(directive);
+					break;
+				case IT4ParameterDirective _:
+					HandleParameterDirective(directive);
+					break;
+				case IT4OutputDirective output:
+					HandleOutputDirective(output);
+					break;
+			}
 		}
 
 		/// <summary>
@@ -180,14 +186,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			}
 		}
 
-		private void HandleOutputDirective([NotNull] IT4Directive directive) =>
+		private void HandleOutputDirective([NotNull] IT4OutputDirective directive) =>
 			Result.Encoding = EncodingsManager.FindEncoding(directive, Interrupter);
 
 		/// <summary>Handles an import directive, equivalent of an using directive in C#.</summary>
 		/// <param name="directive">The import directive.</param>
 		private void HandleImportDirective([NotNull] IT4Directive directive)
 		{
-			var description = T4ImportDescription.FromDirective(directive, Manager);
+			var description = T4ImportDescription.FromDirective(directive);
 			if (description == null) return;
 			Result.Append(description);
 		}
@@ -202,11 +208,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			if (HasSeenTemplateDirective) return;
 			HasSeenTemplateDirective = true;
-			string hostSpecific = directive.GetAttributeValue(Manager.Template.HostSpecificAttribute.Name);
+			string hostSpecific = directive.GetAttributeValueByName(T4DirectiveInfoManager.Template.HostSpecificAttribute.Name);
 			if (bool.TrueString.Equals(hostSpecific, StringComparison.OrdinalIgnoreCase)) Result.RequireHost();
 
 			(ITreeNode classNameToken, string className) =
-				directive.GetAttributeValueIgnoreOnlyWhitespace(Manager.Template.InheritsAttribute.Name);
+				directive.GetAttributeValueIgnoreOnlyWhitespace(T4DirectiveInfoManager.Template.InheritsAttribute.Name);
 			if (classNameToken != null && className != null)
 				Result.CollectedBaseClass.AppendMapped(className, classNameToken.GetTreeTextRange());
 		}
@@ -215,7 +221,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		/// <param name="directive">The parameter directive.</param>
 		private void HandleParameterDirective([NotNull] IT4Directive directive)
 		{
-			var description = T4ParameterDescription.FromDirective(directive, Manager);
+			var description = T4ParameterDescription.FromDirective(directive);
 			if (description == null) return;
 			Result.Append(description);
 		}
