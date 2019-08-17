@@ -23,6 +23,10 @@ namespace GammaJul.ForTea.Core.Parsing
 		public const int PARAMETER_NODE_TYPE_INDEX = 1018;
 		public const int CLEANUP_BEHAVIOR_NODE_TYPE_INDEX = 1019;
 		public const int UNKNOWN_DIRECTIVE_NAME_NODE_TYPE_INDEX = 1020;
+		public const int LEFT_PARENTHESIS_NODE_TYPE_INDEX = 1021;
+		public const int DOLLAR_NODE_TYPE_INDEX = 1022;
+		public const int RIGHT_PARENTHESIS_NODE_TYPE_INDEX = 1023;
+		public const int PERCENT_NODE_TYPE_INDEX = 1024;
 		public const int BAD_TOKEN_NODE_TYPE_INDEX = 1100;
 	}
 }

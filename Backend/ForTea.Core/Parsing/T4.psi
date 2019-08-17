@@ -16,7 +16,7 @@ options {
   parserTargetSubdir="Parsing";
 
   // Don't generate a bitset unless there's 4 or more comparisons to be made
-  tokenBitsetThreshold=100; // TODO: once debugging is over, set back to 4
+  tokenBitsetThreshold=4;
 
   // Composite node type/element generation options
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -194,6 +194,21 @@ t4Code:
 
 // Macros will be inserted here
 t4AttributeValue:
-    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValues>*
-    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValues>*
+    ( RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValues>
+    | t4Macro<t4Macro, Macros>
+    | t4EnvironmentVariable<t4EnvironmentVariable, EnvironmentVariables>
+    )*
+;
+
+t4Macro:
+    DOLLAR<DOLLAR, Dollar>
+    LEFT_PARENTHESIS<LEFT_PARENTHESIS, LeftParenthesis>
+    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>
+    RIGHT_PARENTHESIS<RIGHT_PARENTHESIS, RightParenthesis>
+;
+
+t4EnvironmentVariable:
+    PERCENT<PERCENT, StartPercent>
+    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>
+    PERCENT<PERCENT, EndPercent>
 ;

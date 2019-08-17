@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.Parsing;
 using static GammaJul.ForTea.Core.Parsing.T4TokenNodeFlag;
 
 namespace GammaJul.ForTea.Core.Parsing
@@ -27,5 +28,9 @@ namespace GammaJul.ForTea.Core.Parsing
 		[NotNull] public static readonly T4TokenNodeType CLEANUP_BEHAVIOR = new T4TokenNodeType("CLEANUP_BEHAVIOR", CLEANUP_BEHAVIOR_NODE_TYPE_INDEX, "CleanupBehavior", Identifier);
 		[NotNull] public static readonly T4TokenNodeType UNKNOWN_DIRECTIVE_NAME = new T4TokenNodeType("UNKNOWN", UNKNOWN_DIRECTIVE_NAME_NODE_TYPE_INDEX, null, Identifier);
 		[NotNull] public static readonly T4TokenNodeType BAD_TOKEN = new T4TokenNodeType("BAD_TOKEN", BAD_TOKEN_NODE_TYPE_INDEX, null, None);
+		[NotNull] public static readonly T4TokenNodeType LEFT_PARENTHESIS = new T4TokenNodeType("LEFT_PARENTHESIS", LEFT_PARENTHESIS_NODE_TYPE_INDEX, "(", None);
+		[NotNull] public static readonly T4TokenNodeType DOLLAR = new T4TokenNodeType("DOLLAR", DOLLAR_NODE_TYPE_INDEX, "$", None);
+		[NotNull] public static readonly T4TokenNodeType RIGHT_PARENTHESIS = new T4TokenNodeType("RIGHT_PARENTHESIS", RIGHT_PARENTHESIS_NODE_TYPE_INDEX, ")", None);
+		[NotNull] public static readonly T4TokenNodeType PERCENT = new T4TokenNodeType("PERCENT", PERCENT_NODE_TYPE_INDEX, "%", None);
 	}
 }

@@ -37,7 +37,7 @@ UNKNOWN_DIRECTIVE_NAME={TOKEN}
 
 RAW_CODE=([^#]|(#+[^#>]))+
 RAW_TEXT=([^<\r\n]|(<+[^<#\r\n])|(\\<#))+
-RAW_ATTRIBUTE_VALUE=[^\"]+
+RAW_ATTRIBUTE_VALUE=[^$%()\"]+
 
 %state IN_DIRECTIVE
 %state IN_BLOCK
@@ -73,6 +73,10 @@ RAW_ATTRIBUTE_VALUE=[^\"]+
 
 <IN_ATTRIBUTE_VALUE> "\""                   { yybegin(IN_DIRECTIVE); myCurrentTokenType = makeToken(T4TokenNodeTypes.QUOTE); return myCurrentTokenType; }
 <IN_ATTRIBUTE_VALUE> {RAW_ATTRIBUTE_VALUE}  { myCurrentTokenType = makeToken(T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE); return myCurrentTokenType; }
+<IN_ATTRIBUTE_VALUE> "$"                    { myCurrentTokenType = makeToken(T4TokenNodeTypes.DOLLAR); return myCurrentTokenType; }
+<IN_ATTRIBUTE_VALUE> "("                    { myCurrentTokenType = makeToken(T4TokenNodeTypes.LEFT_PARENTHESIS); return myCurrentTokenType; }
+<IN_ATTRIBUTE_VALUE> ")"                    { myCurrentTokenType = makeToken(T4TokenNodeTypes.RIGHT_PARENTHESIS); return myCurrentTokenType; }
+<IN_ATTRIBUTE_VALUE> "%"                    { myCurrentTokenType = makeToken(T4TokenNodeTypes.PERCENT); return myCurrentTokenType; }
 <IN_ATTRIBUTE_VALUE> [^]                    { myCurrentTokenType = makeToken(T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE); return myCurrentTokenType; }
 
 <IN_BLOCK> "#>"                             { yybegin(YYINITIAL); myCurrentTokenType = makeToken(T4TokenNodeTypes.BLOCK_END); return myCurrentTokenType; }
