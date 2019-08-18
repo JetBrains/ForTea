@@ -23,6 +23,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 				case T4FeatureBlock _:
 					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
+				case T4ExpressionBlock _:
+					Die();
+					return new T4InfoCollectorStateInitial(Interrupter);
 				default:
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE) return this;
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
