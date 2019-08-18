@@ -74,7 +74,7 @@ t4File options { stubBase="T4FileBase"; }
 
 // ---- ---- ---- ---- blocks ---- ---- ---- ----
 
-interface t4Block:
+errorhandling interface t4Block:
     t4Directive | t4CodeBlock
 ;
 
