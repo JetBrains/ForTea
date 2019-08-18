@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.CSharp.Parsing;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4Directive), HighlightingTypes = new[] {typeof(EscapedKeywordHighlighting)})]
+	[ElementProblemAnalyzer(typeof(IT4ParameterDirective), HighlightingTypes = new[] {typeof(EscapedKeywordHighlighting)})]
 	public sealed class T4EscapedKeywordAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4ParameterDirective>
 	{
 		protected override DirectiveAttributeInfo GetTargetAttribute() =>

@@ -14,7 +14,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4Directive), HighlightingTypes =
+	[ElementProblemAnalyzer(typeof(IT4AssemblyDirective), HighlightingTypes =
 		// We could have handled include directives here, too,
 		// but it would be way more cumbersome than in T4IncludeAwareDaemonProcessVisitor
 		new[] {typeof(T4UnresolvedAssemblyHighlighting)})]

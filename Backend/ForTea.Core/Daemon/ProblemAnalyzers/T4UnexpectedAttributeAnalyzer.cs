@@ -1,15 +1,11 @@
-using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4Token), HighlightingTypes =
+	[ElementProblemAnalyzer(typeof(IT4Directive), HighlightingTypes =
 		new[] {typeof(T4UnexpectedAttributeHighlighting)})]
 	public sealed class T4UnexpectedAttributeAnalyzer : ElementProblemAnalyzer<IT4Directive>
 	{

@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4Directive), HighlightingTypes = new[] {typeof(EscapedKeywordHighlighting)})]
+	[ElementProblemAnalyzer(typeof(IT4TemplateDirective), HighlightingTypes = new[] {typeof(EscapedKeywordHighlighting)})]
 	public sealed class T4NoSupportForVBAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4TemplateDirective>
 	{
 		protected override DirectiveAttributeInfo GetTargetAttribute() =>
