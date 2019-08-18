@@ -1,15 +1,15 @@
 ﻿Language: PsiLanguageType:T4
-T4File
-  <#@ template language="C#" #>
+IT4File
+  IT4TemplateDirective
     DIRECTIVE_START: <#@
     WHITE_SPACE:  
-    TOKEN: template
+    TEMPLATE: template
     WHITE_SPACE:  
-    T4DirectiveAttribute
+    IT4DirectiveAttribute
       TOKEN: language
       EQUAL: =
       QUOTE: "
-      T4AttributeValue
+      IT4AttributeValue
         RAW_ATTRIBUTE_VALUE: C#
       QUOTE: "
     WHITE_SPACE:  
@@ -17,31 +17,31 @@ T4File
   NEW_LINE: \n
   RAW_TEXT: Hello, world!
   NEW_LINE: \n
-  T4StatementBlock
+  IT4StatementBlock
     STATEMENT_BLOCK_START: <#
-    T4Code
+    IT4Code
       RAW_CODE:  for (int i = 0; i < 10; i += 1)\n   { 
     BLOCK_END: #>
   NEW_LINE: \n
   NEW_LINE: \n
-  T4ExpressionBlock
+  IT4ExpressionBlock
     EXPRESSION_BLOCK_START: <#=
-    T4Code
+    IT4Code
       RAW_CODE:  Foo(i); 
     BLOCK_END: #>
   NEW_LINE: \n
-  T4StatementBlock
+  IT4StatementBlock
     STATEMENT_BLOCK_START: <#
-    T4Code
+    IT4Code
       RAW_CODE:  } 
     BLOCK_END: #>
   NEW_LINE: \n
   NEW_LINE: \n
   RAW_TEXT: ---- end ----
   NEW_LINE: \n
-  T4FeatureBlock
+  IT4FeatureBlock
     FEATURE_BLOCK_START: <#+
-    T4Code
+    IT4Code
       RAW_CODE: \nint Foo(int argument) => argument * 2;\n
     BLOCK_END: #>
   NEW_LINE: \n

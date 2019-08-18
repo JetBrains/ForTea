@@ -1,0 +1,2 @@
+<#@ tEmPlate LanguagE="C#" #>
+<#@ PaRaMETER NaMe="MyParameter" tYPe="System.dll" #>

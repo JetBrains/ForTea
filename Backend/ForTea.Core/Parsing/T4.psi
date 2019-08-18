@@ -67,7 +67,7 @@ options {
   "objectClassFQName"="System.Object";
 }
 
-t4File options { stubBase="T4FileBase"; }
+t4File options { stubBase="T4FileBase"; customParseFunction; }
 :
     (t4Block<BLOCK, Blocks> | RAW_TEXT<RAW_TEXT, RawTexts> | NEW_LINE<NEW_LINE, NewLines>)*
 ;

@@ -1,0 +1,2 @@
+<#@ assembly name="%AppData%/Foo.dll" #>
+<#@ include file="$(SolutionDir)/$(ProjectName)/Foo.ttinclude" #>

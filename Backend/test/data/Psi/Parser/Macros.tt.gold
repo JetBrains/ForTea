@@ -1,0 +1,48 @@
+﻿Language: PsiLanguageType:T4
+IT4File
+  IT4AssemblyDirective
+    DIRECTIVE_START: <#@
+    WHITE_SPACE:  
+    ASSEMBLY: assembly
+    WHITE_SPACE:  
+    IT4DirectiveAttribute
+      TOKEN: name
+      EQUAL: =
+      QUOTE: "
+      IT4AttributeValue
+        IT4EnvironmentVariable
+          PERCENT: %
+          RAW_ATTRIBUTE_VALUE: AppData
+          PERCENT: %
+        RAW_ATTRIBUTE_VALUE: /Foo.dll
+      QUOTE: "
+    WHITE_SPACE:  
+    BLOCK_END: #>
+  NEW_LINE: \n
+  IT4IncludeDirective
+    DIRECTIVE_START: <#@
+    WHITE_SPACE:  
+    INCLUDE: include
+    WHITE_SPACE:  
+    IT4DirectiveAttribute
+      TOKEN: file
+      EQUAL: =
+      QUOTE: "
+      IT4AttributeValue
+        IT4Macro
+          DOLLAR: $
+          LEFT_PARENTHESIS: (
+          RAW_ATTRIBUTE_VALUE: SolutionDir
+          RIGHT_PARENTHESIS: )
+        RAW_ATTRIBUTE_VALUE: /
+        IT4Macro
+          DOLLAR: $
+          LEFT_PARENTHESIS: (
+          RAW_ATTRIBUTE_VALUE: ProjectName
+          RIGHT_PARENTHESIS: )
+        RAW_ATTRIBUTE_VALUE: /Foo.ttinclude
+      QUOTE: "
+    WHITE_SPACE:  
+    BLOCK_END: #>
+  NEW_LINE: \n
+

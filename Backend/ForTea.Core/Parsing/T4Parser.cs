@@ -9,12 +9,27 @@ namespace GammaJul.ForTea.Core.Parsing
 {
 	internal sealed class T4Parser : T4ParserGenerated, IParser
 	{
+		[NotNull]
+		private ILexer OriginalLexer { get; }
+
+		[NotNull]
 		public IT4File Parse() => (IT4File) ParseT4File();
 
+		// TODO: set range translator
 		public IFile ParseFile() => (IFile) ParseT4File();
 
-		// TODO: is this line necessary?
-		public T4Parser([NotNull] ILexer lexer) => SetLexer(lexer);
+		public T4Parser([NotNull] ILexer lexer)
+		{
+			OriginalLexer = lexer;
+			SetLexer(new T4FilteringLexer(lexer));
+		}
+
+		public override TreeElement ParseT4File()
+		{
+			var file = ParseT4FileInternal();
+			T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
+			return file;
+		}
 
 		public override TreeElement ParseT4Directive()
 		{

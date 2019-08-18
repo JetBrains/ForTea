@@ -1,0 +1,16 @@
+﻿Language: PsiLanguageType:T4
+IT4File
+  IT4TemplateDirective
+    DIRECTIVE_START: <#@
+    WHITE_SPACE:  
+    TEMPLATE: template
+    WHITE_SPACE:  
+    IT4DirectiveAttribute
+      TOKEN: language
+      EQUAL: =
+    ErrorElement:" expected
+      TOKEN: C
+      BAD_TOKEN: #
+      QUOTE: "
+      RAW_ATTRIBUTE_VALUE:  #>\nHello, world!\n
+
