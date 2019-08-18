@@ -14,6 +14,8 @@ namespace JetBrains.ForTea.Tests.Psi
 		[TestCase("CSharpCode")]
 		[TestCase("CaseInsensivity")]
 		[TestCase("Macros")]
+		[TestCase("EmptyDirective")]
+		[TestCase("EmptyExpressionBlock")]
 		public void TestParser(string name) => DoOneTest(name);
 
 		[TestCase("ForgottenBlockEnd")]

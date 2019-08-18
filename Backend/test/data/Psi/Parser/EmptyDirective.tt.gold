@@ -1,0 +1,9 @@
+﻿Language: PsiLanguageType:T4
+IT4File
+  IT4TemplateDirective
+    DIRECTIVE_START: <#@
+    WHITE_SPACE:  
+    ErrorElement:Missing directive name
+      BLOCK_END: #>
+  NEW_LINE: \n
+

@@ -33,16 +33,7 @@ namespace GammaJul.ForTea.Core.Parsing
 
 		public override TreeElement ParseT4Directive()
 		{
-			var directiveStart = myLexer.TokenType;
-			if (directiveStart != T4TokenNodeTypes.DIRECTIVE_START)
-				throw new UnexpectedToken(ErrorMessages.GetErrorMessage2());
-
-			return SelectAndParseT4DirectiveInternal();
-		}
-
-		private TreeElement SelectAndParseT4DirectiveInternal()
-		{
-			var lookahead = myLexer.LookaheadTokenSkipping(1, T4TokenNodeTypes.WHITE_SPACE);
+			var lookahead = myLexer.LookaheadToken(1);
 			if (lookahead == T4TokenNodeTypes.TEMPLATE) return ParseT4TemplateDirective();
 			if (lookahead == T4TokenNodeTypes.PARAMETER) return ParseT4ParameterDirective();
 			if (lookahead == T4TokenNodeTypes.OUTPUT) return ParseT4OutputDirective();
@@ -51,7 +42,11 @@ namespace GammaJul.ForTea.Core.Parsing
 			if (lookahead == T4TokenNodeTypes.INCLUDE) return ParseT4IncludeDirective();
 			if (lookahead == T4TokenNodeTypes.CLEANUP_BEHAVIOR) return ParseT4CleanupBehaviorDirective();
 			if (lookahead == T4TokenNodeTypes.UNKNOWN_DIRECTIVE_NAME) return ParseT4UnknownDirective();
-			throw new UnexpectedToken(ErrorMessages.GetErrorMessage2());
+			// Failure
+			var result = TreeElementFactory.CreateCompositeElement(Tree.Impl.ElementType.T4_TEMPLATE_DIRECTIVE);
+			var tempParsingResult = Match(T4TokenNodeTypes.DIRECTIVE_START);
+			result.AppendNewChild(tempParsingResult);
+			return HandleErrorInT4Directive(result, new UnexpectedToken("Missing directive name"));
 		}
 	}
 }

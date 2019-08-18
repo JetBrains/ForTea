@@ -1,0 +1,8 @@
+﻿Language: PsiLanguageType:T4
+IT4File
+  IT4ExpressionBlock
+    EXPRESSION_BLOCK_START: <#=
+    IT4Code
+    BLOCK_END: #>
+  NEW_LINE: \n
+

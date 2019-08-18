@@ -20,15 +20,14 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 		protected override LookupFocusBehaviour GetLookupFocusBehaviour(T4CodeCompletionContext context)
 			=> LookupFocusBehaviour.SoftWhenEmpty;
 
-		protected override bool IsAvailable(T4CodeCompletionContext context) {
+		protected override bool IsAvailable(T4CodeCompletionContext context)
+		{
 			ITreeNode node = context.BasicContext.File.FindNodeAt(context.BasicContext.SelectedTreeRange);
-			if (node == null)
-				return false;
-
-			if (node.Parent is IT4DirectiveAttribute)
-				return node.GetTokenType() == T4TokenNodeTypes.TOKEN;
-
-			return node.GetTokenType() == T4TokenNodeTypes.WHITE_SPACE && node.Parent is IT4Directive;
+			if (node == null) return false;
+			if (node.Parent is IT4DirectiveAttribute) return node.GetTokenType() == T4TokenNodeTypes.TOKEN;
+			if (node.GetTokenType() != T4TokenNodeTypes.WHITE_SPACE) return false;
+			if (!(node.Parent is IT4Directive directive)) return false;
+			return directive.Name != null;
 		}
 
 		protected override bool AddLookupItems(T4CodeCompletionContext context, IItemsCollector collector) {

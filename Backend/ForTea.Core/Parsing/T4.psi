@@ -67,14 +67,14 @@ options {
   "objectClassFQName"="System.Object";
 }
 
-t4File options { stubBase="T4FileBase"; customParseFunction; }
+errorhandling t4File options { stubBase="T4FileBase"; customParseFunction; }
 :
     (t4Block<BLOCK, Blocks> | RAW_TEXT<RAW_TEXT, RawTexts> | NEW_LINE<NEW_LINE, NewLines>)*
 ;
 
 // ---- ---- ---- ---- blocks ---- ---- ---- ----
 
-errorhandling interface t4Block:
+interface t4Block:
     t4Directive | t4CodeBlock
 ;
 
@@ -102,12 +102,17 @@ t4FeatureBlock:
 
 // ---- ---- ---- ---- directives ---- ---- ---- ----
 
+// Note: parsing method for this rule is overridden
+//
 // All these directives have same start,
 // and generated parser seems to only take into account one lookahead token,
 // so we have to do that manually.
 // I really wish there was a simpler way of doing that
-
-interface t4Directive options { customParseFunction; noInternalParseFunction; }:
+//
+// Cannot add customParseFunction, though, as generated parse function causes error message to get defined
+//
+// error handling is used by overriding method
+errorhandling interface t4Directive:
       t4TemplateDirective
     | t4ParameterDirective
     | t4OutputDirective
@@ -118,56 +123,56 @@ interface t4Directive options { customParseFunction; noInternalParseFunction; }:
     | t4UnknownDirective 
 ;
 
-t4TemplateDirective:
+errorhandling t4TemplateDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     TEMPLATE<TEMPLATE, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
     BLOCK_END<BLOCK_END, End>
 ;
 
-t4ParameterDirective:
+errorhandling t4ParameterDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     PARAMETER<PARAMETER, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
     BLOCK_END<BLOCK_END, End>
 ;
 
-t4OutputDirective:
+errorhandling t4OutputDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     OUTPUT<OUTPUT, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
     BLOCK_END<BLOCK_END, End>
 ;
 
-t4AssemblyDirective:
+errorhandling t4AssemblyDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     ASSEMBLY<ASSEMBLY, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
     BLOCK_END<BLOCK_END, End>
 ;
 
-t4ImportDirective:
+errorhandling t4ImportDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     IMPORT<IMPORT, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
     BLOCK_END<BLOCK_END, End>
 ;
 
-t4IncludeDirective:
+errorhandling t4IncludeDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     INCLUDE<INCLUDE, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
     BLOCK_END<BLOCK_END, End>
 ;
 
-t4CleanupBehaviorDirective:
+errorhandling t4CleanupBehaviorDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     CLEANUP_BEHAVIOR<CLEANUP_BEHAVIOR, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
     BLOCK_END<BLOCK_END, End>
 ;
 
-t4UnknownDirective:
+errorhandling t4UnknownDirective:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     UNKNOWN_DIRECTIVE_NAME<UNKNOWN_DIRECTIVE_NAME, Name>
     t4DirectiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
