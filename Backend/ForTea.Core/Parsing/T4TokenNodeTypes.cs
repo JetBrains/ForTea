@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.Parsing;
 using static GammaJul.ForTea.Core.Parsing.T4TokenNodeFlag;
 
 namespace GammaJul.ForTea.Core.Parsing
@@ -7,7 +6,7 @@ namespace GammaJul.ForTea.Core.Parsing
 	public static partial class T4TokenNodeTypes
 	{
 		[NotNull] public static readonly T4TokenNodeType DIRECTIVE_START = new T4TokenNodeType("DIRECTIVE_START", DIRECTIVE_START_NODE_TYPE_INDEX, "<#@", Tag);
-		[NotNull] public static readonly T4TokenNodeType STATEMENT_BLOCK_START = new T4TokenNodeType("CODE_BLOCK_START", STATEMENT_BLOCK_START_NODE_TYPE_INDEX, "<#", Tag);
+		[NotNull] public static readonly T4TokenNodeType STATEMENT_BLOCK_START = new T4TokenNodeType("STATEMENT_BLOCK_START", STATEMENT_BLOCK_START_NODE_TYPE_INDEX, "<#", Tag);
 		[NotNull] public static readonly T4TokenNodeType EXPRESSION_BLOCK_START = new T4TokenNodeType("EXPRESSION_BLOCK_START", EXPRESSION_BLOCK_START_NODE_TYPE_INDEX, "<#=", Tag);
 		[NotNull] public static readonly T4TokenNodeType FEATURE_BLOCK_START = new T4TokenNodeType("FEATURE_BLOCK_START", FEATURE_BLOCK_START_NODE_TYPE_INDEX, "<#+", Tag);
 		[NotNull] public static readonly T4TokenNodeType BLOCK_END = new T4TokenNodeType("BLOCK_END", BLOCK_END_NODE_TYPE_INDEX, "#>", Tag);
