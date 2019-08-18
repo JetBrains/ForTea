@@ -16,6 +16,7 @@ namespace JetBrains.ForTea.Tests.Psi
 		[TestCase("Simple")]
 		[TestCase("CSharpCode")]
 		[TestCase("VBCode")]
+		[TestCase("ComplexValue")]
 		public void TestLexer(string name) => DoOneTest(name);
 	}
 }

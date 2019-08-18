@@ -1,0 +1,1 @@
+<#@ include file="$(SolutionDir)\lib\Foo.ttinclude" once="%T4OnceIncludes%" #>
