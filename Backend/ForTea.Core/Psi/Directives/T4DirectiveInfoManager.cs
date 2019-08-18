@@ -55,7 +55,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 				?.GetAttributes(Template.LanguageAttribute)
 				.FirstOrDefault()
 				?.Value
-				.GetText();
+				?.GetText();
 			switch (name)
 			{
 				case null:
