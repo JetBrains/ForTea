@@ -17,7 +17,7 @@ namespace JetBrains.ForTea.Tests.Features.TypingAssist
 
 		[TestCase("DollarInPath")]
 		[TestCase("DollarInText")]
-		[TestCase("DollarInDirective", Ignore = "No error recovery")]
+		[TestCase("DollarInDirective")]
 		[TestCase("DollarInCSharp")]
 		public void TestTypingAssist([NotNull] string name) => DoOneTest(name);
 
