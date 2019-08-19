@@ -1,5 +1,6 @@
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
@@ -11,7 +12,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		public T4TextDescription([NotNull] string text) => Text = text;
 
-		public override void AppendContent(T4CSharpCodeGenerationResult destination, IT4ElementAppendFormatProvider provider)
+		public override void AppendContent(
+			T4CSharpCodeGenerationResult destination,
+			IT4ElementAppendFormatProvider provider,
+			IT4File context
+		)
 		{
 			destination.Append(provider.Indent);
 			destination.Append(provider.ExpressionWritingPrefix);

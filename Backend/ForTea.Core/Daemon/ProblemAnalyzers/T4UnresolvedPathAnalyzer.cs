@@ -10,14 +10,15 @@ using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4AttributeValue), HighlightingTypes =
+	[ElementProblemAnalyzer(typeof(IT4Directive), HighlightingTypes =
 		// We could have handled include directives here, too,
 		// but it would be way more cumbersome than in T4IncludeAwareDaemonProcessVisitor
 		new[] {typeof(T4UnresolvedAssemblyHighlighting)})]
-	public class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzer
+	public class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzerBase
 	{
 		[NotNull]
 		private IModuleReferenceResolveManager ResolveManager { get; }
@@ -37,10 +38,10 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 
 		protected override void DoRun(
 			IT4AttributeValue element,
-			IHighlightingConsumer consumer,
-			IT4File t4File
+			IHighlightingConsumer consumer
 		)
 		{
+			var t4File = element.GetContainingFile().NotNull();
 			var sourceFile = t4File.GetSourceFile().NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			using (Preprocessor.Prepare(projectFile))
@@ -56,7 +57,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 				}
 
 				var fileSystemPath = ResolveManager.Resolve(target, projectFile.GetProject(), resolveContext);
-				if (fileSystemPath == null) consumer.AddHighlighting(new T4UnresolvedAssemblyHighlighting(element));
+				if (fileSystemPath?.ExistsFile != true) consumer.AddHighlighting(new T4UnresolvedAssemblyHighlighting(element));
 			}
 		}
 

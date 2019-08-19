@@ -142,4 +142,26 @@ class LexerTest : LexerTestCase() {
     |T4TokenType.NEW_LINE ('\n')
     |""".trimMargin()
   )
+
+  @Test
+  fun `test that lexer merges tokens`() = doTest(
+    """
+    |hello<<#@ output extension=".txt" #>
+    |""".trimMargin(),
+    """
+    |T4TokenType.RAW_TEXT ('hello<')
+    |T4TokenType.DIRECTIVE_START ('<#@')
+    |WHITE_SPACE (' ')
+    |T4TokenType.TOKEN ('output')
+    |WHITE_SPACE (' ')
+    |T4TokenType.TOKEN ('extension')
+    |T4TokenType.EQUAL ('=')
+    |T4TokenType.QUOTE ('"')
+    |T4TokenType.RAW_ATTRIBUTE_VALUE ('.txt')
+    |T4TokenType.QUOTE ('"')
+    |WHITE_SPACE (' ')
+    |T4TokenType.BLOCK_END ('#>')
+    |T4TokenType.NEW_LINE ('\n')""".trimMargin()
+  )
+
 }

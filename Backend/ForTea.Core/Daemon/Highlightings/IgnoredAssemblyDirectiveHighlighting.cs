@@ -9,7 +9,7 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 	[StaticSeverityHighlighting(
 		Severity.WARNING,
 		T4Language.Name,
-		OverlapResolve = OverlapResolveKind.DEADCODE,
+		OverlapResolve = OverlapResolveKind.WARNING,
 		ShowToolTipInStatusBar = true,
 		AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE
 	)]

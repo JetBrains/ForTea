@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.PsiGen.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
@@ -80,26 +81,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public void Append([NotNull] T4CSharpCodeGenerationIntermediateResult other)
 		{
-			AppendInvisible(MyImportDescriptions, other.ImportDescriptions);
+			MyImportDescriptions.addAll(other.ImportDescriptions);
 			Encoding = Encoding ?? other.Encoding;
 			if (CollectedBaseClass.IsEmpty) CollectedBaseClass.Append(other.CollectedBaseClass);
-			AppendInvisible(MyTransformationDescriptions, other.TransformationDescriptions);
-			AppendInvisible(MyFeatureDescriptions, other.FeatureDescriptions);
-			AppendInvisible(MyParameterDescriptions, other.ParameterDescriptions);
+			MyTransformationDescriptions.addAll(other.TransformationDescriptions);
+			MyFeatureDescriptions.addAll(other.FeatureDescriptions);
+			MyParameterDescriptions.addAll(other.ParameterDescriptions);
 			// 'feature started' is intentionally ignored
 			HasHost = HasHost || other.HasHost;
-		}
-
-		private void AppendInvisible<T>(
-			[NotNull, ItemNotNull] ICollection<T> our,
-			[NotNull, ItemNotNull] IEnumerable<T> their
-		) where T : T4ElementDescriptionBase
-		{
-			foreach (var description in their)
-			{
-				description.MakeInvisible();
-				our.Add(description);
-			}
 		}
 	}
 }

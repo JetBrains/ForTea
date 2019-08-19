@@ -10,7 +10,7 @@ namespace JetBrains.ForTea.Tests.General
 		public void TestChangeExtensionOnNameWithTwoDots(
 			[Values("Name.tt", "Foo.tt")] string name,
 			[Values("cs", ".tx.t")] string extension,
-			[Values("Name.cs", "Foo..tx.t")] string expected
+			[Values("Name.cs", "Foo.tx.t")] string expected
 		) => Assert.AreEqual(expected, name.WithOtherExtension(extension));
 	}
 }

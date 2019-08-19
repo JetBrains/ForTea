@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -14,8 +15,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] public const string GeneratedClassNameString = "Generated\x200CTransformation";
 		[NotNull] public const string GeneratedBaseClassNameString = GeneratedClassNameString + "Base";
 		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
+		private const string ToStringConversionPrefixText = "__To\x200CString(";
+		public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
+		public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
 
-		[NotNull, ItemNotNull] private string[] DisabledPropertyInspections =
+		[NotNull, ItemNotNull]
+		private IEnumerable<string> DisabledPropertyInspections { get; } = new[]
 		{
 			"BuiltInTypeReferenceStyle",
 			"RedundantNameQualifier"
@@ -53,7 +58,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 
 			Result.Append("        private global::");
-			if (description.IsVisible)
+			if (description.HasSameSource(File))
 			{
 				var type = description.TypeToken;
 				if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
@@ -62,7 +67,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			else Result.Append(description.TypeString);
 
 			Result.Append(" ");
-			if (description.IsVisible)
+			if (description.HasSameSource(File))
 			{
 				var name = description.NameToken;
 				if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
@@ -106,6 +111,22 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 		}
 
-		protected override IT4ElementAppendFormatProvider Provider => T4CodeBehindFormatProvider.Instance;
+		#region IT4ElementAppendFormatProvider
+		public override string ToStringConversionPrefix => ToStringConversionPrefixText;
+		public override string ToStringConversionSuffix => ")";
+		public override string ExpressionWritingPrefix => "this.Write(";
+		public override string ExpressionWritingSuffix => ");";
+		public override string CodeCommentStart => CodeCommentStartText;
+		public override string CodeCommentEnd => CodeCommentEndText;
+		public override string Indent => "";
+		public override bool ShouldBreakExpressionWithLineDirective => false;
+
+		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		{
+		}
+
+		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>
+			destination.AppendMapped(code);
+		#endregion
 	}
 }

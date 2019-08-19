@@ -15,8 +15,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 		[NotNull]
 		FileSystemPath GetExpectedTemporaryTargetFileLocation([NotNull] IT4File file);
 
+		/// <note>
+		/// This method performs write operations without checking write lock.
+		/// That is done to use it inside ISingleFileCustomTool
+		/// </note>
 		[NotNull]
-		FileSystemPath SaveExecutionResults([NotNull] IT4File file);
+		FileSystemPath CopyExecutionResults([NotNull] IT4File file);
+
+		void UpdateProjectModel([NotNull] IT4File file, [NotNull] FileSystemPath result);
 
 		[NotNull]
 		FileSystemPath SavePreprocessResults([NotNull] IT4File file, [NotNull] string text);

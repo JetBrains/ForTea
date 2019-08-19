@@ -1,5 +1,6 @@
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Format;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
@@ -13,8 +14,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 	{
 		public abstract void AppendContent(
 			[NotNull] T4CSharpCodeGenerationResult destination,
-			[NotNull] IT4ElementAppendFormatProvider provider
-		);
+			[NotNull] IT4ElementAppendFormatProvider provider,
+			[NotNull] IT4File context);
 
 		protected string GetLineDirectiveText(ITreeNode node)
 		{
@@ -25,5 +26,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		protected static Int32<DocColumn> GetOffset(ITreeNode node) =>
 			node.GetSourceFile().NotNull().Document.GetCoordsByOffset(node.GetTreeStartOffset().Offset).Column;
+
+		protected T4AppendableElementDescriptionBase([CanBeNull] IT4File source = null) : base(source)
+		{
+		}
 	}
 }

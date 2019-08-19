@@ -1,6 +1,8 @@
+using FluentAssertions;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
@@ -13,7 +15,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		[NotNull]
 		public string Presentation { get; }
 
-		private T4ImportDescription([NotNull] ITreeNode source, [NotNull] string presentation)
+		private T4ImportDescription([NotNull] ITreeNode source, [NotNull] string presentation) :
+			base (source.GetContainingFile().As<IT4File>().NotNull())
 		{
 			Source = source;
 			Presentation = presentation;

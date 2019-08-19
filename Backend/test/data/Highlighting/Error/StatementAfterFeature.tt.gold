@@ -1,6 +1,5 @@
 ﻿<#+ #>
-||<# #>|(1)
-|(0)
+|<# #>|(0)
+
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: A template containing a class feature must end with a class feature
-(1):<overlapped> ReSharper Underlined Error Highlighting: A statement block cannot appear after a class feature block
+(0): ReSharper Underlined Error Highlighting: A statement block cannot appear after a class feature block

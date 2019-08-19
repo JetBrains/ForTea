@@ -1,0 +1,7 @@
+<#
+    for {caret:par}(int i = 0; i < 10; i += 1)
+    {
+#>Hello, world #<#= i #>
+<#
+    }{caret:brace}
+#>

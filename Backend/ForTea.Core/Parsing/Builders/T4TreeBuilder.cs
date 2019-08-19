@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
+using GammaJul.ForTea.Core.Psi.Translation;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -21,9 +21,6 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 	internal sealed class T4TreeBuilder
 	{
 		#region Properties
-		[NotNull]
-		private List<IT4Include> Includes { get; } = new List<IT4Include>();
-
 		[NotNull]
 		private T4DirectiveInfoManager DirectiveInfoManager { get; }
 
@@ -76,7 +73,7 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 			if (SourceFile != null)
 			{
 				file.SetSourceFile(SourceFile);
-				file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file, SourceFile, Includes);
+				file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file);
 			}
 
 			return file;
@@ -305,7 +302,6 @@ namespace GammaJul.ForTea.Core.Parsing.Builders
 		)
 		{
 			var include = new T4Include(once ?? false, CreateIncludePath(includeFileName));
-			Includes.Add(include);
 			AppendNewChild(parentElement, include);
 		}
 

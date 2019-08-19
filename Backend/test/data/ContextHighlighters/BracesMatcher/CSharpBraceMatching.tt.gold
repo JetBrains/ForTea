@@ -1,0 +1,13 @@
+﻿<#
+    for |(|(0:par)int i = 0; i < 10; i += 1|)|(1:par)
+    |{|(2:brace)
+#>Hello, world #<#= i #>
+<#
+    |}|(3:brace)
+#>
+
+---------------------------------------------------------
+(0:par): ReSharper Matched Brace
+(1:par): ReSharper Matched Brace
+(2:brace): ReSharper Matched Brace
+(3:brace): ReSharper Matched Brace

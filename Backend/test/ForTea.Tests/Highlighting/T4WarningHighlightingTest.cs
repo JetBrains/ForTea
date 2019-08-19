@@ -10,12 +10,13 @@ namespace JetBrains.ForTea.Tests.Highlighting
 	{
 		protected override string RelativeTestDataPath => @"Highlighting\Warning";
 
-		[TestCase("EmptyBlock")]
 		[TestCase("EscapedKeyword")]
 		[TestCase("DuplicateDirective")]
 		[TestCase("RedundantInclude", Ignore="Includes are not resolved in tests")]
 		[TestCase("UnexpectedAttribute")]
 		[TestCase("UnexpectedDirective")]
+		[TestCase("UnresolvedInclude")]
+		[TestCase("UnresolvedAssembly")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.WARNING;

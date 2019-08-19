@@ -47,10 +47,16 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     field("outputPath", string)
   }
 
+  val T4FileLocation = structdef {
+    field("location", string)
+    field("projectId", int)
+  }
+
   init {
-    map("configurations", string, T4ConfigurationModel).async
-    call("requestCompilation", string, T4BuildResult).async
-    call("transferResults", string, void).async
-    call("requestPreprocessing", string, T4PreprocessingResult).async
+    call("getConfiguration", T4FileLocation, T4ConfigurationModel).async
+    call("requestCompilation", T4FileLocation, T4BuildResult).async
+    call("executionSucceeded", T4FileLocation, void).async
+    call("executionFailed", T4FileLocation, void).async
+    call("requestPreprocessing", T4FileLocation, T4PreprocessingResult).async
   }
 }

@@ -23,7 +23,7 @@ object T4SyntaxHighlighter : SyntaxHighlighterBase() {
   private val QUOTE_KEYS = arrayOf(QUOTE)
 
   override fun getTokenHighlights(elementType: IElementType?): Array<TextAttributesKey> = when (elementType) {
-    T4ElementTypes.ATTRIBUTE_VALUE -> ATTRIBUTE_VALUE_KEYS
+    T4ElementTypes.RAW_ATTRIBUTE_VALUE -> ATTRIBUTE_VALUE_KEYS
     T4ElementTypes.BLOCK_END -> BLOCK_MARKER_KEYS
     T4ElementTypes.STATEMENT_BLOCK_START -> BLOCK_MARKER_KEYS
     T4ElementTypes.DIRECTIVE_START -> BLOCK_MARKER_KEYS
@@ -31,7 +31,6 @@ object T4SyntaxHighlighter : SyntaxHighlighterBase() {
     T4ElementTypes.EXPRESSION_BLOCK_START -> BLOCK_MARKER_KEYS
     T4ElementTypes.FEATURE_BLOCK_START -> BLOCK_MARKER_KEYS
     T4ElementTypes.QUOTE -> QUOTE_KEYS
-    T4ElementTypes.TOKEN -> TextAttributesKey.EMPTY_ARRAY
     else -> TextAttributesKey.EMPTY_ARRAY
   }
 

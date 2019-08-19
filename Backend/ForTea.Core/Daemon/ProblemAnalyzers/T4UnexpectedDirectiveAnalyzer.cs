@@ -2,7 +2,6 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
@@ -23,7 +22,8 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		)
 		{
 			if (Manager.GetDirectiveByName(element.GetName()) != null) return;
-			var nameToken = element.GetNameToken().NotNull();
+			var nameToken = element.GetNameToken();
+			if (nameToken == null) return;
 			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(nameToken));
 		}
 	}

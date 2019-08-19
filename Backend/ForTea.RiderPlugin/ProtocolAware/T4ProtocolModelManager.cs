@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using FluentAssertions;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
@@ -8,8 +9,10 @@ using JetBrains.Annotations;
 using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
+using JetBrains.ForTea.RiderPlugin.Utils;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
+using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Resources.Shell;
@@ -19,7 +22,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
 	[SolutionComponent]
-	public sealed class T4ProtocolModelManager : GammaJul.ForTea.Core.ProtocolAware.Impl.T4ProtocolModelManager
+	public sealed class T4ProtocolModelManager
 	{
 		[NotNull]
 		private ILogger Logger { get; }
@@ -39,12 +42,16 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		[NotNull]
 		private IT4BuildMessageConverter Converter { get; }
 
+		[NotNull]
+		private ProjectModelViewHost Host { get; }
+
 		public T4ProtocolModelManager(
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger,
-			[NotNull] T4BuildMessageConverter converter
+			[NotNull] T4BuildMessageConverter converter,
+			[NotNull] ProjectModelViewHost host
 		)
 		{
 			Solution = solution;
@@ -52,6 +59,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			ExecutionManager = executionManager;
 			Logger = logger;
 			Converter = converter;
+			Host = host;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks();
 		}
@@ -59,29 +67,38 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private void RegisterCallbacks()
 		{
 			Model.RequestCompilation.Set(Wrap(Compile, Converter.FatalError()));
-			Model.TransferResults.Set(Wrap(CopyResults, Unit.Instance));
+			Model.ExecutionSucceeded.Set(Wrap(HandleSuccess, Unit.Instance));
+			Model.ExecutionFailed.Set(Wrap(HandleFailure, Unit.Instance));
 			Model.RequestPreprocessing.Set(Wrap(Preprocess, new T4PreprocessingResult(false, null)));
+			Model.GetConfiguration.Set(Wrap(CalculateConfiguration, new T4ConfigurationModel("", "")));
 		}
 
-		public override void UpdateFileInfo(IT4File file) =>
-			Model.Configurations[file.GetSourceFile().GetLocation().FullPath.Replace("\\", "/")] =
-				new T4ConfigurationModel(
-					TargetFileManager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),
-					TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
-				);
+		private T4ConfigurationModel CalculateConfiguration([NotNull] IT4File file) => new T4ConfigurationModel(
+			TargetFileManager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),
+			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
+		);
 
-		private Func<string, T> Wrap<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
-			rawPath =>
+		private Func<T4FileLocation, T> Wrap<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class =>
+			location =>
 			{
 				var result = Logger.Catch(() =>
 				{
-					var path = FileSystemPath.Parse(rawPath);
+					var path = FileSystemPath.Parse(location.Location);
+					if (path.IsNullOrEmpty()) return defaultValue;
 					using (ReadLockCookie.Create())
 					{
-						var sourceFile = path.FindSourceFileInSolution(Solution);
-						var t4File = sourceFile?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
-						if (t4File == null) return defaultValue;
-						return wrappee(t4File);
+						return Host
+							.GetItemById<IProject>(location.ProjectId)
+							?.GetSubItemsRecursively(path.Name)
+							.Where(it => it.Location == path)
+							.AsList()
+							.SingleItem()
+							.As<IProjectFile>()
+							?.ToSourceFile()
+							?.GetPsiFiles(T4Language.Instance)
+							.OfType<IT4File>()
+							.SingleItem()
+							?.Let(wrappee);
 					}
 				});
 				return result ?? defaultValue;
@@ -91,15 +108,19 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			ExecutionManager.Compile(Solution.GetLifetime(), t4File);
 
 		[CanBeNull]
-		private Unit CopyResults([NotNull] IT4File file)
+		private Unit HandleSuccess([NotNull] IT4File file)
 		{
+			var destination = TargetFileManager.CopyExecutionResults(file);
 			using (WriteLockCookie.Create())
 			{
-				TargetFileManager.SaveExecutionResults(file);
+				TargetFileManager.UpdateProjectModel(file, destination);
 			}
 
 			return Unit.Instance;
 		}
+
+		[CanBeNull]
+		private Unit HandleFailure(IT4File arg) => Unit.Instance;
 
 		[NotNull]
 		private T4PreprocessingResult Preprocess([NotNull] IT4File file)
@@ -111,6 +132,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 				{
 					TargetFileManager.SavePreprocessResults(file, message);
 				}
+
 				return new T4PreprocessingResult(true, null);
 			}
 			catch (T4OutputGenerationException e)
