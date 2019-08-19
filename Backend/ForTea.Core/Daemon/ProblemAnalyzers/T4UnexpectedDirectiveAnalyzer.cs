@@ -15,10 +15,10 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			IHighlightingConsumer consumer
 		)
 		{
-			if (T4DirectiveInfoManager.GetDirectiveByName(element.Name.GetText()) != null) return;
-			var nameToken = element.Name;
-			if (nameToken == null) return;
-			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(nameToken));
+			var name = element.Name;
+			if (name == null) return;
+			if (T4DirectiveInfoManager.GetDirectiveByName(name.GetText()) != null) return;
+			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(name));
 		}
 	}
 }
