@@ -26,19 +26,17 @@ using JetBrains.ReSharper.Psi.Transactions;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi {
-
+// TODO: cleanup
 	/// <summary>
 	/// C# custom modification handler that allows the T4 files to be modified in response to C# actions or quickfixes.
 	/// (eg: adding a using statement translates to an import directive).
 	/// </summary>
 	[ProjectFileType(typeof(T4ProjectFileType))]
 	public class T4CSharpCustomModificationHandler : CustomModificationHandler<IT4CodeBlock, IT4Directive>, ICSharpCustomModificationHandler {
-
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
-
 		/// <summary>Determines whether namespace aliases can be used.</summary>
 		/// <returns>Always <c>false</c> since T4 files does not support aliases.</returns>
 		public bool CanUseAliases
@@ -67,7 +65,7 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="codeBlock">The code block.</param>
 		/// <returns>A <see cref="TreeTextRange"/> representing the code range in <paramref name="codeBlock"/>.</returns>
 		protected override TreeTextRange GetCodeTreeTextRange(IT4CodeBlock codeBlock)
-			=> codeBlock.GetCodeToken()?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
+			=> codeBlock.Code?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 
 		/// <summary>Creates a T4 import directive instead of a C# using directive.</summary>
 		/// <param name="before"><c>true</c> to create the directive before <paramref name="anchor"/>; <c>false</c> to create it after.</param>
@@ -78,12 +76,12 @@ namespace GammaJul.ForTea.Core.Psi {
 		protected override bool CreateAndMapUsingNode(bool before, IT4Directive anchor, ITreeNode usingDirective, IFile originalFile) {
 			var t4File = (IT4File) originalFile;
 			string ns = GetNamespaceFromUsingDirective(usingDirective);
-			IT4Directive directive = _directiveInfoManager.Import.CreateDirective(ns);
+			IT4Directive directive = T4DirectiveInfoManager.Import.CreateDirective(ns);
 
-			if (anchor != null && anchor.GetContainingNode<IT4Include>() == null)
+			if (anchor != null && anchor.GetContainingNode<IT4IncludeDirective>() == null)
 				directive = before ? t4File.AddDirectiveBefore(directive, anchor) : t4File.AddDirectiveAfter(directive, anchor);
 			else
-				directive = t4File.AddDirective(directive, _directiveInfoManager);
+				directive = t4File.AddDirective(directive);
 
 			IFile csharpFile = usingDirective.GetContainingFile();
 			if (csharpFile != null) {
@@ -92,7 +90,7 @@ namespace GammaJul.ForTea.Core.Psi {
 				if (!csharpUsingRange.IsValid())
 					return false;
 
-				var t4AttributeValueRange = directive.GetAttributeValueToken(_directiveInfoManager.Import.NamespaceAttribute.Name).GetTreeTextRange();
+				var t4AttributeValueRange = directive.GetAttributeValueToken(T4DirectiveInfoManager.Import.NamespaceAttribute.Name).GetTreeTextRange();
 				if (!t4AttributeValueRange.IsValid())
 					return false;
 
@@ -124,9 +122,9 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="last">The last node.</param>
 		/// <returns>A <see cref="TreeTextRange"/> representing the code range in the newly created feature block.</returns>
 		protected override TreeTextRange CreateTypeMemberNode(IFile originalFile, string text, ITreeNode first, ITreeNode last) {
-			T4FeatureBlock featureBlock = T4ElementFactory.CreateFeatureBlock(text);
+			IT4FeatureBlock featureBlock = T4ElementFactory.CreateFeatureBlock(text);
 			featureBlock = ((IT4File) originalFile).AddFeatureBlock(featureBlock);
-			return featureBlock.GetCodeToken().GetTreeTextRange();
+			return featureBlock.Code.GetTreeTextRange();
 		}
 
 		/// <summary>Creates a new line token.</summary>
@@ -139,35 +137,35 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="originalFile">The original T4 file.</param>
 		/// <returns>A valid <see cref="TreeTextRange"/> if a feature block existed, <see cref="TreeTextRange.InvalidRange"/> otherwise.</returns>
 		protected override TreeTextRange GetExistingTypeMembersRange(IFile originalFile) {
-			T4FeatureBlock lastFeatureBlock = ((IT4File) originalFile).GetFeatureBlocks().LastOrDefault();
-			return lastFeatureBlock?.GetCodeToken().GetTreeTextRange() ?? TreeTextRange.InvalidRange;
+			var lastFeatureBlock = ((IT4File) originalFile).Blocks.OfType<IT4FeatureBlock>().LastOrDefault();
+			return lastFeatureBlock?.Code.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 		}
 
 
 		protected override void AddSuperClassDirectiveToOriginalFile(IFile originalFile, ITreeNode anchor, ITreeNode superClassGeneratedNode) {
 			var t4File = (IT4File) originalFile;
-			IT4Directive directive = t4File.GetDirectives(_directiveInfoManager.Template).FirstOrDefault();
+			IT4Directive directive = t4File.GetDirectives(T4DirectiveInfoManager.Template).FirstOrDefault();
 			IT4DirectiveAttribute attribute;
 			string superClassName = superClassGeneratedNode.GetText();
 
 			if (directive == null) {
-				directive = _directiveInfoManager.Template.CreateDirective(Pair.Of(_directiveInfoManager.Template.InheritsAttribute.Name, superClassName));
-				directive = t4File.AddDirective(directive, _directiveInfoManager);
-				attribute = directive.GetAttributes().First();
+				directive = T4DirectiveInfoManager.Template.CreateDirective(Pair.Of(T4DirectiveInfoManager.Template.InheritsAttribute.Name, superClassName));
+				directive = t4File.AddDirective(directive);
+				attribute = directive.Attributes.First();
 			}
 			else {
-				attribute = directive.AddAttribute(_directiveInfoManager.Template.InheritsAttribute.CreateDirectiveAttribute(superClassName));
+				attribute = directive.AddAttribute(T4DirectiveInfoManager.Template.InheritsAttribute.CreateDirectiveAttribute(superClassName));
 			}
 
 			superClassGeneratedNode.GetRangeTranslator().AddProjectionItem(
 				new TreeTextRange<Generated>(superClassGeneratedNode.GetTreeTextRange()),
-				new TreeTextRange<Original>(attribute.GetValueToken().GetTreeTextRange()));
+				new TreeTextRange<Original>(attribute.Value.GetTreeTextRange()));
 		}
 
 		protected override ITreeNode GetSuperClassNodeFromOriginalFile(IFile originalFile) {
 			var t4File = (IT4File) originalFile;
-			foreach (IT4Directive templateDirective in t4File.GetDirectives(_directiveInfoManager.Template)) {
-				var inheritsToken = templateDirective.GetAttributeValueToken(_directiveInfoManager.Template.InheritsAttribute.Name);
+			foreach (IT4Directive templateDirective in t4File.GetDirectives(T4DirectiveInfoManager.Template)) {
+				var inheritsToken = templateDirective.GetAttributeValueToken(T4DirectiveInfoManager.Template.InheritsAttribute.Name);
 				if (inheritsToken != null)
 					return inheritsToken;
 			}
@@ -259,12 +257,15 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		private static void RemoveContainingBlockIfEmpty([CanBeNull] ITreeNode node) {
 			var block = node.GetT4ContainerFromCSharpNode<IT4CodeBlock>();
-			string code = block?.GetCodeText();
+			string code = block?.Code.GetText();
 			if (code == null || code.Trim().Length == 0)
 				return;
 
-			var file = block.GetContainingFile() as IT4File;
-			file?.RemoveChild(block);
+			if (!(block.GetContainingFile() is IT4File file) || node == null) return;
+			using (WriteLockCookie.Create(file.IsPhysical()))
+			{
+				ModificationUtil.DeleteChild(node);
+			}
 		}
 
 		/// <summary>Gets the body of a method that is visible for user.</summary>
@@ -311,10 +312,8 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		/// <summary>Initializes a new instance of the <see cref="T4CSharpCustomModificationHandler"/> class.</summary>
 		/// <param name="languageManager">The language manager.</param>
-		/// <param name="directiveInfoManager">An instance of <see cref="T4DirectiveInfoManager"/>.</param>
-		public T4CSharpCustomModificationHandler([NotNull] ILanguageManager languageManager, [NotNull] T4DirectiveInfoManager directiveInfoManager)
+		public T4CSharpCustomModificationHandler([NotNull] ILanguageManager languageManager)
 			: base(languageManager) {
-			_directiveInfoManager = directiveInfoManager;
 		}
 
 	}

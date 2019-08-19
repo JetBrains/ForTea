@@ -22,6 +22,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			switch (element)
 			{
 				case T4FeatureBlock _: return this;
+				case T4ExpressionBlock _:
+					Die();
+					return new T4InfoCollectorStateInitial(Interrupter);
 				default:
 					Die();
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE)
@@ -39,7 +42,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			}
 		}
 
-		protected override bool FeatureStartedSafe => false;
+		protected override bool FeatureStartedSafe => true;
 
 		protected override void ConsumeTokenSafe(IT4Token token)
 		{

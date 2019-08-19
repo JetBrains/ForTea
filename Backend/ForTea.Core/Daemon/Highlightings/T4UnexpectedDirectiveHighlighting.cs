@@ -1,7 +1,7 @@
 using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.Highlightings
 {
@@ -12,9 +12,9 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		ShowToolTipInStatusBar = true,
 		AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE
 	)]
-	public class T4UnexpectedDirectiveHighlighting : T4HighlightingBase<IT4Token>
+	public class T4UnexpectedDirectiveHighlighting : T4HighlightingBase<ITokenNode>
 	{
-		public T4UnexpectedDirectiveHighlighting([NotNull] IT4Token associatedNode) : base(associatedNode)
+		public T4UnexpectedDirectiveHighlighting([NotNull] ITokenNode associatedNode) : base(associatedNode)
 		{
 		}
 

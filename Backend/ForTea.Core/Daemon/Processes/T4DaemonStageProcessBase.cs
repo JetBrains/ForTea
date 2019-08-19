@@ -18,8 +18,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		/// <summary>Gets the associated T4 file.</summary>
 		internal IT4File File { get; }
 
-		public virtual bool InteriorShouldBeProcessed(ITreeNode element)
-			=> !(element is IT4Include);
+		public virtual bool InteriorShouldBeProcessed(ITreeNode element) => true;
 
 		public virtual void ProcessBeforeInterior(ITreeNode element)
 		{

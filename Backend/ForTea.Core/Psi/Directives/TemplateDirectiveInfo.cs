@@ -35,11 +35,17 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 
 		public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
-		public TemplateDirectiveInfo([NotNull] IT4Environment environment) : base("template")
+		public TemplateDirectiveInfo() : base("template")
 		{
 			LanguageAttribute = new EnumDirectiveAttributeInfo(
 				"language", DirectiveAttributeOptions.None, CSharpLanguageAttributeValue, VBLanguageAttributeValue);
-			HostSpecificAttribute = BuildHostSpecificAttribute(environment);
+			HostSpecificAttribute = new EnumDirectiveAttributeInfo(
+				"hostspecific",
+				DirectiveAttributeOptions.None,
+				"true",
+				"false",
+				"trueFromBase"
+			);
 			DebugAttribute = new BooleanDirectiveAttributeInfo("debug", DirectiveAttributeOptions.None);
 			InheritsAttribute = new DirectiveAttributeInfo("inherits", DirectiveAttributeOptions.None);
 			CultureAttribute = new CultureDirectiveAttributeInfo("culture", DirectiveAttributeOptions.None);
@@ -48,37 +54,18 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 			VisibilityAttribute =
 				new EnumDirectiveAttributeInfo("visibility", DirectiveAttributeOptions.None, "public", "internal");
 
-			var attributes = new List<DirectiveAttributeInfo>(8)
+
+			SupportedAttributes = new List<DirectiveAttributeInfo>(8)
 			{
 				LanguageAttribute,
 				HostSpecificAttribute,
 				DebugAttribute,
 				InheritsAttribute,
 				CultureAttribute,
-				CompilerOptionsAttribute
-			};
-
-			if (environment.ShouldSupportAdvancedAttributes)
-			{
-				attributes.Add(LinePragmasAttribute);
-				attributes.Add(VisibilityAttribute);
-			}
-
-			SupportedAttributes = attributes.ToImmutableArray();
-		}
-
-		private static EnumDirectiveAttributeInfo BuildHostSpecificAttribute(IT4Environment environment)
-		{
-			if (!environment.ShouldSupportAdvancedAttributes)
-				return new BooleanDirectiveAttributeInfo("hostspecific", DirectiveAttributeOptions.None);
-
-			return new EnumDirectiveAttributeInfo(
-				"hostspecific",
-				DirectiveAttributeOptions.None,
-				"true",
-				"false",
-				"trueFromBase"
-			);
+				CompilerOptionsAttribute,
+				LinePragmasAttribute,
+				VisibilityAttribute
+			}.ToImmutableArray();
 		}
 	}
 }

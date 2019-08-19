@@ -164,7 +164,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			var generatedTokenRange = new TreeTextRange(token.GetTreeStartOffset());
 			var originalTokenRange = rangeTranslator.GeneratedToOriginal(generatedTokenRange);
 			var t4Element = rangeTranslator.OriginalFile.FindNodeAt(originalTokenRange);
-			var otherCodeBlock = t4Element?.GetParentOfType<T4CodeBlock>();
+			var otherCodeBlock = t4Element?.GetParentOfType<IT4CodeBlock>();
 			if (otherCodeBlock == null) return null;
 			return tokenRange.GetIndentFromDocumentRange();
 		}

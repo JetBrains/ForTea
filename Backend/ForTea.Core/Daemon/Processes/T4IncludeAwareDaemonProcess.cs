@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -16,32 +14,22 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 	public class T4IncludeAwareDaemonProcess : IDaemonStageProcess
 	{
 		[NotNull]
-		private T4DirectiveInfoManager Manager { get; }
-
-		[NotNull]
-		private T4TreeNavigator Navigator { get; }
-
-		[NotNull]
 		private IT4File File { get; }
 
 		public IDaemonProcess DaemonProcess { get; }
 
 		public T4IncludeAwareDaemonProcess(
 			[NotNull] IT4File file,
-			[NotNull] IDaemonProcess daemonProcess,
-			[NotNull] T4DirectiveInfoManager manager,
-			[NotNull] T4TreeNavigator navigator
+			[NotNull] IDaemonProcess daemonProcess
 		)
 		{
 			File = file;
 			DaemonProcess = daemonProcess;
-			Manager = manager;
-			Navigator = navigator;
 		}
 
 		public void Execute(Action<DaemonStageResult> committer)
 		{
-			var visitor = new T4IncludeAwareDaemonProcessVisitor(Manager, File.GetSourceFile().NotNull(), Navigator);
+			var visitor = new T4IncludeAwareDaemonProcessVisitor(File.GetSourceFile().NotNull());
 			File.ProcessDescendants(visitor);
 			committer(new DaemonStageResult(visitor.Highlightings.ToArray()));
 		}

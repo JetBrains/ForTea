@@ -1,0 +1,41 @@
+﻿Language: PsiLanguageType:T4
+IT4File
+  IT4TemplateDirective
+    DIRECTIVE_START: <#@
+    WHITE_SPACE:  
+    TEMPLATE: tEmPlate
+    WHITE_SPACE:  
+    IT4DirectiveAttribute
+      TOKEN: LanguagE
+      EQUAL: =
+      QUOTE: "
+      IT4AttributeValue
+        RAW_ATTRIBUTE_VALUE: C#
+      QUOTE: "
+    WHITE_SPACE:  
+    BLOCK_END: #>
+  NEW_LINE: \n
+  IT4ParameterDirective
+    DIRECTIVE_START: <#@
+    WHITE_SPACE:  
+    PARAMETER: PaRaMETER
+    WHITE_SPACE:  
+    IT4DirectiveAttribute
+      TOKEN: NaMe
+      EQUAL: =
+      QUOTE: "
+      IT4AttributeValue
+        RAW_ATTRIBUTE_VALUE: MyParameter
+      QUOTE: "
+    WHITE_SPACE:  
+    IT4DirectiveAttribute
+      TOKEN: tYPe
+      EQUAL: =
+      QUOTE: "
+      IT4AttributeValue
+        RAW_ATTRIBUTE_VALUE: System.dll
+      QUOTE: "
+    WHITE_SPACE:  
+    BLOCK_END: #>
+  NEW_LINE: \n
+

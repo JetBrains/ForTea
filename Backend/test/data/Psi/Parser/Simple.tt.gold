@@ -1,15 +1,15 @@
 ﻿Language: PsiLanguageType:T4
-T4File
-  <#@ assembly name="Foo.dll" #>
+IT4File
+  IT4AssemblyDirective
     DIRECTIVE_START: <#@
     WHITE_SPACE:  
-    TOKEN: assembly
+    ASSEMBLY: assembly
     WHITE_SPACE:  
-    T4DirectiveAttribute
+    IT4DirectiveAttribute
       TOKEN: name
       EQUAL: =
       QUOTE: "
-      T4AttributeValue
+      IT4AttributeValue
         RAW_ATTRIBUTE_VALUE: Foo.dll
       QUOTE: "
     WHITE_SPACE:  

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi.Directives;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
@@ -16,10 +15,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private DocumentHost Host { get; }
 
 		public T4TargetFileManager(
-			[NotNull] T4DirectiveInfoManager manager,
 			[NotNull] ISolution solution,
 			[NotNull] DocumentHost host
-		) : base(manager, solution) => Host = host;
+		) : base(solution) => Host = host;
 
 		protected override void SyncDocuments(FileSystemPath destinationLocation) =>
 			Host.SyncDocumentsWithFiles(destinationLocation);

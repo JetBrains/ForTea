@@ -10,12 +10,19 @@ namespace JetBrains.ForTea.Tests.Psi
 		protected override string RelativeTestDataPath => @"Psi\Parser";
 
 		[TestCase("Simple")]
+		[TestCase("SimpleText")]
 		[TestCase("CSharpCode")]
+		[TestCase("CaseInsensivity")]
+		[TestCase("Macros")]
+		[TestCase("EmptyDirective")]
+		[TestCase("EmptyExpressionBlock")]
 		public void TestParser(string name) => DoOneTest(name);
 
 		[TestCase("ForgottenBlockEnd")]
 		[TestCase("ForgottenBlockEnd2")]
-		[Test, Ignore("Parser cannot recover from errors well yet.")]
+		[TestCase("ForgottenEndQuote")]
+		[TestCase("ForgottenStartQuote")]
+		[TestCase("ForgottenQuotes")]
 		public void TestErrorRecovery(string name) => DoOneTest(name);
 	}
 }

@@ -6,6 +6,7 @@ using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Feature.Services.Contexts;
 using JetBrains.ReSharper.Psi.DataContext;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Services
 {
@@ -31,6 +32,6 @@ namespace GammaJul.ForTea.Core.Services
 		);
 
 		protected override void CollectHighlightings(IPsiView psiView, MatchingHighlightingsConsumer consumer) =>
-			TryConsumeHighlighting<IT4Block>(psiView, consumer, _ => _.GetStartToken(), _ => _.GetEndToken());
+			TryConsumeHighlighting<IT4Block>(psiView, consumer, _ => _.GetFirstTokenIn(), _ => _.GetLastTokenIn());
 	}
 }

@@ -24,12 +24,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		[CanBeNull]
 		public static T4ImportDescription FromDirective(
-			[NotNull] IT4Directive directive,
-			[NotNull] T4DirectiveInfoManager manager
+			[NotNull] IT4Directive directive
 		)
 		{
 			(var source, string presentation) =
-				directive.GetAttributeValueIgnoreOnlyWhitespace(manager.Import.NamespaceAttribute.Name);
+				directive.GetAttributeValueIgnoreOnlyWhitespace(T4DirectiveInfoManager.Import.NamespaceAttribute.Name);
 			if (source == null) return null;
 			if (presentation == null) return null;
 			return new T4ImportDescription(source, presentation);

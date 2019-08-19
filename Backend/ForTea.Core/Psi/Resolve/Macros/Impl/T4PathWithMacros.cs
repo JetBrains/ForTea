@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GammaJul.ForTea.Core.Parsing.Builders;
-using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -33,9 +32,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private IT4Environment Environment { get; }
 
 		[NotNull]
-		private T4DirectiveInfoManager Manager { get; }
-
-		[NotNull]
 		private ISolution Solution { get; }
 
 		[CanBeNull]
@@ -48,7 +44,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
-			Manager = Solution.GetComponent<T4DirectiveInfoManager>();
 		}
 
 		public IT4File ResolveT4File(T4IncludeGuard guard)
@@ -66,8 +61,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		{
 			var languageService = T4Language.Instance.LanguageService();
 			Assertion.AssertNotNull(languageService, "languageService != null");
-			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			return new T4TreeBuilder(Manager, lexer, target).CreateT4Tree();
+			var lexer = (T4Lexer) languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			return new T4Parser(lexer).Parse();
 		}
 
 		public IPsiSourceFile Resolve() => ResolvePath().FindSourceFileInSolution(Solution);

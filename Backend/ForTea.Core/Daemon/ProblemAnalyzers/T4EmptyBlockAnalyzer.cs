@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			IHighlightingConsumer consumer
 		)
 		{
-			if (!element.GetCodeText().IsNullOrWhitespace()) return;
+			if (!element.Code.GetText().IsNullOrWhitespace()) return;
 			if (!(element is T4ExpressionBlock block)) return;
 			consumer.AddHighlighting(new T4EmptyExpressionBlockHighlighting(block));
 		}

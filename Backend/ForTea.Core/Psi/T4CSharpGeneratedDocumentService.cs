@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
-using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -16,21 +16,20 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Web.Generation;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi {
-
+namespace GammaJul.ForTea.Core.Psi
+{
 	/// <summary>This class will generate a C# code-behind from a T4 file.</summary>
 	[GeneratedDocumentService(typeof(T4ProjectFileType))]
 	public class T4CSharpGeneratedDocumentService : GeneratedDocumentServiceBase
 	{
 		private static IEnumerable<PsiLanguageType> PsiLanguageTypes => new PsiLanguageType[] {CSharpLanguage.Instance};
-		
-		[NotNull] private readonly T4DirectiveInfoManager directiveInfoManager;
 
 		/// <summary>Generates a C# file from a T4 file.</summary>
 		/// <param name="modificationInfo">The modifications that occurred in the T4 file.</param>
-		public override ISecondaryDocumentGenerationResult Generate(PrimaryFileModificationInfo modificationInfo) {
+		public override ISecondaryDocumentGenerationResult Generate(PrimaryFileModificationInfo modificationInfo)
+		{
 			if (!(modificationInfo.NewPsiFile is IT4File t4File)) return null;
-			if (!directiveInfoManager.GetLanguageType(t4File).Is<CSharpLanguage>()) return null;
+			if (!T4DirectiveInfoManager.GetLanguageType(t4File).Is<CSharpLanguage>()) return null;
 
 			var solution = modificationInfo.SourceFile.GetSolution();
 			var generator = new T4CSharpCodeBehindGenerator(t4File, solution);
@@ -41,7 +40,11 @@ namespace GammaJul.ForTea.Core.Psi {
 				return null;
 
 			var includedFiles = new OneToSetMap<FileSystemPath, FileSystemPath>();
-			includedFiles.AddRange(modificationInfo.SourceFile.GetLocation(), t4File.GetNonEmptyIncludePaths());
+			includedFiles.AddRange(modificationInfo.SourceFile.GetLocation(), t4File
+				.Blocks
+				.OfType<IT4IncludeDirective>()
+				.Select(include => include.Path.ResolvePath())
+				.Where(path => !path.IsEmpty));
 
 			var t4FileDependencyManager = solution.GetComponent<T4FileDependencyManager>();
 
@@ -52,7 +55,10 @@ namespace GammaJul.ForTea.Core.Psi {
 				new RangeTranslatorWithGeneratedRangeMap(result.GeneratedRangeMap),
 				csharpLanguageService.GetPrimaryLexerFactory(),
 				t4FileDependencyManager,
-				t4File.GetNonEmptyIncludePaths()
+				t4File.Blocks
+					.OfType<IT4IncludeDirective>()
+					.Select(include => include.Path.ResolvePath())
+					.Where(path => !path.IsEmpty)
 			);
 		}
 
@@ -103,7 +109,8 @@ namespace GammaJul.ForTea.Core.Psi {
 			CachedPsiFile cachedPsiFile,
 			TreeTextRange oldTreeRange,
 			string newText
-		) {
+		)
+		{
 			var rangeTranslator = (RangeTranslatorWithGeneratedRangeMap) cachedPsiFile.PsiFile.SecondaryRangeTranslator;
 			if (rangeTranslator == null)
 				return null;
@@ -113,17 +120,17 @@ namespace GammaJul.ForTea.Core.Psi {
 			if (!documentRange.IsValid())
 				return null;
 
-			var documentChange = new DocumentChange(documentRange.Document, documentRange.TextRange.StartOffset, documentRange.TextRange.Length, newText,
+			var documentChange = new DocumentChange(documentRange.Document, documentRange.TextRange.StartOffset,
+				documentRange.TextRange.Length, newText,
 				documentRange.Document.LastModificationStamp, TextModificationSide.NotSpecified);
 
-			return new ICommitBuildResult[] {
-				new CommitBuildResult(cachedPsiFile.WorkIncrementalParse(documentChange), null, documentChange, null, TextRange.InvalidRange, String.Empty),
-				new FixRangeTranslatorsOnSharedRangeCommitBuildResult(rangeTranslator, null, new TreeTextRange<Original>(oldTreeRange), new TreeTextRange<Generated>(range), newText)
+			return new ICommitBuildResult[]
+			{
+				new CommitBuildResult(cachedPsiFile.WorkIncrementalParse(documentChange), null, documentChange, null,
+					TextRange.InvalidRange, String.Empty),
+				new FixRangeTranslatorsOnSharedRangeCommitBuildResult(rangeTranslator, null,
+					new TreeTextRange<Original>(oldTreeRange), new TreeTextRange<Generated>(range), newText)
 			};
 		}
-
-		public T4CSharpGeneratedDocumentService([NotNull] T4DirectiveInfoManager directiveInfoManager) =>
-			this.directiveInfoManager = directiveInfoManager;
 	}
-
 }

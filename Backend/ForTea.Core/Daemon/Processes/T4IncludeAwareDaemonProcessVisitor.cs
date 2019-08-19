@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
@@ -18,12 +18,6 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		[NotNull]
 		private T4IncludeGuard Guard { get; }
 
-		[NotNull]
-		private T4DirectiveInfoManager Manager { get; }
-
-		[NotNull]
-		private T4TreeNavigator Navigator { get; }
-
 		[NotNull, ItemNotNull]
 		private List<HighlightingInfo> MyHighlightings { get; } = new List<HighlightingInfo>();
 
@@ -35,14 +29,8 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		[NotNull, ItemNotNull]
 		public IReadOnlyList<HighlightingInfo> Highlightings => MyHighlightings;
 
-		public T4IncludeAwareDaemonProcessVisitor(
-			[NotNull] T4DirectiveInfoManager manager,
-			[NotNull] IPsiSourceFile initialFile,
-			[NotNull] T4TreeNavigator navigator
-		)
+		public T4IncludeAwareDaemonProcessVisitor([NotNull] IPsiSourceFile initialFile)
 		{
-			Manager = manager;
-			Navigator = navigator;
 			HasSeenRecursiveInclude = false;
 			Guard = new T4IncludeGuard();
 			Guard.StartProcessing(initialFile);
@@ -60,7 +48,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			switch (element)
 			{
-				case IT4Include include:
+				case IT4IncludeDirective include:
 					ProcessInclude(include);
 					break;
 				case IT4Directive directive:
@@ -71,19 +59,24 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ProcessDirective(IT4Directive directive)
 		{
-			if (directive.IsSpecificDirective(Manager.Output))
+			switch (directive)
 			{
-				if (!SeenOutputDirective) SeenOutputDirective = true;
-				else ReportDuplicateDirective(directive);
-			}
-			else if (directive.IsSpecificDirective(Manager.Template))
-			{
-				if (!SeenTemplateDirective) SeenTemplateDirective = true;
-				else ReportDuplicateDirective(directive);
+				case IT4OutputDirective _ when !SeenOutputDirective:
+					SeenOutputDirective = true;
+					break;
+				case IT4OutputDirective _:
+					ReportDuplicateDirective(directive);
+					break;
+				case IT4TemplateDirective _ when !SeenTemplateDirective:
+					SeenTemplateDirective = true;
+					break;
+				case IT4TemplateDirective _:
+					ReportDuplicateDirective(directive);
+					break;
 			}
 		}
 
-		private void ProcessInclude(IT4Include include)
+		private void ProcessInclude(IT4IncludeDirective include)
 		{
 			var sourceFile = include.Path.Resolve();
 			if (sourceFile != null)
@@ -122,26 +115,26 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void AddHighlighting([NotNull] ITreeNode node, IHighlighting highlighting) =>
 			MyHighlightings.Add(new HighlightingInfo(node.GetHighlightingRange(), highlighting));
 
-		private void ReportUnresolvedPath([NotNull] IT4Include include)
+		private void ReportUnresolvedPath([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = Navigator.FindIncludeValue(include);
+			var value = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value;
 			if (value == null) return;
 			AddHighlighting(value, new T4UnresolvedIncludeHighlighting(value));
 		}
 
-		private void ReportRecursiveInclude([NotNull] IT4Include include)
+		private void ReportRecursiveInclude([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = Navigator.FindIncludeValue(include);
+			var value = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value;
 			if (value == null) return;
 			AddHighlighting(value, new T4RecursiveIncludeHighlighting(value));
 		}
 
-		private void ReportRedundantInclude([NotNull] IT4Include include)
+		private void ReportRedundantInclude([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = Navigator.FindIncludeValue(include);
+			var value = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value;
 			if (value == null) return;
 			var directive = (value.Parent?.Parent as IT4Directive).NotNull();
 			AddHighlighting(value, new T4RedundantIncludeHighlighting(directive));

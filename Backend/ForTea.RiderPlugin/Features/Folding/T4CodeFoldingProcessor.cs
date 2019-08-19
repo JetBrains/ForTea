@@ -23,7 +23,7 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 			if (!FileProcessed && element.GetContainingFile() is IT4File file) CollectFileFoldings(context, file);
 			FileProcessed = true;
 
-			if (element is T4CodeBlock && !(element is T4FeatureBlock))
+			if (element is IT4CodeBlock && !(element is IT4FeatureBlock))
 				context.AddDefaultPriorityFolding(
 					T4CodeFoldingAttributes.Directive,
 					element.GetDocumentRange(),
@@ -62,7 +62,7 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 					continue;
 				}
 
-				if (node is IT4Include || node.NodeType == T4TokenNodeTypes.NEW_LINE) continue;
+				if (node.NodeType == T4TokenNodeTypes.NEW_LINE) continue;
 				if (directiveStart == null) continue;
 
 				yield return new DocumentRange(
@@ -80,8 +80,8 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 
 		private DocumentRange? FindFeatureFoldings([NotNull] IT4File file)
 		{
-			int? start = file.Children().OfType<T4FeatureBlock>().FirstOrDefault()?.GetTreeStartOffset().Offset;
-			int? end = file.Children().OfType<T4FeatureBlock>().LastOrDefault()?.GetTreeEndOffset().Offset;
+			int? start = file.Children().OfType<IT4FeatureBlock>().FirstOrDefault()?.GetTreeStartOffset().Offset;
+			int? end = file.Children().OfType<IT4FeatureBlock>().LastOrDefault()?.GetTreeEndOffset().Offset;
 			if (!start.HasValue || !end.HasValue) return null;
 			return new DocumentRange(
 				file.GetSourceFile().NotNull().Document,

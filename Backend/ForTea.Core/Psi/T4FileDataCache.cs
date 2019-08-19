@@ -1,4 +1,3 @@
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
@@ -15,7 +14,6 @@ namespace GammaJul.ForTea.Core.Psi {
 	[PsiComponent]
 	public sealed class T4FileDataCache {
 		[NotNull] private readonly WeakToStrongDictionary<IPsiSourceFile, T4FileData> _fileDataBySourceFile = new WeakToStrongDictionary<IPsiSourceFile, T4FileData>();
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
 
 		[NotNull]
 		public Signal<Pair<IPsiSourceFile, T4FileDataDiff>> FileDataChanged { get; }
@@ -40,7 +38,7 @@ namespace GammaJul.ForTea.Core.Psi {
 			if (sourceFile == null || !sourceFile.LanguageType.Is<T4ProjectFileType>())
 				return;
 
-			var newData = new T4FileData(t4File, _directiveInfoManager);
+			var newData = new T4FileData(t4File);
 			T4FileData existingData;
 			lock (_fileDataBySourceFile) {
 				_fileDataBySourceFile.TryGetValue(sourceFile, out existingData);
@@ -54,11 +52,9 @@ namespace GammaJul.ForTea.Core.Psi {
 
 		public T4FileDataCache(
 			Lifetime lifetime,
-			[NotNull] PsiFiles psiFiles,
-			[NotNull] T4DirectiveInfoManager directiveInfoManager
+			[NotNull] PsiFiles psiFiles
 		)
 		{
-			_directiveInfoManager = directiveInfoManager;
 			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4FileDataDiff>>(lifetime, "T4FileDataCache.FileDataChanged");
 
 			lifetime.Bracket(

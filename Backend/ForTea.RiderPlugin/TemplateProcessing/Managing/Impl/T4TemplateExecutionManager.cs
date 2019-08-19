@@ -45,9 +45,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IT4TargetFileManager Manager { get; }
 
 		[NotNull]
-		private T4TreeNavigator Navigator { get; }
-
-		[NotNull]
 		private RoslynMetadataReferenceCache Cache { get; }
 
 		[NotNull]
@@ -60,7 +57,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			[NotNull] ISolutionProcessStartInfoPatcher patcher,
 			[NotNull] IT4TargetFileManager manager,
 			[NotNull] IT4BuildMessageConverter converter,
-			[NotNull] T4TreeNavigator navigator,
 			[NotNull] ISolution solution
 		)
 		{
@@ -69,7 +65,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Patcher = patcher;
 			Manager = manager;
 			Converter = converter;
-			Navigator = navigator;
 			Solution = solution;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
@@ -77,7 +72,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
 			Locks.AssertReadAccessAllowed();
-			if (file.ContainsErrorElement()) return Converter.SyntaxError(Navigator.GetErrorElements(file).First());
+			if (file.ContainsErrorElement()) return Converter.SyntaxError(T4TreeNavigator.GetErrorElements(file).First());
 			List<Diagnostic> messages = null;
 			return lifetime.UsingNested(nested =>
 			{

@@ -1,0 +1,15 @@
+﻿Language: PsiLanguageType:T4
+IT4File
+  IT4TemplateDirective
+    DIRECTIVE_START: <#@
+    WHITE_SPACE:  
+    TEMPLATE: template
+    WHITE_SPACE:  
+    IT4DirectiveAttribute
+      TOKEN: language
+      EQUAL: =
+      QUOTE: "
+      IT4AttributeValue
+        RAW_ATTRIBUTE_VALUE: C# #>\nHello, world!\n
+    ErrorElement:" expected
+

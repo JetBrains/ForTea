@@ -14,36 +14,23 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Daemon.Processes {
-
-	internal sealed class T4ErrorProcess : T4DaemonStageProcessBase {
-
-		[NotNull] private readonly T4DirectiveInfoManager _directiveInfoManager;
-
-		[CanBeNull] private T4FeatureBlock _lastFeature;
+namespace GammaJul.ForTea.Core.Daemon.Processes
+{
+	internal sealed class T4ErrorProcess : T4DaemonStageProcessBase
+	{
+		[CanBeNull] private IT4FeatureBlock _lastFeature;
 		private bool _gotFeature;
 		private bool _gotLastFeature;
 		private bool _inLastFeature;
 		private bool _afterLastFeatureErrorAdded;
 
-		private static DocumentRange GetMissingTokenRange([NotNull] MissingTokenErrorElement element) {
-			DocumentRange range = element.GetDocumentRange();
-			range = range.TextRange.EndOffset >= range.Document.GetTextLength()
-				? range.ExtendLeft(1)
-				: range.ExtendRight(1);
-			return range;
-		}
-
-		public override void ProcessBeforeInterior(ITreeNode element) {
-			switch (element) {
-
-				case MissingTokenErrorElement errorElement:
-					AddHighlighting(GetMissingTokenRange(errorElement), new MissingTokenHighlighting(errorElement));
-					return;
-
-				// can't have a statement block (<# #>) after a feature block (<#+ #>)
+		public override void ProcessBeforeInterior(ITreeNode element)
+		{
+			switch (element)
+			{
 				case T4StatementBlock statementBlock when _gotFeature:
-					AddHighlighting(element.GetHighlightingRange(), new StatementAfterFeatureHighlighting(statementBlock));
+					AddHighlighting(element.GetHighlightingRange(),
+						new StatementAfterFeatureHighlighting(statementBlock));
 					return;
 
 				case IT4Directive directive:
@@ -52,16 +39,19 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 
 				case T4FeatureBlock _:
 					_gotFeature = true;
-					if (element == _lastFeature) {
+					if (element == _lastFeature)
+					{
 						_gotLastFeature = true;
 						_inLastFeature = true;
 						return;
 					}
+
 					break;
 			}
 
 			// verify that a directive attribute value is valid
-			if (element is IT4AttributeValue value) {
+			if (element is IT4AttributeValue value)
+			{
 				ProcessAttributeValue(value);
 				return;
 			}
@@ -71,7 +61,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 				return;
 
 			TokenNodeType tokenType = element.GetTokenType();
-			if (tokenType != null && tokenType.IsWhitespace)
+			if (tokenType?.IsWhitespace == true)
 				return;
 
 			// highlight from just after the last feature to the end of the document
@@ -80,70 +70,83 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			_afterLastFeatureErrorAdded = true;
 		}
 
-		private void ProcessAttributeValue([NotNull] IT4AttributeValue valueNode) {
+		private void ProcessAttributeValue([NotNull] IT4AttributeValue valueNode)
+		{
 			if (!(valueNode.Parent is IT4DirectiveAttribute attribute))
 				return;
 
 			if (!(attribute.Parent is IT4Directive directive))
 				return;
 
-			DirectiveAttributeInfo attributeInfo = _directiveInfoManager.GetDirectiveByName(directive.GetName())?.GetAttributeByName(attribute.GetName());
-			if (attributeInfo == null || attributeInfo.IsValid(valueNode.GetText()))
+			var attributeInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name.GetText())
+				?.GetAttributeByName(attribute.Name.GetText());
+			if (attributeInfo?.IsValid(valueNode.GetText()) != false)
 				return;
 
-			AddHighlighting(valueNode.GetHighlightingRange(), new InvalidAttributeValueHighlighting(valueNode, attributeInfo));
+			AddHighlighting(valueNode.GetHighlightingRange(),
+				new InvalidAttributeValueHighlighting(valueNode, attributeInfo));
 		}
 
-		private void ProcessDirective([NotNull] IT4Directive directive) {
-			IT4Token nameToken = directive.GetNameToken();
+		private void ProcessDirective([NotNull] IT4Directive directive)
+		{
+			var nameToken = directive.Name;
 			if (nameToken == null)
 				return;
 
-			DirectiveInfo directiveInfo = _directiveInfoManager.GetDirectiveByName(nameToken.GetText());
+			DirectiveInfo directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(nameToken.GetText());
 			if (directiveInfo == null)
 				return;
 
 			// Notify of missing required attributes.
-			IEnumerable<string> attributeNames = directive.GetAttributes().SelectNotNull(attr => attr.GetName());
+			IEnumerable<string> attributeNames = directive.Attributes.SelectNotNull(attr => attr.Name.GetText());
 			var hashSet = new JetHashSet<string>(attributeNames, StringComparer.OrdinalIgnoreCase);
-			foreach (DirectiveAttributeInfo attributeInfo in directiveInfo.SupportedAttributes) {
-				if (attributeInfo.IsRequired && !hashSet.Contains(attributeInfo.Name))
-					AddHighlighting(nameToken.GetHighlightingRange(), new MissingRequiredAttributeHighlighting(nameToken, attributeInfo.Name));
+			var infos = directiveInfo
+				.SupportedAttributes
+				.Where(attributeInfo => attributeInfo.IsRequired && !hashSet.Contains(attributeInfo.Name));
+			foreach (var attributeInfo in infos)
+			{
+				var range = nameToken.GetHighlightingRange();
+				var highlighting = new MissingRequiredAttributeHighlighting(nameToken, attributeInfo.Name);
+				AddHighlighting(range, highlighting);
 			}
 
 			// Assembly attributes in preprocessed templates are useless.
-			if (directiveInfo == _directiveInfoManager.Assembly && DaemonProcess.SourceFile.ToProjectFile().IsPreprocessedT4Template())
+			if (directiveInfo == T4DirectiveInfoManager.Assembly &&
+			    DaemonProcess.SourceFile.ToProjectFile().IsPreprocessedT4Template())
 				AddHighlighting(directive.GetHighlightingRange(), new IgnoredAssemblyDirectiveHighlighting(directive));
 		}
 
-		public override void ProcessAfterInterior(ITreeNode element) {
+		public override void ProcessAfterInterior(ITreeNode element)
+		{
 			if (element == _lastFeature)
 				_inLastFeature = false;
 		}
 
-		public override void Execute(Action<DaemonStageResult> commiter) {
-			_lastFeature = File.GetFeatureBlocks().LastOrDefault();
+		public override void Execute(Action<DaemonStageResult> commiter)
+		{
+			_lastFeature = File.Blocks.OfType<IT4FeatureBlock>().LastOrDefault();
 			base.Execute(commiter);
 		}
 
 		/// <summary>Initializes a new instance of the <see cref="T4DaemonStageProcessBase"/> class.</summary>
 		/// <param name="file">The associated T4 file.</param>
 		/// <param name="daemonProcess">The associated daemon process.</param>
-		/// <param name="directiveInfoManager">An instance of <see cref="T4DirectiveInfoManager"/>.</param>
-		public T4ErrorProcess([NotNull] IT4File file, [NotNull] IDaemonProcess daemonProcess, [NotNull] T4DirectiveInfoManager directiveInfoManager)
-			: base(file, daemonProcess) {
-			_directiveInfoManager = directiveInfoManager;
+		public T4ErrorProcess(
+			[NotNull] IT4File file,
+			[NotNull] IDaemonProcess daemonProcess
+		) : base(file, daemonProcess)
+		{
 		}
 
 		protected override void AnalyzeFile(IT4File file)
 		{
-			var outputDirective = file.GetDirectives().FirstOrDefault(directive =>
-				directive.IsSpecificDirective(_directiveInfoManager.Output));
-			if (outputDirective?.GetAttribute(_directiveInfoManager.Output.ExtensionAttribute.Name) == null)
+			var outputDirective = file.Blocks.OfType<IT4OutputDirective>().FirstOrDefault();
+			var extensionAttribute = outputDirective
+				?.GetFirstAttribute(T4DirectiveInfoManager.Output.ExtensionAttribute);
+			if (extensionAttribute == null)
 			{
 				// TODO: show notification
 			}
 		}
 	}
-
 }
