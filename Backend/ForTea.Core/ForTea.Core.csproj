@@ -71,8 +71,4 @@
     <Clean Remove="obj\Debug\\TempCA\ForTea.Core.pdb" />
     <Clean Remove="obj\Debug\\TempCA\ForTea.Core.dll" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="TemplateProcessing\CodeCollecting\Format" />
-  </ItemGroup>
 </Project>
