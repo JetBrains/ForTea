@@ -39,8 +39,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			using (projectFile.Locks.UsingReadLock())
 			{
-				// .ttinclude and .t4 files exist for being included and should not be auto-executed
-				if (projectFile.Location.ExtensionWithDot != T4ProjectFileType.MainExtension) return false;
+				// .ttinclude files exist for being included and should not be auto-executed
+				if (projectFile.Location.ExtensionWithDot == T4ProjectFileType.IncludeExtension) return false;
 				return projectFile.LanguageType.Is<T4ProjectFileType>();
 			}
 		}
