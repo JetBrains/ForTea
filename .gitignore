@@ -8,6 +8,7 @@
 **/output
 **/_ReSharper.Caches
 **/.idea
+**.DotSettings
 
 */out/
 */packages/
