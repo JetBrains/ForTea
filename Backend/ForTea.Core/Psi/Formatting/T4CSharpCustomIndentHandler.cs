@@ -49,7 +49,10 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		[CanBeNull]
 		private string IndentFeatureBlockMember([NotNull] ITreeNode node)
 		{
-			if (!IsTypeMemberLikeNode(node)) return null;
+			// In feature blocks, there are class features declared
+			if (!IsClassFeature(node)) return null;
+			bool isTopLevel = node.Parent?.GetParentsOfType<IClassLikeDeclaration>().IsSingle() ?? false;
+			if (!isTopLevel) return null;
 			return "    ";
 		}
 
@@ -187,9 +190,9 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			&& tokenNode.GetText() == T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
 
 		[Pure]
-		private static bool IsTypeMemberLikeNode([NotNull] ITreeNode node) =>
+		private static bool IsClassFeature([NotNull] ITreeNode node) =>
 			(node is ITypeMemberDeclaration || node is IMultipleFieldDeclaration || node is IMultipleEventDeclaration)
-			&& !(node is IEventDeclaration)
+			&& !(node is IEventDeclaration) // TODO wtf
 			&& node.GetContainingNode<IClassLikeDeclaration>() != null;
 
 		[Pure]

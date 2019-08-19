@@ -1,0 +1,16 @@
+﻿<#+
+
+    public class Foo
+    {
+        public class Bar
+        {
+            public event Action Bas;
+
+            public void Act()
+            {
+                int x;
+            }
+        }
+    }
+
+{caret}#>
