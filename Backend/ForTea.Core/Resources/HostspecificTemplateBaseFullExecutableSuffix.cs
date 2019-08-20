@@ -25,7 +25,7 @@
         {
             if (newExtension.StartsWith(".")) newExtension = newExtension.Substring(1);
             int dotIndex = source.LastIndexOf('.');
-            if (dotIndex < 0) return source;
+            if (dotIndex < 0) return source + newExtension;
             return source.Substring(0, dotIndex + 1) + newExtension;
         }
 
