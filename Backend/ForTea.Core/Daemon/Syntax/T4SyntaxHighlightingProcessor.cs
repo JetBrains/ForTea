@@ -41,15 +41,20 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		}
 
 		[CanBeNull]
-		private string ExpandEnvironmentVariable([NotNull] IT4EnvironmentVariable variable) =>
-			Environment.GetEnvironmentVariable(variable.RawAttributeValue.GetText());
+		private string ExpandEnvironmentVariable([NotNull] IT4EnvironmentVariable variable)
+		{
+			var value = variable.RawAttributeValue;
+			if (value == null) return null;
+			return Environment.GetEnvironmentVariable(value.GetText());
+		}
 
 		[CanBeNull]
 		private string ExpandMacro([NotNull] IT4Macro macro)
 		{
 			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
 			var solution = projectFile.GetSolution();
-			string name = macro.RawAttributeValue.GetText();
+			string name = macro.RawAttributeValue?.GetText();
+			if (name == null) return null;
 			var macros = solution.GetComponent<IT4MacroResolver>().Resolve(new[] {name}, projectFile);
 			return macros.ContainsKey(name) ? macros[name] : null;
 		}

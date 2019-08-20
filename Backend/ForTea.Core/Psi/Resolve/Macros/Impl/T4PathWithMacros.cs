@@ -76,7 +76,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			if (asAbsolutePath.IsAbsolute) return asAbsolutePath;
 
 			// search as relative path
-			var asRelativePath = SourceFile.GetLocation().Directory.Combine(expanded);
+			var asRelativePath = SourceFile.GetLocation().Directory.TryCombine(expanded);
 			if (asRelativePath.ExistsFile) return asRelativePath;
 
 			// search in global include paths

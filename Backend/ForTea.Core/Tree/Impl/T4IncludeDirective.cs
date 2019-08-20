@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 			?? false;
 
 		public IT4PathWithMacros Path =>
-			CreateIncludePath(this.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value.GetText());
+			CreateIncludePath(this.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value?.GetText());
 
 		private IT4PathWithMacros CreateIncludePath([CanBeNull] string includeFileName)
 		{

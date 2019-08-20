@@ -18,13 +18,25 @@ namespace JetBrains.ForTea.RiderPlugin
 
 			string folderPath = (file.ParentFolder?.Location?.FullPath).NotNull();
 
-			// Maybe the assembly is in the same folder as the text template that called the directive?
-			string candidate = Path.Combine(folderPath, assemblyName);
-			if (File.Exists(candidate)) return candidate;
+			try
+			{
+				// Maybe the assembly is in the same folder as the text template that called the directive?
+				string candidate = Path.Combine(folderPath, assemblyName);
+				if (File.Exists(candidate)) return candidate;
+			}
+			catch (ArgumentException)
+			{
+			}
 
-			// Maybe the assembly name is missing extension?
-			candidate = Path.Combine(folderPath, assemblyName + ".dll");
-			if (File.Exists(candidate)) return candidate;
+			try
+			{
+				// Maybe the assembly name is missing extension?
+				string candidate = Path.Combine(folderPath, assemblyName + ".dll");
+				if (File.Exists(candidate)) return candidate;
+			}
+			catch (ArgumentException)
+			{
+			}
 
 			// There's no need to perform other kinds of search,
 			// as those will be performed by T4AssemblyReferenceManager
