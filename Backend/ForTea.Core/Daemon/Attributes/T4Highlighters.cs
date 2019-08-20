@@ -17,7 +17,7 @@ using JetBrains.TextControl.DocumentMarkup;
 	T4HighlightingAttributeIds.ENVIRONMENT_VARIABLE,
 	EffectType = EffectType.TEXT,
 	GroupId = T4HighlightingAttributeIds.GROUP_ID,
-	FallbackAttributeId = HighlightingAttributeIds.DOC_COMMENT
+	FallbackAttributeId = HighlightingAttributeIds.NUMBER
 )]
 [assembly: RegisterHighlighter(
 	T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE,
