@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Services.CodeCompletion;
@@ -19,6 +20,14 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 
 	[SolutionComponent]
 	public class T4TypingAssist : TypingAssistLanguageBase<T4Language>, ITypingHandler {
+		private static IReadOnlySet<TokenNodeType> AttributeValueTokens { get; } = new JetHashSet<TokenNodeType>
+		{
+			T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE,
+			T4TokenNodeTypes.DOLLAR,
+			T4TokenNodeTypes.LEFT_PARENTHESIS,
+			T4TokenNodeTypes.RIGHT_PARENTHESIS,
+			T4TokenNodeTypes.PERCENT
+		};
 
 		[NotNull] private readonly ICodeCompletionSessionManager _codeCompletionSessionManager;
 
@@ -288,10 +297,11 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
 			if (lexer == null || offset <= 1) return false;
 			if (!lexer.FindTokenAt(offset - 1)) return false;
-			if (lexer.TokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) return true;
-			if (lexer.TokenType != T4TokenNodeTypes.QUOTE) return false;
+			var tokenType = lexer.TokenType;
+			if (AttributeValueTokens.Contains(tokenType)) return true;
+			if (tokenType != T4TokenNodeTypes.QUOTE) return false;
 			if (!lexer.FindTokenAt(offset)) return false;
-			return lexer.TokenType == T4TokenNodeTypes.QUOTE || lexer.TokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
+			return tokenType == T4TokenNodeTypes.QUOTE || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
 		}
 
 		public T4TypingAssist(
