@@ -87,7 +87,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 					if (path.IsNullOrEmpty()) return defaultValue;
 					using (ReadLockCookie.Create())
 					{
-						return Host
+						var file = Host
 							.GetItemById<IProject>(location.ProjectId)
 							?.GetSubItemsRecursively(path.Name)
 							.Where(it => it.Location == path)
@@ -97,8 +97,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 							?.ToSourceFile()
 							?.GetPsiFiles(T4Language.Instance)
 							.OfType<IT4File>()
-							.SingleItem()
-							?.Let(wrappee);
+							.SingleItem();
+						return file == null ? null : wrappee(file);
 					}
 				});
 				return result ?? defaultValue;
