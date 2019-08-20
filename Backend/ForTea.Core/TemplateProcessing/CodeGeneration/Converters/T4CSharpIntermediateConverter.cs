@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -22,8 +23,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected sealed override string ResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
 
-		protected override string GeneratedClassName =>
-			File.GetSourceFile()?.Name.WithoutExtension() ?? DefaultGeneratedClassName;
+		protected override string GeneratedClassName
+		{
+			get
+			{
+				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
+				if (fileName != null && ValidityChecker.IsValidIdentifier(fileName)) return fileName;
+				return DefaultGeneratedClassName;
+			}
+		}
 
 		protected sealed override string GeneratedBaseClassName => GeneratedClassName + "Base";
 

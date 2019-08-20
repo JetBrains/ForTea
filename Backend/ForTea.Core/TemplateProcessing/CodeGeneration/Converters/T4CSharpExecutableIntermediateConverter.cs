@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
@@ -25,10 +24,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		[NotNull] private const string HostResource = "GammaJul.ForTea.Core.Resources.Host.cs";
 
-		protected override string GeneratedClassName =>
-			ValidityChecker.IsValidIdentifier(base.GeneratedClassName)
-				? base.GeneratedClassName
-				: "__T4GeneratedTransformation";
+		protected override string GeneratedClassName => GeneratedClassNameString;
 
 		public T4CSharpExecutableIntermediateConverter(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
