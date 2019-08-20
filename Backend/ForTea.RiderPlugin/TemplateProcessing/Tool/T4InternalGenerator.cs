@@ -64,11 +64,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 			}
 
 			InterruptableActivityCookie.CheckAndThrow();
-			var buildResult = executionManager.Compile(Lifetime, file);
+			T4BuildResult buildResult = null;
+			Lifetime.UsingNested(compilationLifetime => buildResult = executionManager.Compile(Lifetime, file));
 			Assertion.Assert(buildResult.BuildResultKind != T4BuildResultKind.HasErrors,
 				"buildResult.BuildResultKind != T4BuildResultKind.HasErrors");
 			InterruptableActivityCookie.CheckAndThrow();
-			bool succeeded = executionManager.Execute(Lifetime, file);
+			bool succeeded = false;
+			Lifetime.UsingNested(executionLifetime => succeeded = executionManager.Execute(Lifetime, file));
 			if (!succeeded)
 				return new SingleFileCustomToolExecutionResult(
 					EmptyList<FileSystemPath>.Collection,
