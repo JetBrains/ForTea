@@ -31,7 +31,28 @@ namespace GammaJul.ForTea.Core.Services
 			consumerFactory
 		);
 
-		protected override void CollectHighlightings(IPsiView psiView, MatchingHighlightingsConsumer consumer) =>
-			TryConsumeHighlighting<IT4Block>(psiView, consumer, _ => _.GetFirstTokenIn(), _ => _.GetLastTokenIn());
+		protected override void CollectHighlightings(IPsiView psiView, MatchingHighlightingsConsumer consumer)
+		{
+			TryConsumeHighlighting<IT4Block>(
+				psiView,
+				consumer,
+				block => block.GetFirstTokenIn(),
+				block => block.GetLastTokenIn());
+			TryConsumeHighlighting<IT4Macro>(
+				psiView,
+				consumer,
+				macro => macro.LeftParenthesis,
+				macro => macro.RightParenthesis);
+			TryConsumeHighlighting<IT4EnvironmentVariable>(
+				psiView,
+				consumer,
+				variable => variable.StartPercent.SingleItem,
+				variable => variable.EndPercent.SingleItem);
+			TryConsumeHighlighting<IT4DirectiveAttribute>(
+				psiView,
+				consumer,
+				attribute => attribute.OpeningQuote.SingleItem,
+				attribute => attribute.ClosingQuote.SingleItem);
+		}
 	}
 }
