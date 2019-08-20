@@ -3,7 +3,7 @@
     <TargetFramework>net461</TargetFramework>
     <AssemblyName>JetBrains.ForTea.Tests</AssemblyName>
     <RootNamespace>JetBrains.ForTea.Tests</RootNamespace>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ForTea.Core\ForTea.Core.csproj" />
