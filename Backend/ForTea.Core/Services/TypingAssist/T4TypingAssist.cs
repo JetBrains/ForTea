@@ -86,12 +86,6 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 		private bool OnQuoteTyped(ITypingContext context) {
 			ITextControl textControl = context.TextControl;
 
-			// the " character should be skipped to avoid double insertions
-			if (SkippingTypingAssist.ShouldSkip(textControl.Document, context.Char)) {
-				SkippingTypingAssist.SkipIfNeeded(textControl.Document, context.Char);
-				return true;
-			}
-
 			// get the token type after "
 			CachingLexer cachingLexer = GetCachingLexer(textControl);
 			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
@@ -304,6 +298,43 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			return tokenType == T4TokenNodeTypes.QUOTE || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
 		}
 
+		// When '%' is typed, insert another
+		private bool OnPercentTyped(ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			if (!IsInAttributeValue(textControl)) return false;
+
+			// get the token type after %
+			var lexer = GetCachingLexer(textControl);
+			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
+			if (lexer == null || offset <= 0 || !lexer.FindTokenAt(offset)) return false;
+
+			// If there is already another percent after the %, swallow the typing
+			var tokenType = lexer.TokenType;
+			if (tokenType == T4TokenNodeTypes.PERCENT)
+			{
+				textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+				return true;
+			}
+
+			// insert the first %
+			textControl.Selection.Delete();
+			textControl.FillVirtualSpaceUntilCaret();
+			textControl.Document.InsertText(offset, "%");
+
+			// insert the second "
+			context.QueueCommand(() =>
+			{
+				using (CommandProcessor.UsingCommand("Inserting %"))
+				{
+					textControl.Document.InsertText(offset + 1, "%");
+					textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+				}
+			});
+
+			return true;
+		}
+
 		public T4TypingAssist(
 			Lifetime lifetime,
 			[NotNull] ISolution solution,
@@ -324,6 +355,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			typingAssistManager.AddTypingHandler(lifetime, '"', this, OnQuoteTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '#', this, OnOctothorpeTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '$', this, OnDollarTyped, IsTypingSmartParenthesisHandlerAvailable);
+			typingAssistManager.AddTypingHandler(lifetime, '%', this, OnPercentTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, OnEnterPressed, IsActionHandlerAvailable);
 		}
 	}
