@@ -9,7 +9,7 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi {
+namespace GammaJul.ForTea.Core.Psi.Service {
 
 	/// <summary>Base, file independent language service for T4.</summary>
 	[Language(typeof(T4Language))]
