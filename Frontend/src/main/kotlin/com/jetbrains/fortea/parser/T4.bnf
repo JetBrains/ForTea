@@ -31,7 +31,7 @@ feature_block ::= FEATURE_BLOCK_START RAW_CODE? BLOCK_END
 
 directive ::= directive_main BLOCK_END
 
-private directive_main ::= DIRECTIVE_START directive_name attribute* {
+private directive_main ::= DIRECTIVE_START directive_name? attribute* {
   pin=1
   recoverWhile=not_block_end_or_block_start
 }
