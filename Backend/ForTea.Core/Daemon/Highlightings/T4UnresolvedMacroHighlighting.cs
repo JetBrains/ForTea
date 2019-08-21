@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Highlightings
@@ -17,6 +18,9 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		public T4UnresolvedMacroHighlighting([NotNull] IT4Macro associatedNode) : base(associatedNode)
 		{
 		}
+
+		public override DocumentRange CalculateRange() =>
+			AssociatedNode.RawAttributeValue?.GetHighlightingRange() ?? DocumentRange.InvalidRange;
 
 		public override string ToolTip => "Unresolved macro";
 	}

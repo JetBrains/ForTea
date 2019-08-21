@@ -197,21 +197,21 @@ t4Code:
     RAW_CODE<RAW_CODE, RawCodes>*
 ;
 
-t4AttributeValue:
+errorhandling t4AttributeValue:
     ( RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValues>
     | t4Macro<t4Macro, Macros>
     | t4EnvironmentVariable<t4EnvironmentVariable, EnvironmentVariables>
     )*
 ;
 
-t4Macro:
+errorhandling t4Macro:
     DOLLAR<DOLLAR, Dollar>
     LEFT_PARENTHESIS<LEFT_PARENTHESIS, LeftParenthesis>
     RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>?
     RIGHT_PARENTHESIS<RIGHT_PARENTHESIS, RightParenthesis>
 ;
 
-t4EnvironmentVariable:
+errorhandling t4EnvironmentVariable:
     PERCENT<PERCENT, StartPercent>
     RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>?
     PERCENT<PERCENT, EndPercent>

@@ -29,19 +29,14 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer context)
 		{
 			var type = element.NodeType;
-			if (type == ElementType.T4_MACRO) context.AddHighlighting(CreateMacroHighlighting((IT4Macro) element));
+			if (type == ElementType.T4_MACRO) HighlightMacro((IT4Macro) element, context);
 			else if (type == ElementType.T4_ENVIRONMENT_VARIABLE)
-				context.AddHighlighting(CreateEnvironmentVariableHighlighting((IT4EnvironmentVariable) element));
-			else if (type == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE)
-			{
-				const string id = T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE;
-				var highlighting = new ReSharperSyntaxHighlighting(id, null, element.GetDocumentRange());
-				context.AddHighlighting(highlighting);
-			}
+				HighlightEnvironmentVariable((IT4EnvironmentVariable) element, context);
+			else if (type == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) HighlightValue(element, context);
 		}
 
 		[CanBeNull]
-		private string ExpandEnvironmentVariable([NotNull] IT4EnvironmentVariable variable)
+		private static string ExpandEnvironmentVariable([NotNull] IT4EnvironmentVariable variable)
 		{
 			var value = variable.RawAttributeValue;
 			if (value == null) return null;
@@ -49,7 +44,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		}
 
 		[CanBeNull]
-		private string ExpandMacro([NotNull] IT4Macro macro)
+		private static string ExpandMacro([NotNull] IT4Macro macro)
 		{
 			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
 			var solution = projectFile.GetSolution();
@@ -59,25 +54,60 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			return macros.ContainsKey(name) ? macros[name] : null;
 		}
 
-		[NotNull]
-		private IHighlighting CreateMacroHighlighting(IT4Macro element)
+		private static void HighlightMacro(
+			[NotNull] IT4Macro element,
+			[NotNull] IHighlightingConsumer context
+		)
 		{
+			HighlightValue(element.Dollar, context);
+			HighlightValue(element.LeftParenthesis, context);
+			HighlightValue(element.RightParenthesis, context);
+			var value = element.RawAttributeValue;
+			if (value == null) return;
 			string expanded = ExpandMacro(element);
-			if (expanded == null) return new T4UnresolvedMacroHighlighting(element);
+			if (expanded == null)
+			{
+				context.AddHighlighting(new T4UnresolvedMacroHighlighting(element));
+				return;
+			}
+
 			const string id = T4HighlightingAttributeIds.MACRO;
 			string message = expanded.WithPrefix("macro");
-			var range = element.GetDocumentRange();
-			return new ReSharperSyntaxHighlighting(id, message, range);
+			var range = value.GetDocumentRange();
+			context.AddHighlighting(new ReSharperSyntaxHighlighting(id, message, range));
 		}
 
-		private IHighlighting CreateEnvironmentVariableHighlighting(IT4EnvironmentVariable element)
+		private static void HighlightEnvironmentVariable(
+			[NotNull] IT4EnvironmentVariable element,
+			[NotNull] IHighlightingConsumer context
+		)
 		{
+			foreach (var node in element.StartPercent)
+			{
+				HighlightValue(node, context);
+			}
+
+			var value = element.RawAttributeValue;
+			if (value == null) return;
 			string expanded = ExpandEnvironmentVariable(element);
-			if (expanded == null) return new T4UnresolvedEnvironmentVariableHighlighting(element);
+			if (expanded == null)
+			{
+				context.AddHighlighting(new T4UnresolvedEnvironmentVariableHighlighting(element));
+				return;
+			}
+
 			const string id = T4HighlightingAttributeIds.ENVIRONMENT_VARIABLE;
-			var range = element.GetDocumentRange();
+			var range = value.GetDocumentRange();
 			string message = expanded.WithPrefix("environment variable");
-			return new ReSharperSyntaxHighlighting(id, message, range);
+			context.AddHighlighting(new ReSharperSyntaxHighlighting(id, message, range));
+		}
+
+		private static void HighlightValue([CanBeNull] ITreeNode element, [NotNull] IHighlightingConsumer context)
+		{
+			if (element == null) return;
+			const string id = T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE;
+			var highlighting = new ReSharperSyntaxHighlighting(id, null, element.GetDocumentRange());
+			context.AddHighlighting(highlighting);
 		}
 
 		// These methods should never be called
