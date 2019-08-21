@@ -197,7 +197,6 @@ t4Code:
     RAW_CODE<RAW_CODE, RawCodes>*
 ;
 
-// Macros will be inserted here
 t4AttributeValue:
     ( RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValues>
     | t4Macro<t4Macro, Macros>
@@ -208,12 +207,12 @@ t4AttributeValue:
 t4Macro:
     DOLLAR<DOLLAR, Dollar>
     LEFT_PARENTHESIS<LEFT_PARENTHESIS, LeftParenthesis>
-    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>
+    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>?
     RIGHT_PARENTHESIS<RIGHT_PARENTHESIS, RightParenthesis>
 ;
 
 t4EnvironmentVariable:
     PERCENT<PERCENT, StartPercent>
-    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>
+    RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>?
     PERCENT<PERCENT, EndPercent>
 ;
