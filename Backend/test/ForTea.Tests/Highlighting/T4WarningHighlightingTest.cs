@@ -17,6 +17,7 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("UnexpectedDirective")]
 		[TestCase("UnresolvedInclude")]
 		[TestCase("UnresolvedAssembly")]
+		[TestCase("EmptyDirective")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.WARNING;

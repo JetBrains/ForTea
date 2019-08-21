@@ -43,7 +43,7 @@ namespace GammaJul.ForTea.Core.Parsing
 			if (lookahead == T4TokenNodeTypes.CLEANUP_BEHAVIOR) return ParseT4CleanupBehaviorDirective();
 			if (lookahead == T4TokenNodeTypes.UNKNOWN_DIRECTIVE_NAME) return ParseT4UnknownDirective();
 			// Failure
-			var result = TreeElementFactory.CreateCompositeElement(Tree.Impl.ElementType.T4_TEMPLATE_DIRECTIVE);
+			var result = TreeElementFactory.CreateCompositeElement(Tree.Impl.ElementType.T4_UNKNOWN_DIRECTIVE);
 			var tempParsingResult = Match(T4TokenNodeTypes.DIRECTIVE_START);
 			result.AppendNewChild(tempParsingResult);
 			return HandleErrorInT4Directive(result, new UnexpectedToken("Missing directive name"));
