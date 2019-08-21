@@ -4,6 +4,6 @@ import com.intellij.execution.Executor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.jetbrains.rider.icons.ReSharperPsiBuildScriptsIcons
 
-class T4ExecuteTemplateAction : T4RunTemplateActionBase("Run template", ReSharperPsiBuildScriptsIcons.Run) {
+class T4ExecuteTemplateAction : T4RunTemplateActionBase("Run Template", ReSharperPsiBuildScriptsIcons.Run) {
   override val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
 }

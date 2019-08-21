@@ -11,7 +11,7 @@ import com.jetbrains.rider.icons.ReSharperLiveTemplatesCSharpIcons
 import com.jetbrains.rider.model.T4FileLocation
 
 class T4PreprocessTemplateAction : T4FileBasedActionBase<T4PreprocessConfiguration, T4PreprocessConfigurationType>(
-  "Generate code",
+  "Generate Code",
   ReSharperLiveTemplatesCSharpIcons.ScopeCS
 ) {
   override fun createConfiguration(
