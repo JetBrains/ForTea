@@ -53,10 +53,10 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   }
 
   init {
+    property("userSessionActive", bool)
     call("getConfiguration", T4FileLocation, T4ConfigurationModel).async
     call("requestCompilation", T4FileLocation, T4BuildResult).async
     call("executionSucceeded", T4FileLocation, void).async
-    call("executionFailed", T4FileLocation, void).async
     call("requestPreprocessing", T4FileLocation, T4PreprocessingResult).async
   }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
@@ -24,10 +25,16 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 	[ShellComponent]
 	public sealed class T4InternalGenerator : ISingleFileCustomTool
 	{
+		// This is a hack to prevent multiple execution. TODO: remove
+		private DateTime ExecutedFileLastWriteUtc { get; set; }
+		
 		private Lifetime Lifetime { get; }
 
-		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
+		// Should return whether execution should proceed or not
+		[CanBeNull]
+		public event Func<bool> ExecutionRequested;
 
+		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
 		public string Name => "Bundled T4 template executor";
 		public string ActionName => "Execute T4 generator";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
@@ -51,6 +58,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			AssertOperationValidity(projectFile);
 			var file = AsT4File(projectFile).NotNull();
+			if (projectFile.LastWriteTimeUtc == ExecutedFileLastWriteUtc)
+				return new SingleFileCustomToolExecutionResult(
+					new FileSystemPath[] { },
+					new[] {"File already executed"}
+				);
+
+			if (ExecutionRequested?.Invoke() == false)
+				return new SingleFileCustomToolExecutionResult(
+					new FileSystemPath[] { },
+					new[] {"User session is active"}
+				);
+
 			var solution = file.GetSolution();
 			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
@@ -83,6 +102,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				using (WriteLockCookie.Create())
 				{
 					targetFileManager.UpdateProjectModel(file, affectedFile);
+					ExecutedFileLastWriteUtc = projectFile.LastWriteTimeUtc;
 				}
 			});
 
