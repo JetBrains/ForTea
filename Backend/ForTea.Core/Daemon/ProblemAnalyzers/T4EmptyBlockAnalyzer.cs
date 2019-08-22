@@ -1,6 +1,5 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.Util;
 
@@ -17,7 +16,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		)
 		{
 			if (!element.Code.GetText().IsNullOrWhitespace()) return;
-			if (!(element is T4ExpressionBlock block)) return;
+			if (!(element is IT4ExpressionBlock block)) return;
 			consumer.AddHighlighting(new T4EmptyExpressionBlockHighlighting(block));
 		}
 	}

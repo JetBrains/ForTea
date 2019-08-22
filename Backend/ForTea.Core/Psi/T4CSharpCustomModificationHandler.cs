@@ -4,7 +4,6 @@ using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.Diagnostics;
@@ -55,7 +54,7 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="anchor">Where to insert the code.</param>
 		/// <returns>A new instance of <see cref="IT4CodeBlock"/>.</returns>
 		protected override IT4CodeBlock CreateInlineCodeBlock(string text, ITreeNode anchor) {
-			ITreeNode existingFeatureNode = anchor.FindPreviousNode(node => node is T4FeatureBlock ? TreeNodeActionType.ACCEPT : TreeNodeActionType.CONTINUE);
+			var existingFeatureNode = anchor.FindPreviousNode(node => node is IT4FeatureBlock ? TreeNodeActionType.ACCEPT : TreeNodeActionType.CONTINUE);
 			return existingFeatureNode != null
 				? (IT4CodeBlock) T4ElementFactory.CreateFeatureBlock(text)
 				: T4ElementFactory.CreateStatementBlock(text);

@@ -2,7 +2,6 @@ using System.Text;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -20,10 +19,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		{
 			switch (element)
 			{
-				case T4FeatureBlock _:
+				case IT4FeatureBlock _:
 					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
-				case T4ExpressionBlock _:
+				case IT4ExpressionBlock _:
 					Die();
 					return new T4InfoCollectorStateInitial(Interrupter);
 				default:
@@ -46,7 +45,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 
 		protected override string ProduceSafe(ITreeNode lookahead)
 		{
-			if (lookahead is T4FeatureBlock) return null;
+			if (lookahead is IT4FeatureBlock) return null;
 			return Builder.ToString();
 		}
 	}

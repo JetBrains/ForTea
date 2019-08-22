@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Diagnostics;
@@ -173,11 +172,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (code == null) return;
 			switch (codeBlock)
 			{
-				case T4ExpressionBlock _:
+				case IT4ExpressionBlock _:
 					if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
 					else Result.AppendTransformation(new T4ExpressionDescription(code));
 					break;
-				case T4FeatureBlock _:
+				case IT4FeatureBlock _:
 					Result.AppendFeature(new T4CodeDescription(code));
 					break;
 				default:

@@ -4,9 +4,9 @@ namespace GammaJul.ForTea.Core.Parsing
 {
 	public static class ParserMessages
 	{
-		public const string IDS_T4_CODE_BLOCK = "code block";
-		public const string IDS_T4_DIRECTIVE = "directive";
-		public const string IDS_T4_BLOCK = "block";
+		public const string IDS_CODE_BLOCK = "code block";
+		public const string IDS_DIRECTIVE = "directive";
+		public const string IDS_BLOCK = "block";
 
 		public static string GetString(string id) => id;
 

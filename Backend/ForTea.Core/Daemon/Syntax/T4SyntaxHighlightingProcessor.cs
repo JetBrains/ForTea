@@ -21,16 +21,16 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override bool InteriorShouldBeProcessed(ITreeNode element, IHighlightingConsumer context)
 		{
 			var type = element.NodeType;
-			if (type == ElementType.T4_MACRO) return false;
-			if (type == ElementType.T4_ENVIRONMENT_VARIABLE) return false;
+			if (type == ElementType.MACRO) return false;
+			if (type == ElementType.ENVIRONMENT_VARIABLE) return false;
 			return true;
 		}
 
 		public override void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer context)
 		{
 			var type = element.NodeType;
-			if (type == ElementType.T4_MACRO) HighlightMacro((IT4Macro) element, context);
-			else if (type == ElementType.T4_ENVIRONMENT_VARIABLE)
+			if (type == ElementType.MACRO) HighlightMacro((IT4Macro) element, context);
+			else if (type == ElementType.ENVIRONMENT_VARIABLE)
 				HighlightEnvironmentVariable((IT4EnvironmentVariable) element, context);
 			else if (type == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) HighlightValue(element, context);
 		}

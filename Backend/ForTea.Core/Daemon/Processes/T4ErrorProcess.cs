@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -28,7 +27,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			switch (element)
 			{
-				case T4StatementBlock statementBlock when _gotFeature:
+				case IT4StatementBlock statementBlock when _gotFeature:
 					AddHighlighting(element.GetHighlightingRange(),
 						new StatementAfterFeatureHighlighting(statementBlock));
 					return;
@@ -37,7 +36,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 					ProcessDirective(directive);
 					break;
 
-				case T4FeatureBlock _:
+				case IT4FeatureBlock _:
 					_gotFeature = true;
 					if (element == _lastFeature)
 					{

@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.Tree.Impl
 {
-	internal partial class T4IncludeDirective
+	internal partial class IncludeDirective
 	{
 		public bool Once =>
 			this
