@@ -26,11 +26,9 @@
         language="T4"
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
-    <!-- template execution & preprocessing -->
     <configurationType implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationType"/>
     <stepsBeforeRunProvider
         implementation="com.jetbrains.fortea.configuration.run.task.CompileT4BeforeRunTaskProvider"/>
-    <configurationType implementation="com.jetbrains.fortea.configuration.preprocess.T4PreprocessConfigurationType"/>
 
     <!-- delegation to backend -->
     <rider.debuggerSupportPolicy
@@ -74,19 +72,19 @@
     <action
         class="com.jetbrains.fortea.configuration.actions.T4ExecuteTemplateAction"
         id="ExecuteT4Template"
-        text="Execute T4 Template">
+        text="Execute Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
     <action
         class="com.jetbrains.fortea.configuration.actions.T4DebugTemplateAction"
         id="DebugT4Template"
-        text="Debug T4 Template">
+        text="Debug Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
     </action>
     <action
-        class="com.jetbrains.fortea.configuration.actions.T4PreprocessTemplateAction"
+        class="com.jetbrains.fortea.configuration.T4PreprocessTemplateBackendAction"
         id="PreprocessT4Template"
-        text="Preprocess T4 Template">
+        text="Preprocess Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="DebugT4Template"/>
     </action>
   </actions>
