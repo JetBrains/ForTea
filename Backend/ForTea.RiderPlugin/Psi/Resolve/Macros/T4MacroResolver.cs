@@ -37,7 +37,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 //			{"SolutionExt", null},
 				{"SolutionName", Solution.Name},
 				{"SolutionPath", Solution.SolutionFilePath.FullPath},
-//			{"TargetDir", null},
+//			{"OutDir", null},
 //			{"TargetFileName", null},
 //			{"TargetName", null},
 //			{"TargetPath", null},
@@ -52,7 +52,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			if (project == null) return result;
 
 			result.Add("Configuration", project.ProjectProperties.ActiveConfigurations.Configurations.Single().Name);
-			result.Add("OutDir", project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent.FullPath);
+			result.Add("TargetDir", project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent.FullPath);
 			result.Add("ProjectDir", project.Location.FullPath);
 			result.Add("ProjectFileName", project.ProjectFileLocation.Name);
 			result.Add("ProjectName", project.Name);
