@@ -1,5 +1,3 @@
-using JetBrains.Util;
-
 namespace GammaJul.ForTea.Core.Parsing
 {
 	public static class ParserMessages
@@ -13,9 +11,6 @@ namespace GammaJul.ForTea.Core.Parsing
 		public static string GetUnexpectedTokenMessage() => "Unexpected token";
 
 		public static string GetExpectedMessage(string expectedSymbol) =>
-			string.Format(GetString("{0} expected"), expectedSymbol).Capitalize();
-
-		public static string GetExpectedMessage(string firstExpectedSymbol, string secondExpectedSymbol) =>
-			string.Format(GetString("{0} or {1} expected"), firstExpectedSymbol, secondExpectedSymbol).Capitalize();
+			GetUnexpectedTokenMessage();
 	}
 }
