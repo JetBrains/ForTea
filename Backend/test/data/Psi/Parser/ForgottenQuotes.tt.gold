@@ -8,7 +8,7 @@ IT4File
     IT4DirectiveAttribute
       TOKEN: language
       EQUAL: =
-    ErrorElement:" expected
+    ErrorElement:Unexpected token
       TOKEN: C
       BAD_TOKEN: #
       WHITE_SPACE:  
