@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
@@ -10,9 +9,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 	internal partial class IncludeDirective
 	{
 		public bool Once =>
-			this
-				.GetAttributes(T4DirectiveInfoManager.Include.OnceAttribute)
-				.FirstOrDefault()
+			this.GetFirstAttribute(T4DirectiveInfoManager.Include.OnceAttribute)
 				?.Value
 				.GetText()
 				.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase)

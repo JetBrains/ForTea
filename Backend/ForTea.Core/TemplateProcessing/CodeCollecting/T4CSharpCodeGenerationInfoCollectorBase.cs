@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
@@ -74,10 +73,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			var sourceFile = include.Path.Resolve();
 			if (sourceFile == null)
 			{
-				var target =
-					include.GetAttributes(T4DirectiveInfoManager.Include.FileAttribute).FirstOrDefault()?.Value ??
-					element;
-				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target}");
+				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
+				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(null);
 				return;
@@ -86,9 +83,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
 			if (!Guard.CanProcess(sourceFile))
 			{
-				var target =
-					include.GetAttributes(T4DirectiveInfoManager.Include.FileAttribute).FirstOrDefault()?.Value ??
-					element;
+				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, "Recursion in includes");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(sourceFile);

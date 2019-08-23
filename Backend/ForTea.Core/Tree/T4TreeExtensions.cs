@@ -74,13 +74,15 @@ namespace GammaJul.ForTea.Core.Tree
 		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
 			[NotNull] this IT4Directive directive,
 			[NotNull] DirectiveAttributeInfo info
-		) => directive.Attributes.Where(it => it.Name.GetText() == info.Name);
+		) => directive.Attributes.Where(it =>
+			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
 		
 		[CanBeNull]
 		public static IT4DirectiveAttribute GetFirstAttribute(
 			[NotNull] this IT4Directive directive,
 			[NotNull] DirectiveAttributeInfo info
-		) => directive.Attributes.FirstOrDefault(it => it.Name.GetText() == info.Name);
+		) => directive.Attributes.FirstOrDefault(it =>
+			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
 
 		
 
