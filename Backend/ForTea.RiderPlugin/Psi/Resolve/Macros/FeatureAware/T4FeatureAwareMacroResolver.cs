@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features.Processes;
 using JetBrains.ReSharper.Host.Features.Toolset.Detecting;
+using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 {
@@ -16,6 +17,9 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 
 		[NotNull]
 		private ISolutionToolset SolutionToolset { get; }
+
+		[NotNull]
+		private RiderProcessStartInfoEnvironment Environment { get; }
 		
 		public T4FeatureAwareMacroResolver(
 			[NotNull] ISolution solution,
@@ -23,19 +27,39 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			[NotNull] ISolutionToolset solutionToolset,
 			[NotNull] IBuildToolWellKnownPropertiesStore msBuildProperties,
 			[NotNull] RiderProcessStartInfoEnvironment environment
-		) : base(solution, preprocessor, environment)
+		) : base(solution, preprocessor)
 		{
 			MsBuildProperties = msBuildProperties;
 			SolutionToolset = solutionToolset;
+			Environment = environment;
 		}
 
 		protected override Dictionary<string, string> ResolveInternal(IProjectFile file)
 		{
 			var result = base.ResolveInternal(file);
 			AddMsBuildMacros(result);
+			AddPlatformMacros(result);
 			return result;
 		}
 
+		private void AddPlatformMacros(Dictionary<string, string> result)
+		{
+			switch (Environment.Platform)
+			{
+				case PlatformUtil.Platform.Windows:
+					result.Add("Platform", "Win32");
+					break;
+				case PlatformUtil.Platform.MacOsX:
+					result.Add("Platform", "MacOsX");
+					break;
+				case PlatformUtil.Platform.Linux:
+					result.Add("Platform", "Linux");
+					break;
+			}
+
+			result.Add("PlatformShortName", "x64");
+		}
+		
 		private void AddMsBuildMacros(Dictionary<string, string> result)
 		{
 			var buildTool = SolutionToolset.CurrentBuildTool;

@@ -7,8 +7,6 @@ using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.MSBuild;
 using JetBrains.ProjectModel.Properties;
-using JetBrains.ReSharper.Host.Features.Processes;
-using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
@@ -19,18 +17,10 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 		[NotNull]
 		private ISolution Solution { get; }
 
-		[NotNull]
-		private RiderProcessStartInfoEnvironment Environment { get; }
-
 		public T4MacroResolver(
 			[NotNull] ISolution solution,
-			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
-			[NotNull] RiderProcessStartInfoEnvironment environment
-		) : base(preprocessor)
-		{
-			Solution = solution;
-			Environment = environment;
-		}
+			[NotNull] IT4AssemblyNamePreprocessor preprocessor
+		) : base(preprocessor) => Solution = solution;
 
 		public sealed override IReadOnlyDictionary<string, string> Resolve(IEnumerable<string> _, IProjectFile file) =>
 			ResolveInternal(file);
@@ -39,28 +29,9 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 		{
 			var result = new Dictionary<string, string>(CaseInsensitiveComparison.Comparer);
 			AddBasicMacros(result);
-			AddSolutionMacros(result);
 			AddProjectMacros(file, result);
-			AddPlatformMacros(result);
+			AddSolutionMacros(result);
 			return result;
-		}
-
-		private void AddPlatformMacros(Dictionary<string, string> result)
-		{
-			switch (Environment.Platform)
-			{
-				case PlatformUtil.Platform.Windows:
-					result.Add("Platform", "Win32");
-					break;
-				case PlatformUtil.Platform.MacOsX:
-					result.Add("Platform", "MacOsX");
-					break;
-				case PlatformUtil.Platform.Linux:
-					result.Add("Platform", "Linux");
-					break;
-			}
-
-			result.Add("PlatformShortName", "x64");
 		}
 
 		private void AddProjectMacros(IProjectFile file, Dictionary<string, string> result)
