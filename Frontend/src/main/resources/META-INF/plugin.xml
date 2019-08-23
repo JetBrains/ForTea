@@ -70,7 +70,7 @@
   </extensions>
   <actions>
     <action
-        class="com.jetbrains.fortea.configuration.actions.T4ExecuteTemplateAction"
+        class="com.jetbrains.fortea.configuration.T4ExecuteTemplateBackendAction"
         id="ExecuteT4Template"
         text="Execute Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
