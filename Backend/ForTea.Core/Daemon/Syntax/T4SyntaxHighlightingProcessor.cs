@@ -54,6 +54,18 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			return macros.ContainsKey(name) ? macros[name] : null;
 		}
 
+		private static void HighlightUnresolvedMacro(
+			[NotNull] IT4Macro macro,
+			[NotNull] IHighlightingConsumer context
+		)
+		{
+			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
+			var solution = projectFile.GetSolution();
+			if (solution.GetComponent<IT4MacroResolver>().IsSupported(macro))
+				context.AddHighlighting(new T4UnresolvedMacroHighlighting(macro));
+			else context.AddHighlighting(new T4UnsupportedMacroHighlighting(macro));
+		}
+
 		private static void HighlightMacro(
 			[NotNull] IT4Macro element,
 			[NotNull] IHighlightingConsumer context
@@ -67,7 +79,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			string expanded = ExpandMacro(element);
 			if (expanded == null)
 			{
-				context.AddHighlighting(new T4UnresolvedMacroHighlighting(element));
+				HighlightUnresolvedMacro(element, context);
 				return;
 			}
 

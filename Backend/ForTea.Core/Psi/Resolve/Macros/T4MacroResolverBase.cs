@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
@@ -14,6 +15,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 		protected T4MacroResolverBase([NotNull] IT4AssemblyNamePreprocessor preprocessor) =>
 			AssemblyNamePreprocessor = preprocessor;
 
+		public virtual bool IsSupported(IT4Macro macro) => true;
 		public abstract IReadOnlyDictionary<string, string> Resolve(IEnumerable<string> macros, IProjectFile file);
 
 		public void InvalidateAssemblies(
