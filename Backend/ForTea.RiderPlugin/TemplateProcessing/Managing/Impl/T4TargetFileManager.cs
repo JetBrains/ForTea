@@ -63,7 +63,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			string name = file.GetSourceFile().NotNull().Name.WithOtherExtension(".*");
 			var candidates = GetTemporaryTargetFileFolder(file).GetChildFiles(name);
-			Assertion.Assert(candidates.Count == 1, "candidates.Count == 1");
 			return candidates.First();
 		}
 
