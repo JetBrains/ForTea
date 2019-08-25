@@ -105,7 +105,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 					Guard.TryEndProcessing(include.Path.Resolve());
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
-					return; // Do not advance state here
+					AppendRemainingMessage(element);
+					HandleDirective(include);
+					break;
 				case IT4Directive directive:
 					AppendRemainingMessage(element);
 					HandleDirective(directive);
