@@ -35,7 +35,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private ISolution Solution { get; }
 
 		[NotNull]
-		private IT4TemplateExecutionManager ExecutionManager { get; }
+		private IT4TemplateCompiler Compiler { get; }
 
 		[NotNull]
 		private IT4TargetFileManager TargetFileManager { get; }
@@ -50,7 +50,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			Lifetime lifetime,
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
-			[NotNull] IT4TemplateExecutionManager executionManager,
+			[NotNull] IT4TemplateCompiler compiler,
 			[NotNull] ILogger logger,
 			[NotNull] T4BuildMessageConverter converter,
 			[NotNull] ProjectModelViewHost host,
@@ -59,7 +59,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		{
 			Solution = solution;
 			TargetFileManager = targetFileManager;
-			ExecutionManager = executionManager;
+			Compiler = compiler;
 			Logger = logger;
 			Converter = converter;
 			Host = host;
@@ -112,7 +112,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			{
 				// Interrupt template execution, if any
 			}
-			return ExecutionManager.Compile(Solution.GetLifetime(), t4File);
+
+			return Compiler.Compile(Solution.GetLifetime(), t4File);
 		}
 
 		[CanBeNull]

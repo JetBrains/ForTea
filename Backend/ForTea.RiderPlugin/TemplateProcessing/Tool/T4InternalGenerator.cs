@@ -75,10 +75,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				);
 
 			var solution = file.GetSolution();
+			var compiler = solution.GetComponent<IT4TemplateCompiler>();
 			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
 			InterruptableActivityCookie.CheckAndThrow();
-			if (!executionManager.CanCompile(file))
+			if (!compiler.CanCompile(file))
 			{
 				return new SingleFileCustomToolExecutionResult(
 					new FileSystemPath[] { },
@@ -88,7 +89,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 
 			InterruptableActivityCookie.CheckAndThrow();
 			T4BuildResult buildResult = null;
-			Lifetime.UsingNested(compilationLifetime => buildResult = executionManager.Compile(Lifetime, file));
+			Lifetime.UsingNested(compilationLifetime => buildResult = compiler.Compile(Lifetime, file));
 			Assertion.Assert(buildResult.BuildResultKind != T4BuildResultKind.HasErrors,
 				"buildResult.BuildResultKind != T4BuildResultKind.HasErrors");
 			InterruptableActivityCookie.CheckAndThrow();
