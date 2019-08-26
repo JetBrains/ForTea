@@ -48,8 +48,13 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   }
 
   val T4FileLocation = structdef {
-    field("location", string)
-    field("projectId", int)
+    field("id", int)
+  }
+
+  val T4PreprocessingResult = structdef {
+    field("location", T4FileLocation)
+    field("succeeded", bool)
+    field("message", T4BuildMessage.nullable)
   }
 
   init {

@@ -8,6 +8,7 @@ import com.jetbrains.fortea.configuration.run.T4RunConfigurationType
 import com.jetbrains.fortea.psi.T4PsiFile
 import com.jetbrains.rider.model.T4FileLocation
 import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
 import javax.swing.Icon
 
@@ -20,10 +21,11 @@ abstract class T4RunTemplateActionBase(
 
   final override fun setupFromFile(configuration: T4RunConfiguration, file: T4PsiFile, projectId: Int) {
     val model = configuration.project.solution.t4ProtocolModel
-    model.userSessionActive.set(true)
-    val t4Path = file.virtualFile.path
-    val protocolConfiguration = model.getConfiguration.sync(T4FileLocation(t4Path, projectId))
-
+    val virtualFile = file.virtualFile
+    val t4Path = virtualFile.path
+    val host = ProjectModelViewHost.getInstance(configuration.project)
+    val item = host.getItemsByVirtualFile(virtualFile).singleOrNull() ?: return
+    val protocolConfiguration = model.getConfiguration.sync(T4FileLocation(item.id))
     with (configuration) {
       name = file.name
       parameters.exePath = protocolConfiguration.executablePath
@@ -33,7 +35,7 @@ abstract class T4RunTemplateActionBase(
       parameters.useMonoRuntime = false
       parameters.envs = emptyMap()
       parameters.workingDirectory = PathUtil.getParentPath(t4Path)
-      parameters.initialFileLocation = T4FileLocation(t4Path, projectId)
+      parameters.initialFileLocation = T4FileLocation(item.id)
     }
   }
 

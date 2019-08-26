@@ -92,17 +92,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			{
 				var result = Logger.Catch(() =>
 				{
-					var path = FileSystemPath.Parse(location.Location);
-					if (path.IsNullOrEmpty()) return defaultValue;
 					using (ReadLockCookie.Create())
 					{
 						var file = Host
-							.GetItemById<IProject>(location.ProjectId)
-							?.GetSubItemsRecursively(path.Name)
-							.Where(it => it.Location == path)
-							.AsList()
-							.SingleItem()
-							.As<IProjectFile>()
+							.GetItemById<IProjectFile>(location.Id)
 							?.ToSourceFile()
 							?.GetPsiFiles(T4Language.Instance)
 							.OfType<IT4File>()

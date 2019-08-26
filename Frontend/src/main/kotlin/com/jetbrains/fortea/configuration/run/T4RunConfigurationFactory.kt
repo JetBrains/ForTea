@@ -25,7 +25,7 @@ class T4RunConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(
       executeAsIs = false,
       assemblyToDebug = null,
       runtimeArguments = "",
-      initialFileLocation = T4FileLocation("", 0)
+      initialFileLocation = T4FileLocation(0)
     )
   }
 }

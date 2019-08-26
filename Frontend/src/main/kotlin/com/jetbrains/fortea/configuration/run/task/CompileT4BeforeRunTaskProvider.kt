@@ -10,6 +10,7 @@ import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.rider.model.T4BuildResultKind
 import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.getComponent
 import com.jetbrains.rider.util.idea.lifetime
@@ -41,6 +42,9 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
     finished.down()
     var successful = false
 
+    val host = ProjectModelViewHost.getInstance(project)
+    val item = host.getItemById(configuration.parameters.initialFileLocation.id) ?: return false
+    val path = item.getVirtualFile()?.path ?: return false
     val model = project.solution.t4ProtocolModel
 
     val request = model.requestCompilation.start(configuration.parameters.initialFileLocation).result
@@ -48,7 +52,7 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
       try {
         val result = rdTaskResult.unwrap()
         successful = result.buildResultKind.isSuccess
-        view.showT4BuildResult(project.lifetime, result.messages, configuration.parameters.initialFileLocation.location)
+        view.showT4BuildResult(project.lifetime, result.messages, path)
       } finally {
         finished.up()
       }

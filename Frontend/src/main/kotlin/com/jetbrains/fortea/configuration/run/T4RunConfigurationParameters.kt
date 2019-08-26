@@ -1,6 +1,5 @@
 package com.jetbrains.fortea.configuration.run
 
-import com.intellij.execution.configurations.RuntimeConfigurationError
 import com.intellij.openapi.util.JDOMExternalizerUtil
 import com.intellij.util.execution.ParametersListUtil
 import com.jetbrains.fortea.configuration.readT4FileLocationExternal
@@ -9,7 +8,6 @@ import com.jetbrains.rider.model.T4FileLocation
 import com.jetbrains.rider.run.configurations.exe.ExeConfigurationParameters
 import com.jetbrains.rider.runtime.DotNetExecutable
 import org.jdom.Element
-import java.io.File
 
 open class T4RunConfigurationParameters(
   exePath: String,
@@ -47,8 +45,6 @@ open class T4RunConfigurationParameters(
   )
 
   override fun validate() {
-    if (File(initialFileLocation.location).exists()) return
-    throw RuntimeConfigurationError("Target file does not exist")
   }
 
   override fun readExternal(element: Element) {
