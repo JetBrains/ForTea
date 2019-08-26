@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.MSBuild;
 using JetBrains.ProjectModel.Properties;
+using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
@@ -39,13 +40,13 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			var project = file.GetProject();
 			if (project == null) return;
 			result.Add("Configuration", project.ProjectProperties.ActiveConfigurations.Configurations.Single().Name);
-			result.Add("TargetDir", project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent.FullPath);
-			result.Add("ProjectDir", project.Location.FullPath);
+			result.Add("TargetDir", project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent.FullPathWithTrailingPathSeparator());
+			result.Add("ProjectDir", project.Location.FullPathWithTrailingPathSeparator());
 			result.Add("ProjectFileName", project.ProjectFileLocation.Name);
 			result.Add("ProjectName", project.Name);
-			result.Add("ProjectPath", project.Location.FullPath);
+			result.Add("ProjectPath", project.Location.FullPathWithTrailingPathSeparator());
 			var intermediate = project.GetIntermidiateDirectories().FirstOrDefault();
-			if (intermediate != null) result.Add("IntDir", intermediate.FullPath);
+			if (intermediate != null) result.Add("IntDir", intermediate.FullPathWithTrailingPathSeparator());
 			AddMsBuildProjectProperties(result, project);
 		}
 
@@ -69,9 +70,9 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 
 		private void AddBasicMacros(Dictionary<string, string> result)
 		{
-			result.Add("SolutionDir", Solution.SolutionDirectory.FullPath);
+			result.Add("SolutionDir", Solution.SolutionDirectory.FullPathWithTrailingPathSeparator());
 			result.Add("SolutionName", Solution.Name);
-			result.Add("SolutionPath", Solution.SolutionFilePath.FullPath);
+			result.Add("SolutionPath", Solution.SolutionFilePath.FullPathWithTrailingPathSeparator());
 		}
 
 		private static ISet<string> UnsupportedMacros { get; } =
