@@ -16,7 +16,6 @@ class T4PostProcessorProcessListener(
   override fun processTerminated(p0: ProcessEvent) {
     if (p0.exitCode != 0) return
     model.executionSucceeded.start(parameters.initialFileLocation)
-    model.userSessionActive.set(false)
   }
 
   override fun processWillTerminate(p0: ProcessEvent, p1: Boolean) {

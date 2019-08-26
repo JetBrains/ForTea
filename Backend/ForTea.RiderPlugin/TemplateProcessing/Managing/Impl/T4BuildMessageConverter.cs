@@ -36,7 +36,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			ToT4BuildResult(exception.FailureData);
 
 		public T4PreprocessingResult ToT4PreprocessingResult(T4OutputGenerationException exception) =>
-			new T4PreprocessingResult(false, ToT4BuildMessage(exception.FailureData));
+			new T4PreprocessingResult(null, false, ToT4BuildMessage(exception.FailureData)); // TODO
 
 		private T4BuildResult ToT4BuildResult(T4FailureRawData data)
 		{

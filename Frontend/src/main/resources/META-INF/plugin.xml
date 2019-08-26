@@ -76,7 +76,7 @@
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
     <action
-        class="com.jetbrains.fortea.configuration.actions.T4DebugTemplateAction"
+        class="com.jetbrains.fortea.configuration.T4DebugTemplateBackendAction"
         id="DebugT4Template"
         text="Debug Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
@@ -91,6 +91,9 @@
   <project-components>
     <component>
       <implementation-class>com.jetbrains.fortea.configuration.T4BuildSessionView</implementation-class>
+    </component>
+    <component>
+      <implementation-class>com.jetbrains.fortea.configuration.T4RunConfigurationCreator</implementation-class>
     </component>
   </project-components>
 </idea-plugin>

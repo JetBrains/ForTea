@@ -1,13 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application;
-using JetBrains.Application.Progress;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing
 {
@@ -78,24 +74,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 			return targetExtension.StartsWith(".", StringComparison.Ordinal)
 				? targetExtension.Substring(1)
 				: targetExtension;
-		}
-
-		public static int WaitForExitSpinning(
-			[NotNull] this Process process,
-			int interval,
-			[CanBeNull] IProgressIndicator indicator
-		)
-		{
-			if (process == null) throw new ArgumentNullException(nameof(process));
-			while (!process.WaitForExit(interval))
-			{
-				InterruptableActivityCookie.CheckAndThrow();
-				if (indicator?.IsCanceled != true) continue;
-				process.KillTree();
-				throw new OperationCanceledException();
-			}
-
-			return process.ExitCode;
 		}
 	}
 }

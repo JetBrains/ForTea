@@ -53,9 +53,20 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   }
 
   init {
-    property("userSessionActive", bool).async
+    // When this signal is received, tool window is displayed
+    signal("preprocessingFinished", T4PreprocessingResult).async
+
+    // Backend calls these to create and run new configurations
+    val requestExecution = call("requestExecution", T4FileLocation, void).async
+    requestExecution.flow = FlowKind.Sink
+    val requestDebug = call("requestDebug", T4FileLocation, void).async
+    requestDebug.flow = FlowKind.Sink
+
     call("getConfiguration", T4FileLocation, T4ConfigurationModel).async
+
+    // Frontend calls these before executing file
     call("requestCompilation", T4FileLocation, T4BuildResult).async
     call("executionSucceeded", T4FileLocation, void).async
+    call("executionFailed", T4FileLocation, void).async
   }
 }

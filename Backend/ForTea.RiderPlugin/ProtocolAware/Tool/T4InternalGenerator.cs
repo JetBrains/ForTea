@@ -21,7 +21,7 @@ using JetBrains.Rider.Model;
 using JetBrains.UI.Icons;
 using JetBrains.Util;
 
-namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
+namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 {
 	[ShellComponent]
 	public sealed class T4InternalGenerator : ISingleFileCustomTool
@@ -50,6 +50,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 
 		public bool IsApplicable(IProjectFile projectFile)
 		{
+			return false;
 			using (projectFile.Locks.UsingReadLock())
 			{
 				return projectFile.LanguageType.Is<T4ProjectFileType>();
@@ -94,7 +95,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				"buildResult.BuildResultKind != T4BuildResultKind.HasErrors");
 			InterruptableActivityCookie.CheckAndThrow();
 			bool succeeded = false;
-			Lifetime.UsingNested(executionLifetime => succeeded = executionManager.Execute(Lifetime, file));
+			Lifetime.UsingNested(executionLifetime =>
+			{
+				executionManager.Execute(Lifetime, file);
+				succeeded = true; // TODO
+			});
 			if (!succeeded)
 				return new SingleFileCustomToolExecutionResult(
 					EmptyList<FileSystemPath>.Collection,

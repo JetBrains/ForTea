@@ -1,16 +1,11 @@
 using System;
 using System.Linq;
-using FluentAssertions;
 using GammaJul.ForTea.Core.Psi;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool;
-using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
@@ -20,7 +15,7 @@ using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 
-namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
+namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
 	[SolutionComponent]
 	public sealed class T4ProtocolModelManager
@@ -47,14 +42,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private ProjectModelViewHost Host { get; }
 
 		public T4ProtocolModelManager(
-			Lifetime lifetime,
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateCompiler compiler,
 			[NotNull] ILogger logger,
 			[NotNull] T4BuildMessageConverter converter,
-			[NotNull] ProjectModelViewHost host,
-			[NotNull] T4InternalGenerator generator
+			[NotNull] ProjectModelViewHost host
 		)
 		{
 			Solution = solution;
@@ -64,22 +57,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			Converter = converter;
 			Host = host;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
-			RegisterCallbacks(lifetime, generator);
+			RegisterCallbacks();
 		}
 
-		private void RegisterCallbacks(Lifetime lifetime, [NotNull] T4InternalGenerator generator)
+		private void RegisterCallbacks()
 		{
 			Model.RequestCompilation.Set(Wrap(Compile, Converter.FatalError()));
 			Model.ExecutionSucceeded.Set(Wrap(HandleSuccess, Unit.Instance));
-			Model.RequestPreprocessing.Set(Wrap(Preprocess, new T4PreprocessingResult(false, null)));
 			Model.GetConfiguration.Set(Wrap(CalculateConfiguration, new T4ConfigurationModel("", "")));
-
-			bool IsExecutionAllowed() => !Model.UserSessionActive.Maybe.ValueOrDefault;
-
-			lifetime.Bracket(
-				() => generator.ExecutionRequested += IsExecutionAllowed,
-				() => generator.ExecutionRequested -= IsExecutionAllowed
-			);
 		}
 
 		private T4ConfigurationModel CalculateConfiguration([NotNull] IT4File file) => new T4ConfigurationModel(
@@ -126,25 +111,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			}
 
 			return Unit.Instance;
-		}
-
-		[NotNull]
-		private T4PreprocessingResult Preprocess([NotNull] IT4File file)
-		{
-			try
-			{
-				string message = new T4CSharpCodeGenerator(file, Solution).Generate().RawText;
-				using (WriteLockCookie.Create())
-				{
-					TargetFileManager.SavePreprocessResults(file, message);
-				}
-
-				return new T4PreprocessingResult(true, null);
-			}
-			catch (T4OutputGenerationException e)
-			{
-				return Converter.ToT4PreprocessingResult(e);
-			}
 		}
 	}
 }

@@ -21,6 +21,6 @@ abstract class T4BackendAction(backendActionId: String, icon: Icon) :
   }
 }
 
-class T4ExecuteTemplateBackendAction : T4BackendAction("T4.RunFromContext", Run)
-//class T4DebugTemplateBackendAction : RiderContextAwareAnAction("T4.DebugFromContext")
+class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", Run)
+class T4DebugTemplateBackendAction : RiderContextAwareAnAction("T4.DebugFromContext")
 class T4PreprocessTemplateBackendAction : T4BackendAction("T4.PreprocessFromContext", ScopeCS)

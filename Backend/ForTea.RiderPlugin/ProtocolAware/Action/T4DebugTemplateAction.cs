@@ -5,8 +5,8 @@ using JetBrains.ProjectModel;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
-	[Action("T4.ExecuteFromContext", "Execute Template")]
-	public class T4ExecuteTemplateAction : T4FileBasedActionBase
+	[Action("T4.DebugFromContext", "Debug Template")]
+	public class T4DebugTemplateAction : T4FileBasedActionBase
 	{
 		public override void Execute(IDataContext context, DelegateExecute nextExecute)
 		{
@@ -16,7 +16,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			if (file == null) return;
 			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
 			if (!manager.CanExecute(file)) return;
-			solution.GetLifetime().UsingNested(nested => manager.Execute(nested, file));
+			solution.GetLifetime().UsingNested(nested => manager.Debug(nested, file));
 		}
 	}
 }
