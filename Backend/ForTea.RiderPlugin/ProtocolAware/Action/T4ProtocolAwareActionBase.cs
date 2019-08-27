@@ -15,7 +15,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			var file = FindT4File(context);
 			if (file == null) return;
 			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
-			if (!manager.CanExecute(file)) return;
 			Execute(manager, file);
 		}
 

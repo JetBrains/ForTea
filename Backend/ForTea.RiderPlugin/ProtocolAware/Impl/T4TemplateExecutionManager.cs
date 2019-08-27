@@ -29,7 +29,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		public void Execute(IT4File file) => Model.RequestExecution.Start(GetT4FileLocation(file));
 		public void Debug(IT4File file) => Model.RequestDebug.Start(GetT4FileLocation(file));
-		public bool CanExecute(IT4File file) => true; // TODO: check whether execution is running
+		public bool IsExecutionRunning(IT4File file) => false; // TODO
 
 		[NotNull]
 		private T4FileLocation GetT4FileLocation([NotNull] IT4File file)

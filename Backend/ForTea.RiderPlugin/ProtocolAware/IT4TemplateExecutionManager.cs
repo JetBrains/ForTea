@@ -7,6 +7,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 	{
 		void Execute([NotNull] IT4File file);
 		void Debug([NotNull] IT4File file);
-		bool CanExecute(IT4File file);
+		bool IsExecutionRunning(IT4File file);
 	}
 }
