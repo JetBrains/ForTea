@@ -64,7 +64,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
 			Locks.AssertReadAccessAllowed();
-			if (file.ContainsErrorElement()) return Converter.SyntaxError(T4TreeNavigator.GetErrorElements(file).First());
+			if (file.ContainsErrorElement())
+				return Converter.SyntaxError(file.ThisAndDescendants<IErrorElement>().First());
 			List<Diagnostic> messages = null;
 			return lifetime.UsingNested(nested =>
 			{
