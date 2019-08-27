@@ -15,7 +15,13 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 	public class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
 		[NotNull]
+		private ILogger Logger { get; }
+
+		[NotNull]
 		private ISet<FileSystemPath> RunningFiles { get; }
+
+		[NotNull]
+		private object ExecutionLocker { get; } = new object();
 
 		[NotNull]
 		private T4ProtocolModel Model { get; }
@@ -25,28 +31,57 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		public T4TemplateExecutionManager(
 			[NotNull] ISolution solution,
-			[NotNull] ProjectModelViewHost projectModelViewHost
+			[NotNull] ProjectModelViewHost projectModelViewHost,
+			[NotNull] ILogger logger
 		)
 		{
 			ProjectModelViewHost = projectModelViewHost;
+			Logger = logger;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RunningFiles = new HashSet<FileSystemPath>();
 		}
 
 		public void Execute(IT4File file)
 		{
-			RunningFiles.Add(file.GetSourceFile().GetLocation());
+			lock (ExecutionLocker)
+			{
+				if (IsExecutionRunning(file))
+				{
+					Logger.Warn("Could not execute template: execution already running");
+					return;
+				}
+
+				RunningFiles.Add(file.GetSourceFile().GetLocation());
+			}
+
 			Model.RequestExecution.Start(GetT4FileLocation(file));
 		}
 
 		public void Debug(IT4File file)
 		{
-			RunningFiles.Add(file.GetSourceFile().GetLocation());
+			lock (ExecutionLocker)
+			{
+				if (IsExecutionRunning(file))
+				{
+					Logger.Warn("Could not execute template: execution already running");
+					return;
+				}
+
+				RunningFiles.Add(file.GetSourceFile().GetLocation());
+			}
+
 			Model.RequestDebug.Start(GetT4FileLocation(file));
 		}
 
 		public bool IsExecutionRunning(IT4File file) => RunningFiles.Contains(file.GetSourceFile().GetLocation());
-		public void OnExecutionFinished(IT4File file) => RunningFiles.Remove(file.GetSourceFile().GetLocation());
+
+		public void OnExecutionFinished(IT4File file)
+		{
+			lock (ExecutionLocker)
+			{
+				RunningFiles.Remove(file.GetSourceFile().GetLocation());
+			}
+		}
 
 		[NotNull]
 		private T4FileLocation GetT4FileLocation([NotNull] IT4File file)
