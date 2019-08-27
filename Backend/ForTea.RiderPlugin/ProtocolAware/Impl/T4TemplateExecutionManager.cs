@@ -1,9 +1,6 @@
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application.Processes;
 using JetBrains.Diagnostics;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
-using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
@@ -19,29 +16,19 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private T4ProtocolModel Model { get; }
 
 		[NotNull]
-		private ISolutionProcessStartInfoPatcher Patcher { get; }
-
-		[NotNull]
-		private IT4TargetFileManager TargetManager { get; }
-
-		[NotNull]
 		private ProjectModelViewHost ProjectModelViewHost { get; }
 
 		public T4TemplateExecutionManager(
-			[NotNull] ISolutionProcessStartInfoPatcher patcher,
-			[NotNull] IT4TargetFileManager targetManager,
 			[NotNull] ISolution solution,
 			[NotNull] ProjectModelViewHost projectModelViewHost
 		)
 		{
-			Patcher = patcher;
-			TargetManager = targetManager;
 			ProjectModelViewHost = projectModelViewHost;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 		}
 
-		public void Execute(Lifetime lifetime, IT4File file) => Model.RequestExecution.Start(GetT4FileLocation(file));
-		public void Debug(Lifetime lifetime, IT4File file) => Model.RequestDebug.Start(GetT4FileLocation(file));
+		public void Execute(IT4File file) => Model.RequestExecution.Start(GetT4FileLocation(file));
+		public void Debug(IT4File file) => Model.RequestDebug.Start(GetT4FileLocation(file));
 		public bool CanExecute(IT4File file) => true; // TODO: check whether execution is running
 
 		[NotNull]

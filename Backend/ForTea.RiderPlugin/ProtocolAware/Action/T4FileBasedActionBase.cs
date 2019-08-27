@@ -5,7 +5,6 @@ using JetBrains.Annotations;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.DataFlow;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.DataContext;
 using JetBrains.ReSharper.Psi.DataContext;
@@ -16,11 +15,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
 	public abstract class T4FileBasedActionBase : IExecutableAction
 	{
-		[CanBeNull]
-		public ISignal<IT4File> Performed { get; }
-
-		protected T4FileBasedActionBase() => Performed = new Signal<IT4File>("T4 Action Performed");
-
 		public virtual bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
 		{
 			bool canExecute = FindT4File(context) != null && FindSolution(context) != null;

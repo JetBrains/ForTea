@@ -1,22 +1,11 @@
-using JetBrains.Application.DataContext;
-using JetBrains.Application.UI.Actions;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.ProjectModel;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
 	[Action("T4.DebugFromContext", "Debug Template")]
-	public class T4DebugTemplateAction : T4FileBasedActionBase
+	public class T4DebugTemplateAction : T4ProtocolAwareActionBase
 	{
-		public override void Execute(IDataContext context, DelegateExecute nextExecute)
-		{
-			var solution = FindSolution(context);
-			if (solution == null) return;
-			var file = FindT4File(context);
-			if (file == null) return;
-			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
-			if (!manager.CanExecute(file)) return;
-			solution.GetLifetime().UsingNested(nested => manager.Debug(nested, file));
-		}
+		protected override void Execute(IT4TemplateExecutionManager manager, IT4File file) => manager.Debug(file);
 	}
 }

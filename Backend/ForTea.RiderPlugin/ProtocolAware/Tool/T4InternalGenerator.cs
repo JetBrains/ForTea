@@ -97,7 +97,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 			bool succeeded = false;
 			Lifetime.UsingNested(executionLifetime =>
 			{
-				executionManager.Execute(Lifetime, file);
+				executionManager.Execute(file);
 				succeeded = true; // TODO
 			});
 			if (!succeeded)
