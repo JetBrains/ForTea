@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.FeaturesTestFramework.TypingAssist;
 using JetBrains.ReSharper.TestFramework;
@@ -10,7 +10,7 @@ namespace JetBrains.ForTea.Tests.Features.TypingAssist
 	[TestFixture]
 	[Category("Typing assist")]
 	[Category("T4")]
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	public class T4OctothorpeTypingAssistTest : TypingAssistTestBase
 	{
 		protected override string RelativeTestDataPath => @"Features\TypingAssist";

@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;

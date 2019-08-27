@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Application.Components;
 using JetBrains.ProjectModel;
 using JetBrains.TestFramework;
@@ -21,7 +22,7 @@ namespace JetBrains.ForTea.Tests.General
 		public void ProjectFileTypeFromExtension()
 		{
 			var projectFileExtensions = ShellInstance.GetComponent<IProjectFileExtensions>();
-			Assert.AreSame(T4ProjectFileType.Instance, projectFileExtensions.GetFileType(T4ProjectFileType.MainExtension));
+			Assert.AreSame(T4ProjectFileType.Instance, projectFileExtensions.GetFileType(T4FileExtensions.MainExtension));
 		}
 	}
 }

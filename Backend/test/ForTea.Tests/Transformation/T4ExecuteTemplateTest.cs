@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.FeaturesTestFramework.Intentions;
 using JetBrains.ReSharper.TestFramework;
@@ -6,7 +7,7 @@ using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Transformation
 {
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	[Ignore("Template execution has moved to frontend")]
 	public sealed class T4ExecuteTemplateTest : ContextActionExecuteTestBase<IContextAction>
 	{

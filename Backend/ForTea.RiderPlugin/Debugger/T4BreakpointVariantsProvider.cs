@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Debugger;
 using JetBrains.ReSharper.Psi;

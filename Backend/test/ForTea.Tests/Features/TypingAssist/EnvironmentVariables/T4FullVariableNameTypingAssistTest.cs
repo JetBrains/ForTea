@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.FeaturesTestFramework.TypingAssist;
 using JetBrains.ReSharper.TestFramework;
 using JetBrains.TextControl;
@@ -9,7 +9,7 @@ namespace JetBrains.ForTea.Tests.Features.TypingAssist.EnvironmentVariables
 	[TestFixture]
 	[Category("Typing assist")]
 	[Category("T4")]
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	public class T4FullVariableNameTypingAssistTest : TypingAssistTestBase
 	{
 		protected override string RelativeTestDataPath => @"Features\TypingAssist\EnvironmentVariables";

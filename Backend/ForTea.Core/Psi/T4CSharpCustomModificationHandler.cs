@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;

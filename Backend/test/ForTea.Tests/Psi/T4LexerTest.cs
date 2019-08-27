@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.TestFramework;
 using JetBrains.Text;
@@ -7,7 +8,7 @@ using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Psi
 {
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	public sealed class T4LexerTest : LexerTestBase
 	{
 		protected override string RelativeTestDataPath => @"Psi\Lexer";

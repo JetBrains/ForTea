@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Services.CodeCompletion;
 using JetBrains.Annotations;
 using JetBrains.Application.CommandProcessing;
