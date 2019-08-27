@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference
 {
 	public static class T4ReferenceExtractionUtils
 	{
-		public static List<MetadataReference> ExtractReferences(
+		public static List<PortableExecutableReference> ExtractReferences(
 			[NotNull] this IT4File file,
 			Lifetime lifetime,
 			[NotNull] IShellLocks locks,

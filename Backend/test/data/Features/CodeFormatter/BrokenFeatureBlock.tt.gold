@@ -1,4 +1,4 @@
-﻿{caret}<#@ include file="foo/bar.txt" once="i don't know" #>
+﻿<#@ include file="foo/bar.txt" once="i don't know" #>
 <#+
 
     public static void Foo(int number, string line)
@@ -14,3 +14,4 @@
     }
 
 #>
+{caret}

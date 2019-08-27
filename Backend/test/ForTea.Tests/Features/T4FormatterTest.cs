@@ -41,22 +41,12 @@ namespace JetBrains.ForTea.Tests.Features
 		{
 			var textControl = OpenTextControl(lifetime);
 			var document = textControl.Document;
-			int caretOffset = textControl.Caret.Offset();
-			string newDocumentText = GetTextAfterFormatting(document, textControl, ref caretOffset);
-			document.ReplaceText(TextRange.FromLength(document.GetTextLength()), newDocumentText);
-			if (caretOffset >= 0)
-			{
-				textControl.Caret.MoveTo(caretOffset, CaretVisualPlacement.Generic);
-			}
-
+			string newDocumentText = GetTextAfterFormatting(document, textControl);
+			document.ReplaceText(document.DocumentRange, newDocumentText);
 			CheckTextControl(textControl);
 		}
 
-		private string GetTextAfterFormatting(
-			[NotNull] IDocument document,
-			[NotNull] ITextControl textControl,
-			ref int caretOffset
-		)
+		private string GetTextAfterFormatting([NotNull] IDocument document, [NotNull] ITextControl textControl)
 		{
 			using (Solution.GetComponent<DocumentTransactionManager>()
 				.CreateTransactionCookie(DefaultAction.Rollback, "Temporary change"))
@@ -68,7 +58,7 @@ namespace JetBrains.ForTea.Tests.Features
 				var selectionRange = textControl.Selection.OneDocRangeWithCaret();
 				codeCleanup.Run(file, selectionRange.Length > 0
 					? new DocumentRange(textControl.Document, selectionRange)
-					: DocumentRange.InvalidRange, ref caretOffset, profile, NullProgressIndicator.Create());
+					: DocumentRange.InvalidRange, profile, NullProgressIndicator.Create());
 				return document.GetText();
 			}
 		}
