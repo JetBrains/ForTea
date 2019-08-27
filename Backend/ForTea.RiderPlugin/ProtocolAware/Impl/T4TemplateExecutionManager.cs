@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -6,12 +7,16 @@ using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Rider.Model;
+using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
 	[SolutionComponent]
 	public class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
+		[NotNull]
+		private ISet<FileSystemPath> RunningFiles { get; }
+
 		[NotNull]
 		private T4ProtocolModel Model { get; }
 
@@ -25,11 +30,23 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		{
 			ProjectModelViewHost = projectModelViewHost;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
+			RunningFiles = new HashSet<FileSystemPath>();
 		}
 
-		public void Execute(IT4File file) => Model.RequestExecution.Start(GetT4FileLocation(file));
-		public void Debug(IT4File file) => Model.RequestDebug.Start(GetT4FileLocation(file));
-		public bool IsExecutionRunning(IT4File file) => false; // TODO
+		public void Execute(IT4File file)
+		{
+			RunningFiles.Add(file.GetSourceFile().GetLocation());
+			Model.RequestExecution.Start(GetT4FileLocation(file));
+		}
+
+		public void Debug(IT4File file)
+		{
+			RunningFiles.Add(file.GetSourceFile().GetLocation());
+			Model.RequestDebug.Start(GetT4FileLocation(file));
+		}
+
+		public bool IsExecutionRunning(IT4File file) => RunningFiles.Contains(file.GetSourceFile().GetLocation());
+		public void OnExecutionFinished(IT4File file) => RunningFiles.Remove(file.GetSourceFile().GetLocation());
 
 		[NotNull]
 		private T4FileLocation GetT4FileLocation([NotNull] IT4File file)

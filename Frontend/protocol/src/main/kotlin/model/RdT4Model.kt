@@ -63,8 +63,9 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     requestDebug.flow = FlowKind.Sink
 
     call("getConfiguration", T4FileLocation, T4ConfigurationModel).async
+    call("canExecute", T4FileLocation, bool)
 
-    // Frontend calls these before executing file
+    // Frontend calls this before executing file
     call("requestCompilation", T4FileLocation, T4BuildResult).async
     call("executionSucceeded", T4FileLocation, void).async
     call("executionFailed", T4FileLocation, void).async

@@ -15,6 +15,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 		[NotNull]
 		FileSystemPath GetExpectedTemporaryTargetFileLocation([NotNull] IT4File file);
 
+		// TODO: it is no longer called from ISingleFileCustomTool, check write locks maybe?
 		/// <note>
 		/// This method performs write operations without checking write lock.
 		/// That is done to use it inside ISingleFileCustomTool

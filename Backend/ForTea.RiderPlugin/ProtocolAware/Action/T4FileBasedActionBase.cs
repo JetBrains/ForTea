@@ -17,9 +17,20 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 	{
 		public virtual bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
 		{
-			bool canExecute = FindT4File(context) != null && FindSolution(context) != null;
+			bool canExecute = CanExecute(context);
 			presentation.Visible = canExecute;
 			return canExecute;
+		}
+
+		private static bool CanExecute([NotNull] IDataContext context)
+		{
+			var file = FindT4File(context);
+			if (file == null) return false;
+			var solution = FindSolution(context);
+			if (solution == null) return false;
+			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
+			if (executionManager.IsExecutionRunning(file)) return false;
+			return true;
 		}
 
 		public abstract void Execute(IDataContext context, DelegateExecute nextExecute);
