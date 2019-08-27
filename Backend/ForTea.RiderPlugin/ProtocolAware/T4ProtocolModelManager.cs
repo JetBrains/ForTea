@@ -113,8 +113,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 				return result ?? defaultValue;
 			};
 
-		private T4BuildResult Compile([NotNull] IT4File t4File) =>
-			ExecutionManager.Compile(Solution.GetLifetime(), t4File);
+		private T4BuildResult Compile([NotNull] IT4File t4File)
+		{
+			using (WriteLockCookie.Create())
+			{
+				// Interrupt template execution, if any
+			}
+			return ExecutionManager.Compile(Solution.GetLifetime(), t4File);
+		}
 
 		[CanBeNull]
 		private Unit HandleSuccess([NotNull] IT4File file)
