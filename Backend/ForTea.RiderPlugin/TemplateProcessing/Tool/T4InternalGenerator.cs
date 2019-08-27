@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
@@ -27,7 +28,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 	{
 		// This is a hack to prevent multiple execution. TODO: remove
 		private DateTime ExecutedFileLastWriteUtc { get; set; }
-		
 		private Lifetime Lifetime { get; }
 
 		// Should return whether execution should proceed or not
@@ -39,15 +39,19 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		public string ActionName => "Execute T4 generator";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
 		public string[] CustomTools => new[] {"T4 Generator Custom Tool"};
-		public string[] Extensions => new[] {T4ProjectFileType.MainExtensionNoDot};
 		public bool IsEnabled => true;
+
+		public string[] Extensions => new[]
+		{
+			T4FileExtensions.MainExtensionNoDot,
+			T4FileExtensions.SecondExtensionNoDot
+			// .ttinclude files exist for being included and should not be auto-executed
+		};
 
 		public bool IsApplicable(IProjectFile projectFile)
 		{
 			using (projectFile.Locks.UsingReadLock())
 			{
-				// .ttinclude files exist for being included and should not be auto-executed
-				if (projectFile.Location.ExtensionWithDot == T4ProjectFileType.IncludeExtension) return false;
 				return projectFile.LanguageType.Is<T4ProjectFileType>();
 			}
 		}
