@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.jetbrains.fortea.language.T4Language
 import com.jetbrains.rider.actions.base.RiderContextAwareAnAction
+import com.jetbrains.rider.icons.ReSharperCommonIcons
 import com.jetbrains.rider.icons.ReSharperLiveTemplatesCSharpIcons.ScopeCS
 import com.jetbrains.rider.icons.ReSharperPsiBuildScriptsIcons.Run
 import javax.swing.Icon
@@ -22,5 +23,5 @@ abstract class T4BackendAction(backendActionId: String, icon: Icon) :
 }
 
 class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", Run)
-class T4DebugTemplateBackendAction : RiderContextAwareAnAction("T4.DebugFromContext")
+class T4DebugTemplateBackendAction : T4BackendAction("T4.DebugFromContext", Debug)
 class T4PreprocessTemplateBackendAction : T4BackendAction("T4.PreprocessFromContext", ScopeCS)
