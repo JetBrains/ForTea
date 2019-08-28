@@ -52,14 +52,19 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     field("message", T4BuildMessage.nullable)
   }
 
+  val T4ExecutionRequest = structdef {
+    field("location", T4FileLocation)
+    field("isVisible", bool)
+  }
+
   init {
     // When this signal is received, tool window is displayed
     signal("preprocessingFinished", T4PreprocessingResult).async
 
     // Backend calls these to create and run new configurations
-    val requestExecution = call("requestExecution", T4FileLocation, void).async
+    val requestExecution = call("requestExecution", T4ExecutionRequest, void).async
     requestExecution.flow = FlowKind.Sink
-    val requestDebug = call("requestDebug", T4FileLocation, void).async
+    val requestDebug = call("requestDebug", T4ExecutionRequest, void).async
     requestDebug.flow = FlowKind.Sink
 
     call("getConfiguration", T4FileLocation, T4ConfigurationModel).async

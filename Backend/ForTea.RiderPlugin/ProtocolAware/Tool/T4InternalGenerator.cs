@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Altering.Resources;
 using JetBrains.ReSharper.Host.Features.ProjectModel.CustomTools;
@@ -59,7 +58,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		{
 			if (file == null || manager == null) return;
 			if (manager.IsExecutionRunning(file)) return;
-			manager.Execute(file);
+			manager.ExecuteSilently(file);
 		}
 	}
 }

@@ -16,7 +16,7 @@ import com.jetbrains.rider.util.idea.getComponent
 import com.jetbrains.rider.util.idea.lifetime
 
 class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunTask>() {
-  override fun getName() = "Compile T4 file"
+  override fun getName() = "Compile T4 File"
 
   override fun getId(): Key<CompileT4BeforeRunTask> = providerId
 
@@ -37,30 +37,31 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
 
     val project = configuration.project
     val view = project.getComponent<T4BuildSessionView>()
-    view.openWindow(project.lifetime)
+    val executionRequest = configuration.parameters.request
+    if (executionRequest.isVisible) view.openWindow(project.lifetime)
     val finished = Semaphore()
     finished.down()
     var successful = false
 
     val host = ProjectModelViewHost.getInstance(project)
-    val initialFileLocation = configuration.parameters.initialFileLocation
-    val item = host.getItemById(initialFileLocation.id) ?: return false
+    val location = executionRequest.location
+    val item = host.getItemById(location.id) ?: return false
     val path = item.getVirtualFile()?.path ?: return false
     val model = project.solution.t4ProtocolModel
 
-    val request = model.requestCompilation.start(initialFileLocation).result
+    val request = model.requestCompilation.start(location).result
     request.advise(project.lifetime) { rdTaskResult ->
       try {
         val result = rdTaskResult.unwrap()
         successful = result.buildResultKind.isSuccess
-        view.showT4BuildResult(project.lifetime, result.messages, path)
+        if (executionRequest.isVisible) view.showT4BuildResult(project.lifetime, result.messages, path)
       } finally {
         finished.up()
       }
     }
 
     finished.waitFor()
-    if (!successful) model.executionAborted.fire(initialFileLocation)
+    if (!successful) model.executionAborted.fire(location)
     return successful
   }
 

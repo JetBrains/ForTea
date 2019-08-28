@@ -1,13 +1,9 @@
 package com.jetbrains.fortea.configuration.run
 
-import com.intellij.openapi.util.JDOMExternalizerUtil
 import com.intellij.util.execution.ParametersListUtil
-import com.jetbrains.fortea.configuration.readT4FileLocationExternal
-import com.jetbrains.fortea.configuration.writeExternal
-import com.jetbrains.rider.model.T4FileLocation
+import com.jetbrains.rider.model.T4ExecutionRequest
 import com.jetbrains.rider.run.configurations.exe.ExeConfigurationParameters
 import com.jetbrains.rider.runtime.DotNetExecutable
-import org.jdom.Element
 
 open class T4RunConfigurationParameters(
   exePath: String,
@@ -20,7 +16,7 @@ open class T4RunConfigurationParameters(
   private var executeAsIs: Boolean,
   private val assemblyToDebug: String?,
   var runtimeArguments: String,
-  var initialFileLocation: T4FileLocation
+  var request: T4ExecutionRequest
 ) : ExeConfigurationParameters(
   exePath,
   programParameters,
@@ -29,7 +25,7 @@ open class T4RunConfigurationParameters(
   isPassParentEnvs,
   useExternalConsole
 ) {
-  open fun toDotNetExecutable() = DotNetExecutable(
+  fun toDotNetExecutable() = DotNetExecutable(
     exePath,
     "",
     workingDirectory,
@@ -45,24 +41,5 @@ open class T4RunConfigurationParameters(
   )
 
   override fun validate() {
-  }
-
-  override fun readExternal(element: Element) {
-    super.readExternal(element)
-    useMonoRuntime = JDOMExternalizerUtil.readField(element, USE_MONO) == "1"
-    runtimeArguments = JDOMExternalizerUtil.readField(element, RUNTIME_ARGUMENTS) ?: ""
-    initialFileLocation = readT4FileLocationExternal(element)
-  }
-
-  override fun writeExternal(element: Element) {
-    super.writeExternal(element)
-    JDOMExternalizerUtil.writeField(element, USE_MONO, if (useMonoRuntime) "1" else "0")
-    JDOMExternalizerUtil.writeField(element, RUNTIME_ARGUMENTS, runtimeArguments)
-    initialFileLocation.writeExternal(element)
-  }
-
-  companion object {
-    private const val USE_MONO = "USE_MONO"
-    private const val RUNTIME_ARGUMENTS = "RUNTIME_ARGUMENTS"
   }
 }

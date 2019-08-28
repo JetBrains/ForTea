@@ -55,7 +55,23 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				RunningFiles.Add(file.GetSourceFile().GetLocation());
 			}
 
-			Model.RequestExecution.Start(GetT4FileLocation(file));
+			Model.RequestExecution.Start(new T4ExecutionRequest(GetT4FileLocation(file), true));
+		}
+
+		public void ExecuteSilently(IT4File file)
+		{
+			lock (ExecutionLocker)
+			{
+				if (IsExecutionRunning(file))
+				{
+					ShowNotification();
+					return;
+				}
+
+				RunningFiles.Add(file.GetSourceFile().GetLocation());
+			}
+
+			Model.RequestExecution.Start(new T4ExecutionRequest(GetT4FileLocation(file), false));
 		}
 
 		public void Debug(IT4File file)
@@ -71,7 +87,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				RunningFiles.Add(file.GetSourceFile().GetLocation());
 			}
 
-			Model.RequestDebug.Start(GetT4FileLocation(file));
+			Model.RequestDebug.Start(new T4ExecutionRequest(GetT4FileLocation(file), true));
 		}
 
 		public bool IsExecutionRunning(IT4File file) => RunningFiles.Contains(file.GetSourceFile().GetLocation());

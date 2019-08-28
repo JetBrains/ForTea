@@ -3,6 +3,7 @@ package com.jetbrains.fortea.configuration.run
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.ConfigurationType
 import com.intellij.openapi.project.Project
+import com.jetbrains.rider.model.T4ExecutionRequest
 import com.jetbrains.rider.model.T4FileLocation
 import org.jetbrains.annotations.NotNull
 
@@ -25,7 +26,7 @@ class T4RunConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(
       executeAsIs = false,
       assemblyToDebug = null,
       runtimeArguments = "",
-      initialFileLocation = T4FileLocation(0)
+      request = T4ExecutionRequest(T4FileLocation(0), false)
     )
   }
 }
