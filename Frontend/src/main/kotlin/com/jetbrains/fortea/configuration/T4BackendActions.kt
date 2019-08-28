@@ -16,25 +16,25 @@ import javax.swing.Icon
 abstract class T4BackendAction(backendActionId: String, icon: Icon) :
   RiderContextAwareAnAction(backendActionId, icon = icon) {
   override fun update(e: AnActionEvent) {
-    val dataContext = e.dataContext
-    val presentation = e.presentation
-    val psiFile = dataContext.getData(CommonDataKeys.PSI_FILE)
-    if (psiFile?.language != T4Language) {
-      presentation.isEnabledAndVisible = false
-      return
-    }
-
-    presentation.isVisible = true
-    presentation.isEnabled = false
-
-    val project = e.project ?: return
-    val host = ProjectModelViewHost.getInstance(project)
-    val item = host.getItemsByVirtualFile(psiFile.virtualFile).singleOrNull() ?: return
-    val canExecute = project.solution.t4ProtocolModel.canExecute.sync(T4FileLocation(item.id))
-    if (canExecute) presentation.isEnabled = true
+    e.presentation.isEnabledAndVisible = e.dataContext.getData(CommonDataKeys.PSI_FILE)?.language == T4Language
   }
 }
 
-class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", Run)
-class T4DebugTemplateBackendAction : T4BackendAction("T4.DebugFromContext", Debug)
+abstract class T4ExecutionBackendAction(backendActionId: String, icon: Icon) : T4BackendAction(backendActionId, icon) {
+  override fun update(e: AnActionEvent) {
+    super.update(e)
+    if (!e.presentation.isVisible) return
+    e.presentation.isEnabled = false
+    val psiFile = e.dataContext.getData(CommonDataKeys.PSI_FILE) ?: return
+    val project = e.project ?: return
+    val host = ProjectModelViewHost.getInstance(project)
+    val item = host.getItemsByVirtualFile(psiFile.virtualFile).singleOrNull() ?: return
+    val model = project.solution.t4ProtocolModel
+    val canExecute = model.canExecute.sync(T4FileLocation(item.id))
+    if (canExecute) e.presentation.isEnabled = true
+  }
+}
+
+class T4ExecuteTemplateBackendAction : T4ExecutionBackendAction("T4.ExecuteFromContext", Run)
+class T4DebugTemplateBackendAction : T4ExecutionBackendAction("T4.DebugFromContext", Debug)
 class T4PreprocessTemplateBackendAction : T4BackendAction("T4.PreprocessFromContext", ScopeCS)
