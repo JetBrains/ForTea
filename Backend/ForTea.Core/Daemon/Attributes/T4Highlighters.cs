@@ -5,7 +5,8 @@ using JetBrains.TextControl.DocumentMarkup;
 [assembly: RegisterHighlighterGroup(
 	T4HighlightingAttributeIds.GROUP_ID,
 	T4HighlightingAttributeIds.GROUP_ID,
-	HighlighterGroupPriority.LANGUAGE_SETTINGS
+	HighlighterGroupPriority.LANGUAGE_SETTINGS,
+	DemoText = "<#@ assembly name=\"<T4_ATTRIBUTE_VALUE>$(</T4_ATTRIBUTE_VALUE><MACRO_IN_T4>SolutionDir</MACRO_IN_T4><T4_ATTRIBUTE_VALUE>)/%</T4_ATTRIBUTE_VALUE><ENVIRONMENT_VARIABLE_IN_T4>USERNAME</ENVIRONMENT_VARIABLE_IN_T4><T4_ATTRIBUTE_VALUE>%/Foo.dll</T4_ATTRIBUTE_VALUE>\"#>"
 )]
 [assembly: RegisterHighlighter(
 	T4HighlightingAttributeIds.MACRO,

@@ -5,8 +5,8 @@ namespace GammaJul.ForTea.Core.Daemon.Attributes
 		public static class T4HighlightingAttributeIds
 		{
 			public const string GROUP_ID = "T4";
-			public const string MACRO = "Macro in T4";
-			public const string ENVIRONMENT_VARIABLE = "Environment Variable in T4";
+			public const string MACRO = "T4 Macro Value";
+			public const string ENVIRONMENT_VARIABLE = "T4 Environment Variable";
 			public const string RAW_ATTRIBUTE_VALUE = "T4 Attribute value";
 		}
 	}
