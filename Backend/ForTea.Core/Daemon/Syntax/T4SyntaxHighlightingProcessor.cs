@@ -18,6 +18,11 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 {
 	public sealed class T4SyntaxHighlightingProcessor : SyntaxHighlightingProcessor
 	{
+		[NotNull]
+		private IT4MacroResolver Resolver { get; }
+
+		public T4SyntaxHighlightingProcessor([NotNull] IT4MacroResolver resolver) => Resolver = resolver;
+
 		public override bool InteriorShouldBeProcessed(ITreeNode element, IHighlightingConsumer context)
 		{
 			var type = element.NodeType;
@@ -44,13 +49,12 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		}
 
 		[CanBeNull]
-		private static string ExpandMacro([NotNull] IT4Macro macro)
+		private string ExpandMacro([NotNull] IT4Macro macro)
 		{
 			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
-			var solution = projectFile.GetSolution();
 			string name = macro.RawAttributeValue?.GetText();
 			if (name == null) return null;
-			var macros = solution.GetComponent<IT4MacroResolver>().Resolve(new[] {name}, projectFile);
+			var macros = Resolver.Resolve(new[] {name}, projectFile);
 			return macros.ContainsKey(name) ? macros[name] : null;
 		}
 
@@ -66,7 +70,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			else context.AddHighlighting(new T4UnsupportedMacroHighlighting(macro));
 		}
 
-		private static void HighlightMacro(
+		private void HighlightMacro(
 			[NotNull] IT4Macro element,
 			[NotNull] IHighlightingConsumer context
 		)
