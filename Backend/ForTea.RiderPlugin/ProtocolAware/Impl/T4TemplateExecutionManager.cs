@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Rider.Model;
+using JetBrains.Rider.Model.Notifications;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
@@ -14,9 +15,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 	[SolutionComponent]
 	public class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
-		[NotNull]
-		private ILogger Logger { get; }
-
 		[NotNull]
 		private ISet<FileSystemPath> RunningFiles { get; }
 
@@ -29,14 +27,17 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		[NotNull]
 		private ProjectModelViewHost ProjectModelViewHost { get; }
 
+		[NotNull]
+		private NotificationsModel NotificationsModel { get; }
+
 		public T4TemplateExecutionManager(
 			[NotNull] ISolution solution,
 			[NotNull] ProjectModelViewHost projectModelViewHost,
-			[NotNull] ILogger logger
+			[NotNull] NotificationsModel notificationsModel
 		)
 		{
 			ProjectModelViewHost = projectModelViewHost;
-			Logger = logger;
+			NotificationsModel = notificationsModel;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RunningFiles = new HashSet<FileSystemPath>();
 		}
@@ -47,7 +48,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			{
 				if (IsExecutionRunning(file))
 				{
-					Logger.Warn("Could not execute template: execution already running");
+					ShowNotification();
 					return;
 				}
 
@@ -63,7 +64,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			{
 				if (IsExecutionRunning(file))
 				{
-					Logger.Warn("Could not execute template: execution already running");
+					ShowNotification();
 					return;
 				}
 
@@ -90,6 +91,16 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			int id = ProjectModelViewHost.GetIdByItem(projectFile);
 			return new T4FileLocation(id);
+		}
+
+		private void ShowNotification()
+		{
+			var notification = new NotificationModel(
+				"Could not execute T4 file",
+				"Execution is already running", true,
+				RdNotificationEntryType.ERROR
+			);
+			NotificationsModel.Notification(notification);
 		}
 	}
 }
