@@ -6,9 +6,6 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 {
 	public class TemplateDirectiveInfo : DirectiveInfo
 	{
-		[NotNull] public const string CSharpLanguageAttributeValue = "C#";
-		[NotNull] public const string VBLanguageAttributeValue = "VB";
-
 		[NotNull]
 		public DirectiveAttributeInfo CompilerOptionsAttribute { get; }
 
@@ -37,8 +34,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 
 		public TemplateDirectiveInfo() : base("template")
 		{
-			LanguageAttribute = new EnumDirectiveAttributeInfo(
-				"language", DirectiveAttributeOptions.None, CSharpLanguageAttributeValue, VBLanguageAttributeValue);
+			LanguageAttribute = new LanguageAttributeInfo();
 			HostSpecificAttribute = new EnumDirectiveAttributeInfo(
 				"hostspecific",
 				DirectiveAttributeOptions.None,

@@ -1,0 +1,8 @@
+﻿<#@ template language="C#" #>
+<#@ template language="C#v3.5" #>
+<#@ template language="|VB|(0)" #>
+<#@ template language="|F#|(1)" #>
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Visual Basic is not supported
+(1): ReSharper Underlined Error Highlighting: Unexpected value

@@ -58,9 +58,10 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 			switch (name)
 			{
 				case null:
-				case TemplateDirectiveInfo.CSharpLanguageAttributeValue:
+				case LanguageAttributeInfo.CSharpLanguageAttributeValue:
+				case LanguageAttributeInfo.NewCSharpLanguageAttributeValue:
 					return CSharpLanguage.Instance;
-				case TemplateDirectiveInfo.VBLanguageAttributeValue:
+				case LanguageAttributeInfo.VBLanguageAttributeValue:
 					return VBLanguage.Instance;
 				default:
 					return UnknownLanguage.Instance;
