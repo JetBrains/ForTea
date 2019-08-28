@@ -33,6 +33,7 @@ class T4RunConfigurationCreator(
     setupFromFile(configuration, request)
     val runManager = RunManager.getInstance(project)
     val configurationSettings = runManager.createConfiguration(configuration, configurationType.factory)
+    configurationSettings.isActivateToolWindowBeforeRun = request.isVisible
     executeConfiguration(configurationSettings, executor, project)
   }
 
