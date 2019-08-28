@@ -47,6 +47,20 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				return result ?? defaultValue;
 			};
 
+		public Action<T4FileLocation> Wrap(Action<IT4File> wrappee) => location => Logger.Catch(() =>
+		{
+			using (ReadLockCookie.Create())
+			{
+				var file = Host
+					.GetItemById<IProjectFile>(location.Id)
+					?.ToSourceFile()
+					?.GetPsiFiles(T4Language.Instance)
+					.OfType<IT4File>()
+					.SingleItem();
+				if (file != null) wrappee(file);
+			}
+		});
+
 		public Func<T4FileLocation, T> WrapStructFunc<T>(Func<IT4File, T?> wrappee, T defaultValue) where T : struct =>
 			location =>
 			{

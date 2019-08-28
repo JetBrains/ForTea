@@ -7,7 +7,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
 	public interface IT4ModelInteractionHelper
 	{
-		Func<T4FileLocation, T> Wrap<T>(Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class;
-		Func<T4FileLocation, T> WrapStructFunc<T>(Func<IT4File, T?> wrappee, T defaultValue) where T : struct;
+		Func<T4FileLocation, T> Wrap<T>([NotNull] Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class;
+		Action<T4FileLocation> Wrap([NotNull] Action<IT4File> wrappee);
+		Func<T4FileLocation, T> WrapStructFunc<T>([NotNull] Func<IT4File, T?> wrappee, T defaultValue) where T : struct;
 	}
 }

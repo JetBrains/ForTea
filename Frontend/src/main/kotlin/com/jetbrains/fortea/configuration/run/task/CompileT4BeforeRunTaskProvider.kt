@@ -43,11 +43,12 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
     var successful = false
 
     val host = ProjectModelViewHost.getInstance(project)
-    val item = host.getItemById(configuration.parameters.initialFileLocation.id) ?: return false
+    val initialFileLocation = configuration.parameters.initialFileLocation
+    val item = host.getItemById(initialFileLocation.id) ?: return false
     val path = item.getVirtualFile()?.path ?: return false
     val model = project.solution.t4ProtocolModel
 
-    val request = model.requestCompilation.start(configuration.parameters.initialFileLocation).result
+    val request = model.requestCompilation.start(initialFileLocation).result
     request.advise(project.lifetime) { rdTaskResult ->
       try {
         val result = rdTaskResult.unwrap()
@@ -59,6 +60,7 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
     }
 
     finished.waitFor()
+    if (!successful) model.executionAborted.fire(initialFileLocation)
     return successful
   }
 

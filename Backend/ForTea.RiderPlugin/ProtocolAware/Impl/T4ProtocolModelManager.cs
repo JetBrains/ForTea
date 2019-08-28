@@ -1,8 +1,8 @@
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Resources.Shell;
@@ -29,6 +29,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private IT4TemplateExecutionManager ExecutionManager { get; }
 
 		public T4ProtocolModelManager(
+			Lifetime lifetime,
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateCompiler compiler,
@@ -43,15 +44,20 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			Converter = converter;
 			ExecutionManager = executionManager;
 			var model = solution.GetProtocolSolution().GetT4ProtocolModel();
-			RegisterCallbacks(model, helper);
+			RegisterCallbacks(lifetime, model, helper);
 		}
 
-		private void RegisterCallbacks([NotNull] T4ProtocolModel model, [NotNull] IT4ModelInteractionHelper helper)
+		private void RegisterCallbacks(
+			Lifetime lifetime,
+			[NotNull] T4ProtocolModel model,
+			[NotNull] IT4ModelInteractionHelper helper
+		)
 		{
 			model.RequestCompilation.Set(helper.Wrap(Compile, Converter.FatalError()));
 			model.GetConfiguration.Set(helper.Wrap(CalculateConfiguration, new T4ConfigurationModel("", "")));
-			model.ExecutionSucceeded.Set(helper.Wrap(HandleSuccess, Unit.Instance));
-			model.ExecutionFailed.Set(helper.Wrap(HandleFailure, Unit.Instance));
+			model.ExecutionSucceeded.Advise(lifetime, helper.Wrap(ExecutionSucceeded));
+			model.ExecutionFailed.Advise(lifetime, helper.Wrap(ExecutionFailed));
+			model.ExecutionAborted.Advise(lifetime, helper.Wrap(ExecutionFailed));
 			model.CanExecute.Set(helper.WrapStructFunc(CanExecute, false));
 		}
 
@@ -62,8 +68,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		private T4BuildResult Compile([NotNull] IT4File t4File) => Compiler.Compile(Solution.GetLifetime(), t4File);
 
-		[CanBeNull]
-		private Unit HandleSuccess([NotNull] IT4File file)
+		private void ExecutionSucceeded([NotNull] IT4File file)
 		{
 			var destination = TargetFileManager.CopyExecutionResults(file);
 			using (WriteLockCookie.Create())
@@ -72,15 +77,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			}
 
 			ExecutionManager.OnExecutionFinished(file);
-			return Unit.Instance;
 		}
 
-		private Unit HandleFailure([NotNull] IT4File file)
-		{
-			ExecutionManager.OnExecutionFinished(file);
-			return Unit.Instance;
-		}
-
+		private void ExecutionFailed([NotNull] IT4File file) => ExecutionManager.OnExecutionFinished(file);
 		private bool? CanExecute([NotNull] IT4File file) => !ExecutionManager.IsExecutionRunning(file);
 	}
 }
