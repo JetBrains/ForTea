@@ -3,7 +3,6 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
@@ -14,7 +13,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-	[ShellComponent]
+	[SolutionComponent]
 	public class T4ModelInteractionHelper : IT4ModelInteractionHelper
 	{
 		[NotNull]
