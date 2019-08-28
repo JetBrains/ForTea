@@ -1,4 +1,3 @@
-using System.IO;
 using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.Tree;
@@ -47,7 +46,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public FileSystemPath GetExpectedTemporaryTargetFileLocation(IT4File file) =>
 			GetTemporaryExecutableLocation(file).Parent.Combine(GetExpectedTargetFileName(file));
 
-		public string GetExpectedTargetFileName(IT4File file)
+		[NotNull]
+		private string GetExpectedTargetFileName([NotNull] IT4File file)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -56,17 +56,20 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return name.WithOtherExtension(targetExtension);
 		}
 
-		private FileSystemPath GetTemporaryTargetFileFolder(IT4File file) =>
+		[NotNull]
+		private FileSystemPath GetTemporaryTargetFileFolder([NotNull] IT4File file) =>
 			GetTemporaryExecutableLocation(file).Parent;
 
-		private FileSystemPath FindTemporaryTargetFile(IT4File file)
+		[CanBeNull]
+		private FileSystemPath TryFindTemporaryTargetFile([NotNull] IT4File file)
 		{
 			string name = file.GetSourceFile().NotNull().Name.WithOtherExtension(".*");
 			var candidates = GetTemporaryTargetFileFolder(file).GetChildFiles(name);
-			return candidates.First();
+			return candidates.FirstOrDefault();
 		}
 
-		private string GetPreprocessingTargetFileName(IT4File file)
+		[NotNull]
+		private string GetPreprocessingTargetFileName([NotNull] IT4File file)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
@@ -134,29 +137,27 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return sourceFile.ToProjectFile().NotNull().Location.Parent.Combine(temporaryName);
 		}
 
-		public FileSystemPath CopyExecutionResults(IT4File file)
+		public void TryProcessExecutionResults(IT4File file)
 		{
 			Locks.AssertReadAccessAllowed();
-			Locks.AssertWriteAccessForbidden();
-			var temporary = FindTemporaryTargetFile(file);
+			Locks.AssertWriteAccessAllowed();
+			var temporary = TryFindTemporaryTargetFile(file);
+			if (temporary == null) return;
 			var destinationLocation = GetDestinationLocation(file, temporary.Name);
-			// There seems to be no method with 'move-and-overwrite' semantics
-			File.Copy(temporary.FullPath, destinationLocation.FullPath, true);
-			File.Delete(temporary.FullPath);
-			return destinationLocation;
+			temporary.MoveFile(destinationLocation, true);
+			UpdateProjectModel(file, destinationLocation);
 		}
 
-		public void UpdateProjectModel(IT4File file, FileSystemPath result)
+		private void UpdateProjectModel([NotNull] IT4File file, [NotNull] FileSystemPath result)
 		{
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
 			IProjectFile destination = null;
 			Solution.InvokeUnderTransaction(
 				cookie => destination = GetOrCreateSameDestinationFile(cookie, file, result));
-			// TODO: Do I really need that?
 			SyncDocuments(destination.Location);
-			var sourceFile = destination.ToSourceFile();
-			if (sourceFile != null) SyncSymbolCaches(sourceFile);
+			var sourceFile = destination.ToSourceFile().NotNull();
+			SyncSymbolCaches(sourceFile);
 			RefreshFiles(destination.Location);
 		}
 
@@ -180,11 +181,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return destinationLocation;
 		}
 
-		protected virtual void SyncDocuments(FileSystemPath destinationLocation)
+		protected virtual void SyncDocuments([NotNull] FileSystemPath destinationLocation)
 		{
 		}
 
-		protected virtual void RefreshFiles(FileSystemPath destinationLocation)
+		protected virtual void RefreshFiles([NotNull] FileSystemPath destinationLocation)
 		{
 		}
 

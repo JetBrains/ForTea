@@ -7,6 +7,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
+using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
@@ -28,6 +29,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		[NotNull]
 		private IT4TemplateExecutionManager ExecutionManager { get; }
 
+		[NotNull]
+		private ILogger Logger { get; }
+
 		public T4ProtocolModelManager(
 			Lifetime lifetime,
 			[NotNull] ISolution solution,
@@ -35,7 +39,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			[NotNull] IT4TemplateCompiler compiler,
 			[NotNull] T4BuildMessageConverter converter,
 			IT4ModelInteractionHelper helper,
-			[NotNull] IT4TemplateExecutionManager executionManager
+			[NotNull] IT4TemplateExecutionManager executionManager,
+			[NotNull] ILogger logger
 		)
 		{
 			Solution = solution;
@@ -43,6 +48,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			Compiler = compiler;
 			Converter = converter;
 			ExecutionManager = executionManager;
+			Logger = logger;
 			var model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks(lifetime, model, helper);
 		}
@@ -68,14 +74,20 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		private T4BuildResult Compile([NotNull] IT4File t4File) => Compiler.Compile(Solution.GetLifetime(), t4File);
 
+		// When execution is said to succeed, we still cannot be sure whether temporary file exists or not.
+		// If the process being executed was the debugger process,
+		// it would exit normally even if the process it was debugging
+		// (i.e. the generated transformation process) crashed
 		private void ExecutionSucceeded([NotNull] IT4File file)
 		{
-			var destination = TargetFileManager.CopyExecutionResults(file);
-			using (WriteLockCookie.Create())
+			Logger.Catch(() =>
 			{
-				TargetFileManager.UpdateProjectModel(file, destination);
-			}
-
+				// This call is not expected to fail, but just in case
+				using (WriteLockCookie.Create())
+				{
+					TargetFileManager.TryProcessExecutionResults(file);
+				}
+			});
 			ExecutionManager.OnExecutionFinished(file);
 		}
 
