@@ -72,7 +72,7 @@
     <action
         class="com.jetbrains.fortea.configuration.T4ExecuteTemplateBackendAction"
         id="ExecuteT4Template"
-        text="Execute Template">
+        text="Run Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
     <action
