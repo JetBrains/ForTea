@@ -22,6 +22,7 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("UnknownEncoding")]
 		[TestCase("UnsupportedLanguage")]
 		[TestCase("PossibleLanguages")]
+		[TestCase("IllegalCharacter")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.ERROR;
