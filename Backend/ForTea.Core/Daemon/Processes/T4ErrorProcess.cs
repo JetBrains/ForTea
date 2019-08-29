@@ -29,7 +29,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			{
 				case IT4StatementBlock statementBlock when _gotFeature:
 					AddHighlighting(element.GetHighlightingRange(),
-						new StatementAfterFeatureHighlighting(statementBlock));
+						new StatementAfterFeatureError(statementBlock));
 					return;
 
 				case IT4Directive directive:
@@ -65,7 +65,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 			// highlight from just after the last feature to the end of the document
 			DocumentRange range = element.GetHighlightingRange().SetEndTo(File.GetDocumentRange().EndOffset);
-			AddHighlighting(range, new AfterLastFeatureHighlighting(element));
+			AddHighlighting(range, new TextAfterFeatureError(element));
 			_afterLastFeatureErrorAdded = true;
 		}
 
@@ -77,13 +77,12 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			if (!(attribute.Parent is IT4Directive directive))
 				return;
 
-			var attributeInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name.GetText())
+			var attributeInfo = T4DirectiveInfoManager
+				.GetDirectiveByName(directive.Name.GetText())
 				?.GetAttributeByName(attribute.Name.GetText());
-			if (attributeInfo?.IsValid(valueNode.GetText()) != false)
-				return;
+			if (attributeInfo?.IsValid(valueNode.GetText()) != false) return;
 
-			AddHighlighting(valueNode.GetHighlightingRange(),
-				new InvalidAttributeValueHighlighting(valueNode, attributeInfo));
+			AddHighlighting(valueNode.GetHighlightingRange(), new InvalidAttributeValueError(valueNode));
 		}
 
 		private void ProcessDirective([NotNull] IT4Directive directive)
@@ -105,14 +104,14 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			foreach (var attributeInfo in infos)
 			{
 				var range = nameToken.GetHighlightingRange();
-				var highlighting = new MissingRequiredAttributeHighlighting(nameToken, attributeInfo.Name);
+				var highlighting = new MissingRequiredAttributeError(nameToken, attributeInfo.Name);
 				AddHighlighting(range, highlighting);
 			}
 
 			// Assembly attributes in preprocessed templates are useless.
-			if (directiveInfo == T4DirectiveInfoManager.Assembly &&
-			    DaemonProcess.SourceFile.ToProjectFile().IsPreprocessedT4Template())
-				AddHighlighting(directive.GetHighlightingRange(), new IgnoredAssemblyDirectiveHighlighting(directive));
+			if (!(directive is IT4AssemblyDirective assemblyDirective)) return;
+			if (!DaemonProcess.SourceFile.ToProjectFile().IsPreprocessedT4Template()) return;
+			AddHighlighting(directive.GetHighlightingRange(), new IgnoredAssemblyDirectiveWarning(assemblyDirective));
 		}
 
 		public override void ProcessAfterInterior(ITreeNode element)

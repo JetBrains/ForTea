@@ -17,12 +17,13 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 	public class ChangeAttributeValueQuickFix : QuickFixBase
 	{
 		[NotNull]
-		private InvalidAttributeValueHighlighting Highlighting { get; }
+		private InvalidAttributeValueError Highlighting { get; }
 
+		[NotNull]
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{
-			string text = Highlighting.AssociatedNode.GetText();
-			DocumentRange range = Highlighting.AssociatedNode.GetDocumentRange();
+			string text = Highlighting.Value.GetText();
+			DocumentRange range = Highlighting.Value.GetDocumentRange();
 
 			// create a hotspot around the directive value, with basic completion invoked
 			return textControl =>
@@ -39,10 +40,9 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 
 		public override string Text => "Change value";
 
-		public override bool IsAvailable(IUserDataHolder cache) =>
-			Highlighting.IsValid() && Highlighting.DirectiveAttributeInfo != null;
+		public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
 
-		public ChangeAttributeValueQuickFix([NotNull] InvalidAttributeValueHighlighting highlighting) =>
+		public ChangeAttributeValueQuickFix([NotNull] InvalidAttributeValueError highlighting) =>
 			Highlighting = highlighting;
 	}
 }

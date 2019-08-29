@@ -20,14 +20,14 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 	public class ReplaceWithClrNameQuickFix : QuickFixBase
 	{
 		[NotNull]
-		private EscapedKeywordHighlighting Highlighting { get; }
+		private EscapedKeywordWarning Highlighting { get; }
 
-		public ReplaceWithClrNameQuickFix([NotNull] EscapedKeywordHighlighting highlighting) =>
+		public ReplaceWithClrNameQuickFix([NotNull] EscapedKeywordWarning highlighting) =>
 			Highlighting = highlighting;
 
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{
-			var node = Highlighting.AssociatedNode;
+			var node = Highlighting.Value;
 			string keyword = node.GetText();
 			Assertion.Assert(CSharpLexer.IsKeyword(keyword), "CSharpLexer.IsKeyword(text)");
 			

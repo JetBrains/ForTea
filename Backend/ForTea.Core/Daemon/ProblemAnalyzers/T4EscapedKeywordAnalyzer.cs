@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi.CSharp.Parsing;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4ParameterDirective), HighlightingTypes = new[] {typeof(EscapedKeywordHighlighting)})]
+	[ElementProblemAnalyzer(typeof(IT4ParameterDirective), HighlightingTypes = new[] {typeof(EscapedKeywordWarning)})]
 	public sealed class T4EscapedKeywordAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4ParameterDirective>
 	{
 		protected override DirectiveAttributeInfo GetTargetAttribute() =>
@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		protected override void DoRun(IT4AttributeValue element, IHighlightingConsumer consumer)
 		{
 			if (!CSharpLexer.IsKeyword(element.GetText())) return;
-			consumer.AddHighlighting(new EscapedKeywordHighlighting(element));
+			consumer.AddHighlighting(new EscapedKeywordWarning(element));
 		}
 	}
 }

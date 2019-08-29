@@ -19,11 +19,12 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 	[QuickFix]
 	public class MoveStatementBlockQuickFix : QuickFixBase {
 
-		[NotNull] private readonly StatementAfterFeatureHighlighting _highlighting;
+		[NotNull] private readonly StatementAfterFeatureError _highlighting;
 
+		[NotNull]
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress) {
 
-			IT4StatementBlock statementBlock = _highlighting.AssociatedNode;
+			IT4StatementBlock statementBlock = _highlighting.Block;
 			var file = statementBlock.GetContainingFile() as IT4File;
 			Assertion.AssertNotNull(file, "file != null");
 
@@ -55,7 +56,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 		public override bool IsAvailable(IUserDataHolder cache)
 			=> _highlighting.IsValid();
 
-		public MoveStatementBlockQuickFix([NotNull] StatementAfterFeatureHighlighting highlighting) {
+		public MoveStatementBlockQuickFix([NotNull] StatementAfterFeatureError highlighting) {
 			_highlighting = highlighting;
 		}
 

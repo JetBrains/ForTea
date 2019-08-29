@@ -62,8 +62,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
 			var solution = projectFile.GetSolution();
 			if (solution.GetComponent<IT4MacroResolver>().IsSupported(macro))
-				context.AddHighlighting(new T4UnresolvedMacroHighlighting(macro));
-			else context.AddHighlighting(new T4UnsupportedMacroHighlighting(macro));
+				context.AddHighlighting(new UnresolvedMacroError(macro));
+			else context.AddHighlighting(new UnsupportedMacroError(macro));
 		}
 
 		private void HighlightMacro(
@@ -104,7 +104,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			string expanded = ExpandEnvironmentVariable(element);
 			if (expanded == null)
 			{
-				context.AddHighlighting(new T4UnresolvedEnvironmentVariableHighlighting(element));
+				context.AddHighlighting(new UnresolvedEnvironmentVariableError(element));
 				return;
 			}
 

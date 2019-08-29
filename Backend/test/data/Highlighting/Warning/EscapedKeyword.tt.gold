@@ -2,4 +2,4 @@
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Property 'Foo' is never used
-(1): ReSharper Warning: In T4, keywords are automatically escaped, which causes errors in generated code
+(1): ReSharper Warning: Keyword will be escaped

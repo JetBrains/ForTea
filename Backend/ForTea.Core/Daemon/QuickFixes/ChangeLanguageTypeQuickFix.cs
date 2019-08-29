@@ -17,12 +17,12 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 	[QuickFix]
 	public class ChangeLanguageTypeQuickFix : QuickFixBase
 	{
-		private NoSupportForVBHighlighting Highlighting { get; }
-		public ChangeLanguageTypeQuickFix(NoSupportForVBHighlighting highlighting) => Highlighting = highlighting;
+		private NoSupportForVBWarning Highlighting { get; }
+		public ChangeLanguageTypeQuickFix(NoSupportForVBWarning highlighting) => Highlighting = highlighting;
 
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{
-			var token = Highlighting.AssociatedNode;
+			var token = Highlighting.Value;
 			var newToken = T4ElementFactory.CreateAttributeValue(LanguageAttributeInfo.CSharpLanguageAttributeValue);
 			var file = token.GetContainingFile();
 			Assertion.AssertNotNull(file, "file != null");

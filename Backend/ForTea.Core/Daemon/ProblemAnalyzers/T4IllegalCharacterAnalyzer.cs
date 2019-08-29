@@ -11,8 +11,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4OutputDirective), HighlightingTypes =
-		new[] {typeof(T4IllegalCharacterHighlighting)})]
+	[ElementProblemAnalyzer(typeof(IT4OutputDirective), HighlightingTypes = new[] {typeof(IllegalCharacterError)})]
 	public class T4IllegalCharacterAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4OutputDirective>
 	{
 		[NotNull]
@@ -29,7 +28,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			{
 				if (IsLegal(text[index])) continue;
 				var range = new DocumentRange(elementStart + index, elementStart + index + 1);
-				var highlighting = new T4IllegalCharacterHighlighting(element, range);
+				var highlighting = new IllegalCharacterError(element, range);
 				consumer.AddHighlighting(highlighting);
 			}
 		}

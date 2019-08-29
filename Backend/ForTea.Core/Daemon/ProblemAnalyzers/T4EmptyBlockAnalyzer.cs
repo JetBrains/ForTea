@@ -6,7 +6,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
 	[ElementProblemAnalyzer(typeof(IT4CodeBlock),
-		HighlightingTypes = new[] {typeof(T4EmptyExpressionBlockHighlighting)})]
+		HighlightingTypes = new[] {typeof(EmptyExpressionBlockError)})]
 	public class T4EmptyBlockAnalyzer : ElementProblemAnalyzer<IT4CodeBlock>
 	{
 		protected override void Run(
@@ -17,7 +17,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		{
 			if (!element.Code.GetText().IsNullOrWhitespace()) return;
 			if (!(element is IT4ExpressionBlock block)) return;
-			consumer.AddHighlighting(new T4EmptyExpressionBlockHighlighting(block));
+			consumer.AddHighlighting(new EmptyExpressionBlockError(block));
 		}
 	}
 }

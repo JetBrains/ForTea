@@ -20,7 +20,6 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("EmptyExpressionBlock")]
 		[TestCase("RecursiveInclude")]
 		[TestCase("UnknownEncoding")]
-		[TestCase("UnsupportedLanguage")]
 		[TestCase("PossibleLanguages")]
 		[TestCase("IllegalCharacter")]
 		public void TestHighlighting(string name) => DoOneTest(name);

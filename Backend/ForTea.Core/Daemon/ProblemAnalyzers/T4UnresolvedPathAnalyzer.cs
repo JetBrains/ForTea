@@ -16,9 +16,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
 	[ElementProblemAnalyzer(typeof(IT4AssemblyDirective), HighlightingTypes =
-		// We could have handled include directives here, too,
-		// but it would be way more cumbersome than in T4IncludeAwareDaemonProcessVisitor
-		new[] {typeof(T4UnresolvedAssemblyHighlighting)})]
+		new[] {typeof(UnresolvedAssemblyWarning)})]
 	public sealed class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4AssemblyDirective>
 	{
 		[NotNull]
@@ -52,12 +50,12 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 				var target = T4AssemblyReferenceManager.FindAssemblyReferenceTarget(path);
 				if (target == null)
 				{
-					consumer.AddHighlighting(new T4UnresolvedAssemblyHighlighting(element));
+					consumer.AddHighlighting(new UnresolvedAssemblyWarning(element));
 					return;
 				}
 
 				var fileSystemPath = ResolveManager.Resolve(target, projectFile.GetProject(), resolveContext);
-				if (fileSystemPath?.ExistsFile != true) consumer.AddHighlighting(new T4UnresolvedAssemblyHighlighting(element));
+				if (fileSystemPath?.ExistsFile != true) consumer.AddHighlighting(new UnresolvedAssemblyWarning(element));
 			}
 		}
 

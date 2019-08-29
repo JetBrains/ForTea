@@ -16,16 +16,16 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 	public class T4ReplaceWithFeatureBlockQuickFix : QuickFixBase
 	{
 		[NotNull]
-		private StatementAfterFeatureHighlighting Highlighting { get; }
+		private StatementAfterFeatureError Highlighting { get; }
 
 		public override string Text => "Replace with feature block";
 
-		public T4ReplaceWithFeatureBlockQuickFix([NotNull] StatementAfterFeatureHighlighting highlighting) =>
+		public T4ReplaceWithFeatureBlockQuickFix([NotNull] StatementAfterFeatureError highlighting) =>
 			Highlighting = highlighting;
 
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{
-			var node = Highlighting.AssociatedNode;
+			var node = Highlighting.Block;
 			var newNode = T4ElementFactory.CreateFeatureBlock(node.Code.GetText());
 			using (WriteLockCookie.Create(node.IsPhysical()))
 			{

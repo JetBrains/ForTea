@@ -2,4 +2,4 @@
 |hello
 |(0)
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: A template containing a class feature must end with a class feature
+(0): ReSharper Underlined Error Highlighting: Text cannot be placed after last feature block

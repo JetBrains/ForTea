@@ -7,12 +7,12 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes.Removing
 {
 	[QuickFix]
 	public class T4RemoveDuplicateDirectiveQuickFix :
-		T4RemoveBlockQuickFixBase<IT4Directive, T4DuplicateDirectiveHighlighting>
+		T4RemoveBlockQuickFixBase<IT4Directive, DuplicateDirectiveWarning>
 	{
 		public override string Text => "Remove duplicate directive";
+		protected override IT4Directive Node => Highlighting.Directive;
 
-		public T4RemoveDuplicateDirectiveQuickFix([NotNull] T4DuplicateDirectiveHighlighting highlighting) :
-			base(highlighting)
+		public T4RemoveDuplicateDirectiveQuickFix([NotNull] DuplicateDirectiveWarning highlighting) : base(highlighting)
 		{
 		}
 	}
