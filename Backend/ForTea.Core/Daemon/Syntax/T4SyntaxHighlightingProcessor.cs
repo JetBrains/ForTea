@@ -18,11 +18,6 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 {
 	public sealed class T4SyntaxHighlightingProcessor : SyntaxHighlightingProcessor
 	{
-		[NotNull]
-		private IT4MacroResolver Resolver { get; }
-
-		public T4SyntaxHighlightingProcessor([NotNull] IT4MacroResolver resolver) => Resolver = resolver;
-
 		public override bool InteriorShouldBeProcessed(ITreeNode element, IHighlightingConsumer context)
 		{
 			var type = element.NodeType;
@@ -54,7 +49,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
 			string name = macro.RawAttributeValue?.GetText();
 			if (name == null) return null;
-			var macros = Resolver.Resolve(new[] {name}, projectFile);
+			// Cannot be injected because that causes component container failure in tests
+			var macros = projectFile.GetSolution().GetComponent<IT4MacroResolver>().Resolve(new[] {name}, projectFile);
 			return macros.ContainsKey(name) ? macros[name] : null;
 		}
 
