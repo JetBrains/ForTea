@@ -12,7 +12,6 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Tree
@@ -51,13 +50,6 @@ namespace GammaJul.ForTea.Core.Tree
 			return new Pair<ITreeNode, string>(valueToken, value);
 		}
 
-		[ContractAnnotation("directive:null => false"), Obsolete("Use tree types", true)]
-		public static bool IsSpecificDirective(
-			[CanBeNull] this IT4Directive directive,
-			[CanBeNull] DirectiveInfo directiveInfo
-		) => directive != null &&
-		     directiveInfo?.Name.Equals(directive.Name.GetText(), StringComparison.OrdinalIgnoreCase) == true;
-
 		[NotNull]
 		public static IEnumerable<IT4Directive> GetDirectives(
 			[NotNull] this IT4File file,
@@ -65,19 +57,13 @@ namespace GammaJul.ForTea.Core.Tree
 		) => file.Blocks.OfType<IT4Directive>().Where(d =>
 			directiveInfo.Name.Equals(d.Name.GetText(), StringComparison.OrdinalIgnoreCase));
 
-		[NotNull, Obsolete("Use overload with attribute info", true)]
-		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
-			[NotNull] this IT4Directive directive,
-			[NotNull] string name
-		) => directive.Attributes.Where(it => it.Name.GetText() == name);
-
 		[NotNull]
 		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
 			[NotNull] this IT4Directive directive,
 			[NotNull] DirectiveAttributeInfo info
 		) => directive.Attributes.Where(it =>
 			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
-		
+
 		[CanBeNull]
 		public static IT4DirectiveAttribute GetFirstAttribute(
 			[NotNull] this IT4Directive directive,
@@ -85,11 +71,11 @@ namespace GammaJul.ForTea.Core.Tree
 		) => directive.Attributes.FirstOrDefault(it =>
 			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
 
-		
-
 		[NotNull, ItemNotNull]
-		public static IEnumerable<IT4File> GetIncludedFilesRecursive([NotNull] this IT4File file,
-			[NotNull] T4IncludeGuard guard)
+		public static IEnumerable<IT4File> GetIncludedFilesRecursive(
+			[NotNull] this IT4File file,
+			[NotNull] T4IncludeGuard guard
+		)
 		{
 			var sourceFile = file.GetSourceFile();
 			if (sourceFile == null || guard.CanProcess(sourceFile)) yield break;
@@ -131,6 +117,7 @@ namespace GammaJul.ForTea.Core.Tree
 			return t4Node.GetContainingNode<T>(true);
 		}
 
+		[NotNull]
 		public static IT4Directive AddDirective([NotNull] this IT4File file, [NotNull] IT4Directive directive)
 		{
 			IT4Directive anchor = file.Blocks.OfType<IT4Directive>().LastOrDefault();
@@ -147,7 +134,12 @@ namespace GammaJul.ForTea.Core.Tree
 			}
 		}
 
-		public static IT4Directive AddDirectiveBefore(this IT4File file, IT4Directive directive, IT4Directive anchor)
+		[NotNull]
+		public static IT4Directive AddDirectiveBefore(
+			[NotNull] this IT4File file,
+			IT4Directive directive,
+			[NotNull] IT4Directive anchor
+		)
 		{
 			using (WriteLockCookie.Create(file.IsPhysical()))
 			{
@@ -162,8 +154,12 @@ namespace GammaJul.ForTea.Core.Tree
 			}
 		}
 
-		public static IT4Directive AddDirectiveAfter([NotNull] this IT4File file, IT4Directive directive,
-			IT4Directive anchor)
+		[NotNull]
+		public static IT4Directive AddDirectiveAfter(
+			[NotNull] this IT4File file,
+			[NotNull] IT4Directive directive,
+			[NotNull] IT4Directive anchor
+		)
 		{
 			using (WriteLockCookie.Create(file.IsPhysical()))
 			{
@@ -192,7 +188,8 @@ namespace GammaJul.ForTea.Core.Tree
 		}
 
 		[NotNull]
-		public static IT4FeatureBlock AddFeatureBlock([NotNull] this IT4File file,
+		public static IT4FeatureBlock AddFeatureBlock(
+			[NotNull] this IT4File file,
 			[NotNull] IT4FeatureBlock featureBlock)
 		{
 			var anchor = file.Blocks.OfType<IT4FeatureBlock>().LastOrDefault();
@@ -232,15 +229,14 @@ namespace GammaJul.ForTea.Core.Tree
 			}
 		}
 
+		[NotNull]
 		public static IEnumerable<TParent> GetParentsOfType<TParent>([NotNull] this ITreeNode node)
 			where TParent : class, ITreeNode
 		{
-			var parent = node.GetParentOfType<TParent>();
-			while (parent != null)
+			for (; node != null; node = node.Parent)
 			{
-				yield return parent;
-				var tmpParent = parent.Parent;
-				parent = tmpParent?.GetParentOfType<TParent>();
+				if (!(node is TParent obj)) continue;
+				yield return obj;
 			}
 		}
 	}
