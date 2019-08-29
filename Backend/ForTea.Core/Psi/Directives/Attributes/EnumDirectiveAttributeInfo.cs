@@ -3,7 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.DataStructures;
 
-namespace GammaJul.ForTea.Core.Psi.Directives {
+namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 
 	public class EnumDirectiveAttributeInfo : DirectiveAttributeInfo {
 

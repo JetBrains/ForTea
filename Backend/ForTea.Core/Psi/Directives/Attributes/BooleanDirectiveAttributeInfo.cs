@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace GammaJul.ForTea.Core.Psi.Directives {
+namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 
 	public class BooleanDirectiveAttributeInfo : EnumDirectiveAttributeInfo {
 		

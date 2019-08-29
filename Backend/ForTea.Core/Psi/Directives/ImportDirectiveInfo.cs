@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DataStructures;

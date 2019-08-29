@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.DataStructures;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Directives
+namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
 {
 	public class EncodingDirectiveAttributeInfo : DirectiveAttributeInfo
 	{
