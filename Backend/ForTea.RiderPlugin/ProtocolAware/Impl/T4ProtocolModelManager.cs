@@ -38,7 +38,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateCompiler compiler,
 			[NotNull] T4BuildMessageConverter converter,
-			IT4ModelInteractionHelper helper,
+			[NotNull] IT4ModelInteractionHelper helper,
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger
 		)
@@ -64,9 +64,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			model.ExecutionSucceeded.Advise(lifetime, helper.Wrap(ExecutionSucceeded));
 			model.ExecutionFailed.Advise(lifetime, helper.Wrap(ExecutionFailed));
 			model.ExecutionAborted.Advise(lifetime, helper.Wrap(ExecutionFailed));
-			model.CanExecute.Set(helper.WrapStructFunc(CanExecute, false));
 		}
 
+		[NotNull]
 		private T4ConfigurationModel CalculateConfiguration([NotNull] IT4File file) => new T4ConfigurationModel(
 			TargetFileManager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),
 			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
@@ -92,6 +92,5 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		}
 
 		private void ExecutionFailed([NotNull] IT4File file) => ExecutionManager.OnExecutionFinished(file);
-		private bool? CanExecute([NotNull] IT4File file) => !ExecutionManager.IsExecutionRunning(file);
 	}
 }
