@@ -6,38 +6,31 @@ import com.jetbrains.rider.run.configurations.exe.ExeConfigurationParameters
 import com.jetbrains.rider.runtime.DotNetExecutable
 
 open class T4RunConfigurationParameters(
+  val request: T4ExecutionRequest,
   exePath: String,
   programParameters: String,
-  workingDirectory: String,
-  envs: Map<String, String>,
-  isPassParentEnvs: Boolean,
-  useExternalConsole: Boolean,
-  var useMonoRuntime: Boolean,
-  private var executeAsIs: Boolean,
-  private val assemblyToDebug: String?,
-  var runtimeArguments: String,
-  var request: T4ExecutionRequest
+  workingDirectory: String
 ) : ExeConfigurationParameters(
   exePath,
   programParameters,
   workingDirectory,
-  envs,
-  isPassParentEnvs,
-  useExternalConsole
+  emptyMap(),
+  false,
+  false
 ) {
   fun toDotNetExecutable() = DotNetExecutable(
     exePath,
     "",
     workingDirectory,
     ParametersListUtil.parse(programParameters),
-    useMonoRuntime,
+    false,
     useExternalConsole,
     envs,
-    isPassParentEnvs,
+    false,
     { _, _ -> },
-    assemblyToDebug,
-    runtimeArguments,
-    executeAsIs
+    null,
+    "",
+    false
   )
 
   override fun validate() {

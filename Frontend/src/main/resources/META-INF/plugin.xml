@@ -26,9 +26,8 @@
         language="T4"
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
-    <configurationType implementation="com.jetbrains.fortea.configuration.run.T4RunConfigurationType"/>
     <stepsBeforeRunProvider
-        implementation="com.jetbrains.fortea.configuration.run.task.CompileT4BeforeRunTaskProvider"/>
+        implementation="com.jetbrains.fortea.configuration.run.CompileT4BeforeRunTaskProvider"/>
 
     <!-- delegation to backend -->
     <rider.debuggerSupportPolicy

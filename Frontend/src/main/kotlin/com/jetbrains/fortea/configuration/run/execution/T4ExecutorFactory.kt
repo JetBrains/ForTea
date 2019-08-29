@@ -13,13 +13,9 @@ import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.util.idea.getComponent
-import com.jetbrains.rider.util.idea.getLogger
 
 class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
-
-  private val logger = getLogger<T4ExecutorFactory>()
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
-
   override fun create(executorId: String, environment: ExecutionEnvironment): RunProfileState {
     val dotNetExecutable = parameters.toDotNetExecutable()
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
@@ -28,7 +24,6 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
       dotNetExecutable.useMonoRuntime
     )
     val model = environment.project.solution.t4ProtocolModel
-    logger.info("Configuration will be executed on ${runtimeToExecute.javaClass.name}")
     return when (executorId) {
       DefaultRunExecutor.EXECUTOR_ID -> {
         val wrappee = runtimeToExecute.createRunState(dotNetExecutable, environment)

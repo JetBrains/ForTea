@@ -1,7 +1,6 @@
 package com.jetbrains.fortea.configuration
 
 import com.intellij.execution.*
-import com.intellij.execution.configurations.ConfigurationTypeUtil
 import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.process.NopProcessHandler
@@ -10,7 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.PathUtil
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationFactory
-import com.jetbrains.fortea.configuration.run.T4RunConfigurationType
+import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.rider.model.T4ExecutionRequest
 import com.jetbrains.rider.model.T4FileLocation
 import com.jetbrains.rider.model.t4ProtocolModel
@@ -27,12 +26,10 @@ class T4RunConfigurationCreator(
     model.requestDebug.set(launcher(DefaultDebugExecutor.getDebugExecutorInstance()))
   }
 
-  private fun launcher(executor: Executor) = { request : T4ExecutionRequest ->
-    val configurationType = ConfigurationTypeUtil.findConfigurationType(T4RunConfigurationType::class.java)
-    val configuration = createConfiguration(project, configurationType)
-    setupFromFile(configuration, request)
+  private fun launcher(executor: Executor) = { request: T4ExecutionRequest ->
+    val configuration = setupFromFile(request)
     val runManager = RunManager.getInstance(project)
-    val configurationSettings = runManager.createConfiguration(configuration, configurationType.factory)
+    val configurationSettings = runManager.createConfiguration(configuration, T4RunConfigurationFactory)
     configurationSettings.isActivateToolWindowBeforeRun = request.isVisible
     executeConfiguration(configurationSettings, executor, project)
   }
@@ -60,26 +57,18 @@ class T4RunConfigurationCreator(
     }
   }
 
-  private fun createConfiguration(project: Project, configurationType: T4RunConfigurationType) =
-    T4RunConfiguration("", project, configurationType.factory, T4RunConfigurationFactory.createParameters())
-
-  private fun setupFromFile(configuration: T4RunConfiguration, request: T4ExecutionRequest) {
-    val model = configuration.project.solution.t4ProtocolModel
+  private fun setupFromFile(request: T4ExecutionRequest): T4RunConfiguration {
+    val model = project.solution.t4ProtocolModel
     val item = host.getItemById(request.location.id)
-    val virtualFile = item?.getVirtualFile() ?: return
+    val virtualFile = item?.getVirtualFile()!!
     val t4Path = virtualFile.path
     val protocolConfiguration = model.getConfiguration.sync(T4FileLocation(item.id))
-    with(configuration) {
-      name = virtualFile.name
-      parameters.exePath = protocolConfiguration.executablePath
-      parameters.programParameters = protocolConfiguration.outputPath
-      parameters.isPassParentEnvs = false
-      parameters.runtimeArguments = ""
-      parameters.useMonoRuntime = false
-      parameters.envs = emptyMap()
-      parameters.workingDirectory = PathUtil.getParentPath(t4Path)
-      parameters.request = request
-    }
+    val parameters = T4RunConfigurationParameters(
+      request,
+      protocolConfiguration.executablePath,
+      protocolConfiguration.outputPath,
+      PathUtil.getParentPath(t4Path)
+    )
+    return T4RunConfiguration(virtualFile.name, project, parameters)
   }
-
 }
