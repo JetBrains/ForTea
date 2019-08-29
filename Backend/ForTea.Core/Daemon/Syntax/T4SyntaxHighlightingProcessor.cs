@@ -84,7 +84,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			}
 
 			const string id = T4HighlightingAttributeIds.MACRO;
-			string message = expanded.WithPrefix("macro");
+			string message = $"(macro) {expanded}";
 			var range = value.GetDocumentRange();
 			context.AddHighlighting(new ReSharperSyntaxHighlighting(id, message, range));
 		}
@@ -110,7 +110,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 
 			const string id = T4HighlightingAttributeIds.ENVIRONMENT_VARIABLE;
 			var range = value.GetDocumentRange();
-			string message = expanded.WithPrefix("environment variable");
+			string message = $"(environment variable) {expanded}";
 			context.AddHighlighting(new ReSharperSyntaxHighlighting(id, message, range));
 		}
 
