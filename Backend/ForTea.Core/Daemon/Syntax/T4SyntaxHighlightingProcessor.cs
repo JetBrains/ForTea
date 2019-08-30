@@ -2,15 +2,11 @@ using System;
 using GammaJul.ForTea.Core.Daemon.Attributes.GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -35,38 +31,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			else if (type == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) HighlightValue(element, context);
 		}
 
-		[CanBeNull]
-		private static string ExpandEnvironmentVariable([NotNull] IT4EnvironmentVariable variable)
-		{
-			var value = variable.RawAttributeValue;
-			if (value == null) return null;
-			return Environment.GetEnvironmentVariable(value.GetText());
-		}
-
-		[CanBeNull]
-		private string ExpandMacro([NotNull] IT4Macro macro)
-		{
-			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
-			string name = macro.RawAttributeValue?.GetText();
-			if (name == null) return null;
-			// Cannot be injected because that causes component container failure in tests
-			var macros = projectFile.GetSolution().GetComponent<IT4MacroResolver>().Resolve(new[] {name}, projectFile);
-			return macros.ContainsKey(name) ? macros[name] : null;
-		}
-
-		private static void HighlightUnresolvedMacro(
-			[NotNull] IT4Macro macro,
-			[NotNull] IHighlightingConsumer context
-		)
-		{
-			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
-			var solution = projectFile.GetSolution();
-			if (solution.GetComponent<IT4MacroResolver>().IsSupported(macro))
-				context.AddHighlighting(new UnresolvedMacroError(macro));
-			else context.AddHighlighting(new UnsupportedMacroError(macro));
-		}
-
-		private void HighlightMacro(
+		private static void HighlightMacro(
 			[NotNull] IT4Macro element,
 			[NotNull] IHighlightingConsumer context
 		)
@@ -76,17 +41,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			HighlightValue(element.RightParenthesis, context);
 			var value = element.RawAttributeValue;
 			if (value == null) return;
-			string expanded = ExpandMacro(element);
-			if (expanded == null)
-			{
-				HighlightUnresolvedMacro(element, context);
-				return;
-			}
-
-			const string id = T4HighlightingAttributeIds.MACRO;
-			string message = $"(macro) {expanded}";
 			var range = value.GetDocumentRange();
-			context.AddHighlighting(new ReSharperSyntaxHighlighting(id, message, range));
+			context.AddHighlighting(new MacroHighlighting(range));
 		}
 
 		private static void HighlightEnvironmentVariable(
@@ -101,17 +57,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 
 			var value = element.RawAttributeValue;
 			if (value == null) return;
-			string expanded = ExpandEnvironmentVariable(element);
-			if (expanded == null)
-			{
-				context.AddHighlighting(new UnresolvedEnvironmentVariableError(element));
-				return;
-			}
-
-			const string id = T4HighlightingAttributeIds.ENVIRONMENT_VARIABLE;
 			var range = value.GetDocumentRange();
-			string message = $"(environment variable) {expanded}";
-			context.AddHighlighting(new ReSharperSyntaxHighlighting(id, message, range));
+			context.AddHighlighting(new EnvironmentVariableHighlighting(range));
 		}
 
 		private static void HighlightValue([CanBeNull] ITreeNode element, [NotNull] IHighlightingConsumer context)

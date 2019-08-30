@@ -1,0 +1,4 @@
+﻿<#@ assembly name="%|USERNAM|(0)%/Foo" #>
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Unresolved environment variable
