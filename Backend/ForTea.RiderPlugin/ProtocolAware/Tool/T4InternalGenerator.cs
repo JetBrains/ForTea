@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.UI.Icons;
 using JetBrains.Util;
+using UsageStatisticsNew = JetBrains.Application.ActivityTrackingNew.UsageStatistics;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 {
@@ -32,6 +33,11 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 			// .ttinclude files exist for being included and should not be auto-executed
 		};
 
+		[NotNull]
+		private UsageStatisticsNew Statistics { get; }
+
+		public T4InternalGenerator([NotNull] UsageStatisticsNew statistics) => Statistics = statistics;
+
 		public bool IsApplicable(IProjectFile projectFile)
 		{
 			using (projectFile.Locks.UsingReadLock())
@@ -42,12 +48,13 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 
 		public string[] Keywords => new[] {"tt", "t4", "template", "generator"};
 
+		[NotNull]
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
+			Statistics.TrackAction("T4.Template.Execution.Background");
 			var file = projectFile.ToSourceFile()?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
 			var manager = file?.GetSolution().GetComponent<IT4TemplateExecutionManager>();
 			Execute(file, manager);
-			// TODO: do we still need this to be ISingleFileCustomTool
 			return new SingleFileCustomToolExecutionResult(
 				EmptyList<FileSystemPath>.Collection,
 				EmptyList<string>.Collection

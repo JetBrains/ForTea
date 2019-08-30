@@ -6,6 +6,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 	[Action("T4.ExecuteFromContext", "Execute Template")]
 	public class T4ExecuteTemplateAction : T4ProtocolAwareActionBase
 	{
-		protected override void Execute(IT4TemplateExecutionManager manager, IT4File file) => manager.Execute(file);
+		protected override void Execute(
+			IT4TemplateExecutionManager manager,
+			IT4File file,
+			Application.ActivityTrackingNew.UsageStatistics statistics
+		)
+		{
+			statistics.TrackAction("T4.Template.Execution");
+			manager.Execute(file);
+		}
 	}
 }

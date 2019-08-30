@@ -19,6 +19,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			var solution = FindSolution(context).NotNull();
 			var file = FindT4File(context).NotNull();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
+			var statistics = solution.GetComponent<Application.ActivityTrackingNew.UsageStatistics>();
+			statistics.TrackAction("T4.Template.Preprocess");
 			try
 			{
 				string message = new T4CSharpCodeGenerator(file, solution).Generate().RawText;
