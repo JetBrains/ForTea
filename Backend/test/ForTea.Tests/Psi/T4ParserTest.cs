@@ -1,10 +1,11 @@
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.TestFramework;
 using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Psi
 {
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	public sealed class T4ParserTest : ParserTestBase<T4Language>
 	{
 		protected override string RelativeTestDataPath => @"Psi\Parser";

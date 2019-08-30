@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
@@ -22,5 +23,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 			[NotNull] IProjectFile file,
 			[NotNull] T4AssemblyReferenceManager referenceManager
 		);
+
+		bool IsSupported([NotNull] IT4Macro macro);
 	}
 }

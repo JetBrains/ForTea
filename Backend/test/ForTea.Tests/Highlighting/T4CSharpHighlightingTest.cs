@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.FeaturesTestFramework.Daemon;
@@ -9,7 +10,7 @@ using NUnit.Framework;
 namespace JetBrains.ForTea.Tests.Highlighting
 {
 	[Ignore("Highlighting is delegated to frontend")]
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	public sealed class T4CSharpHighlightingTest : HighlightingTestBase
 	{
 		protected override PsiLanguageType CompilerIdsLanguage => T4Language.Instance;

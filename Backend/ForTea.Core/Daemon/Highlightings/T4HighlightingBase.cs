@@ -22,7 +22,7 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings {
 		public string ErrorStripeToolTip
 			=> ToolTip;
 
-		public DocumentRange CalculateRange()
+		public virtual DocumentRange CalculateRange()
 			=> AssociatedNode.GetNavigationRange();
 
 		/// <summary>Initializes a new instance of the <see cref="T4HighlightingBaseBase{TNode}"/> class.</summary>

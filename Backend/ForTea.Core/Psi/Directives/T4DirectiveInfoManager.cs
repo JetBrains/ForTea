@@ -52,8 +52,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 				?.Blocks
 				.OfType<IT4TemplateDirective>()
 				.FirstOrDefault()
-				?.GetAttributes(Template.LanguageAttribute)
-				.FirstOrDefault()
+				?.GetFirstAttribute(Template.LanguageAttribute)
 				?.Value
 				?.GetText();
 			switch (name)

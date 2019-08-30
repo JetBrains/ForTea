@@ -12,8 +12,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public sealed class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		[NotNull] public const string GeneratedClassNameString = "Generated\x200CTransformation";
-		[NotNull] public const string GeneratedBaseClassNameString = GeneratedClassNameString + "Base";
 		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
 		private const string ToStringConversionPrefixText = "__To\x200CString(";
 		public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
@@ -34,8 +32,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		protected override string ResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
-		protected override string GeneratedClassName => GeneratedClassNameString;
-		protected override string GeneratedBaseClassName => GeneratedBaseClassNameString;
 
 		protected override void AppendSyntheticAttribute()
 		{

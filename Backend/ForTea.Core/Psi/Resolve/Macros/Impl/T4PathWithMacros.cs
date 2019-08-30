@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -76,7 +77,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			if (asAbsolutePath.IsAbsolute) return asAbsolutePath;
 
 			// search as relative path
-			var asRelativePath = SourceFile.GetLocation().Directory.Combine(expanded);
+			var asRelativePath = SourceFile.GetLocation().Directory.TryCombine(expanded);
 			if (asRelativePath.ExistsFile) return asRelativePath;
 
 			// search in global include paths

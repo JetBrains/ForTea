@@ -1,9 +1,12 @@
+using System.Linq;
+using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 
 namespace GammaJul.ForTea.Core.Parsing.Lexing
 {
-	internal partial class T4LexerGenerated : IIncrementalLexer
+	internal partial class T4LexerGenerated
 	{
 		private readonly struct T4LexerState
 		{
@@ -26,6 +29,34 @@ namespace GammaJul.ForTea.Core.Parsing.Lexing
 				YyBufferStart = yyBufferStart;
 				YyBufferEnd = yyBufferEnd;
 				YyLexicalState = yyLexicalState;
+			}
+		}
+
+		[NotNull]
+		private ReusableBufferRange ReusableBufferRange { get; } = new ReusableBufferRange();
+
+		private T4TokenNodeType FindDirectiveByCurrentToken() =>
+			Directives.GetValueSafe(ReusableBufferRange, yy_buffer, yy_buffer_start, yy_buffer_end);
+
+		private static NodeTypeSet DirectiveTypes { get; } = new NodeTypeSet(
+			T4TokenNodeTypes.TEMPLATE,
+			T4TokenNodeTypes.PARAMETER,
+			T4TokenNodeTypes.OUTPUT,
+			T4TokenNodeTypes.ASSEMBLY,
+			T4TokenNodeTypes.IMPORT,
+			T4TokenNodeTypes.INCLUDE,
+			T4TokenNodeTypes.CLEANUP_BEHAVIOR
+		);
+
+		[NotNull]
+		private static LexerDictionary<T4TokenNodeType> Directives { get; } =
+			new LexerDictionary<T4TokenNodeType>(false);
+
+		static T4LexerGenerated()
+		{
+			foreach (var keyword in DirectiveTypes.Cast<TokenNodeType>())
+			{
+				Directives[keyword.TokenRepresentation] = (T4TokenNodeType) keyword;
 			}
 		}
 

@@ -1,11 +1,12 @@
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.TestFramework;
 using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Highlighting
 {
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	public class T4WarningHighlightingTest : T4HighlightingTestBase
 	{
 		protected override string RelativeTestDataPath => @"Highlighting\Warning";
@@ -17,6 +18,7 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("UnexpectedDirective")]
 		[TestCase("UnresolvedInclude")]
 		[TestCase("UnresolvedAssembly")]
+		[TestCase("EmptyDirective")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.WARNING;

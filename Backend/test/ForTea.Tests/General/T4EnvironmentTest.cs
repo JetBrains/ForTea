@@ -12,7 +12,7 @@ namespace JetBrains.ForTea.Tests.General
 		[Test]
 		public void TestThatT4EnvironmentSupportsEverything()
 		{
-			var environment = ShellInstance.GetComponent<IT4Environment>();
+			var environment = ShellInstance.TryGetComponent<IT4Environment>();
 			Assert.NotNull(environment);
 			Assert.That(environment.IsSupported);
 			Assert.That(environment.ShouldSupportAdvancedAttributes);

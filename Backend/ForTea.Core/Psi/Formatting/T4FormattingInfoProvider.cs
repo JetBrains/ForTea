@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;

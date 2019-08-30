@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
@@ -23,12 +24,9 @@ import javax.swing.JPanel
 class T4BuildToolWindowFactory(
   project: Project,
   private val buildToolWindowFactory: BuildToolWindowFactory,
-  private val projectModelViewHost: ProjectModelViewHost
+  private val projectModelViewHost: ProjectModelViewHost,
+  val application: Application
 ) : LifetimedProjectService(project) {
-  companion object {
-    const val TOOLWINDOW_ID = "T4 Build"
-  }
-
   private val lock = Any()
   private var context: BuildToolWindowContext? = null
 

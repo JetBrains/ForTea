@@ -20,6 +20,7 @@ abstract class T4RunTemplateActionBase(
 
   final override fun setupFromFile(configuration: T4RunConfiguration, file: T4PsiFile, projectId: Int) {
     val model = configuration.project.solution.t4ProtocolModel
+    model.userSessionActive.set(true)
     val t4Path = file.virtualFile.path
     val protocolConfiguration = model.getConfiguration.sync(T4FileLocation(t4Path, projectId))
 

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
@@ -24,23 +26,32 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 	[ShellComponent]
 	public sealed class T4InternalGenerator : ISingleFileCustomTool
 	{
+		// This is a hack to prevent multiple execution. TODO: remove
+		private DateTime ExecutedFileLastWriteUtc { get; set; }
 		private Lifetime Lifetime { get; }
 
-		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
+		// Should return whether execution should proceed or not
+		[CanBeNull]
+		public event Func<bool> ExecutionRequested;
 
+		public T4InternalGenerator(Lifetime lifetime) => Lifetime = lifetime;
 		public string Name => "Bundled T4 template executor";
 		public string ActionName => "Execute T4 generator";
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
 		public string[] CustomTools => new[] {"T4 Generator Custom Tool"};
-		public string[] Extensions => new[] {T4ProjectFileType.MainExtensionNoDot};
 		public bool IsEnabled => true;
+
+		public string[] Extensions => new[]
+		{
+			T4FileExtensions.MainExtensionNoDot,
+			T4FileExtensions.SecondExtensionNoDot
+			// .ttinclude files exist for being included and should not be auto-executed
+		};
 
 		public bool IsApplicable(IProjectFile projectFile)
 		{
 			using (projectFile.Locks.UsingReadLock())
 			{
-				// .ttinclude and .t4 files exist for being included and should not be auto-executed
-				if (projectFile.Location.ExtensionWithDot != T4ProjectFileType.MainExtension) return false;
 				return projectFile.LanguageType.Is<T4ProjectFileType>();
 			}
 		}
@@ -51,6 +62,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 		{
 			AssertOperationValidity(projectFile);
 			var file = AsT4File(projectFile).NotNull();
+			if (projectFile.LastWriteTimeUtc == ExecutedFileLastWriteUtc)
+				return new SingleFileCustomToolExecutionResult(
+					new FileSystemPath[] { },
+					new[] {"File already executed"}
+				);
+
+			if (ExecutionRequested?.Invoke() == false)
+				return new SingleFileCustomToolExecutionResult(
+					new FileSystemPath[] { },
+					new[] {"User session is active"}
+				);
+
 			var solution = file.GetSolution();
 			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
@@ -64,11 +87,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 			}
 
 			InterruptableActivityCookie.CheckAndThrow();
-			var buildResult = executionManager.Compile(Lifetime, file);
+			T4BuildResult buildResult = null;
+			Lifetime.UsingNested(compilationLifetime => buildResult = executionManager.Compile(Lifetime, file));
 			Assertion.Assert(buildResult.BuildResultKind != T4BuildResultKind.HasErrors,
 				"buildResult.BuildResultKind != T4BuildResultKind.HasErrors");
 			InterruptableActivityCookie.CheckAndThrow();
-			bool succeeded = executionManager.Execute(Lifetime, file);
+			bool succeeded = false;
+			Lifetime.UsingNested(executionLifetime => succeeded = executionManager.Execute(Lifetime, file));
 			if (!succeeded)
 				return new SingleFileCustomToolExecutionResult(
 					EmptyList<FileSystemPath>.Collection,
@@ -81,6 +106,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool
 				using (WriteLockCookie.Create())
 				{
 					targetFileManager.UpdateProjectModel(file, affectedFile);
+					ExecutedFileLastWriteUtc = projectFile.LastWriteTimeUtc;
 				}
 			});
 

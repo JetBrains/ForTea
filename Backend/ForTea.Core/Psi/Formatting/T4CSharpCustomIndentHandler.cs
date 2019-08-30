@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Diagnostics;
@@ -21,6 +21,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
 using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
+using BlockNavigator = JetBrains.ReSharper.Psi.CSharp.Tree.BlockNavigator;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting
 {
@@ -49,7 +50,10 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		[CanBeNull]
 		private string IndentFeatureBlockMember([NotNull] ITreeNode node)
 		{
-			if (!IsTypeMemberLikeNode(node)) return null;
+			// In feature blocks, there are class features declared
+			if (!IsClassFeature(node)) return null;
+			bool isTopLevel = node.Parent?.GetParentsOfType<IClassLikeDeclaration>().IsSingle() ?? false;
+			if (!isTopLevel) return null;
 			return "    ";
 		}
 
@@ -173,12 +177,12 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		private static bool IsTransformTextMember([NotNull] ITreeNode node)
 		{
 			var block = node.GetFirstTokenIn().GetT4ContainerFromCSharpNode<IT4CodeBlock>();
-			return block != null && !(block is T4FeatureBlock);
+			return block != null && !(block is IT4FeatureBlock);
 		}
 
 		[Pure]
 		private static bool IsFeatureBlockMember([NotNull] ITreeNode node) =>
-			node.GetFirstTokenIn().GetT4ContainerFromCSharpNode<T4FeatureBlock>() != null;
+			node.GetFirstTokenIn().GetT4ContainerFromCSharpNode<IT4FeatureBlock>() != null;
 
 		[Pure]
 		private static bool IsEndComment([NotNull] ITreeNode node) =>
@@ -187,9 +191,9 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			&& tokenNode.GetText() == T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
 
 		[Pure]
-		private static bool IsTypeMemberLikeNode([NotNull] ITreeNode node) =>
+		private static bool IsClassFeature([NotNull] ITreeNode node) =>
 			(node is ITypeMemberDeclaration || node is IMultipleFieldDeclaration || node is IMultipleEventDeclaration)
-			&& !(node is IEventDeclaration)
+			&& !(node is IEventDeclaration) // TODO wtf
 			&& node.GetContainingNode<IClassLikeDeclaration>() != null;
 
 		[Pure]

@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Services.CodeCompletion;
 using JetBrains.Annotations;
 using JetBrains.Application.CommandProcessing;
@@ -19,6 +21,14 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 
 	[SolutionComponent]
 	public class T4TypingAssist : TypingAssistLanguageBase<T4Language>, ITypingHandler {
+		private static IReadOnlySet<TokenNodeType> AttributeValueTokens { get; } = new JetHashSet<TokenNodeType>
+		{
+			T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE,
+			T4TokenNodeTypes.DOLLAR,
+			T4TokenNodeTypes.LEFT_PARENTHESIS,
+			T4TokenNodeTypes.RIGHT_PARENTHESIS,
+			T4TokenNodeTypes.PERCENT
+		};
 
 		[NotNull] private readonly ICodeCompletionSessionManager _codeCompletionSessionManager;
 
@@ -76,12 +86,6 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 		/// <summary>When a " is typed, insert another ".</summary>
 		private bool OnQuoteTyped(ITypingContext context) {
 			ITextControl textControl = context.TextControl;
-
-			// the " character should be skipped to avoid double insertions
-			if (SkippingTypingAssist.ShouldSkip(textControl.Document, context.Char)) {
-				SkippingTypingAssist.SkipIfNeeded(textControl.Document, context.Char);
-				return true;
-			}
 
 			// get the token type after "
 			CachingLexer cachingLexer = GetCachingLexer(textControl);
@@ -288,10 +292,48 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
 			if (lexer == null || offset <= 1) return false;
 			if (!lexer.FindTokenAt(offset - 1)) return false;
-			if (lexer.TokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) return true;
-			if (lexer.TokenType != T4TokenNodeTypes.QUOTE) return false;
+			var tokenType = lexer.TokenType;
+			if (AttributeValueTokens.Contains(tokenType)) return true;
+			if (tokenType != T4TokenNodeTypes.QUOTE) return false;
 			if (!lexer.FindTokenAt(offset)) return false;
-			return lexer.TokenType == T4TokenNodeTypes.QUOTE || lexer.TokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
+			return tokenType == T4TokenNodeTypes.QUOTE || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
+		}
+
+		// When '%' is typed, insert another
+		private bool OnPercentTyped(ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			if (!IsInAttributeValue(textControl)) return false;
+
+			// get the token type after %
+			var lexer = GetCachingLexer(textControl);
+			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
+			if (lexer == null || offset <= 0 || !lexer.FindTokenAt(offset)) return false;
+
+			// If there is already another percent after the %, swallow the typing
+			var tokenType = lexer.TokenType;
+			if (tokenType == T4TokenNodeTypes.PERCENT)
+			{
+				textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+				return true;
+			}
+
+			// insert the first %
+			textControl.Selection.Delete();
+			textControl.FillVirtualSpaceUntilCaret();
+			textControl.Document.InsertText(offset, "%");
+
+			// insert the second "
+			context.QueueCommand(() =>
+			{
+				using (CommandProcessor.UsingCommand("Inserting %"))
+				{
+					textControl.Document.InsertText(offset + 1, "%");
+					textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+				}
+			});
+
+			return true;
 		}
 
 		public T4TypingAssist(
@@ -314,6 +356,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			typingAssistManager.AddTypingHandler(lifetime, '"', this, OnQuoteTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '#', this, OnOctothorpeTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '$', this, OnDollarTyped, IsTypingSmartParenthesisHandlerAvailable);
+			typingAssistManager.AddTypingHandler(lifetime, '%', this, OnPercentTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, OnEnterPressed, IsActionHandlerAvailable);
 		}
 	}

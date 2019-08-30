@@ -9,7 +9,8 @@ using JetBrains.Annotations;
 using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
-using JetBrains.ForTea.RiderPlugin.Utils;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Tool;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
@@ -46,12 +47,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 		private ProjectModelViewHost Host { get; }
 
 		public T4ProtocolModelManager(
+			Lifetime lifetime,
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger,
 			[NotNull] T4BuildMessageConverter converter,
-			[NotNull] ProjectModelViewHost host
+			[NotNull] ProjectModelViewHost host,
+			[NotNull] T4InternalGenerator generator
 		)
 		{
 			Solution = solution;
@@ -61,16 +64,22 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 			Converter = converter;
 			Host = host;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
-			RegisterCallbacks();
+			RegisterCallbacks(lifetime, generator);
 		}
 
-		private void RegisterCallbacks()
+		private void RegisterCallbacks(Lifetime lifetime, [NotNull] T4InternalGenerator generator)
 		{
 			Model.RequestCompilation.Set(Wrap(Compile, Converter.FatalError()));
 			Model.ExecutionSucceeded.Set(Wrap(HandleSuccess, Unit.Instance));
-			Model.ExecutionFailed.Set(Wrap(HandleFailure, Unit.Instance));
 			Model.RequestPreprocessing.Set(Wrap(Preprocess, new T4PreprocessingResult(false, null)));
 			Model.GetConfiguration.Set(Wrap(CalculateConfiguration, new T4ConfigurationModel("", "")));
+
+			bool IsExecutionAllowed() => !Model.UserSessionActive.Maybe.ValueOrDefault;
+
+			lifetime.Bracket(
+				() => generator.ExecutionRequested += IsExecutionAllowed,
+				() => generator.ExecutionRequested -= IsExecutionAllowed
+			);
 		}
 
 		private T4ConfigurationModel CalculateConfiguration([NotNull] IT4File file) => new T4ConfigurationModel(
@@ -87,7 +96,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 					if (path.IsNullOrEmpty()) return defaultValue;
 					using (ReadLockCookie.Create())
 					{
-						return Host
+						var file = Host
 							.GetItemById<IProject>(location.ProjectId)
 							?.GetSubItemsRecursively(path.Name)
 							.Where(it => it.Location == path)
@@ -97,15 +106,21 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 							?.ToSourceFile()
 							?.GetPsiFiles(T4Language.Instance)
 							.OfType<IT4File>()
-							.SingleItem()
-							?.Let(wrappee);
+							.SingleItem();
+						return file == null ? null : wrappee(file);
 					}
 				});
 				return result ?? defaultValue;
 			};
 
-		private T4BuildResult Compile([NotNull] IT4File t4File) =>
-			ExecutionManager.Compile(Solution.GetLifetime(), t4File);
+		private T4BuildResult Compile([NotNull] IT4File t4File)
+		{
+			using (WriteLockCookie.Create())
+			{
+				// Interrupt template execution, if any
+			}
+			return ExecutionManager.Compile(Solution.GetLifetime(), t4File);
+		}
 
 		[CanBeNull]
 		private Unit HandleSuccess([NotNull] IT4File file)
@@ -118,9 +133,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 
 			return Unit.Instance;
 		}
-
-		[CanBeNull]
-		private Unit HandleFailure(IT4File arg) => Unit.Instance;
 
 		[NotNull]
 		private T4PreprocessingResult Preprocess([NotNull] IT4File file)

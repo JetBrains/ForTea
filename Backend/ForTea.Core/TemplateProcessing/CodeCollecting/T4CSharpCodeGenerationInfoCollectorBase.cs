@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Diagnostics;
@@ -75,10 +73,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			var sourceFile = include.Path.Resolve();
 			if (sourceFile == null)
 			{
-				var target =
-					include.GetAttributes(T4DirectiveInfoManager.Include.FileAttribute).FirstOrDefault()?.Value ??
-					element;
-				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target}");
+				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
+				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(null);
 				return;
@@ -87,9 +83,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
 			if (!Guard.CanProcess(sourceFile))
 			{
-				var target =
-					include.GetAttributes(T4DirectiveInfoManager.Include.FileAttribute).FirstOrDefault()?.Value ??
-					element;
+				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, "Recursion in includes");
 				Interrupter.InterruptAfterProblem(data);
 				Guard.StartProcessing(sourceFile);
@@ -111,7 +105,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 					Guard.TryEndProcessing(include.Path.Resolve());
 					var intermediateResults = Results.Pop();
 					Result.Append(intermediateResults);
-					return; // Do not advance state here
+					AppendRemainingMessage(element);
+					HandleDirective(include);
+					break;
 				case IT4Directive directive:
 					AppendRemainingMessage(element);
 					HandleDirective(directive);
@@ -173,11 +169,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (code == null) return;
 			switch (codeBlock)
 			{
-				case T4ExpressionBlock _:
+				case IT4ExpressionBlock _:
 					if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
 					else Result.AppendTransformation(new T4ExpressionDescription(code));
 					break;
-				case T4FeatureBlock _:
+				case IT4FeatureBlock _:
 					Result.AppendFeature(new T4CodeDescription(code));
 					break;
 				default:

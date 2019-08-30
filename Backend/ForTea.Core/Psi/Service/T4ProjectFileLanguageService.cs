@@ -1,9 +1,10 @@
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.UI.Icons;
 
-namespace GammaJul.ForTea.Core.Psi {
+namespace GammaJul.ForTea.Core.Psi.Service {
 
 	/// <summary>Language service for T4 project files.</summary>
 	[ProjectFileType(typeof(T4ProjectFileType))]

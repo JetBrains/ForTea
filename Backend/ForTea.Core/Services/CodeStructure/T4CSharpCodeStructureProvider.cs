@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.ProjectModel;
@@ -50,7 +50,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 				case IT4Directive directive:
 					ProcessT4Directive(directive, parentElement);
 					return;
-				case T4FeatureBlock featureBlock:
+				case IT4FeatureBlock featureBlock:
 					ProcessT4FeatureBlock(featureBlock, parentElement, cSharpFile, secondaryRangeTranslator, state);
 					break;
 			}
@@ -61,7 +61,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 			=> new T4CodeStructureDirective(parentElement, directive);
 
 		private static void ProcessT4FeatureBlock(
-			[NotNull] T4FeatureBlock featureBlock,
+			[NotNull] IT4FeatureBlock featureBlock,
 			[NotNull] CodeStructureElement parentElement,
 			[NotNull] ICSharpFile cSharpFile,
 			[NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,

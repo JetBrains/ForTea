@@ -1,6 +1,6 @@
 ﻿Language: PsiLanguageType:T4
 IT4File
-  IT4TemplateDirective
+  IT4UnknownDirective
     DIRECTIVE_START: <#@
     WHITE_SPACE:  
     ErrorElement:Missing directive name

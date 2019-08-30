@@ -34,11 +34,13 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
   ): Boolean {
     if (configuration !is T4RunConfiguration) return false
 
+    val project = configuration.project
+    val view = project.getComponent<T4BuildSessionView>()
+    view.openWindow(project.lifetime)
     val finished = Semaphore()
     finished.down()
     var successful = false
 
-    val project = configuration.project
     val model = project.solution.t4ProtocolModel
 
     val request = model.requestCompilation.start(configuration.parameters.initialFileLocation).result
@@ -46,7 +48,6 @@ class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<CompileT4BeforeRunT
       try {
         val result = rdTaskResult.unwrap()
         successful = result.buildResultKind.isSuccess
-        val view = project.getComponent<T4BuildSessionView>()
         view.showT4BuildResult(project.lifetime, result.messages, configuration.parameters.initialFileLocation.location)
       } finally {
         finished.up()

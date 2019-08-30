@@ -1,7 +1,6 @@
 using System.Text;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
@@ -17,24 +16,24 @@ namespace GammaJul.ForTea.Core.Parsing {
 
 		/// <summary>Creates a new statement block (&lt;# ... #&gt;).</summary>
 		/// <param name="code">The code that will be contained in the block.</param>
-		/// <returns>A new instance of <see cref="T4StatementBlock"/>.</returns>
+		/// <returns>A new instance of <see cref="IT4StatementBlock"/>.</returns>
 		[NotNull]
 		public static IT4StatementBlock CreateStatementBlock([CanBeNull] string code)
-			=> (T4StatementBlock) CreateTreeAndGetFirstChild("<#" + code + "#>");
+			=> (IT4StatementBlock) CreateTreeAndGetFirstChild("<#" + code + "#>");
 
 		/// <summary>Creates a new feature block (&lt;#+ ... #&gt;).</summary>
 		/// <param name="code">The code that will be contained in the block.</param>
-		/// <returns>A new instance of <see cref="T4FeatureBlock"/>.</returns>
+		/// <returns>A new instance of <see cref="IT4FeatureBlock"/>.</returns>
 		[NotNull]
 		public static IT4FeatureBlock CreateFeatureBlock([CanBeNull] string code)
-			=> (T4FeatureBlock) CreateTreeAndGetFirstChild("<#+" + code + "#>");
+			=> (IT4FeatureBlock) CreateTreeAndGetFirstChild("<#+" + code + "#>");
 
 		/// <summary>Creates a new expression block (&lt;#= ... #&gt;).</summary>
 		/// <param name="code">The code that will be contained in the block.</param>
-		/// <returns>A new instance of <see cref="T4ExpressionBlock"/>.</returns>
+		/// <returns>A new instance of <see cref="IT4ExpressionBlock"/>.</returns>
 		[NotNull]
 		public static IT4ExpressionBlock CreateExpressionBlock([CanBeNull] string code)
-			=> (T4ExpressionBlock) CreateTreeAndGetFirstChild("<#=" + code + "#>");
+			=> (IT4ExpressionBlock) CreateTreeAndGetFirstChild("<#=" + code + "#>");
 
 		/// <summary>Creates a new directive (&lt;#@ ... #&gt;).</summary>
 		/// <param name="directiveName">Name of the directive.</param>

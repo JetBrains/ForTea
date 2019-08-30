@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.DocumentModel;
@@ -18,7 +19,7 @@ namespace JetBrains.ForTea.Tests.Features
 	[TestFixture]
 	[Category("Formatting")]
 	[Category("T4")]
-	[TestFileExtension(T4ProjectFileType.MainExtension)]
+	[TestFileExtension(T4FileExtensions.MainExtension)]
 	public class T4FormatterTest : BaseTestWithTextControl
 	{
 		protected override string RelativeTestDataPath => @"Features\CodeFormatter";
@@ -33,6 +34,7 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("ExpressionBlock", Ignore = "Not implemented")]
 		[TestCase("ComplexFeatureBlock")]
 		[TestCase("BrokenFeatureBlock")]
+		[TestCase("InnerClasses")]
 		public void TestFormatter([NotNull] string name) => DoOneTest(name);
 
 		protected override void DoTest(Lifetime lifetime, IProject testProject)

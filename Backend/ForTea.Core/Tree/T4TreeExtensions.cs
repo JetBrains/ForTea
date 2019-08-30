@@ -11,6 +11,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Tree
@@ -73,13 +74,15 @@ namespace GammaJul.ForTea.Core.Tree
 		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
 			[NotNull] this IT4Directive directive,
 			[NotNull] DirectiveAttributeInfo info
-		) => directive.Attributes.Where(it => it.Name.GetText() == info.Name);
+		) => directive.Attributes.Where(it =>
+			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
 		
 		[CanBeNull]
 		public static IT4DirectiveAttribute GetFirstAttribute(
 			[NotNull] this IT4Directive directive,
 			[NotNull] DirectiveAttributeInfo info
-		) => directive.Attributes.FirstOrDefault(it => it.Name.GetText() == info.Name);
+		) => directive.Attributes.FirstOrDefault(it =>
+			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
 
 		
 
@@ -225,6 +228,18 @@ namespace GammaJul.ForTea.Core.Tree
 					ModificationUtil.AddChildAfter(result, T4TokenNodeTypes.WHITE_SPACE.CreateLeafElement());
 
 				return result;
+			}
+		}
+
+		public static IEnumerable<TParent> GetParentsOfType<TParent>([NotNull] this ITreeNode node)
+			where TParent : class, ITreeNode
+		{
+			var parent = node.GetParentOfType<TParent>();
+			while (parent != null)
+			{
+				yield return parent;
+				var tmpParent = parent.Parent;
+				parent = tmpParent?.GetParentOfType<TParent>();
 			}
 		}
 	}

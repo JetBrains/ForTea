@@ -1,24 +1,22 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4Directive), HighlightingTypes =
+	[ElementProblemAnalyzer(typeof(IT4UnknownDirective), HighlightingTypes =
 		new[] {typeof(T4UnexpectedDirectiveHighlighting)})]
-	public class T4UnexpectedDirectiveAnalyzer : ElementProblemAnalyzer<IT4Directive>
+	public class T4UnexpectedDirectiveAnalyzer : ElementProblemAnalyzer<IT4UnknownDirective>
 	{
 		protected override void Run(
-			IT4Directive element,
+			IT4UnknownDirective element,
 			ElementProblemAnalyzerData data,
 			IHighlightingConsumer consumer
 		)
 		{
-			if (T4DirectiveInfoManager.GetDirectiveByName(element.Name.GetText()) != null) return;
-			var nameToken = element.Name;
-			if (nameToken == null) return;
-			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(nameToken));
+			var name = element.Name;
+			if (name == null) return;
+			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(name));
 		}
 	}
 }

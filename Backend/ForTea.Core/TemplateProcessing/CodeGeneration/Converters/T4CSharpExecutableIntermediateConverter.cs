@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
@@ -25,10 +24,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		[NotNull] private const string HostResource = "GammaJul.ForTea.Core.Resources.Host.cs";
 
-		protected override string GeneratedClassName =>
-			ValidityChecker.IsValidIdentifier(base.GeneratedClassName)
-				? base.GeneratedClassName
-				: "__T4GeneratedTransformation";
+		[NotNull] private const string AssemblyRegisteringResource =
+			"GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs"; 
+
+		protected override string GeneratedClassName => GeneratedClassNameString;
 
 		public T4CSharpExecutableIntermediateConverter(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
@@ -86,8 +85,20 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			string resource = IntermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
 			var provider = new T4TemplateResourceProvider(resource, this);
 			string encoding = IntermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
-			string suffix = provider.ProcessResource(GeneratedClassName, encoding, GetReferences());
+			string suffix = provider.ProcessResource(GeneratedClassName, encoding);
 			Result.Append(suffix);
+			AppendAssemblyRegistering();
+			// assembly registration code is part of main class,
+			// so resources do not include closing brace
+			Result.Append("}");
+		}
+
+		private void AppendAssemblyRegistering()
+		{
+			var provider = new T4TemplateResourceProvider(AssemblyRegisteringResource, this);
+			string references = GetReferences();
+			string registering = provider.ProcessResource(references);
+			Result.Append(registering);
 		}
 
 		private string GetReferences() => File

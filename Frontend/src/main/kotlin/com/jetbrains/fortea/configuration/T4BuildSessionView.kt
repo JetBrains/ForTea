@@ -2,10 +2,13 @@ package com.jetbrains.fortea.configuration
 
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rd.util.lifetime.isAlive
+import com.jetbrains.rd.util.reactive.ViewableMap
 import com.jetbrains.rdclient.util.idea.LifetimedProjectService
+import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.Diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.Diagnostics.DiagnosticKind
+import com.jetbrains.rider.model.BuildMessageKind
+import com.jetbrains.rider.model.MessageBuildEvent
 import com.jetbrains.rider.model.T4BuildMessage
 import com.jetbrains.rider.model.T4BuildMessageKind
 
@@ -13,19 +16,29 @@ class T4BuildSessionView(
   project: Project,
   private val windowFactory: T4BuildToolWindowFactory
 ) : LifetimedProjectService(project) {
-  fun showT4BuildResult(lifetime: Lifetime, buildMessages: List<T4BuildMessage>, file: String) {
-    val context = windowFactory.getOrCreateContext(lifetime)
+  fun openWindow(lifetime: Lifetime) = windowFactory.application.invokeLater {
+    val context = initializeContext(lifetime)
     context.clear()
-    if (!lifetime.isAlive) return
-    val shouldReactivateBuildToolWindow = !context.isActive
+    val buildEvent = MessageBuildEvent(null, BuildMessageKind.Message, "Build started")
+    context.addOutputMessage(buildEvent, ViewableMap())
+    context.invalidatePanelMode()
+  }
+
+  fun showT4BuildResult(lifetime: Lifetime, buildMessages: List<T4BuildMessage>, file: String) {
+    val context = initializeContext(lifetime)
     val buildDiagnostics = buildMessages.map {
       toBuildDiagnostic(it, file)
     }
     for (it in buildDiagnostics) {
       context.addBuildEvent(it)
     }
-    if (shouldReactivateBuildToolWindow) context.showToolWindowIfHidden(true)
     context.invalidatePanelMode()
+  }
+
+  private fun initializeContext(lifetime: Lifetime): BuildToolWindowContext {
+    val context = windowFactory.getOrCreateContext(lifetime)
+    if (!context.isActive) context.showToolWindowIfHidden(true)
+    return context
   }
 
   private fun toBuildDiagnostic(

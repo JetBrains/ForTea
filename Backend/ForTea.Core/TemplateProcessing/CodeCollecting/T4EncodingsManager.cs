@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -15,7 +14,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		[CanBeNull]
 		public string FindEncoding([NotNull] IT4OutputDirective directive, [NotNull] IT4CodeGenerationInterrupter interrupter)
 		{
-			var attribute = directive.GetAttributes(T4DirectiveInfoManager.Output.EncodingAttribute).FirstOrDefault();
+			var attribute = directive.GetFirstAttribute(T4DirectiveInfoManager.Output.EncodingAttribute);
 			var value = attribute?.Value;
 			if (value == null) return null;
 			string rawEncoding = value.GetText();

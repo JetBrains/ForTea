@@ -11,7 +11,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 	{
 		protected override void Run(IT4Directive directive, ElementProblemAnalyzerData data, IHighlightingConsumer consumer)
 		{
-			var directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name.GetText());
+			var directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name?.GetText());
 			if (directiveInfo == null) return;
 
 			var badAttributes = directive

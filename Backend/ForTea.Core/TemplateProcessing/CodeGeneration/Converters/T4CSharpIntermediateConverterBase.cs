@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
@@ -14,6 +15,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public abstract class T4CSharpIntermediateConverterBase : IT4ElementAppendFormatProvider
 	{
+		[NotNull] public const string GeneratedClassNameString = "TextTransformation";
+		[NotNull] public const string GeneratedBaseClassNameString = GeneratedClassNameString + "Base";
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
 		[NotNull]
@@ -40,7 +43,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendGeneratedMessage();
 			string ns = GetNamespace();
-			bool hasNamespace = !string.IsNullOrEmpty(ns);
+			bool hasNamespace = !String.IsNullOrEmpty(ns);
 			if (hasNamespace)
 			{
 				Result.AppendLine($"namespace {ns}");
@@ -212,10 +215,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract string ResourceName { get; }
 
 		[NotNull]
-		protected abstract string GeneratedClassName { get; }
+		protected virtual string GeneratedClassName => GeneratedClassNameString;
 
 		[NotNull]
-		protected abstract string GeneratedBaseClassName { get; }
+		protected virtual string GeneratedBaseClassName => GeneratedBaseClassNameString;
 
 		protected abstract void AppendSyntheticAttribute();
 
