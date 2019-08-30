@@ -15,7 +15,7 @@ IT4File
     WHITE_SPACE: \n
     IT4DirectiveAttribute
       TOKEN: Hello
-    ErrorElement:Unexpected token
+    ErrorElement:= expected
       BAD_TOKEN: ,
       WHITE_SPACE:  
       TOKEN: world

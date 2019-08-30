@@ -8,12 +8,11 @@ IT4File
     IT4DirectiveAttribute
       TOKEN: language
       EQUAL: =
-    ErrorElement:" expected
-      TOKEN: C
-      BAD_TOKEN: #
-      WHITE_SPACE:  
-      BLOCK_END: #>
-  NEW_LINE: \n
-  RAW_TEXT: Hello, world!
+      QUOTE: "
+      IT4AttributeValue
+        RAW_ATTRIBUTE_VALUE: <#
+      QUOTE: "
+    WHITE_SPACE:  
+    BLOCK_END: #>
   NEW_LINE: \n
 

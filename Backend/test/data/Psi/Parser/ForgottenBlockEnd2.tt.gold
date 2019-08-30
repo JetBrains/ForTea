@@ -12,7 +12,7 @@ IT4File
       IT4AttributeValue
         RAW_ATTRIBUTE_VALUE: C#
       QUOTE: "
-    ErrorElement:Unexpected token
+    ErrorElement:#> expected
   WHITE_SPACE: \n
   IT4ExpressionBlock
     EXPRESSION_BLOCK_START: <#=

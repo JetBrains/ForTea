@@ -17,6 +17,8 @@ namespace JetBrains.ForTea.Tests.Psi
 		[TestCase("Macros")]
 		[TestCase("EmptyDirective")]
 		[TestCase("EmptyExpressionBlock")]
+		[TestCase("LonelyBlockEnd")]
+		[TestCase("BlockStartInAttributeValue")]
 		public void TestParser(string name) => DoOneTest(name);
 
 		[TestCase("ForgottenBlockEnd")]

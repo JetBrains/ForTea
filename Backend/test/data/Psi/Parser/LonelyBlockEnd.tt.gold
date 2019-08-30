@@ -1,0 +1,8 @@
+﻿Language: PsiLanguageType:T4
+IT4File
+  RAW_TEXT: while (true) {}
+  NEW_LINE: \n
+  ErrorElement:Unexpected token
+    BLOCK_END: #>
+  NEW_LINE: \n
+

@@ -11,5 +11,5 @@ IT4File
       QUOTE: "
       IT4AttributeValue
         RAW_ATTRIBUTE_VALUE: C# #>\nHello, world!\n
-    ErrorElement:Unexpected token
+    ErrorElement:" expected
 
