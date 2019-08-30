@@ -66,6 +66,9 @@
     <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
     <projectService serviceImplementation="com.jetbrains.fortea.configuration.T4BuildToolWindowFactory"/>
+
+    <internalFileTemplate name="T4 File"/>
+    <internalFileTemplate name="T4 Include"/>
   </extensions>
   <actions>
     <action
@@ -85,6 +88,9 @@
         id="PreprocessT4Template"
         text="Preprocess Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="DebugT4Template"/>
+    </action>
+    <action id="NewT4File" class="com.jetbrains.fortea.actions.CreateT4FileAction">
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
   </actions>
   <project-components>

@@ -1,0 +1,2 @@
+<#@ template language="C#" #>
+<#@ output extension=".txt" encoding="utf-8" #>
