@@ -1,4 +1,3 @@
-using FluentAssertions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
