@@ -78,7 +78,7 @@ namespace GammaJul.ForTea.Core.Tree
 		)
 		{
 			var sourceFile = file.GetSourceFile();
-			if (sourceFile == null || guard.CanProcess(sourceFile)) yield break;
+			if (sourceFile == null || !guard.CanProcess(sourceFile)) yield break;
 			guard.StartProcessing(sourceFile);
 			var includedFiles = file.Blocks.OfType<IT4IncludeDirective>()
 				.Select(include => include.Path.ResolveT4File(guard))
