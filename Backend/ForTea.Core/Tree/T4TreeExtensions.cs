@@ -239,5 +239,18 @@ namespace GammaJul.ForTea.Core.Tree
 				yield return obj;
 			}
 		}
+
+		[CanBeNull]
+		public static TParent GetParentOfType<TParent>([NotNull] this ITreeNode node)
+			where TParent : class, ITreeNode
+		{
+			for (; node != null; node = node.Parent)
+			{
+				if (!(node is TParent obj)) continue;
+				return obj;
+			}
+
+			return null;
+		}
 	}
 }

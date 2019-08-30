@@ -19,7 +19,6 @@ using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Impl.Shared;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
-using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
 using BlockNavigator = JetBrains.ReSharper.Psi.CSharp.Tree.BlockNavigator;
 
