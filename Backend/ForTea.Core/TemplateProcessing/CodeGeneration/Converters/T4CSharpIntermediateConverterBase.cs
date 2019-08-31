@@ -7,7 +7,6 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
@@ -88,23 +87,25 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			return ns.IsEmpty() ? ns2 : ns;
 		}
 
-		protected virtual void AppendImports()
+		private void AppendImports()
 		{
-			foreach (var description in IntermediateResult.ImportDescriptions)
+			AppendIndent();
+			Result.AppendLine("#pragma warning disable 8019");
+			AppendIndent();
+			AppendIndent();
+			Result.AppendLine("using System;");
+			if (IntermediateResult.HasHost)
 			{
 				AppendIndent();
-				Result.Append("using ");
-				if (description.HasSameSource(File))
-					Result.AppendMapped(description.Presentation, description.Source.GetTreeTextRange());
-				else Result.Append(description.Presentation);
-				Result.AppendLine(";");
+				Result.AppendLine("using System.CodeDom.Compiler;");
 			}
 
 			AppendIndent();
-			Result.AppendLine("using System;");
-			if (!IntermediateResult.HasHost) return;
-			AppendIndent();
-			Result.AppendLine("using System.CodeDom.Compiler;");
+			Result.AppendLine("#pragma warning restore 8019");
+			foreach (var description in IntermediateResult.ImportDescriptions)
+			{
+				description.AppendContent(Result, this, File);
+			}
 		}
 
 		protected virtual void AppendClass()
