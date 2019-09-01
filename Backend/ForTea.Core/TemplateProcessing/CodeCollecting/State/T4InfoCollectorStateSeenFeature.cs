@@ -16,16 +16,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		{
 		}
 
-		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(ITreeNode element)
 		{
 			switch (element)
 			{
 				case IT4FeatureBlock _: return this;
 				case IT4ExpressionBlock _:
-					Die();
 					return new T4InfoCollectorStateInitial(Interrupter);
 				default:
-					Die();
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE)
 						return new T4InfoCollectorStateSeenFeatureAndNewLine(Interrupter);
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
@@ -41,14 +39,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			}
 		}
 
-		protected override bool FeatureStartedSafe => true;
+		public override bool FeatureStarted => true;
 
-		protected override void ConsumeTokenSafe(IT4Token token)
+		public override void ConsumeToken(IT4Token token)
 		{
 			if (token.NodeType != T4TokenNodeTypes.NEW_LINE) LastToken = token;
 		}
 
-		protected override string ProduceSafe(ITreeNode lookahead) => null;
-		protected override string ProduceBeforeEofSafe() => null;
+		public override string Produce(ITreeNode lookahead) => null;
+		public override string ProduceBeforeEof() => null;
 	}
 }

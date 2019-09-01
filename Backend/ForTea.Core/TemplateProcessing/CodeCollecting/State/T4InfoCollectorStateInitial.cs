@@ -21,27 +21,24 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			[NotNull] IT4CodeGenerationInterrupter interrupter
 		) : base(interrupter) => Builder = builder;
 
-		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(ITreeNode element)
 		{
 			switch (element)
 			{
 				case IT4FeatureBlock _:
-					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4Directive _:
 				case IT4StatementBlock _:
-					Die();
 					return new T4InfoCollectorSateSeenDirectiveOrStatementBlock(Interrupter);
 				case IT4ExpressionBlock _:
-					Die();
 					return new T4InfoCollectorStateInitial(Interrupter);
 				default: return this;
 			}
 		}
 
-		protected override bool FeatureStartedSafe => false;
-		protected override void ConsumeTokenSafe(IT4Token token) => Builder.Append(Convert(token));
-		protected override string ProduceSafe(ITreeNode lookahead) => Builder.ToString();
-		protected override string ProduceBeforeEofSafe() => Builder.ToString();
+		public override bool FeatureStarted => false;
+		public override void ConsumeToken(IT4Token token) => Builder.Append(Convert(token));
+		public override string Produce(ITreeNode lookahead) => Builder.ToString();
+		public override string ProduceBeforeEof() => Builder.ToString();
 	}
 }

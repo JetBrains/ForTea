@@ -15,21 +15,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		public T4InfoCollectorStateSeenFeatureAndNewLine([NotNull] IT4CodeGenerationInterrupter interrupter) :
 			base(interrupter) => Builder = new StringBuilder();
 
-		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(ITreeNode element)
 		{
 			switch (element)
 			{
 				case IT4FeatureBlock _:
-					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4ExpressionBlock _:
-					Die();
 					return new T4InfoCollectorStateInitial(Interrupter);
 				default:
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE) return this;
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
 					{
-						Die();
 						return new T4InfoCollectorStateSeenFeatureAndText(Builder, Interrupter, element);
 					}
 
@@ -39,11 +36,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			}
 		}
 
-		protected override bool FeatureStartedSafe => true;
-		protected override void ConsumeTokenSafe(IT4Token token) => Builder.Append(Convert(token));
-		protected override string ProduceBeforeEofSafe() => null;
+		public override bool FeatureStarted => true;
+		public override void ConsumeToken(IT4Token token) => Builder.Append(Convert(token));
+		public override string ProduceBeforeEof() => null;
 
-		protected override string ProduceSafe(ITreeNode lookahead)
+		public override string Produce(ITreeNode lookahead)
 		{
 			if (lookahead is IT4FeatureBlock) return null;
 			return Builder.ToString();

@@ -25,15 +25,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			FirstElement = firstElement;
 		}
 
-		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(ITreeNode element)
 		{
 			switch (element)
 			{
 				case IT4FeatureBlock _:
-					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4ExpressionBlock _:
-					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4Token _: return this;
 				default:
@@ -43,11 +41,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			}
 		}
 
-		protected override bool FeatureStartedSafe => true;
-		protected override void ConsumeTokenSafe(IT4Token token) => Builder.Append(Convert(token));
-		protected override string ProduceSafe(ITreeNode lookahead) => Builder.ToString();
+		public override bool FeatureStarted => true;
+		public override void ConsumeToken(IT4Token token) => Builder.Append(Convert(token));
+		public override string Produce(ITreeNode lookahead) => Builder.ToString();
 
-		protected override string ProduceBeforeEofSafe()
+		public override string ProduceBeforeEof()
 		{
 			var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
 			Interrupter.InterruptAfterProblem(data);
