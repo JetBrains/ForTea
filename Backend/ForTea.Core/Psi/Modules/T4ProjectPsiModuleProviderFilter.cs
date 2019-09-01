@@ -1,5 +1,6 @@
 using System;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Lifetimes;
@@ -16,6 +17,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly IT4Environment _t4Environment;
 		[NotNull] private readonly IT4MacroResolver _resolver;
 		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
+		
+		[NotNull]
+		private IT4TemplateTypeProvider TemplateTypeProvider { get; }
 
 		public Tuple<IProjectPsiModuleHandler, IPsiModuleDecorator> OverrideHandler(
 			Lifetime lifetime,
@@ -29,7 +33,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_t4Environment,
 				project,
 				_resolver,
-				_coordinator
+				_coordinator,
+				TemplateTypeProvider
 			);
 			return new Tuple<IProjectPsiModuleHandler, IPsiModuleDecorator>(t4ModuleHandler, null);
 		}
@@ -38,12 +43,15 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator
-		) {
+			[NotNull] PsiProjectFileTypeCoordinator coordinator,
+			[NotNull] IT4TemplateTypeProvider templateTypeProvider
+		)
+		{
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 			_coordinator = coordinator;
+			TemplateTypeProvider = templateTypeProvider;
 		}
 
 	}

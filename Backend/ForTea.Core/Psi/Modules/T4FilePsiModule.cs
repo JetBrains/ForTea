@@ -89,9 +89,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			// tells the world the module has changed
 			var changeBuilder = new PsiModuleChangeBuilder();
 			changeBuilder.AddModuleChange(this, PsiModuleChange.ChangeType.Modified);
-
-			if (true) GetPsiServices().MarkAsDirty(SourceFile);
-
+			// TODO: mark as dirty
 			_shellLocks.ExecuteOrQueueEx("T4PsiModuleChange",
 				() => _changeManager.ExecuteAfterChange(
 					() => _shellLocks.ExecuteWithWriteLock(

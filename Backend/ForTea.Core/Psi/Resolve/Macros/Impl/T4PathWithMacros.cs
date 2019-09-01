@@ -66,7 +66,15 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			return new T4Parser(lexer).Parse();
 		}
 
-		public IPsiSourceFile Resolve() => ResolvePath().FindSourceFileInSolution(Solution);
+		public IPsiSourceFile Resolve()
+		{
+			var path = ResolvePath();
+			if (path.IsEmpty) return null;
+			return Solution
+				.FindProjectItemsByLocation(path)
+				.OfType<IProjectFile>()
+				.SingleOrDefault()?.ToSourceFile();
+		}
 
 		public FileSystemPath ResolvePath()
 		{

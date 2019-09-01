@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
@@ -22,6 +23,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private bool _gotLastFeature;
 		private bool _inLastFeature;
 		private bool _afterLastFeatureErrorAdded;
+
+		[NotNull]
+		private IT4TemplateTypeProvider TemplateTypeProvider { get; }
 
 		public override void ProcessBeforeInterior(ITreeNode element)
 		{
@@ -110,7 +114,8 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 			// Assembly attributes in preprocessed templates are useless.
 			if (!(directive is IT4AssemblyDirective assemblyDirective)) return;
-			if (!DaemonProcess.SourceFile.ToProjectFile().IsPreprocessedT4Template()) return;
+			var projectFile = DaemonProcess.SourceFile.ToProjectFile().NotNull();
+			if (!TemplateTypeProvider.IsPreprocessedTemplate(projectFile)) return;
 			AddHighlighting(directive.GetHighlightingRange(), new IgnoredAssemblyDirectiveWarning(assemblyDirective));
 		}
 
@@ -126,15 +131,11 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			base.Execute(commiter);
 		}
 
-		/// <summary>Initializes a new instance of the <see cref="T4DaemonStageProcessBase"/> class.</summary>
-		/// <param name="file">The associated T4 file.</param>
-		/// <param name="daemonProcess">The associated daemon process.</param>
 		public T4ErrorProcess(
 			[NotNull] IT4File file,
-			[NotNull] IDaemonProcess daemonProcess
-		) : base(file, daemonProcess)
-		{
-		}
+			[NotNull] IDaemonProcess daemonProcess,
+			[NotNull] IT4TemplateTypeProvider templateTypeProvider
+		) : base(file, daemonProcess) => TemplateTypeProvider = templateTypeProvider;
 
 		protected override void AnalyzeFile(IT4File file)
 		{

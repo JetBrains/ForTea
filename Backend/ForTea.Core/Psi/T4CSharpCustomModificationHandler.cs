@@ -107,7 +107,7 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="usingDirective">The using directive.</param>
 		/// <returns>A <see cref="TreeTextRange"/> corresponding to the namespace in <paramref name="usingDirective"/>.</returns>
 		protected override TreeTextRange GetNameRange(ITreeNode usingDirective)
-			=> (usingDirective as IUsingDirective).GetUsedNamespaceNode().GetTreeTextRange();
+			=> GetUsedNamespaceNode(usingDirective as IUsingDirective).GetTreeTextRange();
 
 		/// <summary>Removes an import directive.</summary>
 		/// <param name="originalFile">The original T4 file where the directive must be removed.</param>
@@ -237,7 +237,7 @@ namespace GammaJul.ForTea.Core.Psi {
 			IUsingDirective usingDirective,
 			Action action
 		) {
-			ICSharpTreeNode namespaceNode = usingDirective.GetUsedNamespaceNode();
+			ICSharpTreeNode namespaceNode = GetUsedNamespaceNode(usingDirective);
 			if (namespaceNode == null)
 				Assertion.Fail("Only a namespace using can be removed.");
 			else {
@@ -282,7 +282,7 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <returns>The namespace contained in <paramref name="usingDirective"/>.</returns>
 		[NotNull]
 		private static string GetNamespaceFromUsingDirective([NotNull] ITreeNode usingDirective) {
-			IReferenceName namespaceNode = (usingDirective as IUsingDirective).GetUsedNamespaceNode();
+			IReferenceName namespaceNode = GetUsedNamespaceNode(usingDirective as IUsingDirective);
 			if (namespaceNode == null)
 				throw new FailPsiTransactionException("Cannot create namespace alias.");
 			return namespaceNode.QualifiedName;
@@ -315,6 +315,12 @@ namespace GammaJul.ForTea.Core.Psi {
 		public T4CSharpCustomModificationHandler([NotNull] ILanguageManager languageManager)
 			: base(languageManager) {
 		}
+
+		[CanBeNull]
+		private static IReferenceName GetUsedNamespaceNode([CanBeNull] IUsingDirective directive)
+			=> directive is IUsingSymbolDirective usingSymbolDirective && usingSymbolDirective.StaticKeyword == null
+				? usingSymbolDirective.ImportedSymbolName
+				: null;
 
 	}
 

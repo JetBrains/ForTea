@@ -75,17 +75,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		[CanBeNull]
-		private string GetNamespace()
-		{
-			var sourceFile = File.GetSourceFile();
-			var projectFile = sourceFile?.ToProjectFile();
-
-			string ns = projectFile.GetCustomToolNamespace();
-			string ns2 = sourceFile?.Properties.GetDefaultNamespace();
-			if (ns == null) return ns2;
-			if (ns2 == null) return ns;
-			return ns.IsEmpty() ? ns2 : ns;
-		}
+		private string GetNamespace() => File.GetSourceFile()?.Properties.GetDefaultNamespace();
 
 		private void AppendImports()
 		{

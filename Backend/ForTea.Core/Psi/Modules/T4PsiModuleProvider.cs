@@ -4,7 +4,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
-using GammaJul.ForTea.Core.Tree;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Threading;
@@ -30,6 +30,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly IT4Environment _t4Environment;
 		[NotNull] private readonly IT4MacroResolver _resolver;
 		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
+
+		[NotNull]
+		private IT4TemplateTypeProvider TemplateTypeProvider { get; }
 
 		private readonly struct ModuleWrapper {
 
@@ -88,7 +91,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				case PsiModuleChange.ChangeType.Added:
 					// Preprocessed .tt files should be handled by R# itself as if it's a normal project file,
 					// so that it has access to the current project types.
-					if (projectFile.LanguageType.Is<T4ProjectFileType>() && !projectFile.IsPreprocessedT4Template()) {
+					if (projectFile.LanguageType.Is<T4ProjectFileType>()
+					    && !TemplateTypeProvider.IsPreprocessedTemplate(projectFile))
+					{
 						AddFile(projectFile, changeBuilder);
 						return true;
 					}
@@ -103,7 +108,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 				case PsiModuleChange.ChangeType.Modified:
 					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
-						if (!projectFile.IsPreprocessedT4Template()) {
+						if (!TemplateTypeProvider.IsPreprocessedTemplate(projectFile)) {
 							ModifyFile(changeBuilder, moduleWrapper);
 							return true;
 						}
@@ -115,7 +120,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					}
 
 					// The T4 file went from Preprocessed to Transformed, it now needs a T4PsiModule.
-					if (projectFile.LanguageType.Is<T4ProjectFileType>() && !projectFile.IsPreprocessedT4Template()) {
+					if (projectFile.LanguageType.Is<T4ProjectFileType>()
+					    && !TemplateTypeProvider.IsPreprocessedTemplate(projectFile))
+					{
 						AddFile(projectFile, changeBuilder);
 						changeType = PsiModuleChange.ChangeType.Removed;
 						return false;
@@ -176,6 +183,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			psiServices
 				.GetComponent<T4FileDependencyManager>()
 				.UpdateIncludes(includeLocation, EmptyList<FileSystemPath>.InstanceList);
+			/* TODO: mark as dirty
 			foreach (var sourceFile in _modules.Values.Select(moduleWrapper => moduleWrapper.Module.SourceFile))
 			{
 				if (!(sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File)) continue;
@@ -185,7 +193,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					.Where(path => !path.IsEmpty)
 					.Any(path => path == includeLocation);
 				if (hasUpdatedDependency) psiServices.MarkAsDirty(sourceFile);
-			}
+			}*/
 		}
 		
 		public void Dispose() {
@@ -202,7 +210,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator
+			[NotNull] PsiProjectFileTypeCoordinator coordinator,
+			[NotNull] IT4TemplateTypeProvider templateTypeProvider
 		)
 		{
 			_lifetime = lifetime;
@@ -211,6 +220,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 			_coordinator = coordinator;
+			TemplateTypeProvider = templateTypeProvider;
 		}
 
 	}
