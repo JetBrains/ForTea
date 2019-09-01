@@ -47,11 +47,11 @@ java {
 
 
 val baseVersion = "2019.3"
-version = "0.01"
+version = baseVersion
 
 intellij {
   type = "RD"
-  version = "$baseVersion-SNAPSHOT"
+  version = "$version-SNAPSHOT"
   instrumentCode = false
   downloadSources = false
   updateSinceUntilBuild = false
@@ -188,11 +188,12 @@ tasks {
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
-    dependsOn(generateT4Parser, generateT4Lexer)
+    // dependsOn(generateT4Parser, generateT4Lexer)
+    dependsOn(generateT4Lexer)
   }
 
   withType<Test> {
-    dependsOn(generateT4Lexer, generateT4Parser)
+    dependsOn(generateT4Lexer)
     useTestNG()
     testLogging {
       showStandardStreams = true
@@ -259,6 +260,15 @@ tasks {
         args = listOf(backendPluginSolutionPath.canonicalPath)
       }
     }
+  }
+
+  getByName("buildSearchableOptions") {
+    // A kind of hack.
+    // The task is broken outside of Rider
+    // and cannot be performed when building standalone plugin
+    // Assumption: plugin is built in Release mode if and only if
+    // it is built on the server as Ridier bundled plugin
+    enabled = buildConfiguration == "Release"
   }
 }
 
