@@ -56,28 +56,6 @@ Visual Basic T4 files aren't supported yet.
 Custom T4 directives aren't supported yet.  
 
 Licensed under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
-
-Building plugin
---------------
-To build R# plugin, run
-```
-cd Backend
-.\build.ps1 pack
-```
-or
-```
-cd Backend
-./build.sh pack
-```
-Build outputs will be placed at `Backend/output/Debug/`
-
-To build Rider plugin, run
-```
-cd Frontend
-gradlew :prepare
-cd ..\Backend
-msbuild
-cd ..\Frontend
-gradlew :buildPlugin
-```
-Build outputs will be placed at `Frontend/build/distributions/`
+----
+Building plugin  
+Build instruction can be found at BUILD.md
