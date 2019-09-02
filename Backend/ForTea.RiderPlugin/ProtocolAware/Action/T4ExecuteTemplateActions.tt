@@ -9,7 +9,10 @@
 // ------------------------------------------------------------------------------
 
 using GammaJul.ForTea.Core.Tree;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
@@ -18,16 +21,19 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
    {
 #>
 	[Action("T4.<#= name #>FromContext", "<#= name #> Template")]
-	public class T4<#= name #>TemplateAction : T4ProtocolAwareActionBase
+	public sealed class T4<#= name #>TemplateAction : T4ProtocolAwareActionBase
 	{
 		protected override void Execute(
-			IT4TemplateExecutionManager manager,
+			IT4TemplateExecutionManager executionManager,
 			IT4File file,
-			Application.ActivityTrackingNew.UsageStatistics statistics
+			Application.ActivityTrackingNew.UsageStatistics statistics,
+			IT4ProjectModelTemplateDataManager dataManager
 		)
 		{
+			var projectFile = file.GetSourceFile().NotNull().ToProjectFile().NotNull();
+			dataManager.SetTemplateKind(projectFile, T4TemplateKind.Executable);
 			statistics.TrackAction("T4.Template.<#= name #>");
-			manager.<#= name #>(file);
+			executionManager.<#= name #>(file);
 		}
 	}
 <# } #>

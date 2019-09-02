@@ -6,35 +6,44 @@
 // </auto-generated>
 // ------------------------------------------------------------------------------
 
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
 	[Action("T4.ExecuteFromContext", "Execute Template")]
-	public class T4ExecuteTemplateAction : T4ProtocolAwareActionBase
+	public sealed class T4ExecuteTemplateAction : T4ProtocolAwareActionBase
 	{
 		protected override void Execute(
-			IT4TemplateExecutionManager manager,
+			IT4TemplateExecutionManager executionManager,
 			IT4File file,
-			Application.ActivityTrackingNew.UsageStatistics statistics
+			Application.ActivityTrackingNew.UsageStatistics statistics,
+			IT4ProjectModelTemplateDataManager dataManager
 		)
 		{
+			var projectFile = file.GetSourceFile().NotNull().ToProjectFile().NotNull();
+			dataManager.SetTemplateKind(projectFile, T4TemplateKind.Executable);
 			statistics.TrackAction("T4.Template.Execute");
-			manager.Execute(file);
+			executionManager.Execute(file);
 		}
 	}
 	[Action("T4.DebugFromContext", "Debug Template")]
-	public class T4DebugTemplateAction : T4ProtocolAwareActionBase
+	public sealed class T4DebugTemplateAction : T4ProtocolAwareActionBase
 	{
 		protected override void Execute(
-			IT4TemplateExecutionManager manager,
+			IT4TemplateExecutionManager executionManager,
 			IT4File file,
-			Application.ActivityTrackingNew.UsageStatistics statistics
+			Application.ActivityTrackingNew.UsageStatistics statistics,
+			IT4ProjectModelTemplateDataManager dataManager
 		)
 		{
+			var projectFile = file.GetSourceFile().NotNull().ToProjectFile().NotNull();
+			dataManager.SetTemplateKind(projectFile, T4TemplateKind.Executable);
 			statistics.TrackAction("T4.Template.Debug");
-			manager.Debug(file);
+			executionManager.Debug(file);
 		}
 	}
 }

@@ -1,11 +1,10 @@
 using System.Linq;
-using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Properties;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 
-namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
+namespace GammaJul.ForTea.Core.TemplateProcessing.Services.Impl
 {
 	[SolutionComponent]
 	public class T4ProjectModelTemplateDataManager : IT4ProjectModelTemplateDataManager

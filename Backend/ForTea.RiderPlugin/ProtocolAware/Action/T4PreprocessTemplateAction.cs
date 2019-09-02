@@ -1,11 +1,13 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model.Notifications;
 
@@ -18,9 +20,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 		{
 			var solution = FindSolution(context).NotNull();
 			var file = FindT4File(context).NotNull();
+			var projectFile = file.GetSourceFile().ToProjectFile().NotNull();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
+			var templateDataManager = solution.GetComponent<IT4ProjectModelTemplateDataManager>();
 			var statistics = solution.GetComponent<Application.ActivityTrackingNew.UsageStatistics>();
 			statistics.TrackAction("T4.Template.Preprocess");
+			templateDataManager.SetTemplateKind(projectFile, T4TemplateKind.Preprocessed);
 			try
 			{
 				string message = new T4CSharpCodeGenerator(file, solution).Generate().RawText;

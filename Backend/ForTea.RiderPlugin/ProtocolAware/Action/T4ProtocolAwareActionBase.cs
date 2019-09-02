@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.DataContext;
@@ -14,14 +15,16 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			if (solution == null) return;
 			var file = FindT4File(context);
 			if (file == null) return;
-			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
+			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
 			var statistics = solution.GetComponent<Application.ActivityTrackingNew.UsageStatistics>();
-			Execute(manager, file, statistics);
+			var dataManager = solution.GetComponent<IT4ProjectModelTemplateDataManager>();
+			Execute(executionManager, file, statistics, dataManager);
 		}
 
 		protected abstract void Execute(
-			[NotNull] IT4TemplateExecutionManager manager,
+			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] IT4File file,
-			[NotNull] Application.ActivityTrackingNew.UsageStatistics statistics);
+			[NotNull] Application.ActivityTrackingNew.UsageStatistics statistics,
+			[NotNull] IT4ProjectModelTemplateDataManager dataManager);
 	}
 }
