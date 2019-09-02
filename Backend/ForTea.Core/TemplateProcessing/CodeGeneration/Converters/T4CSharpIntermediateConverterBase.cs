@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
@@ -206,10 +205,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract string ResourceName { get; }
 
 		[NotNull]
-		protected virtual string GeneratedClassName => GeneratedClassNameString;
+		protected virtual string GeneratedClassName
+		{
+			get
+			{
+				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
+				if (fileName != null && ValidityChecker.IsValidIdentifier(fileName)) return fileName;
+				return GeneratedClassNameString;
+			}
+		}
 
 		[NotNull]
-		protected virtual string GeneratedBaseClassName => GeneratedBaseClassNameString;
+		protected virtual string GeneratedBaseClassName => GeneratedClassName + "Base";
 
 		protected abstract void AppendSyntheticAttribute();
 

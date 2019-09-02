@@ -16,6 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private const string ToStringConversionPrefixText = "__To\x200CString(";
 		public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
 		public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
+		private const string GeneratedClassNameText = "Generated\x200CTransformation";
 
 		[NotNull, ItemNotNull]
 		private IEnumerable<string> DisabledPropertyInspections { get; } = new[]
@@ -101,6 +102,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine(
 				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
 		}
+
+		protected override string GeneratedClassName => GeneratedClassNameText;
 
 		// No indents should be inserted in code-behind file in order to avoid indenting code in code blocks
 		protected override void AppendIndent(int size)

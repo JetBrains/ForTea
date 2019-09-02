@@ -5,15 +5,12 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public class T4CSharpIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		private const string DefaultGeneratedClassName = "GeneratedTransformation";
-
 		public T4CSharpIntermediateConverter(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
 			[NotNull] IT4File file
@@ -22,18 +19,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		protected sealed override string ResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
-
-		protected override string GeneratedClassName
-		{
-			get
-			{
-				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-				if (fileName != null && ValidityChecker.IsValidIdentifier(fileName)) return fileName;
-				return DefaultGeneratedClassName;
-			}
-		}
-
-		protected sealed override string GeneratedBaseClassName => GeneratedClassName + "Base";
 
 		protected sealed override void AppendSyntheticAttribute()
 		{
