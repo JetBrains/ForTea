@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private bool _afterLastFeatureErrorAdded;
 
 		[NotNull]
-		private IT4TemplateTypeProvider TemplateTypeProvider { get; }
+		private IT4ProjectModelTemplateDataManager TemplateDataManager { get; }
 
 		public override void ProcessBeforeInterior(ITreeNode element)
 		{
@@ -115,7 +115,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			// Assembly attributes in preprocessed templates are useless.
 			if (!(directive is IT4AssemblyDirective assemblyDirective)) return;
 			var projectFile = DaemonProcess.SourceFile.ToProjectFile().NotNull();
-			if (!TemplateTypeProvider.IsPreprocessedTemplate(projectFile)) return;
+			if (!TemplateDataManager.IsPreprocessedTemplate(projectFile)) return;
 			AddHighlighting(directive.GetHighlightingRange(), new IgnoredAssemblyDirectiveWarning(assemblyDirective));
 		}
 
@@ -134,8 +134,8 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		public T4ErrorProcess(
 			[NotNull] IT4File file,
 			[NotNull] IDaemonProcess daemonProcess,
-			[NotNull] IT4TemplateTypeProvider templateTypeProvider
-		) : base(file, daemonProcess) => TemplateTypeProvider = templateTypeProvider;
+			[NotNull] IT4ProjectModelTemplateDataManager templateDataManager
+		) : base(file, daemonProcess) => TemplateDataManager = templateDataManager;
 
 		protected override void AnalyzeFile(IT4File file)
 		{

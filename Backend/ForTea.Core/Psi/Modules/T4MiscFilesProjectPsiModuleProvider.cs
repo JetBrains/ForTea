@@ -42,7 +42,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
-			[NotNull] IT4TemplateTypeProvider templateTypeProvider
+			[NotNull] IT4ProjectModelTemplateDataManager templateDataManager
 		) => _t4PsiModuleProvider = new T4PsiModuleProvider(
 			lifetime,
 			shellLocks,
@@ -50,7 +50,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			t4Environment,
 			resolver,
 			coordinator,
-			templateTypeProvider
+			templateDataManager
 		);
 	}
 }

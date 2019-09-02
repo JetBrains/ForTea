@@ -32,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
 
 		[NotNull]
-		private IT4TemplateTypeProvider TemplateTypeProvider { get; }
+		private IT4ProjectModelTemplateDataManager TemplateDataManager { get; }
 
 		private readonly struct ModuleWrapper {
 
@@ -92,7 +92,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					// Preprocessed .tt files should be handled by R# itself as if it's a normal project file,
 					// so that it has access to the current project types.
 					if (projectFile.LanguageType.Is<T4ProjectFileType>()
-					    && !TemplateTypeProvider.IsPreprocessedTemplate(projectFile))
+					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
 					{
 						AddFile(projectFile, changeBuilder);
 						return true;
@@ -108,7 +108,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 				case PsiModuleChange.ChangeType.Modified:
 					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
-						if (!TemplateTypeProvider.IsPreprocessedTemplate(projectFile)) {
+						if (!TemplateDataManager.IsPreprocessedTemplate(projectFile)) {
 							ModifyFile(changeBuilder, moduleWrapper);
 							return true;
 						}
@@ -121,7 +121,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 					// The T4 file went from Preprocessed to Transformed, it now needs a T4PsiModule.
 					if (projectFile.LanguageType.Is<T4ProjectFileType>()
-					    && !TemplateTypeProvider.IsPreprocessedTemplate(projectFile))
+					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
 					{
 						AddFile(projectFile, changeBuilder);
 						changeType = PsiModuleChange.ChangeType.Removed;
@@ -211,7 +211,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
-			[NotNull] IT4TemplateTypeProvider templateTypeProvider
+			[NotNull] IT4ProjectModelTemplateDataManager templateDataManager
 		)
 		{
 			_lifetime = lifetime;
@@ -220,7 +220,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 			_coordinator = coordinator;
-			TemplateTypeProvider = templateTypeProvider;
+			TemplateDataManager = templateDataManager;
 		}
 
 	}

@@ -92,7 +92,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		)
 		{
 			Locks.AssertWriteAccessAllowed();
-			var existingFile = GetSameDestinationFile(file, destinationName);
+			var existingFile = GetSameDestinationFile(file, destinationName); // TODO: update properties
 			if (existingFile != null) return existingFile;
 			return CreateSameDestinationFile(cookie, file, destinationName);
 		}

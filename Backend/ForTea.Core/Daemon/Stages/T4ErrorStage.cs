@@ -13,15 +13,15 @@ namespace GammaJul.ForTea.Core.Daemon.Stages
 	public sealed class T4ErrorStage : T4DaemonStageBase
 	{
 		[NotNull]
-		private IT4TemplateTypeProvider TemplateTypeProvider { get; }
+		private IT4ProjectModelTemplateDataManager TemplateDataManager { get; }
 
-		public T4ErrorStage([NotNull] IT4TemplateTypeProvider templateTypeProvider) =>
-			TemplateTypeProvider = templateTypeProvider;
+		public T4ErrorStage([NotNull] IT4ProjectModelTemplateDataManager templateDataManager) =>
+			TemplateDataManager = templateDataManager;
 
 		protected override IDaemonStageProcess CreateProcess(
 			IDaemonProcess process,
 			IT4File file,
 			IContextBoundSettingsStore settings
-		) => new T4ErrorProcess(file, process, TemplateTypeProvider);
+		) => new T4ErrorProcess(file, process, TemplateDataManager);
 	}
 }

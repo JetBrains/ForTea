@@ -3,11 +3,11 @@ using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.Services
 {
-	public static class T4TemplateTypeProviderExtensions
+	public static class T4TemplateDataManagerExtensions
 	{
 		public static bool IsPreprocessedTemplate(
-			[NotNull] this IT4TemplateTypeProvider provider,
+			[NotNull] this IT4ProjectModelTemplateDataManager manager,
 			[NotNull] IProjectFile file
-		) => provider.GetTemplateKind(file) == TemplateKind.Preprocessed;
+		) => manager.GetTemplateKind(file) == T4TemplateKind.Preprocessed;
 	}
 }
