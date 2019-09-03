@@ -20,7 +20,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 		[NotNull]
 		private string GetDirectiveText() {
 			IT4Directive directive = GetTreeNode();
-			string name = directive?.Name.GetText();
+			string name = directive?.Name?.GetText();
 			if (name == null)
 				return "???";
 

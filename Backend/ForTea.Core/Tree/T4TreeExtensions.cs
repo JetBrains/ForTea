@@ -55,7 +55,7 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] this IT4File file,
 			[NotNull] DirectiveInfo directiveInfo
 		) => file.Blocks.OfType<IT4Directive>().Where(d =>
-			directiveInfo.Name.Equals(d.Name.GetText(), StringComparison.OrdinalIgnoreCase));
+			directiveInfo.Name.Equals(d.Name?.GetText(), StringComparison.OrdinalIgnoreCase));
 
 		[NotNull]
 		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
