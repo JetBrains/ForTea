@@ -23,8 +23,8 @@
                 <Description>Visual Basic is not supported</Description>
             </Tag>
             <Tag name="DuplicateDirective" default="WARNING">
-                <Title>Duplicate directive</Title>
-                <Description>Same directive was defined above, so this one will be ignored</Description>
+                <Title>This directive was declared earlier and will be ignored</Title>
+                <Description/>
             </Tag>
             <Tag name="RedundantInclude" default="WARNING">
                 <Title>Redundant include</Title>
@@ -65,7 +65,7 @@
     </Warning>
     <Warning name="DuplicateDirective" configurableSeverity="DuplicateDirective">
         <Parameter type="IT4Directive" name="directive"/>
-        <Message value="Duplicate directive"/>
+        <Message value="This directive was declared earlier and will be ignored"/>
         <Range>Directive.GetHighlightingRange()</Range>
         <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     </Warning>
