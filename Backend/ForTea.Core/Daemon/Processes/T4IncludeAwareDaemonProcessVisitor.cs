@@ -106,9 +106,13 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			if (HasSeenRecursiveInclude) ReportRecursiveInclude(include);
 		}
 
-		private void ReportDuplicateDirective([NotNull] IT4Directive directive) =>
-			MyHighlightings.Add(new HighlightingInfo(directive.GetHighlightingRange(),
-				new DuplicateDirectiveWarning(directive)));
+		private void ReportDuplicateDirective([NotNull] IT4Directive directive)
+		{
+			if (!Guard.IsOnTopLevel) return;
+			var warning = new DuplicateDirectiveWarning(directive);
+			var highlightingInfo = new HighlightingInfo(directive.GetHighlightingRange(), warning);
+			MyHighlightings.Add(highlightingInfo);
+		}
 
 		private void AddHighlighting([NotNull] ITreeNode node, [NotNull] IHighlighting highlighting) =>
 			MyHighlightings.Add(new HighlightingInfo(node.GetHighlightingRange(), highlighting));
