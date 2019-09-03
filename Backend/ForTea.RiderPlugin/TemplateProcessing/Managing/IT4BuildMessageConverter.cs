@@ -17,9 +17,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 		T4BuildResult ToT4BuildResult([NotNull] T4OutputGenerationException exception);
 
 		[NotNull]
-		T4PreprocessingResult ToT4PreprocessingResult([NotNull] T4OutputGenerationException exception);
-
-		[NotNull]
 		T4BuildResult SyntaxError([NotNull] ITreeNode node);
 
 		[NotNull]

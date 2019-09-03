@@ -8,8 +8,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 {
 	public interface IT4TemplateCompiler
 	{
-		bool CanCompile([NotNull] IT4File file);
-
 		T4BuildResult Compile(
 			Lifetime lifetime,
 			[NotNull] IT4File file,

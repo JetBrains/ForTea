@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Debugger.Common.MetadataAndPdb;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
@@ -12,10 +11,7 @@ using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi.CSharp;
-using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
@@ -44,13 +40,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		private IT4BuildMessageConverter Converter { get; }
 
+		[NotNull]
+		private IT4SyntaxErrorSearcher ErrorSearcher { get; }
+
 		public T4TemplateCompiler(
 			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
 			[NotNull] IPsiModules psiModules,
 			[NotNull] IT4TargetFileManager targetManager,
 			[NotNull] IT4BuildMessageConverter converter,
-			[NotNull] ISolution solution
+			[NotNull] ISolution solution,
+			[NotNull] IT4SyntaxErrorSearcher errorSearcher
 		)
 		{
 			Locks = locks;
@@ -58,14 +58,16 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			TargetManager = targetManager;
 			Converter = converter;
 			Solution = solution;
+			ErrorSearcher = errorSearcher;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
+		[NotNull]
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
 			Locks.AssertReadAccessAllowed();
-			if (file.ContainsErrorElement())
-				return Converter.SyntaxError(file.ThisAndDescendants<IErrorElement>().First());
+			var error = ErrorSearcher.FindErrorElement(file);
+			if (error != null) return Converter.SyntaxError(error);
 			List<Diagnostic> messages = null;
 			return lifetime.UsingNested(nested =>
 			{
@@ -120,16 +122,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				new[] {syntaxTree},
 				options: options,
 				references: references);
-		}
-
-		public bool CanCompile(IT4File file)
-		{
-			var sourceFile = file.GetSourceFile();
-			var cSharpFile = sourceFile?.GetPsiFiles(CSharpLanguage.Instance).SingleOrDefault();
-			var t4File = sourceFile?.GetPsiFiles(T4Language.Instance).SingleOrDefault();
-			if (cSharpFile?.ContainsErrorElement() != false) return false;
-			if (t4File?.ContainsErrorElement() != false) return false;
-			return true;
 		}
 	}
 }

@@ -58,12 +58,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			return BuildT4Tree(target);
 		}
 
-		private IT4File BuildT4Tree(IPsiSourceFile target)
+		[NotNull]
+		private IT4File BuildT4Tree([NotNull] IPsiSourceFile target)
 		{
-			var languageService = T4Language.Instance.LanguageService();
-			Assertion.AssertNotNull(languageService, "languageService != null");
+			var languageService = T4Language.Instance.LanguageService().NotNull();
 			var lexer = (T4Lexer) languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			return new T4Parser(lexer).Parse();
+			var file = new T4Parser(lexer).Parse();
+			file.SetSourceFile(target);
+			return file;
 		}
 
 		public IPsiSourceFile Resolve()
