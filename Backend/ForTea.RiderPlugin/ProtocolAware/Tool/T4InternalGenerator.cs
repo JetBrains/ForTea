@@ -1,20 +1,18 @@
 using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Altering.Resources;
 using JetBrains.ReSharper.Host.Features.ProjectModel.CustomTools;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.UI.Icons;
 using UsageStatisticsNew = JetBrains.Application.ActivityTrackingNew.UsageStatistics;
 
@@ -75,17 +73,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 			manager.ExecuteSilently(file);
 		}
 
-		private static void Preprocess([NotNull] IT4File file, [NotNull] ISolution solution)
-		{
-			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
-			string message = new T4CSharpCodeGenerator(file, solution).Generate().RawText;
-			solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "T4 template preprocessing", () =>
-			{
-				using (WriteLockCookie.Create())
-				{
-					targetFileManager.SavePreprocessResults(file, message);
-				}
-			});
-		}
+		private static void Preprocess([NotNull] IT4File file, [NotNull] ISolution solution) =>
+			solution.GetComponent<IT4TemplatePreprocessingManager>().Preprocess(file);
 	}
 }
