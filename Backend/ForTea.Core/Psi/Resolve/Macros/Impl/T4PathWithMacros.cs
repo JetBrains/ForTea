@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -34,9 +33,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		[NotNull]
 		private ISolution Solution { get; }
-
-		[CanBeNull]
-		private IT4FilePsiModule Module => SourceFile.PsiModule as IT4FilePsiModule;
 
 		public T4PathWithMacros([NotNull] string rawPath, [NotNull] IPsiSourceFile file)
 		{
@@ -100,8 +96,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		public string ResolveString()
 		{
-			var module = Module;
-			if (string.IsNullOrEmpty(RawPath) || module == null || !ContainsMacros) return RawPath;
+			if (string.IsNullOrEmpty(RawPath) || !ContainsMacros) return RawPath;
 
 			var macroValues = Resolver.Resolve(RawMacros, SourceFile.ToProjectFile().NotNull());
 
