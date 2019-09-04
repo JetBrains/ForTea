@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
@@ -102,7 +101,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		private string GetReferences() => File
-			.ExtractReferenceLocations(File.GetSolution().GetComponent<PsiModules>())
+			.ExtractReferenceLocations()
 			.AggregateString(",\n", (builder, it) => builder
 				.Append("{\"")
 				.Append(it.FullName)

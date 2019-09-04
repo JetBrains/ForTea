@@ -11,7 +11,6 @@ using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
@@ -29,9 +28,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IShellLocks Locks { get; }
 
 		[NotNull]
-		private IPsiModules PsiModules { get; }
-
-		[NotNull]
 		private IT4TargetFileManager TargetManager { get; }
 
 		[NotNull]
@@ -46,7 +42,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public T4TemplateCompiler(
 			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
-			[NotNull] IPsiModules psiModules,
 			[NotNull] IT4TargetFileManager targetManager,
 			[NotNull] IT4BuildMessageConverter converter,
 			[NotNull] ISolution solution,
@@ -54,7 +49,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		)
 		{
 			Locks = locks;
-			PsiModules = psiModules;
 			TargetManager = targetManager;
 			Converter = converter;
 			Solution = solution;
@@ -73,7 +67,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			{
 				try
 				{
-					var references = file.ExtractReferences(lifetime, Locks, PsiModules, Cache);
+					var references = file.ExtractReferences(lifetime, Locks, Cache);
 					string code = GenerateCode(file);
 					if (progress != null) progress.CurrentItemText = "Compiling code";
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);

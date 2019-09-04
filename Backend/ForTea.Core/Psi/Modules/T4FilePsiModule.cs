@@ -98,20 +98,20 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			);
 		}
 
-		/// <summary>Gets all modules referenced by this module.</summary>
-		/// <returns>All referenced modules.</returns>
-		protected override IEnumerable<IPsiModuleReference> GetReferencesInternal() {
-			_shellLocks.AssertReadAccessAllowed();
+		protected override IEnumerable<IPsiModuleReference> GetReferencesInternal()
+		{
 			var references = new PsiModuleReferenceAccumulator(TargetFrameworkId);
-			var moduleReferences = _assemblyReferenceManager
-				.References
-				.Values
-				.Where(cookie => cookie.Assembly != null)
-				.SelectNotNull(cookie => _psiModules.GetPrimaryPsiModule(cookie.Assembly, TargetFrameworkId))
+			var moduleReferences = RawReferences
+				.SelectNotNull(assembly => _psiModules.GetPrimaryPsiModule(assembly, TargetFrameworkId))
 				.Select(it => new PsiModuleReference(it));
 			references.AddRange(moduleReferences);
 			return references.GetReferences();
 		}
+
+		public IEnumerable<IAssembly> RawReferences => _assemblyReferenceManager
+			.References
+			.Values
+			.SelectNotNull(cookie => cookie.Assembly);
 
 		[NotNull]
 		private PsiProjectFile CreateSourceFile([NotNull] IProjectFile projectFile, [NotNull] DocumentManager documentManager)
