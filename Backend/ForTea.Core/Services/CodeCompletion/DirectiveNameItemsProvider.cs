@@ -42,7 +42,7 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			collector.AddRanges(ranges);
 
 			foreach (string directiveName in T4DirectiveInfoManager.AllDirectives.Select(di => di.Name)) {
-				var item = new TextLookupItem(directiveName);
+				var item = new TextLookupItem(directiveName, T4Entity.Id);
 				item.InitializeRanges(ranges, context.BasicContext);
 				collector.Add(item);
 			}
