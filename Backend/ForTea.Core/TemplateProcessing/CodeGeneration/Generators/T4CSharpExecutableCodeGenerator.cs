@@ -1,8 +1,10 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -17,6 +19,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		) => new T4CSharpExecutableIntermediateConverter(intermediateResult, File);
+		)
+		{
+			var referenceExtractionManager = File.GetSolution().GetComponent<IT4ReferenceExtractionManager>();
+			return new T4CSharpExecutableIntermediateConverter(intermediateResult, File, referenceExtractionManager);
+		}
 	}
 }

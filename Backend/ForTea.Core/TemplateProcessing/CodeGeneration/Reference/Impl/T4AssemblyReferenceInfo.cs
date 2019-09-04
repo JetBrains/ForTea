@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference
+namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 {
 	public readonly struct T4AssemblyReferenceInfo
 	{

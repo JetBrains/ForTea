@@ -24,16 +24,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] private const string HostResource = "GammaJul.ForTea.Core.Resources.Host.cs";
 
 		[NotNull] private const string AssemblyRegisteringResource =
-			"GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs"; 
+			"GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs";
 
 		protected override string GeneratedClassName => GeneratedClassNameString;
 
+		[NotNull]
+		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
+
 		public T4CSharpExecutableIntermediateConverter(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		) : base(intermediateResult, file)
-		{
-		}
+			[NotNull] IT4File file,
+			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
+		) : base(intermediateResult, file) => ReferenceExtractionManager = referenceExtractionManager;
 
 		// When creating executable, it is better to put base class first,
 		// to make error messages more informative
@@ -100,8 +102,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.Append(registering);
 		}
 
-		private string GetReferences() => File
-			.ExtractReferenceLocations()
+		[NotNull]
+		private string GetReferences() => ReferenceExtractionManager
+			.ExtractReferenceLocations(File)
 			.AggregateString(",\n", (builder, it) => builder
 				.Append("{\"")
 				.Append(it.FullName)

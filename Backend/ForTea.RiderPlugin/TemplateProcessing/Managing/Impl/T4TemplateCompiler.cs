@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
@@ -31,7 +30,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IT4TargetFileManager TargetManager { get; }
 
 		[NotNull]
-		private RoslynMetadataReferenceCache Cache { get; }
+		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
 
 		[NotNull]
 		private IT4BuildMessageConverter Converter { get; }
@@ -40,12 +39,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IT4SyntaxErrorSearcher ErrorSearcher { get; }
 
 		public T4TemplateCompiler(
-			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
 			[NotNull] IT4TargetFileManager targetManager,
 			[NotNull] IT4BuildMessageConverter converter,
 			[NotNull] ISolution solution,
-			[NotNull] IT4SyntaxErrorSearcher errorSearcher
+			[NotNull] IT4SyntaxErrorSearcher errorSearcher,
+			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
 		)
 		{
 			Locks = locks;
@@ -53,7 +52,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Converter = converter;
 			Solution = solution;
 			ErrorSearcher = errorSearcher;
-			Cache = new RoslynMetadataReferenceCache(lifetime);
+			ReferenceExtractionManager = referenceExtractionManager;
 		}
 
 		[NotNull]
@@ -67,7 +66,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			{
 				try
 				{
-					var references = file.ExtractReferences(lifetime, Locks, Cache);
+					var references = ReferenceExtractionManager.ExtractReferences(file, lifetime);
 					string code = GenerateCode(file);
 					if (progress != null) progress.CurrentItemText = "Compiling code";
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);

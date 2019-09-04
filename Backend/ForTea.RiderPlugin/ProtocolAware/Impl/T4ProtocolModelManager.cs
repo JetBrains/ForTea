@@ -72,7 +72,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
 		);
 
-		private T4BuildResult Compile([NotNull] IT4File t4File) => Compiler.Compile(Solution.GetLifetime(), t4File);
+		private T4BuildResult Compile([NotNull] IT4File t4File)
+		{
+			T4BuildResult result = null;
+			Solution.GetLifetime().UsingNested(nested => result = Compiler.Compile(nested, t4File));
+			return result;
+		}
 
 		// When execution is said to succeed, we still cannot be sure whether temporary file exists or not.
 		// If the process being executed was the debugger process,
