@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
@@ -10,7 +11,6 @@ using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Build;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
@@ -30,7 +30,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IShellLocks _shellLocks;
 		[NotNull] private readonly IT4Environment _t4Environment;
-		[NotNull] private readonly OutputAssemblies _outputAssemblies;
 		[NotNull] private readonly IT4MacroResolver _resolver;
 
 		[NotNull]
@@ -103,30 +102,14 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		/// <returns>All referenced modules.</returns>
 		protected override IEnumerable<IPsiModuleReference> GetReferencesInternal() {
 			_shellLocks.AssertReadAccessAllowed();
-			
 			var references = new PsiModuleReferenceAccumulator(TargetFrameworkId);
-			
-			foreach (IAssemblyCookie cookie in _assemblyReferenceManager.References.Values) {
-				if (cookie.Assembly == null)
-					continue;
-
-				IPsiModule psiModule = _psiModules.GetPrimaryPsiModule(cookie.Assembly, TargetFrameworkId);
-
-				// Normal assembly.
-				if (psiModule != null)
-					references.Add(new PsiModuleReference(psiModule));
-
-				// Assembly that is the output of a current project: reference the project instead.
-				else {
-					IProject project = _outputAssemblies.TryGetProjectByOutputAssembly(cookie.Assembly);
-					if (project != null) {
-						psiModule = _psiModules.GetPrimaryPsiModule(project, TargetFrameworkId);
-						if (psiModule != null)
-							references.Add(new PsiModuleReference(psiModule));
-					}
-				}
-			}
-
+			var moduleReferences = _assemblyReferenceManager
+				.References
+				.Values
+				.Where(cookie => cookie.Assembly != null)
+				.SelectNotNull(cookie => _psiModules.GetPrimaryPsiModule(cookie.Assembly, TargetFrameworkId))
+				.Select(it => new PsiModuleReference(it));
+			references.AddRange(moduleReferences);
 			return references.GetReferences();
 		}
 
@@ -203,8 +186,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
 			changeManager.AddDependency(lifetime, _psiModules, ChangeProvider);
-
-			_outputAssemblies = solution.GetComponent<OutputAssemblies>();
 
 			var documentManager = solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(file, documentManager);
