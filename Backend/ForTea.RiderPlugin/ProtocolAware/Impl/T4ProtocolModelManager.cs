@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
@@ -5,6 +8,8 @@ using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
+using JetBrains.ReSharper.Host.Features.ProjectModel;
+using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
@@ -30,6 +35,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private IT4TemplateExecutionManager ExecutionManager { get; }
 
 		[NotNull]
+		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
+
+		[NotNull]
+		private ProjectModelViewHost Host { get; }
+
+		[NotNull]
 		private ILogger Logger { get; }
 
 		public T4ProtocolModelManager(
@@ -40,7 +51,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			[NotNull] T4BuildMessageConverter converter,
 			[NotNull] IT4ModelInteractionHelper helper,
 			[NotNull] IT4TemplateExecutionManager executionManager,
-			[NotNull] ILogger logger
+			[NotNull] ILogger logger,
+			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager,
+			[NotNull] ProjectModelViewHost host
 		)
 		{
 			Solution = solution;
@@ -49,6 +62,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			Converter = converter;
 			ExecutionManager = executionManager;
 			Logger = logger;
+			ReferenceExtractionManager = referenceExtractionManager;
+			Host = host;
 			var model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks(lifetime, model, helper);
 		}
@@ -61,10 +76,17 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		{
 			model.RequestCompilation.Set(helper.Wrap(Compile, Converter.FatalError()));
 			model.GetConfiguration.Set(helper.Wrap(CalculateConfiguration, new T4ConfigurationModel("", "")));
+			model.GetProjectDependencies.Set(helper.Wrap(CalculateProjectDependencies, new List<int>()));
 			model.ExecutionSucceeded.Advise(lifetime, helper.Wrap(ExecutionSucceeded));
 			model.ExecutionFailed.Advise(lifetime, helper.Wrap(ExecutionFailed));
 			model.ExecutionAborted.Advise(lifetime, helper.Wrap(ExecutionFailed));
 		}
+
+		[CanBeNull]
+		private List<int> CalculateProjectDependencies([NotNull] IT4File file) => ReferenceExtractionManager
+			.GetProjectDependencies(file)
+			.Select(it => Host.GetIdByProjectModelElement(it))
+			.AsList();
 
 		[NotNull]
 		private T4ConfigurationModel CalculateConfiguration([NotNull] IT4File file) => new T4ConfigurationModel(

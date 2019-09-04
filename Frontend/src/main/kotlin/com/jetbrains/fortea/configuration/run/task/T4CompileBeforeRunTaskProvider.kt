@@ -1,6 +1,5 @@
-package com.jetbrains.fortea.configuration.run
+package com.jetbrains.fortea.configuration.run.task
 
-import com.intellij.execution.BeforeRunTask
 import com.intellij.execution.BeforeRunTaskProvider
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.runners.ExecutionEnvironment
@@ -8,6 +7,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.fortea.configuration.T4BuildSessionView
+import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.rider.model.T4BuildResultKind
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
@@ -15,9 +15,7 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.getComponent
 import com.jetbrains.rider.util.idea.lifetime
 
-class T4CompileBeforeRunTask : BeforeRunTask<T4CompileBeforeRunTask>(CompileT4BeforeRunTaskProvider.providerId)
-
-class CompileT4BeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunTask>() {
+class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunTask>() {
   override fun getName() = "Compile T4 File"
 
   override fun getId(): Key<T4CompileBeforeRunTask> = providerId

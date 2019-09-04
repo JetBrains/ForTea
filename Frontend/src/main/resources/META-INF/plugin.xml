@@ -5,7 +5,7 @@
   <description>Support for Microsoft T4 template language</description>
 
   <version>0.01</version>
-  <idea-version since-build="191" />
+  <idea-version since-build="191"/>
 
   <depends>com.intellij.modules.rider</depends>
 
@@ -27,7 +27,11 @@
         implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
     <stepsBeforeRunProvider
-        implementation="com.jetbrains.fortea.configuration.run.CompileT4BeforeRunTaskProvider"/>
+        implementation="com.jetbrains.fortea.configuration.run.task.T4CompileBeforeRunTaskProvider"
+        id="CompileT4"/>
+    <stepsBeforeRunProvider
+        implementation="com.jetbrains.fortea.configuration.run.task.T4BuildProjectsBeforeRunTaskProvider"
+        order="before CompileT4"/>
 
     <!-- delegation to backend -->
     <rider.debuggerSupportPolicy

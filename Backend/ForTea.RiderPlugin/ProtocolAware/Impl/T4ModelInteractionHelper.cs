@@ -28,6 +28,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			Logger = logger;
 		}
 
+		[NotNull]
 		public Func<T4FileLocation, T> Wrap<T>(Func<IT4File, T> wrappee, T defaultValue) where T : class =>
 			location =>
 			{
@@ -47,6 +48,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				return result ?? defaultValue;
 			};
 
+		[NotNull]
 		public Action<T4FileLocation> Wrap(Action<IT4File> wrappee) => location => Logger.Catch(() =>
 		{
 			using (ReadLockCookie.Create())
@@ -60,24 +62,5 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				if (file != null) wrappee(file);
 			}
 		});
-
-		public Func<T4FileLocation, T> WrapStructFunc<T>(Func<IT4File, T?> wrappee, T defaultValue) where T : struct =>
-			location =>
-			{
-				var result = Logger.Catch(() =>
-				{
-					using (ReadLockCookie.Create())
-					{
-						var file = Host
-							.GetItemById<IProjectFile>(location.Id)
-							?.ToSourceFile()
-							?.GetPsiFiles(T4Language.Instance)
-							.OfType<IT4File>()
-							.SingleItem();
-						return file == null ? null : wrappee(file);
-					}
-				});
-				return result ?? defaultValue;
-			};
 	}
 }

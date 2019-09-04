@@ -9,6 +9,5 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 	{
 		Func<T4FileLocation, T> Wrap<T>([NotNull] Func<IT4File, T> wrappee, [NotNull] T defaultValue) where T : class;
 		Action<T4FileLocation> Wrap([NotNull] Action<IT4File> wrappee);
-		Func<T4FileLocation, T> WrapStructFunc<T>([NotNull] Func<IT4File, T?> wrappee, T defaultValue) where T : struct;
 	}
 }

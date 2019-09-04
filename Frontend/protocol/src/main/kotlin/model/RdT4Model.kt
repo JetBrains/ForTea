@@ -75,5 +75,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     signal("executionSucceeded", T4FileLocation).async
     signal("executionFailed", T4FileLocation).async
     signal("executionAborted", T4FileLocation).async
+
+    call("getProjectDependencies", T4FileLocation, immutableList(int)).async
   }
 }
