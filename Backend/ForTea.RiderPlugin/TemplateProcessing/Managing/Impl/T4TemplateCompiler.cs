@@ -38,13 +38,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		private IT4SyntaxErrorSearcher ErrorSearcher { get; }
 
+		[NotNull]
+		private ILogger Logger { get; }
+
 		public T4TemplateCompiler(
 			[NotNull] IShellLocks locks,
 			[NotNull] IT4TargetFileManager targetManager,
 			[NotNull] IT4BuildMessageConverter converter,
 			[NotNull] ISolution solution,
 			[NotNull] IT4SyntaxErrorSearcher errorSearcher,
-			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
+			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager,
+			[NotNull] ILogger logger
 		)
 		{
 			Locks = locks;
@@ -53,11 +57,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Solution = solution;
 			ErrorSearcher = errorSearcher;
 			ReferenceExtractionManager = referenceExtractionManager;
+			Logger = logger;
 		}
 
 		[NotNull]
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
 		{
+			Logger.Verbose("Compiling {0}", file.GetSourceFile()?.Name);
 			Locks.AssertReadAccessAllowed();
 			var error = ErrorSearcher.FindErrorElement(file);
 			if (error != null) return Converter.SyntaxError(error);
@@ -88,6 +94,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}) ?? Converter.ToT4BuildResult(messages, file);
 		}
 
+		[NotNull]
 		private string GenerateCode([NotNull] IT4File file)
 		{
 			Locks.AssertReadAccessAllowed();

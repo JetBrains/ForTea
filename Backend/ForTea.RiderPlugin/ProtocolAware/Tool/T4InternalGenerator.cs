@@ -14,6 +14,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.UI.Icons;
+using JetBrains.Util;
 using UsageStatisticsNew = JetBrains.Application.ActivityTrackingNew.UsageStatistics;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
@@ -37,7 +38,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		[NotNull]
 		private UsageStatisticsNew Statistics { get; }
 
-		public T4InternalGenerator([NotNull] UsageStatisticsNew statistics) => Statistics = statistics;
+		[NotNull]
+		private ILogger Logger { get; }
+
+		public T4InternalGenerator([NotNull] UsageStatisticsNew statistics, [NotNull] ILogger logger)
+		{
+			Statistics = statistics;
+			Logger = logger;
+		}
 
 		public bool IsApplicable(IProjectFile projectFile)
 		{
@@ -55,6 +63,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		[NotNull]
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
+			Logger.Verbose("Got request to execute {0}", projectFile.Name);
 			Statistics.TrackAction("T4.Template.Execution.Background");
 			var file = projectFile.ToSourceFile()?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
 			if (file == null) return SingleFileCustomToolExecutionResult.NotExecuted;

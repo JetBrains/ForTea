@@ -7,6 +7,7 @@ using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 {
@@ -18,11 +19,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 		[NotNull]
 		private IT4TargetFileManager TargetFileManager { get; }
 
-		public T4TemplatePreprocessingManager([NotNull] IT4TargetFileManager targetFileManager) =>
+		[NotNull]
+		private ILogger Logger { get; }
+
+		public T4TemplatePreprocessingManager(
+			[NotNull] IT4TargetFileManager targetFileManager,
+			[NotNull] ILogger logger
+		)
+		{
 			TargetFileManager = targetFileManager;
+			Logger = logger;
+		}
 
 		public void Preprocess(IT4File file)
 		{
+			Logger.Verbose("Preprocessing {0}", file.GetSourceFile()?.Name);
 			var psiSourceFile = file.GetSourceFile();
 			if (psiSourceFile == null) return;
 			var lastWriteTimeUtc = psiSourceFile.LastWriteTimeUtc;

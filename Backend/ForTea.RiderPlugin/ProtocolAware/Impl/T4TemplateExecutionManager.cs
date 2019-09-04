@@ -30,20 +30,26 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		[NotNull]
 		private NotificationsModel NotificationsModel { get; }
 
+		[NotNull]
+		private ILogger Logger { get; }
+
 		public T4TemplateExecutionManager(
 			[NotNull] ISolution solution,
 			[NotNull] ProjectModelViewHost projectModelViewHost,
-			[NotNull] NotificationsModel notificationsModel
+			[NotNull] NotificationsModel notificationsModel,
+			[NotNull] ILogger logger
 		)
 		{
 			ProjectModelViewHost = projectModelViewHost;
 			NotificationsModel = notificationsModel;
+			Logger = logger;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RunningFiles = new HashSet<FileSystemPath>();
 		}
 
 		public void Execute(IT4File file)
 		{
+			Logger.Verbose("Trying to execute {0}", file.GetSourceFile()?.Name);
 			lock (ExecutionLocker)
 			{
 				if (IsExecutionRunning(file))
@@ -60,6 +66,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		public void ExecuteSilently(IT4File file)
 		{
+			Logger.Verbose("Trying to execute silently {0}", file.GetSourceFile()?.Name);
 			lock (ExecutionLocker)
 			{
 				if (IsExecutionRunning(file))
@@ -76,6 +83,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		public void Debug(IT4File file)
 		{
+			Logger.Verbose("Trying to debug {0}", file.GetSourceFile()?.Name);
 			lock (ExecutionLocker)
 			{
 				if (IsExecutionRunning(file))
