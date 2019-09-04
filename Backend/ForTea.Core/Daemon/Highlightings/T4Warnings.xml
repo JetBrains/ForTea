@@ -57,6 +57,7 @@
         <Parameter type="IT4AssemblyDirective" name="directive"/>
         <Message value="Ignored assembly reference"/>
         <Range>Directive.GetHighlightingRange()</Range>
+        <Behavour attributeID="DEADCODE" overlapResolvePolicy="ERROR"/>
     </Warning>
     <Warning name="NoSupportForVB" configurableSeverity="NoSupportForVB">
         <Parameter type="IT4AttributeValue" name="value"/>
