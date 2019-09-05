@@ -164,7 +164,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			);
 		}
 
-		private void RemoveLastGenOutput([NotNull] IT4File file)
+		public void RemoveLastGenOutput(IT4File file)
 		{
 			var projectFile = file.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return;
@@ -210,6 +210,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
+			RemoveLastGenOutput(file);
 			FileSystemPath destinationLocation = null;
 			IProjectFile destination = null;
 			string destinationName = GetPreprocessingTargetFileName(file);
@@ -219,6 +220,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				destinationLocation = destination.Location;
 				destinationLocation.WriteAllText(text);
 			});
+			UpdateLastGetOutput(file, destinationLocation);
 			SyncDocuments(destinationLocation);
 			var sourceFile = destination.ToSourceFile();
 			if (sourceFile != null) SyncSymbolCaches(sourceFile);

@@ -18,6 +18,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 		[NotNull]
 		FileSystemPath SavePreprocessResults([NotNull] IT4File file, [NotNull] string text);
 
+		void RemoveLastGenOutput([NotNull] IT4File file);
+		
 		bool IsGeneratedFrom([NotNull] IProjectFile generated, [NotNull] IProjectFile source);
 	}
 }
