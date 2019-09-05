@@ -43,9 +43,10 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
     val project = configuration.project
     val buildHost = project.getComponent<BuildHost>()
     if (configuration !is T4RunConfiguration) return false
-    val selectedProjectsForBuild = project
+    val model = project
       .solution
       .t4ProtocolModel
+    val selectedProjectsForBuild = model
       .getProjectDependencies
       .sync(configuration.parameters.request.location)
       .mapNotNull(ProjectModelViewHost.getInstance(project)::getItemById)
@@ -62,6 +63,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
       }
     }
     finished.waitFor()
+    if (!result) model.executionAborted.fire(configuration.parameters.request.location)
     return result
   }
 
