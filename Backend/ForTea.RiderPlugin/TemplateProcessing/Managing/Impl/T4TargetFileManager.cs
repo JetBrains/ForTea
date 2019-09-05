@@ -9,6 +9,7 @@ using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers.Transactions;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Properties;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -143,9 +144,53 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertWriteAccessAllowed();
 			var temporary = TryFindTemporaryTargetFile(file);
 			if (temporary == null) return;
+			RemoveLastGenOutput(file);
 			var destinationLocation = GetDestinationLocation(file, temporary.Name);
 			temporary.MoveFile(destinationLocation, true);
 			UpdateProjectModel(file, destinationLocation);
+			UpdateLastGetOutput(file, destinationLocation);
+		}
+
+		private void UpdateLastGetOutput([NotNull] IT4File file, [NotNull] FileSystemPath destinationLocation)
+		{
+			var projectFile = file.GetSourceFile()?.ToProjectFile();
+			if (projectFile == null) return;
+			Solution.InvokeUnderTransaction(cookie =>
+				cookie.EditFileProperties(projectFile, properties =>
+				{
+					if (!(properties is ProjectFileProperties projectFileProperties)) return;
+					projectFileProperties.CustomToolOutput = destinationLocation.Name;
+				})
+			);
+		}
+
+		private void RemoveLastGenOutput([NotNull] IT4File file)
+		{
+			var projectFile = file.GetSourceFile()?.ToProjectFile();
+			if (projectFile == null) return;
+			if (!(projectFile.Properties is ProjectFileProperties properties)) return;
+			string output = properties.CustomToolOutput;
+			var folder = projectFile.ParentFolder;
+			if (folder == null) return;
+			Solution.InvokeUnderTransaction(cookie =>
+			{
+				var suspects = folder
+					.GetSubItems(output)
+					.AsEnumerable()
+					.OfType<IProjectFile>()
+					.Where(it => IsGeneratedFrom(it, projectFile));
+				foreach (var suspect in suspects)
+				{
+					cookie.Remove(suspect);
+				}
+			});
+		}
+
+		public bool IsGeneratedFrom(IProjectFile generated, IProjectFile source)
+		{
+			if (!(generated.Properties is ProjectFileProperties properties)) return false;
+			// TODO: check AutoGen and DesignTime, too
+			return properties.DependsUponName == source.Name;
 		}
 
 		private void UpdateProjectModel([NotNull] IT4File file, [NotNull] FileSystemPath result)
