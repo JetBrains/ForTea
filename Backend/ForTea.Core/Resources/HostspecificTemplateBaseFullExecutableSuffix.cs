@@ -5,7 +5,7 @@
             RegisterAssemblyLocations__Generated();
             var transformation = new $(PARAMETER_0)();
             transformation.Host.transformation = transformation;
-            transformation.Host.SetOutputEncoding(Encoding.GetEncoding($(PARAMETER_1)), true);
+            transformation.Host.SetOutputEncoding(global::System.Text.Encoding.GetEncoding($(PARAMETER_1)), true);
             string destination = args[0];
             string text = transformation.TransformText();
             var encoding = transformation.Host.Encoding;
@@ -17,7 +17,7 @@
             }
 
             if (transformation.Errors.HasErrors) return 1;
-            File.WriteAllText(destination, text, encoding);
+            global::System.IO.File.WriteAllText(destination, text, encoding);
             return 0;
         }
     

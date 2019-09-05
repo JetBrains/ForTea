@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TextTemplating
 
         private string LoadContent(string path)
         {
-            using (global::System.IO.StreamReader streamReader = new StreamReader(path))
+            using (global::System.IO.StreamReader streamReader = new global::System.IO.StreamReader(path))
             {
                 return streamReader.ReadToEnd();
             }
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TextTemplating
 
         public void SetFileExtension(string extension) => FileExtension = extension;
 
-        public void SetOutputEncoding(Encoding encoding, bool fromOutputDirective) => Encoding = encoding;
+        public void SetOutputEncoding(global::System.Text.Encoding encoding, bool fromOutputDirective) => Encoding = encoding;
 
         public string TemplateFile => @"$(PARAMETER_0)";
 
