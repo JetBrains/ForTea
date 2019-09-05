@@ -26,6 +26,8 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 		public sealed override IReadOnlyDictionary<string, string> Resolve(IEnumerable<string> _, IProjectFile file) =>
 			ResolveInternal(file);
 
+		public override IReadOnlyDictionary<string, string> TryGetAllMacros(IProjectFile file) => ResolveInternal(file);
+
 		protected virtual Dictionary<string, string> ResolveInternal([NotNull] IProjectFile file)
 		{
 			var result = new Dictionary<string, string>(CaseInsensitiveComparison.Comparer);

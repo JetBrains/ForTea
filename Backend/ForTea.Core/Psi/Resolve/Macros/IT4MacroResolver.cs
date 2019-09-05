@@ -16,6 +16,9 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 			[NotNull] IProjectFile file
 		);
 
+		[NotNull]
+		IReadOnlyDictionary<string, string> TryGetAllMacros([NotNull] IProjectFile file);
+
 		// TODO: move somewhere else. Wtf Macro resolver handles assemblies?
 		void InvalidateAssemblies(
 			[NotNull] T4FileDataDiff dataDiff,

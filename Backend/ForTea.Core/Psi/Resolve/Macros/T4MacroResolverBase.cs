@@ -17,6 +17,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 
 		public virtual bool IsSupported(IT4Macro macro) => true;
 		public abstract IReadOnlyDictionary<string, string> Resolve(IEnumerable<string> macros, IProjectFile file);
+		public abstract IReadOnlyDictionary<string, string> TryGetAllMacros(IProjectFile file);
 
 		public void InvalidateAssemblies(
 			T4FileDataDiff dataDiff,
