@@ -2,11 +2,11 @@ package com.jetbrains.fortea.configuration
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.jetbrains.fortea.icons.T4Icons
 import com.jetbrains.fortea.language.T4Language
 import com.jetbrains.rider.actions.base.RiderContextAwareAnAction
 import com.jetbrains.rider.icons.ReSharperCommonIcons.Debug
-import com.jetbrains.rider.icons.ReSharperLiveTemplatesCSharpIcons.ScopeCS
-import com.jetbrains.rider.icons.ReSharperPsiBuildScriptsIcons.Run
+import com.jetbrains.rider.icons.ReSharperUnitTestingIcons
 import javax.swing.Icon
 
 abstract class T4BackendAction(backendActionId: String, icon: Icon) :
@@ -21,9 +21,9 @@ abstract class T4BackendAction(backendActionId: String, icon: Icon) :
   }
 }
 
-class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", Run)
+class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", ReSharperUnitTestingIcons.RunTest)
 class T4DebugTemplateBackendAction : T4BackendAction("T4.DebugFromContext", Debug)
-class T4PreprocessTemplateBackendAction : RiderContextAwareAnAction("T4.PreprocessFromContext", icon = ScopeCS) {
+class T4PreprocessTemplateBackendAction : RiderContextAwareAnAction("T4.PreprocessFromContext", icon = T4Icons.T4) {
   override fun update(e: AnActionEvent) {
     e.presentation.isEnabledAndVisible = e.dataContext.getData(CommonDataKeys.PSI_FILE)?.language == T4Language
   }
