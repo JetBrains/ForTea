@@ -19,6 +19,7 @@ class T4BuildSessionView(
   fun openWindow(lifetime: Lifetime) = windowFactory.application.invokeLater {
     val context = initializeContext(lifetime)
     context.clear()
+    context.showToolWindowIfHidden(true)
     val buildEvent = MessageBuildEvent(null, BuildMessageKind.Message, "Build started")
     context.addOutputMessage(buildEvent, ViewableMap())
     context.invalidatePanelMode()

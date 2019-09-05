@@ -56,7 +56,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
     var result = false
     // when false returned build was not started because another is in progress, we should not run task
     application.invokeLater {
-      result = buildHost.requestBuild(BuildParameters(BuildTarget(), selectedProjectsForBuild)) {
+      result = buildHost.requestBuild(BuildParameters(BuildTarget(), selectedProjectsForBuild, silentMode = true)) {
         result = it == BuildResultKind.Successful || it == BuildResultKind.HasWarnings
         finished.up()
       }
@@ -66,6 +66,6 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
   }
 
   companion object {
-    val providerId = Key.create<T4BuildProjectsBeforeRunTask>("Build")
+    val providerId = Key.create<T4BuildProjectsBeforeRunTask>("Build before T4")
   }
 }
