@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
+using JetBrains.ReSharper.Psi.CSharp.Util;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -103,7 +107,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
 		}
 
-		protected override string GeneratedClassName => GeneratedClassNameText;
+		protected override string GeneratedClassName
+		{
+			get
+			{
+				var projectFile = File.GetSourceFile()?.ToProjectFile();
+				if (projectFile == null) return GeneratedClassNameText;
+				var dataManager = File.GetSolution().GetComponent<IT4ProjectModelTemplateDataManager>();
+				var templateKind = dataManager.GetTemplateKind(projectFile);
+				if (templateKind != T4TemplateKind.Preprocessed) return GeneratedClassNameText;
+				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
+				if (fileName == null) return GeneratedClassNameText;
+				if (!ValidityChecker.IsValidIdentifier(fileName)) return GeneratedClassNameText;
+				return fileName;
+			}
+		}
 
 		// No indents should be inserted in code-behind file in order to avoid indenting code in code blocks
 		protected override void AppendIndent(int size)
