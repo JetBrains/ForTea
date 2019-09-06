@@ -1,5 +1,6 @@
 using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing;
+using GammaJul.ForTea.Core.TemplateProcessing.Managing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -28,9 +29,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		protected ISolution Solution { get; }
 
 		[NotNull]
-		private IShellLocks Locks => Solution.Locks;
+		private IShellLocks Locks { get; }
 
-		public T4TargetFileManager([NotNull] ISolution solution) => Solution = solution;
+		[NotNull]
+		private IT4TargetFileChecker TargetFileChecker { get; }
+
+		public T4TargetFileManager(
+			[NotNull] ISolution solution,
+			[NotNull] IT4TargetFileChecker targetFileChecker,
+			[NotNull] IShellLocks locks
+		)
+		{
+			Solution = solution;
+			TargetFileChecker = targetFileChecker;
+			Locks = locks;
+		}
 
 		public FileSystemPath GetTemporaryExecutableLocation(IT4File file)
 		{
@@ -164,7 +177,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			);
 		}
 
-		public void RemoveLastGenOutput(IT4File file)
+		private void RemoveLastGenOutput([NotNull] IT4File file)
 		{
 			var projectFile = file.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return;
@@ -178,19 +191,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					.GetSubItems(output)
 					.AsEnumerable()
 					.OfType<IProjectFile>()
-					.Where(it => IsGeneratedFrom(it, projectFile));
+					.Where(it => TargetFileChecker.IsGeneratedFrom(it, projectFile));
 				foreach (var suspect in suspects)
 				{
 					cookie.Remove(suspect);
 				}
 			});
-		}
-
-		public bool IsGeneratedFrom(IProjectFile generated, IProjectFile source)
-		{
-			if (!(generated.Properties is ProjectFileProperties properties)) return false;
-			// TODO: check AutoGen and DesignTime, too
-			return properties.DependsUponName == source.Name;
 		}
 
 		private void UpdateProjectModel([NotNull] IT4File file, [NotNull] FileSystemPath result)

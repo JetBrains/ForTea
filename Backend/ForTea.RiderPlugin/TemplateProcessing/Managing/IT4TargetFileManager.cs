@@ -1,6 +1,5 @@
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
@@ -17,9 +16,5 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 
 		[NotNull]
 		FileSystemPath SavePreprocessResults([NotNull] IT4File file, [NotNull] string text);
-
-		void RemoveLastGenOutput([NotNull] IT4File file);
-		
-		bool IsGeneratedFrom([NotNull] IProjectFile generated, [NotNull] IProjectFile source);
 	}
 }
