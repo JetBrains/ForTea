@@ -32,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Properties
 			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return prevProperties;
 			var checker = sourceFile.GetSolution().GetComponent<IT4TargetFileChecker>();
-			if (checker.IsPreprocessResult(projectFile)) return T4GeneratedProjectFileProperties.Instance;
+			if (checker.IsPreprocessResult(projectFile)) return T4PreprocessResultProjectFileProperties.Instance;
 			if (checker.IsGenerationResult(projectFile)) return T4GeneratedProjectFileProperties.Instance;
 			return prevProperties;
 		}
