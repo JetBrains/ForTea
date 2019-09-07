@@ -81,7 +81,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("#pragma warning disable 8019");
 			AppendIndent();
-			AppendIndent();
 			Result.AppendLine("using System;");
 			if (IntermediateResult.HasHost)
 			{
@@ -172,7 +171,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			PushIndent();
 			AppendIndent();
 			Result.AppendLine();
-			AppendTransformationPrefix();
 			foreach (var description in IntermediateResult.TransformationDescriptions)
 			{
 				description.AppendContent(Result, this, File);
@@ -216,16 +214,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		[NotNull]
-		protected virtual string GeneratedBaseClassName => GeneratedClassName + "Base";
+		private string GeneratedBaseClassName => GeneratedClassName + "Base";
 
 		protected abstract void AppendSyntheticAttribute();
 
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
-
-		protected virtual void AppendTransformationPrefix()
-		{
-		}
 
 		protected virtual void AppendGeneratedMessage()
 		{
@@ -240,10 +234,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		#endregion Indentation
 
 		#region IT4ElementAppendFormatProvider
-		public abstract string ToStringConversionPrefix { get; }
-		public abstract string ToStringConversionSuffix { get; }
-		public abstract string ExpressionWritingPrefix { get; }
-		public abstract string ExpressionWritingSuffix { get; }
+		[NotNull]
+		public string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
+
+		[NotNull]
+		public string ToStringConversionSuffix => ")";
+
+		[NotNull]
+		public string ExpressionWritingPrefix => "this.Write(";
+
+		[NotNull]
+		public string ExpressionWritingSuffix => ");";
+
 		public abstract string CodeCommentStart { get; }
 		public abstract string CodeCommentEnd { get; }
 		public abstract string Indent { get; }

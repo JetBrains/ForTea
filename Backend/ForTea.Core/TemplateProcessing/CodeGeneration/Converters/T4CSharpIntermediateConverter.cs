@@ -156,10 +156,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		#region IT4ElementAppendFormatProvider
-		public override string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
-		public override string ToStringConversionSuffix => ")";
-		public override string ExpressionWritingPrefix => "this.Write(";
-		public override string ExpressionWritingSuffix => ");";
 		public override string CodeCommentStart => "";
 		public override string CodeCommentEnd => "";
 		public override string Indent => new string(' ', CurrentIndent * 4); // TODO: use user indents?

@@ -17,10 +17,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	public sealed class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
 		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
-		private const string ToStringConversionPrefixText = "__To\x200CString(";
 		public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
 		public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
-		private const string GeneratedClassNameText = "Generated\x200CTransformation";
+		private const string GeneratedClassNameText = "GeneratedTextTransformation";
 
 		[NotNull, ItemNotNull]
 		private IEnumerable<string> DisabledPropertyInspections { get; } = new[]
@@ -115,11 +114,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				if (projectFile == null) return GeneratedClassNameText;
 				var dataManager = File.GetSolution().GetComponent<IT4ProjectModelTemplateDataManager>();
 				var templateKind = dataManager.GetTemplateKind(projectFile);
-				if (templateKind != T4TemplateKind.Preprocessed) return GeneratedClassNameText;
-				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-				if (fileName == null) return GeneratedClassNameText;
-				if (!ValidityChecker.IsValidIdentifier(fileName)) return GeneratedClassNameText;
-				return fileName;
+				if (templateKind == T4TemplateKind.Preprocessed)
+				{
+					string fileName = File.GetSourceFile()?.Name.WithoutExtension();
+					if (fileName == null) return GeneratedClassNameText;
+					if (!ValidityChecker.IsValidIdentifier(fileName)) return GeneratedClassNameText;
+					return fileName;
+				}
+
+				return GeneratedClassNameText;
 			}
 		}
 
@@ -129,10 +132,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		#region IT4ElementAppendFormatProvider
-		public override string ToStringConversionPrefix => ToStringConversionPrefixText;
-		public override string ToStringConversionSuffix => ")";
-		public override string ExpressionWritingPrefix => "this.Write(";
-		public override string ExpressionWritingSuffix => ");";
 		public override string CodeCommentStart => CodeCommentStartText;
 		public override string CodeCommentEnd => CodeCommentEndText;
 		public override string Indent => "";
