@@ -52,6 +52,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
       .mapNotNull(ProjectModelViewHost.getInstance(project)::getItemById)
       .mapNotNull(ProjectModelNode::getVirtualFile)
       .map(VirtualFile::getPath)
+    if (selectedProjectsForBuild.isEmpty()) return true
     val finished = Semaphore()
     finished.down()
     var result = false
