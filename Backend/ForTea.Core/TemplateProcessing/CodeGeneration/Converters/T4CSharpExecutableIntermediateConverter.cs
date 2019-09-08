@@ -56,6 +56,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine("    new Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost();");
 		}
 
+		protected override bool ShouldAppendPragmaDirectives => true;
+
 		private void AppendHostDefinition()
 		{
 			var provider = new T4TemplateResourceProvider(HostResource, this);

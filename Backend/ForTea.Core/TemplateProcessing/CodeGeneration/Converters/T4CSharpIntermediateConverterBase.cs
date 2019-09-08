@@ -78,8 +78,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		private void AppendImports()
 		{
-			AppendIndent();
-			Result.AppendLine("#pragma warning disable 8019");
+			if (ShouldAppendPragmaDirectives)
+			{
+				AppendIndent();
+				Result.AppendLine("#pragma warning disable 8019");
+			}
+
 			AppendIndent();
 			Result.AppendLine("using System;");
 			if (IntermediateResult.HasHost)
@@ -88,8 +92,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				Result.AppendLine("using System.CodeDom.Compiler;");
 			}
 
-			AppendIndent();
-			Result.AppendLine("#pragma warning restore 8019");
+			if (ShouldAppendPragmaDirectives)
+			{
+				AppendIndent();
+				Result.AppendLine("#pragma warning restore 8019");
+			}
+
 			foreach (var description in IntermediateResult.ImportDescriptions)
 			{
 				description.AppendContent(Result, this, File);
@@ -224,6 +232,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual void AppendGeneratedMessage()
 		{
 		}
+
+		protected virtual bool ShouldAppendPragmaDirectives => false;
 
 		#region Indentation
 		protected int CurrentIndent { get; private set; }

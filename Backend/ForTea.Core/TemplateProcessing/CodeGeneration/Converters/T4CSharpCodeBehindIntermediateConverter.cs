@@ -131,6 +131,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 		}
 
+		protected override bool ShouldAppendPragmaDirectives => true;
+
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => CodeCommentStartText;
 		public override string CodeCommentEnd => CodeCommentEndText;
