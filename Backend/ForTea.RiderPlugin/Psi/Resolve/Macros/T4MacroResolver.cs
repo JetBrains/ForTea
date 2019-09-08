@@ -23,16 +23,10 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			[NotNull] IT4AssemblyNamePreprocessor preprocessor
 		) : base(preprocessor) => Solution = solution;
 
-		public override IReadOnlyDictionary<string, string> ResolveHeavyMacros(
-			IEnumerable<string> macros,
-			IProjectFile file
-		) => EmptyDictionary<string, string>.Instance;
+		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(IList<string> macros,
+			IProjectFile file) => EmptyDictionary<string, string>.Instance;
 
-		public override IReadOnlyDictionary<string, string> ResolveAllLightMacros(IProjectFile file) =>
-			GetAllLightMacros(file);
-
-		[NotNull]
-		protected virtual Dictionary<string, string> GetAllLightMacros([NotNull] IProjectFile file)
+		protected override Dictionary<string, string> ResolveAllLightMacrosInternal(IProjectFile file)
 		{
 			var result = new Dictionary<string, string>(CaseInsensitiveComparison.Comparer);
 			AddBasicMacros(result);

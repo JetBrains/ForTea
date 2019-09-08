@@ -26,24 +26,30 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 		[NotNull]
 		private RiderProcessStartInfoEnvironment Environment { get; }
 
+		[NotNull]
+		private ILogger Logger { get; }
+
 		public T4FeatureAwareMacroResolver(
 			[NotNull] ISolution solution,
 			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
 			[NotNull] ISolutionToolset solutionToolset,
 			[NotNull] IBuildToolWellKnownPropertiesStore msBuildProperties,
-			[NotNull] RiderProcessStartInfoEnvironment environment
+			[NotNull] RiderProcessStartInfoEnvironment environment,
+			[NotNull] ILogger logger
 		) : base(solution, preprocessor)
 		{
 			MsBuildProperties = msBuildProperties;
 			SolutionToolset = solutionToolset;
 			Environment = environment;
+			Logger = logger;
 		}
 
-		public override IReadOnlyDictionary<string, string> ResolveHeavyMacros(
-			IEnumerable<string> heavyMacros,
+		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(
+			IList<string> heavyMacros,
 			IProjectFile file
 		)
 		{
+			Logger.Warn("Resolving {0} heavy (msbuild) macros", heavyMacros.Count);
 			var mark = file.GetProject()?.GetProjectMark();
 			if (mark == null) return EmptyDictionary<string, string>.Instance;
 			var projectsHostContainer = Solution.ProjectsHostContainer();
@@ -60,9 +66,9 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			return result;
 		}
 
-		protected override Dictionary<string, string> GetAllLightMacros(IProjectFile file)
+		protected override Dictionary<string, string> ResolveAllLightMacrosInternal(IProjectFile file)
 		{
-			var result = base.GetAllLightMacros(file);
+			var result = base.ResolveAllLightMacrosInternal(file);
 			AddMsBuildMacros(result);
 			AddPlatformMacros(result);
 			return result;
