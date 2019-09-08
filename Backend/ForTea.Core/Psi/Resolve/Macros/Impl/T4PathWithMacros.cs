@@ -34,6 +34,9 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		[NotNull]
 		private ISolution Solution { get; }
 
+		[NotNull]
+		private T4OutsideSolutionSourceFileManager OutsideSolutionManager { get; }
+
 		public T4PathWithMacros([NotNull] string rawPath, [NotNull] IPsiSourceFile file)
 		{
 			RawPath = rawPath;
@@ -41,6 +44,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
+			OutsideSolutionManager = Solution.GetComponent<T4OutsideSolutionSourceFileManager>();
 		}
 
 		public IT4File ResolveT4File(T4IncludeGuard guard)
@@ -68,10 +72,11 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		{
 			var path = ResolvePath();
 			if (path.IsEmpty) return null;
-			return Solution
+			var solutionSourceFile = Solution
 				.FindProjectItemsByLocation(path)
 				.OfType<IProjectFile>()
 				.SingleOrDefault()?.ToSourceFile();
+			return solutionSourceFile ?? OutsideSolutionManager.GetOrCreateSourceFile(path);
 		}
 
 		public FileSystemPath ResolvePath()
