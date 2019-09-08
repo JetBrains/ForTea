@@ -98,7 +98,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		{
 			if (string.IsNullOrEmpty(RawPath) || !ContainsMacros) return RawPath;
 
-			var macroValues = Resolver.Resolve(RawMacros, SourceFile.ToProjectFile().NotNull());
+			var macroValues = Resolver.ResolveHeavyMacros(RawMacros, SourceFile.ToProjectFile().NotNull());
 
 			string result = System.Environment.ExpandEnvironmentVariables(RawPath);
 			return MacroRegex.Replace(result, match =>

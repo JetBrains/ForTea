@@ -73,7 +73,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			var projectFile = File.GetSourceFile().ToProjectFile();
 			if (projectFile == null) return "";
 			var resolver = File.GetSolution().GetComponent<IT4MacroResolver>();
-			var macros = resolver.TryGetAllMacros(projectFile);
+			var macros = resolver.ResolveAllLightMacros(projectFile);
 			return macros.AggregateString(",\n", (builder, pair) => builder
 				.Append("{\"")
 				.Append(StringLiteralConverter.EscapeToRegular(pair.Key))

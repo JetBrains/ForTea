@@ -27,7 +27,7 @@ namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
 			string name = macro.RawAttributeValue?.GetText();
 			if (name == null) return null;
-			var macros = Resolver.Resolve(new[] {name}, projectFile);
+			var macros = Resolver.ResolveHeavyMacros(new[] {name}, projectFile);
 			return macros.ContainsKey(name) ? macros[name] : null;
 		}
 

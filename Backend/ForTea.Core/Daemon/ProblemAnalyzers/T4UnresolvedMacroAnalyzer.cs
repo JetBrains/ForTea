@@ -21,7 +21,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
 			string name = macro.RawAttributeValue?.GetText();
 			if (name == null) return;
-			var macros = Resolver.Resolve(new[] {name}, projectFile);
+			var macros = Resolver.ResolveHeavyMacros(new[] {name}, projectFile);
 			if (macros.ContainsKey(name)) return;
 			if (Resolver.IsSupported(macro)) context.AddHighlighting(new UnresolvedMacroError(macro));
 			else context.AddHighlighting(new UnsupportedMacroError(macro));

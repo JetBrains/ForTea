@@ -2,7 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using JetBrains.Annotations;
+using JetBrains.Application.Components;
+using JetBrains.Platform.MsBuildHost.ProjectModel;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.ProjectsHost;
+using JetBrains.ProjectModel.ProjectsHost.MsBuild;
+using JetBrains.ProjectModel.ProjectsHost.SolutionHost;
 using JetBrains.ReSharper.Host.Features.Processes;
 using JetBrains.ReSharper.Host.Features.Toolset.Detecting;
 using JetBrains.Util;
@@ -10,7 +15,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 {
 	[SolutionComponent]
-	public class T4FeatureAwareMacroResolver : T4MacroResolver
+	public sealed class T4FeatureAwareMacroResolver : T4MacroResolver
 	{
 		[NotNull]
 		private IBuildToolWellKnownPropertiesStore MsBuildProperties { get; }
@@ -20,7 +25,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 
 		[NotNull]
 		private RiderProcessStartInfoEnvironment Environment { get; }
-		
+
 		public T4FeatureAwareMacroResolver(
 			[NotNull] ISolution solution,
 			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
@@ -34,15 +39,36 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			Environment = environment;
 		}
 
-		protected override Dictionary<string, string> ResolveInternal(IProjectFile file)
+		public override IReadOnlyDictionary<string, string> ResolveHeavyMacros(
+			IEnumerable<string> heavyMacros,
+			IProjectFile file
+		)
 		{
-			var result = base.ResolveInternal(file);
+			var mark = file.GetProject()?.GetProjectMark();
+			if (mark == null) return EmptyDictionary<string, string>.Instance;
+			var projectsHostContainer = Solution.ProjectsHostContainer();
+			var msBuildSessionHolder = projectsHostContainer.GetComponent<MsBuildSessionHolder>();
+			var msBuildSession = msBuildSessionHolder.Session;
+			var result = new Dictionary<string, string>();
+			foreach (string heavyMacro in heavyMacros)
+			{
+				string value = msBuildSession.GetProjectProperty(mark, heavyMacro)?.EvaluatedValue;
+				if (value == null) continue;
+				result.Add(heavyMacro, value);
+			}
+
+			return result;
+		}
+
+		protected override Dictionary<string, string> GetAllLightMacros(IProjectFile file)
+		{
+			var result = base.GetAllLightMacros(file);
 			AddMsBuildMacros(result);
 			AddPlatformMacros(result);
 			return result;
 		}
 
-		private void AddPlatformMacros(Dictionary<string, string> result)
+		private void AddPlatformMacros([NotNull] Dictionary<string, string> result)
 		{
 			switch (Environment.Platform)
 			{
@@ -59,7 +85,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 
 			result.Add("PlatformShortName", "x64");
 		}
-		
+
 		private void AddMsBuildMacros(Dictionary<string, string> result)
 		{
 			var buildTool = SolutionToolset.CurrentBuildTool;
