@@ -106,7 +106,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		)
 		{
 			Locks.AssertWriteAccessAllowed();
-			var existingFile = GetSameDestinationFile(file, destinationName); // TODO: update properties
+			var existingFile = GetSameDestinationFile(file, destinationName);
 			if (existingFile != null) return existingFile;
 			return CreateSameDestinationFile(cookie, file, destinationName);
 		}
@@ -157,27 +157,32 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertWriteAccessAllowed();
 			var temporary = TryFindTemporaryTargetFile(file);
 			if (temporary == null) return;
-			RemoveLastGenOutput(file);
-			var destinationLocation = GetDestinationLocation(file, temporary.Name);
-			temporary.MoveFile(destinationLocation, true);
-			UpdateProjectModel(file, destinationLocation);
-			UpdateLastGetOutput(file, destinationLocation);
+			Solution.InvokeUnderTransaction(cookie =>
+			{
+				RemoveLastGenOutput(file, cookie);
+				var destinationLocation = GetDestinationLocation(file, temporary.Name);
+				temporary.MoveFile(destinationLocation, true);
+				UpdateProjectModel(file, destinationLocation, cookie);
+				UpdateLastGetOutput(file, destinationLocation, cookie);
+			});
 		}
 
-		private void UpdateLastGetOutput([NotNull] IT4File file, [NotNull] FileSystemPath destinationLocation)
+		private void UpdateLastGetOutput(
+			[NotNull] IT4File file,
+			[NotNull] FileSystemPath destinationLocation,
+			[NotNull] IProjectModelTransactionCookie cookie
+		)
 		{
 			var projectFile = file.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return;
-			Solution.InvokeUnderTransaction(cookie =>
-				cookie.EditFileProperties(projectFile, properties =>
-				{
-					if (!(properties is ProjectFileProperties projectFileProperties)) return;
-					projectFileProperties.CustomToolOutput = destinationLocation.Name;
-				})
-			);
+			cookie.EditFileProperties(projectFile, properties =>
+			{
+				if (!(properties is ProjectFileProperties projectFileProperties)) return;
+				projectFileProperties.CustomToolOutput = destinationLocation.Name;
+			});
 		}
 
-		private void RemoveLastGenOutput([NotNull] IT4File file)
+		private void RemoveLastGenOutput([NotNull] IT4File file, [NotNull] IProjectModelTransactionCookie cookie)
 		{
 			var projectFile = file.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return;
@@ -185,27 +190,26 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			string output = properties.CustomToolOutput;
 			var folder = projectFile.ParentFolder;
 			if (folder == null) return;
-			Solution.InvokeUnderTransaction(cookie =>
+			var suspects = folder
+				.GetSubItems(output)
+				.AsEnumerable()
+				.OfType<IProjectFile>()
+				.Where(it => TargetFileChecker.IsGeneratedFrom(it, projectFile));
+			foreach (var suspect in suspects)
 			{
-				var suspects = folder
-					.GetSubItems(output)
-					.AsEnumerable()
-					.OfType<IProjectFile>()
-					.Where(it => TargetFileChecker.IsGeneratedFrom(it, projectFile));
-				foreach (var suspect in suspects)
-				{
-					cookie.Remove(suspect);
-				}
-			});
+				cookie.Remove(suspect);
+			}
 		}
 
-		private void UpdateProjectModel([NotNull] IT4File file, [NotNull] FileSystemPath result)
+		private void UpdateProjectModel(
+			[NotNull] IT4File file,
+			[NotNull] FileSystemPath result,
+			[NotNull] IProjectModelTransactionCookie cookie
+		)
 		{
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
-			IProjectFile destination = null;
-			Solution.InvokeUnderTransaction(
-				cookie => destination = GetOrCreateSameDestinationFile(cookie, file, result));
+			var destination = GetOrCreateSameDestinationFile(cookie, file, result);
 			SyncDocuments(destination.Location);
 			var sourceFile = destination.ToSourceFile().NotNull();
 			SyncSymbolCaches(sourceFile);
@@ -216,17 +220,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
-			RemoveLastGenOutput(file);
 			FileSystemPath destinationLocation = null;
 			IProjectFile destination = null;
-			string destinationName = GetPreprocessingTargetFileName(file);
 			Solution.InvokeUnderTransaction(cookie =>
 			{
+				RemoveLastGenOutput(file, cookie);
+				string destinationName = GetPreprocessingTargetFileName(file);
 				destination = GetOrCreateSameDestinationFile(cookie, file, destinationName);
 				destinationLocation = destination.Location;
 				destinationLocation.WriteAllText(text);
+				UpdateLastGetOutput(file, destinationLocation, cookie);
 			});
-			UpdateLastGetOutput(file, destinationLocation);
 			SyncDocuments(destinationLocation);
 			var sourceFile = destination.ToSourceFile();
 			if (sourceFile != null) SyncSymbolCaches(sourceFile);
