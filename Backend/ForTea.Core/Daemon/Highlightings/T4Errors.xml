@@ -18,7 +18,8 @@
         <Parameter type="IT4ExpressionBlock" name="block"/>
         <Message value="Expression block cannot be empty"/>
         <Range>Block.GetHighlightingRange()</Range>
-        <Behavour overlapResolvePolicy="ERROR"/>
+        <Behavour overlapResolvePolicy="UNRESOLVED_ERROR"/>
+        <!-- higher priority is used to hide undesired message from R# -->
     </Error>
     <Error name="RecursiveInclude" staticGroup="T4Errors">
         <Parameter type="IT4AttributeValue" name="value"/>

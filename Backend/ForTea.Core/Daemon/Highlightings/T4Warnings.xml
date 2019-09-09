@@ -77,9 +77,9 @@
         <Behavour attributeID="HINT" overlapResolvePolicy="DEADCODE"/>
     </Warning>
     <Warning name="UnresolvedInclude" configurableSeverity="UnresolvedInclude">
-        <Parameter type="IT4AttributeValue" name="value"/>
+        <Parameter type="ITokenNode" name="node"/>
         <Message value="Unresolved include path"/>
-        <Range>Value.GetHighlightingRange()</Range>
+        <Range>Node.GetHighlightingRange()</Range>
     </Warning>
     <Warning name="UnresolvedAssembly" configurableSeverity="UnresolvedAssembly">
         <Parameter type="IT4AttributeValue" name="value"/>

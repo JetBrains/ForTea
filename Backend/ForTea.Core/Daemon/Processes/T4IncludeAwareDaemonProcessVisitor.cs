@@ -120,9 +120,8 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ReportUnresolvedPath([NotNull] IT4IncludeDirective include)
 		{
 			if (!Guard.IsOnTopLevel) return;
-			var value = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value;
-			if (value == null) return;
-			AddHighlighting(value, new UnresolvedIncludeWarning(value));
+			var name = include.Name;
+			AddHighlighting(name, new UnresolvedIncludeWarning(name));
 		}
 
 		private void ReportRecursiveInclude([NotNull] IT4IncludeDirective include)
