@@ -1,0 +1,19 @@
+<#@ assembly name="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ import namespace="System.Linq" #>
+<#+
+
+    private string ToIdentifier(string s) =>
+        s.Split(' ').Select(Capitalize).Aggregate((first, second) => first + second);
+
+    private string ToPrintable(string s) =>
+        "T4 " + s.Split(' ').Select(Capitalize).Aggregate((first, second) => first + ' ' + second) + " Folding";
+
+    private string Capitalize(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return s;
+        char upper = char.ToUpperInvariant(s[0]);
+        if (s[0] == upper) return s;
+        return upper + s.Substring(1);
+    }
+
+#>

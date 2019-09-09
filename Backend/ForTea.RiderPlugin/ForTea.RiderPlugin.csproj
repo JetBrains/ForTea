@@ -16,4 +16,14 @@
     <PackageReference Include="JetBrains.Roslyn.References.Repack" Version="42.42.20190604.144922" />
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Features\Folding\T4CodeFoldingAttributes.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>T4CodeFoldingAttributes.cs</LastGenOutput>
+    </None>
+    <None Update="ProtocolAware\Action\T4ExecuteTemplateActions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>T4ExecuteTemplateActions.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
 </Project>
