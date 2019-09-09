@@ -159,15 +159,16 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			if (temporary == null) return;
 			Solution.InvokeUnderTransaction(cookie =>
 			{
-				RemoveLastGenOutput(file, cookie);
 				var destinationLocation = GetDestinationLocation(file, temporary.Name);
-				temporary.MoveFile(destinationLocation, true);
+				System.IO.File.Copy(temporary.FullPath, destinationLocation.FullPath, true);
+				temporary.DeleteFile();
 				UpdateProjectModel(file, destinationLocation, cookie);
-				UpdateLastGetOutput(file, destinationLocation, cookie);
+				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
+				UpdateLastGenOutput(file, destinationLocation, cookie);
 			});
 		}
 
-		private void UpdateLastGetOutput(
+		private void UpdateLastGenOutput(
 			[NotNull] IT4File file,
 			[NotNull] FileSystemPath destinationLocation,
 			[NotNull] IProjectModelTransactionCookie cookie
@@ -182,7 +183,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			});
 		}
 
-		private void RemoveLastGenOutput([NotNull] IT4File file, [NotNull] IProjectModelTransactionCookie cookie)
+		private void RemoveLastGenOutputIfDifferent(
+			[NotNull] IT4File file,
+			[NotNull] IProjectModelTransactionCookie cookie,
+			[NotNull] FileSystemPath destinationLocation
+		)
 		{
 			var projectFile = file.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return;
@@ -194,7 +199,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				.GetSubItems(output)
 				.AsEnumerable()
 				.OfType<IProjectFile>()
-				.Where(it => TargetFileChecker.IsGeneratedFrom(it, projectFile));
+				.Where(it => TargetFileChecker.IsGeneratedFrom(it, projectFile))
+				.Where(it => it.Location != destinationLocation);
 			foreach (var suspect in suspects)
 			{
 				cookie.Remove(suspect);
@@ -224,12 +230,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			IProjectFile destination = null;
 			Solution.InvokeUnderTransaction(cookie =>
 			{
-				RemoveLastGenOutput(file, cookie);
 				string destinationName = GetPreprocessingTargetFileName(file);
 				destination = GetOrCreateSameDestinationFile(cookie, file, destinationName);
 				destinationLocation = destination.Location;
 				destinationLocation.WriteAllText(text);
-				UpdateLastGetOutput(file, destinationLocation, cookie);
+				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
+				UpdateLastGenOutput(file, destinationLocation, cookie);
 			});
 			SyncDocuments(destinationLocation);
 			var sourceFile = destination.ToSourceFile();
