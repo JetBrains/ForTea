@@ -27,9 +27,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			{
 				case IT4FeatureBlock _:
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
+				case IT4IncludeDirective _:
+					return new T4InfoCollectorStateInitial(Interrupter);
 				case IT4Directive _:
 				case IT4StatementBlock _:
-					return new T4InfoCollectorSateSeenDirectiveOrStatementBlock(Interrupter);
+					return new T4InfoCollectorSateSeenSpecialBlock(Interrupter);
 				case IT4ExpressionBlock _:
 					return new T4InfoCollectorStateInitial(Interrupter);
 				default: return this;

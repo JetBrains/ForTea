@@ -64,6 +64,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public void ProcessBeforeInterior(ITreeNode element)
 		{
+			AppendRemainingMessage(element);
 			if (!(element is IT4IncludeDirective include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
 			var sourceFile = include.Path.Resolve();
@@ -117,38 +118,31 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			Guard.TryEndProcessing(includeDirectiveParam.Path.Resolve());
 			var intermediateResults = Results.Pop();
 			Result.Append(intermediateResults);
-			AppendRemainingMessage(includeDirectiveParam);
 		}
 
 		public override void VisitAssemblyDirectiveNode(IT4AssemblyDirective assemblyDirectiveParam)
 		{
-			AppendRemainingMessage(assemblyDirectiveParam);
 			// TODO: resolve assemblies here
 		}
 
 		public override void VisitCleanupBehaviorDirectiveNode(
 			IT4CleanupBehaviorDirective cleanupBehaviorDirectiveParam)
 		{
-			AppendRemainingMessage(cleanupBehaviorDirectiveParam);
+			// TODO: should anything be done here?
 		}
 
 		public override void VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam)
 		{
-			AppendRemainingMessage(importDirectiveParam);
 			var description = T4ImportDescription.FromDirective(importDirectiveParam);
 			if (description == null) return;
 			Result.Append(description);
 		}
 
-		public override void VisitOutputDirectiveNode(IT4OutputDirective outputDirectiveParam)
-		{
-			AppendRemainingMessage(outputDirectiveParam);
+		public override void VisitOutputDirectiveNode(IT4OutputDirective outputDirectiveParam) =>
 			Result.Encoding = EncodingsManager.FindEncoding(outputDirectiveParam, Interrupter);
-		}
 
 		public override void VisitParameterDirectiveNode(IT4ParameterDirective parameterDirectiveParam)
 		{
-			AppendRemainingMessage(parameterDirectiveParam);
 			var description = T4ParameterDescription.FromDirective(parameterDirectiveParam);
 			if (description == null) return;
 			Result.Append(description);
@@ -156,7 +150,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public override void VisitTemplateDirectiveNode(IT4TemplateDirective templateDirectiveParam)
 		{
-			AppendRemainingMessage(templateDirectiveParam);
 			if (HasSeenTemplateDirective) return;
 			HasSeenTemplateDirective = true;
 			string hostSpecific = templateDirectiveParam
@@ -171,14 +164,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public override void VisitUnknownDirectiveNode(IT4UnknownDirective unknownDirectiveParam)
 		{
-			AppendRemainingMessage(unknownDirectiveParam);
 			var data = T4FailureRawData.FromElement(unknownDirectiveParam, "Custom directives are not supported");
 			Interrupter.InterruptAfterProblem(data);
 		}
 
 		public override void VisitExpressionBlockNode(IT4ExpressionBlock expressionBlockParam)
 		{
-			AppendRemainingMessage(expressionBlockParam);
 			var code = expressionBlockParam.Code;
 			if (code == null) return;
 			if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
@@ -187,7 +178,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public override void VisitFeatureBlockNode(IT4FeatureBlock featureBlockParam)
 		{
-			AppendRemainingMessage(featureBlockParam);
 			var code = featureBlockParam.Code;
 			if (code == null) return;
 			Result.AppendFeature(new T4CodeDescription(code));
@@ -195,7 +185,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public override void VisitStatementBlockNode(IT4StatementBlock statementBlockParam)
 		{
-			AppendRemainingMessage(statementBlockParam);
 			var code = statementBlockParam.Code;
 			if (code == null) return;
 			Result.AppendTransformation(new T4CodeDescription(code));
