@@ -76,7 +76,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 				.FindProjectItemsByLocation(path)
 				.OfType<IProjectFile>()
 				.SingleOrDefault()?.ToSourceFile();
-			return solutionSourceFile ?? OutsideSolutionManager.GetOrCreateSourceFile(path);
+			var file = solutionSourceFile;
+			if (file != null) return file;
+			if (path.ExistsFile) return OutsideSolutionManager.GetOrCreateSourceFile(path);
+			return null;
 		}
 
 		public FileSystemPath ResolvePath()
