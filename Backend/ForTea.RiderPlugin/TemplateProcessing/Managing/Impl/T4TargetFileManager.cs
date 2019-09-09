@@ -211,8 +211,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertWriteAccessAllowed();
 			var destination = GetOrCreateSameDestinationFile(cookie, file, result);
 			SyncDocuments(destination.Location);
-			var sourceFile = destination.ToSourceFile().NotNull();
-			SyncSymbolCaches(sourceFile);
+			var sourceFile = destination.ToSourceFile();
+			if (sourceFile != null) SyncSymbolCaches(sourceFile);
 			RefreshFiles(destination.Location);
 		}
 
