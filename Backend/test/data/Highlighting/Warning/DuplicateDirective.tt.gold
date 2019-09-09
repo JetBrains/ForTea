@@ -4,5 +4,5 @@
 |<#@ output extension="cshtml" #>|(1)
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Duplicate directive
-(1): ReSharper Dead Code: Duplicate directive
+(0): ReSharper Dead Code: This directive was declared earlier and will be ignored
+(1): ReSharper Dead Code: This directive was declared earlier and will be ignored

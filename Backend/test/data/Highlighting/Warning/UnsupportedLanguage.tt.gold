@@ -3,4 +3,4 @@
 
 ---------------------------------------------------------
 (0): ReSharper Warning: Visual Basic is not supported
-(1): ReSharper Dead Code: Duplicate directive
+(1): ReSharper Dead Code: This directive was declared earlier and will be ignored
