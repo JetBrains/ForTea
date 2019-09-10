@@ -19,7 +19,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
 		public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
 		public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
-		private const string GeneratedClassNameText = "GeneratedTextTransformation";
 
 		[NotNull, ItemNotNull]
 		private IEnumerable<string> DisabledPropertyInspections { get; } = new[]
@@ -111,18 +110,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			get
 			{
 				var projectFile = File.GetSourceFile()?.ToProjectFile();
-				if (projectFile == null) return GeneratedClassNameText;
+				if (projectFile == null) return GeneratedClassNameString;
 				var dataManager = File.GetSolution().GetComponent<IT4ProjectModelTemplateDataManager>();
 				var templateKind = dataManager.GetTemplateKind(projectFile);
-				if (templateKind == T4TemplateKind.Preprocessed)
-				{
-					string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-					if (fileName == null) return GeneratedClassNameText;
-					if (!ValidityChecker.IsValidIdentifier(fileName)) return GeneratedClassNameText;
-					return fileName;
-				}
+				if (templateKind != T4TemplateKind.Preprocessed) return GeneratedClassNameString;
+				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
+				if (fileName == null) return GeneratedClassNameString;
+				if (!ValidityChecker.IsValidIdentifier(fileName)) return GeneratedClassNameString;
+				return fileName;
 
-				return GeneratedClassNameText;
 			}
 		}
 

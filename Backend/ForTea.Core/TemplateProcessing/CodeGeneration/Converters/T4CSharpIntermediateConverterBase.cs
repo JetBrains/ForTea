@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
@@ -13,8 +12,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public abstract class T4CSharpIntermediateConverterBase : IT4ElementAppendFormatProvider
 	{
-		[NotNull] public const string GeneratedClassNameString = "TextTransformation";
-		[NotNull] public const string GeneratedBaseClassNameString = GeneratedClassNameString + "Base";
+		[NotNull] public const string GeneratedClassNameString = "GeneratedTextTransformation";
+		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
 		[NotNull]
@@ -211,18 +210,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract string ResourceName { get; }
 
 		[NotNull]
-		protected virtual string GeneratedClassName
-		{
-			get
-			{
-				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-				if (fileName != null && ValidityChecker.IsValidIdentifier(fileName)) return fileName;
-				return GeneratedClassNameString;
-			}
-		}
+		protected virtual string GeneratedClassName => GeneratedClassNameString;
 
 		[NotNull]
-		private string GeneratedBaseClassName => GeneratedClassName + "Base";
+		private string GeneratedBaseClassName => GeneratedBaseClassNameString;
 
 		protected abstract void AppendSyntheticAttribute();
 

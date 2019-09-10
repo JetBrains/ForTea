@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -144,6 +145,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected override void AppendHost()
 		{
 			// Host directive does not work for runtime templates
+		}
+
+		protected override string GeneratedClassName
+		{
+			get
+			{
+				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
+				if (fileName != null && ValidityChecker.IsValidIdentifier(fileName)) return fileName;
+				return GeneratedClassNameString;
+			}
 		}
 
 		protected override void AppendIndent(int size)
