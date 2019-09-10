@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Invalidation;
@@ -38,16 +37,7 @@ namespace GammaJul.ForTea.Core.Psi
 			T4CSharpCodeGenerationResult result = generator.GenerateSafe();
 
 			LanguageService csharpLanguageService = CSharpLanguage.Instance.LanguageService();
-			if (csharpLanguageService == null)
-				return null;
-
-			var includedFiles = new OneToSetMap<FileSystemPath, FileSystemPath>();
-			includedFiles.AddRange(modificationInfo.SourceFile.GetLocation(), t4File
-				.Blocks
-				.OfType<IT4IncludeDirective>()
-				.Select(include => include.Path.ResolvePath())
-				.Where(path => !path.IsEmpty));
-
+			if (csharpLanguageService == null) return null;
 			var t4FileDependencyManager = solution.GetComponent<T4FileDependencyManager>();
 
 			return new T4SecondaryDocumentGenerationResult(
@@ -57,10 +47,7 @@ namespace GammaJul.ForTea.Core.Psi
 				new RangeTranslatorWithGeneratedRangeMap(result.GeneratedRangeMap),
 				csharpLanguageService.GetPrimaryLexerFactory(),
 				t4FileDependencyManager,
-				t4File.Blocks
-					.OfType<IT4IncludeDirective>()
-					.Select(include => include.Path.ResolvePath())
-					.Where(path => !path.IsEmpty)
+				t4File.Blocks.OfType<IT4IncludeDirective>()
 			);
 		}
 

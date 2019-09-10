@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -50,13 +51,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		[NotNull]
 		public T4CSharpCodeGenerationIntermediateResult Collect()
 		{
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			Guard.StartProcessing(File.GetSourceFile().NotNull());
-			File.ProcessDescendants(this);
-			string suffix = Result.State.ProduceBeforeEof();
-			if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
-			Guard.EndProcessing();
-			return Results.Pop();
+			var projectFile = File.GetSourceFile()?.ToProjectFile();
+			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(File, Interrupter);
+			using (T4MacroResolveContextCookie.Create(projectFile))
+			{
+				Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+				Guard.StartProcessing(File.GetSourceFile().NotNull());
+				File.ProcessDescendants(this);
+				string suffix = Result.State.ProduceBeforeEof();
+				if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+				Guard.EndProcessing();
+				return Results.Pop();
+			}
 		}
 
 		#region IRecirsiveElementProcessor
@@ -89,7 +95,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 			var resolved = include.Path.ResolveT4File(Guard).NotNull();
 			Guard.StartProcessing(sourceFile);
-			resolved.ProcessDescendants(this);
+			var projectFile = sourceFile.ToProjectFile();
+			if (projectFile == null) resolved.ProcessDescendants(this);
+			else
+			{
+				using (T4MacroResolveContextCookie.Create(projectFile))
+				{
+					resolved.ProcessDescendants(this);
+				}
+			}
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)

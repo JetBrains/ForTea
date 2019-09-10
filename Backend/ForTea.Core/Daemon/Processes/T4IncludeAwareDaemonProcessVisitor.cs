@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -101,7 +102,15 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			}
 
 			Guard.StartProcessing(sourceFile);
-			destination.ProcessDescendants(this);
+			var projectFile = sourceFile.ToProjectFile();
+			if (projectFile == null) destination.ProcessDescendants(this);
+			else
+			{
+				using (T4MacroResolveContextCookie.Create(projectFile))
+				{
+					destination.ProcessDescendants(this);
+				}
+			}
 			Guard.EndProcessing();
 			if (HasSeenRecursiveInclude) ReportRecursiveInclude(include);
 		}

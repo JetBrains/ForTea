@@ -20,6 +20,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private static Regex MacroRegex { get; } =
 			new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
+		[NotNull]
 		private string RawPath { get; }
 
 		[NotNull]
@@ -35,11 +36,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private ISolution Solution { get; }
 
 		[NotNull]
+		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4PathWithMacros>();
+
+		[NotNull]
 		private T4OutsideSolutionSourceFileManager OutsideSolutionManager { get; }
 
-		public T4PathWithMacros([NotNull] string rawPath, [NotNull] IPsiSourceFile file)
+		public T4PathWithMacros([CanBeNull] string rawPath, [NotNull] IPsiSourceFile file)
 		{
-			RawPath = rawPath;
+			RawPath = rawPath ?? "";
 			SourceFile = file;
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
@@ -105,9 +109,13 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		public string ResolveString()
 		{
 			if (string.IsNullOrEmpty(RawPath) || !ContainsMacros) return RawPath;
-
-			var macroValues = Resolver.ResolveHeavyMacros(RawMacros, SourceFile.ToProjectFile().NotNull());
-
+			var projectFile = SourceFile.ToProjectFile() ?? T4MacroResolveContextCookie.ProjectFile;
+			if (projectFile == null)
+			{
+				Logger.Warn("Could not find any project file for macro resolution");
+				return RawPath;
+			}
+			var macroValues = Resolver.ResolveHeavyMacros(RawMacros, projectFile);
 			string result = System.Environment.ExpandEnvironmentVariables(RawPath);
 			return MacroRegex.Replace(result, match =>
 			{
@@ -146,7 +154,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		{
 			unchecked
 			{
-				return ((RawPath != null ? RawPath.GetHashCode() : 0) * 397) ^ SourceFile.GetHashCode();
+				return (RawPath.GetHashCode() * 397) ^ SourceFile.GetHashCode();
 			}
 		}
 

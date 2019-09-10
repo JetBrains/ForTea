@@ -2,6 +2,7 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
+using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
@@ -41,7 +42,9 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		{
 			var t4File = element.GetContainingFile().NotNull();
 			var sourceFile = t4File.GetSourceFile().NotNull();
-			var projectFile = sourceFile.ToProjectFile().NotNull();
+			var projectFile = sourceFile.ToProjectFile();
+			if (projectFile == null) return;
+			using (T4MacroResolveContextCookie.Create(projectFile))
 			using (Preprocessor.Prepare(projectFile))
 			{
 				string resolved = new T4PathWithMacros(element.GetText(), sourceFile).ResolveString();

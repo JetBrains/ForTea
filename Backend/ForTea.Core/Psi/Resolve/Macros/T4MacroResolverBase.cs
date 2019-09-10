@@ -47,6 +47,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 			T4AssemblyReferenceManager referenceManager
 		)
 		{
+			using (T4MacroResolveContextCookie.Create(file))
 			using (AssemblyNamePreprocessor.Prepare(file))
 			{
 				// removes the assembly references from the old assembly directives
