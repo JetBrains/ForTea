@@ -106,12 +106,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		[NotNull]
 		private string GetReferences() => ReferenceExtractionManager
-			.ExtractReferenceLocations(File)
+			.ExtractReferenceLocationsTransitive(File)
 			.AggregateString(",\n", (builder, it) => builder
 				.Append("{\"")
-				.Append(it.FullName)
+				.Append(StringLiteralConverter.EscapeToRegular(it.FullName))
 				.Append("\", \"")
-				.Append(it.Location)
+				.Append(StringLiteralConverter.EscapeToRegular(it.Location.FullPath))
 				.Append("\"}"));
 
 		#region IT4ElementAppendFormatProvider
