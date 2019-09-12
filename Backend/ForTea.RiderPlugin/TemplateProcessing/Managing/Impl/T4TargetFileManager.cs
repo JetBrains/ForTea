@@ -135,7 +135,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				.ToProjectFile()
 				?.ParentFolder
 				?.GetSubItems(temporaryName)
-				.AsEnumerable()
+				.ToList()
 				.OfType<IProjectFile>()
 				.AsList();
 			Assertion.AssertNotNull(candidates, "candidates != null");
@@ -197,7 +197,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			if (folder == null) return;
 			var suspects = folder
 				.GetSubItems(output)
-				.AsEnumerable()
+				.ToList()
 				.OfType<IProjectFile>()
 				.Where(it => TargetFileChecker.IsGeneratedFrom(it, projectFile))
 				.Where(it => it.Location != destinationLocation);

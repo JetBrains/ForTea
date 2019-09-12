@@ -14,7 +14,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 	{
 		[NotNull]
 		public T4CSharpCodeGenerationResult CollectedBaseClass { get; }
-		
+
 		[CanBeNull]
 		public string Encoding { get; set; }
 
@@ -81,12 +81,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public void Append([NotNull] T4CSharpCodeGenerationIntermediateResult other)
 		{
-			MyImportDescriptions.addAll(other.ImportDescriptions);
+			MyImportDescriptions.AddAll(other.ImportDescriptions);
 			Encoding = Encoding ?? other.Encoding;
 			if (CollectedBaseClass.IsEmpty) CollectedBaseClass.Append(other.CollectedBaseClass);
-			MyTransformationDescriptions.addAll(other.TransformationDescriptions);
-			MyFeatureDescriptions.addAll(other.FeatureDescriptions);
-			MyParameterDescriptions.addAll(other.ParameterDescriptions);
+			MyTransformationDescriptions.AddAll(other.TransformationDescriptions);
+			MyFeatureDescriptions.AddAll(other.FeatureDescriptions);
+			MyParameterDescriptions.AddAll(other.ParameterDescriptions);
 			// 'feature started' is intentionally ignored
 			HasHost = HasHost || other.HasHost;
 		}

@@ -29,7 +29,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.Managing.Impl
 			if (parentFolder == null) return false;
 			return parentFolder
 				.GetSubItems(sourceName)
-				.AsEnumerable()
+				.ToList()
 				.OfType<IProjectFile>()
 				.Any(source => IsActionResult(suspect, source, kind));
 		}

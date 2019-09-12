@@ -35,7 +35,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.Services.Impl
 			return file
 				.ParentFolder
 				?.GetSubItems(targetFileName)
-				.AsEnumerable()
+				.ToList()
 				.OfType<IProjectFile>()
 				.SingleOrDefault(suspect => file == suspect.GetDependsUponFile());
 		}
