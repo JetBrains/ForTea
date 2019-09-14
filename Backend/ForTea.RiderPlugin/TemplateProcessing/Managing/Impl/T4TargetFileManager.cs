@@ -157,15 +157,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertWriteAccessAllowed();
 			var temporary = TryFindTemporaryTargetFile(file);
 			if (temporary == null) return;
+			var destinationLocation = GetDestinationLocation(file, temporary.Name);
 			Solution.InvokeUnderTransaction(cookie =>
 			{
-				var destinationLocation = GetDestinationLocation(file, temporary.Name);
-				System.IO.File.Copy(temporary.FullPath, destinationLocation.FullPath, true);
-				temporary.DeleteFile();
 				UpdateProjectModel(file, destinationLocation, cookie);
 				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
 				UpdateLastGenOutput(file, destinationLocation, cookie);
 			});
+			destinationLocation.DeleteFile();
+			System.IO.File.Move(temporary.FullPath, destinationLocation.FullPath);
 		}
 
 		private void UpdateLastGenOutput(
