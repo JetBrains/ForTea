@@ -75,7 +75,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		{
 			var t4File = directive.GetContainingFile().NotNull();
 			var targetAttribute = T4DirectiveInfoManager.Assembly.NameAttribute;
-			string assemblyNameOrFile = directive.GetFirstAttribute(targetAttribute)?.GetText();
+			string assemblyNameOrFile = directive.GetFirstAttribute(targetAttribute)?.Value.GetText();
 			if (assemblyNameOrFile == null) return null;
 			var sourceFile = directive.GetSourceFile();
 			var projectFile = sourceFile?.ToProjectFile();
