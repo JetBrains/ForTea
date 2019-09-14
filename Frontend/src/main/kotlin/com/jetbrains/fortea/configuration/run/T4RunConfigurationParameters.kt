@@ -26,7 +26,7 @@ open class T4RunConfigurationParameters(
     false,
     useExternalConsole,
     envs,
-    false,
+    true,
     { _, _ -> },
     null,
     "",
