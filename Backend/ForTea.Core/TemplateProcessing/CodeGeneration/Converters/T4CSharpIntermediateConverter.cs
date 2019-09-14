@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 		}
 
-		protected sealed override string ResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
+		protected sealed override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
 
 		protected sealed override void AppendSyntheticAttribute()
 		{

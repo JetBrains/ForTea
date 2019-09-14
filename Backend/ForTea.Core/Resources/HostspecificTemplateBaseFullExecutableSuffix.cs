@@ -3,7 +3,12 @@
         public static int Main(string[] args)
         {
             RegisterAssemblyLocations__Generated();
-            var transformation = new $(PARAMETER_0)();
+            return PostRegisterMain(args);
+        }
+
+        private static int PostRegisterMain(string[] args)
+        {
+            var transformation = new $(PARAMETER_0) ();
             transformation.Host.transformation = transformation;
             transformation.Host.SetOutputEncoding(global::System.Text.Encoding.GetEncoding($(PARAMETER_1)), true);
             string destination = args[0];

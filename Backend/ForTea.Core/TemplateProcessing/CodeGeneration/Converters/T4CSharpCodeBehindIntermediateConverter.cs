@@ -34,7 +34,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 		}
 
-		protected override string ResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
+		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
 
 		protected override void AppendSyntheticAttribute()
 		{

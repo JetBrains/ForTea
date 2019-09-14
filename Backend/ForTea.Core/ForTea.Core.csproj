@@ -24,6 +24,7 @@
     <Compile Remove="Resources\HostStub.cs" />
     <Compile Remove="Resources\Host.cs" />
     <Compile Remove="Resources\AssemblyRegistering.cs" />
+    <Compile Remove="Resources\ToStringInstanceHelper.cs" />
 
     <EmbeddedResource Include="Resources\TemplateBaseFull.cs" />
     <EmbeddedResource Include="Resources\TemplateBaseFullExecutableSuffix.cs" />
@@ -32,6 +33,7 @@
     <EmbeddedResource Include="Resources\HostStub.cs" />
     <EmbeddedResource Include="Resources\Host.cs" />
     <EmbeddedResource Include="Resources\AssemblyRegistering.cs" />
+    <EmbeddedResource Include="Resources\ToStringInstanceHelper.cs" />
 
     <None Remove="Parsing\T4.lex" />
 

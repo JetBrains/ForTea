@@ -16,6 +16,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
+		[NotNull] private const string ToStringInstanceHelperResource =
+			"GammaJul.ForTea.Core.Resources.ToStringInstanceHelper.cs";
+
 		[NotNull]
 		protected T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
 
@@ -198,8 +201,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected void AppendBaseClass()
 		{
-			if (IntermediateResult.HasBaseClass) return;
-			var provider = new T4TemplateResourceProvider(ResourceName, this);
+			string resource = !IntermediateResult.HasBaseClass ? BaseClassResourceName : ToStringInstanceHelperResource;
+			var provider = new T4TemplateResourceProvider(resource, this);
 			Result.Append(provider.ProcessResource(GeneratedBaseClassName));
 		}
 
@@ -207,7 +210,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
 
 		[NotNull]
-		protected abstract string ResourceName { get; }
+		protected abstract string BaseClassResourceName { get; }
 
 		[NotNull]
 		protected virtual string GeneratedClassName => GeneratedClassNameString;
@@ -236,7 +239,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		#region IT4ElementAppendFormatProvider
 		[NotNull]
-		public string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
+		public virtual string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
 
 		[NotNull]
 		public string ToStringConversionSuffix => ")";

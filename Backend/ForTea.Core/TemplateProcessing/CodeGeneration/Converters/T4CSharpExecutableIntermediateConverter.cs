@@ -115,6 +115,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				.Append("\"}"));
 
 		#region IT4ElementAppendFormatProvider
+		public override string ToStringConversionPrefix => "ToStringInstanceHelper.ToStringWithCulture(";
 		public override bool ShouldBreakExpressionWithLineDirective => true;
 
 		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>

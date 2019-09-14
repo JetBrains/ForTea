@@ -78,7 +78,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 			var resolveContext = psiModule.GetResolveContextEx(projectFile);
 			using (CompilationContextCookie.GetOrCreate(resolveContext))
 			{
-				return psiModule.RawReferences.SelectNotNull(it => it.GetFiles().Single()).AsList();
+				return psiModule.RawReferences.SelectMany(it => it.GetFiles()).AsList();
 			}
 		}
 
