@@ -72,7 +72,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			{
 				try
 				{
-					var references = ReferenceExtractionManager.ExtractReferences(file, lifetime);
+					var references = ReferenceExtractionManager.ExtractPortableReferencesTransitive(file, lifetime);
 					string code = GenerateCode(file);
 					if (progress != null) progress.CurrentItemText = "Compiling code";
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);

@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -21,9 +20,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 	public sealed class T4ReferenceExtractionManager : IT4ReferenceExtractionManager
 	{
 		[NotNull]
-		private IShellLocks Locks { get; }
-
-		[NotNull]
 		private RoslynMetadataReferenceCache Cache { get; }
 
 		[NotNull]
@@ -34,25 +30,22 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 
 		public T4ReferenceExtractionManager(
 			Lifetime lifetime,
-			[NotNull] IShellLocks locks,
 			[NotNull] IPsiModules psiModules,
 			[NotNull] IT4AssemblyReferenceResolver assemblyReferenceResolver
 		)
 		{
-			Locks = locks;
 			PsiModules = psiModules;
 			AssemblyReferenceResolver = assemblyReferenceResolver;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
-		public IEnumerable<PortableExecutableReference> ExtractReferences(IT4File file, Lifetime lifetime)
-		{
-			Locks.AssertReadAccessAllowed();
-			return ExtractRawAssemblyReferences(file)
-				.Select(it => it.Location)
-				.SelectNotNull(it => Cache.GetMetadataReference(lifetime, it))
-				.AsList();
-		}
+		public IEnumerable<PortableExecutableReference> ExtractPortableReferencesTransitive(
+			IT4File file,
+			Lifetime lifetime
+		) => ExtractReferenceLocationsTransitive(file)
+			.Select(it => it.Location)
+			.SelectNotNull(it => Cache.GetMetadataReference(lifetime, it))
+			.AsList();
 
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
@@ -65,7 +58,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 			var psiModule = sourceFile.PsiModule;
 			var resolveContext = psiModule.GetResolveContextEx(projectFile);
 			return AssemblyReferenceResolver
-				.ResolveTransitiveDependencies(directReferences, project, resolveContext)
+				.ResolveTransitiveDependencies(directReferences, resolveContext)
 				.AsList();
 		}
 

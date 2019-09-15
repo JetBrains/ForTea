@@ -11,7 +11,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference
 	public interface IT4ReferenceExtractionManager
 	{
 		[NotNull, ItemNotNull]
-		IEnumerable<PortableExecutableReference> ExtractReferences([NotNull] IT4File file, Lifetime lifetime);
+		IEnumerable<PortableExecutableReference> ExtractPortableReferencesTransitive([NotNull] IT4File file, Lifetime lifetime);
 
 		[NotNull]
 		IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive([NotNull] IT4File file);

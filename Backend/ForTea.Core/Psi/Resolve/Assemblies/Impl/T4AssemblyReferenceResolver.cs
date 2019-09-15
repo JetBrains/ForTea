@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Infra;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Metadata.Utils;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
@@ -93,22 +94,21 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 
 		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
 			IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			IProject project,
 			IModuleReferenceResolveContext resolveContext
 		)
 		{
 			var result = new List<T4AssemblyReferenceInfo>();
-			ResolveTransitiveDependencies(directDependencies, project, resolveContext, result);
+			ResolveTransitiveDependencies(directDependencies, resolveContext, result);
 			return result;
 		}
 
 		private void ResolveTransitiveDependencies(
 			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			[NotNull] IProject project,
 			[NotNull] IModuleReferenceResolveContext resolveContext,
 			[NotNull] IList<T4AssemblyReferenceInfo> destination
 		)
 		{
+			var currentRuntimeResolver = new DotNetFrameworkCurrentRuntimeAssemblyResolver();
 			foreach (var directDependency in directDependencies)
 			{
 				if (destination.Any(it => it.FullName == directDependency.FullName)) continue;
@@ -117,12 +117,18 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 					.GetReferencedAssemblyNames(directDependency.Location)
 					.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(assemblyNameInfo =>
 					{
-						var target = assemblyNameInfo.ToAssemblyReferenceTarget();
-						var resolved = ResolveManager.Resolve(target, project, resolveContext);
-						if (resolved == null) return null;
-						return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, resolved);
+						IAssemblyResolver resolver = new CombiningAssemblyResolver(
+							new AssemblyResolverOnFolders(directDependency.Location.Parent),
+							// This resolver might be redundant since the runtime
+							// will resolve such assemblies without any additional help,
+							// but let's resolve them, too, just in case
+							currentRuntimeResolver
+						);
+						resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
+						if (path == null) return null;
+						return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
 					});
-				ResolveTransitiveDependencies(indirectDependencies, project, resolveContext, destination);
+				ResolveTransitiveDependencies(indirectDependencies, resolveContext, destination);
 			}
 		}
 	}
