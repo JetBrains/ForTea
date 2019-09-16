@@ -78,19 +78,19 @@
     <action
         class="com.jetbrains.fortea.configuration.T4ExecuteTemplateBackendAction"
         id="ExecuteT4Template"
-        text="Run Template">
+        text="Run">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
     <action
         class="com.jetbrains.fortea.configuration.T4DebugTemplateBackendAction"
         id="DebugT4Template"
-        text="Debug Template">
+        text="Debug">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
     </action>
     <action
         class="com.jetbrains.fortea.configuration.T4PreprocessTemplateBackendAction"
         id="PreprocessT4Template"
-        text="Preprocess Template">
+        text="Preprocess">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="DebugT4Template"/>
     </action>
     <action id="NewT4File" class="com.jetbrains.fortea.actions.CreateT4FileAction">

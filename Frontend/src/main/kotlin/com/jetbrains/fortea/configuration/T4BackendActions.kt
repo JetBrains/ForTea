@@ -23,7 +23,7 @@ abstract class T4BackendAction(backendActionId: String, icon: Icon) :
 
 class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", ReSharperUnitTestingIcons.RunTest)
 class T4DebugTemplateBackendAction : T4BackendAction("T4.DebugFromContext", Debug)
-class T4PreprocessTemplateBackendAction : RiderContextAwareAnAction("T4.PreprocessFromContext", icon = T4Icons.T4) {
+class T4PreprocessTemplateBackendAction : RiderContextAwareAnAction("T4.PreprocessFromContext") {
   override fun update(e: AnActionEvent) {
     e.presentation.isEnabledAndVisible = e.dataContext.getData(CommonDataKeys.PSI_FILE)?.language == T4Language
   }
