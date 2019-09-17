@@ -1,10 +1,10 @@
 <Errors language="C#" implementationLanguage="T4">
     <Usings>
-        GammaJul.ForTea.Core.Daemon.Highlightings;
+        GammaJul.ForTea.Core.Daemon.Attributes;
         GammaJul.ForTea.Core.Tree;
     </Usings>
     <SeverityConfiguration>
-        <Group name="T4HighlightingGroupIds.T4">
+        <Group name="T4HighlightingAttributeIds.T4">
             <Tag name="EscapedKeyword" default="WARNING">
                 <Title>Keyword will be escaped</Title>
                 <Description>
