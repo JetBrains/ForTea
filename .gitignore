@@ -15,7 +15,6 @@
 
 */RiderSdkPackageVersion.props
 /NuGet.Config
-**/java/
 
 **.Generated.kt
 **.Generated.cs
