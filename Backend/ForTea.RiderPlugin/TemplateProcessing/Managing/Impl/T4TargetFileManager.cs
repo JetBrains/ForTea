@@ -158,14 +158,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var temporary = TryFindTemporaryTargetFile(file);
 			if (temporary == null) return;
 			var destinationLocation = GetDestinationLocation(file, temporary.Name);
+			destinationLocation.DeleteFile();
+			System.IO.File.Move(temporary.FullPath, destinationLocation.FullPath);
 			Solution.InvokeUnderTransaction(cookie =>
 			{
 				UpdateProjectModel(file, destinationLocation, cookie);
 				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
 				UpdateLastGenOutput(file, destinationLocation, cookie);
 			});
-			destinationLocation.DeleteFile();
-			System.IO.File.Move(temporary.FullPath, destinationLocation.FullPath);
 		}
 
 		private void UpdateLastGenOutput(
