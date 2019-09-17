@@ -2,11 +2,14 @@
 <#@ import namespace="System.Linq" #>
 <#+
 
+    private string ToConstantIdentifier(string s) =>
+        s.Split(' ').Select(word => word.ToUpper()).Aggregate((first, second) => first + '_' + second);
+
     private string ToIdentifier(string s) =>
         s.Split(' ').Select(Capitalize).Aggregate((first, second) => first + second);
 
     private string ToPrintable(string s) =>
-        "T4 " + s.Split(' ').Select(Capitalize).Aggregate((first, second) => first + ' ' + second) + " Folding";
+        "T4 " + s.Split(' ').Select(Capitalize).Aggregate((first, second) => first + ' ' + second);
 
     private string Capitalize(string s)
     {

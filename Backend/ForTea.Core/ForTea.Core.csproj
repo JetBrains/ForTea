@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>GammaJul.ForTea.Core</RootNamespace>
   </PropertyGroup>
-
+  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
   <ItemGroup>
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
       <PrivateAssets>all</PrivateAssets>
@@ -43,6 +43,10 @@
     <CsLex Include="Parsing\Lexing\T4Lexer.lex" />
     <ParserGen Include="Parsing\T4.psi" />
     <None Include="Parsing\T4.psi" />
+    <None Update="Daemon\Attributes\T4HighlightingAttributeIds.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>T4HighlightingAttributeIds.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

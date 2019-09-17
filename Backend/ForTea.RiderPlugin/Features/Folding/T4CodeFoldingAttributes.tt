@@ -16,7 +16,6 @@
         "feature block",
         "statement block"
     };
-
 #>
 using JetBrains.ForTea.RiderPlugin.Features.Folding;
 using JetBrains.TextControl.DocumentMarkup;
@@ -38,7 +37,7 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
     foreach (string name in names)
     {
 #>
-		public const string <#= ToIdentifier(name) #> = "<#= ToPrintable(name) #>";
+		public const string <#= ToIdentifier(name) #> = "<#= ToPrintable(name) #> Folding";
 <#
     }
 #>

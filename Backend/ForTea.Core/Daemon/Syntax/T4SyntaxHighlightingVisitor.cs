@@ -1,5 +1,5 @@
 using System.Linq;
-using GammaJul.ForTea.Core.Daemon.Attributes.GammaJul.ForTea.Core.Daemon.Highlightings;
+using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;

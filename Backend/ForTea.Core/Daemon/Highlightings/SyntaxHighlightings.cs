@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.Daemon.Attributes.GammaJul.ForTea.Core.Daemon.Highlightings;
+using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Daemon.Tooltip;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
