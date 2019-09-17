@@ -82,9 +82,9 @@
         <Range>Node.GetHighlightingRange()</Range>
     </Warning>
     <Warning name="UnresolvedAssembly" configurableSeverity="UnresolvedAssembly">
-        <Parameter type="IT4AttributeValue" name="value"/>
+        <Parameter type="ITokenNode" name="node"/>
         <Message value="Unresolved assembly"/>
-        <Range>Value.GetNavigationRange()</Range>
+        <Range>Node.GetNavigationRange()</Range>
     </Warning>
     <Warning name="UnexpectedDirective" configurableSeverity="UnexpectedDirective">
         <Parameter type="ITokenNode" name="name"/>

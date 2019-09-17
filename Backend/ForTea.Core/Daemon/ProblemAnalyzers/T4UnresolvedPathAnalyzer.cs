@@ -22,10 +22,8 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			var attribute = DirectiveAttributeNavigator.GetByValue(element);
 			if (!(DirectiveNavigator.GetByAttribute(attribute) is IT4AssemblyDirective assemblyDirective)) return;
 			var systemPath = Resolver.Resolve(assemblyDirective);
-			if (systemPath == null || !systemPath.ExistsFile)
-			{
-				consumer.AddHighlighting(new UnresolvedAssemblyWarning(element));
-			}
+			if (systemPath != null && systemPath.ExistsFile) return;
+			consumer.AddHighlighting(new UnresolvedAssemblyWarning(assemblyDirective.Name));
 		}
 
 		protected override DirectiveAttributeInfo GetTargetAttribute() => T4DirectiveInfoManager.Assembly.NameAttribute;
