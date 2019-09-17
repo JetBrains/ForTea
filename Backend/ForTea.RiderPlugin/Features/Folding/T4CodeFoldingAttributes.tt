@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-<#@ include file="T4StringUtils.ttinclude"#>
+<#@ include file="$(T4UtilsLocation)T4StringUtils.ttinclude" #>
 <#
     var names = new[]
     {

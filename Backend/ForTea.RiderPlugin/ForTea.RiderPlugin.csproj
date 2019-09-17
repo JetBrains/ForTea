@@ -9,6 +9,7 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
   <ItemGroup>
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
       <PrivateAssets>all</PrivateAssets>
