@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -61,7 +60,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		[NotNull]
-		public T4BuildResult Compile(Lifetime lifetime, IT4File file, IProgressIndicator progress = null)
+		public T4BuildResult Compile(Lifetime lifetime, IT4File file)
 		{
 			Logger.Verbose("Compiling {0}", file.GetSourceFile()?.Name);
 			Locks.AssertReadAccessAllowed();
@@ -74,7 +73,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				{
 					var references = ReferenceExtractionManager.ExtractPortableReferencesTransitive(file, lifetime);
 					string code = GenerateCode(file);
-					if (progress != null) progress.CurrentItemText = "Compiling code";
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);
 					var compilation = CreateCompilation(code, references, executablePath);
 					var diagnostics = compilation.GetDiagnostics(nested);
