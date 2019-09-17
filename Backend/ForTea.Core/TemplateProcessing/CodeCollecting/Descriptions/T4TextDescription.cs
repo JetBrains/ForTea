@@ -21,9 +21,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			destination.Append(provider.Indent);
 			destination.Append(provider.ExpressionWritingPrefix);
 			destination.Append("\"");
-			destination.Append(Text);
+			destination.Append(Sanitize(Text));
 			destination.Append("\"");
 			destination.AppendLine(provider.ExpressionWritingSuffix);
 		}
+
+		[NotNull]
+		private static string Sanitize([NotNull] string raw) => raw.Replace("\\\\<#", "<#").Replace("\\\\#>", "#>");
 	}
 }
