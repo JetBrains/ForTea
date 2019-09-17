@@ -26,3 +26,15 @@ using JetBrains.TextControl.DocumentMarkup;
 	GroupId = T4HighlightingAttributeIds.GROUP_ID,
 	FallbackAttributeId = HighlightingAttributeIds.STRING
 )]
+[assembly: RegisterHighlighter(
+	T4HighlightingAttributeIds.DIRECTIVE,
+	EffectType = EffectType.TEXT,
+	GroupId = T4HighlightingAttributeIds.GROUP_ID,
+	FallbackAttributeId = HighlightingAttributeIds.KEYWORD
+)]
+[assembly: RegisterHighlighter(
+	T4HighlightingAttributeIds.DIRECTIVE_ATTRIBUTE,
+	EffectType = EffectType.TEXT,
+	GroupId = T4HighlightingAttributeIds.GROUP_ID,
+	FallbackAttributeId = HighlightingAttributeIds.CONSTANT_IDENTIFIER_ATTRIBUTE
+)]

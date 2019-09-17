@@ -180,7 +180,7 @@ errorhandling unknownDirective:
 ;
 
 directiveAttribute:
-    TOKEN<TOKEN, Name>
+    attributeName<AttributeName, Name>
     EQUAL<EQUAL, Equal>
     QUOTE<QUOTE, OpeningQuote>
     attributeValue<DIRECTIVE_ATTRIBUTE_VALUE, Value>

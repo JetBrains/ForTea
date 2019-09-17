@@ -22,9 +22,6 @@
     <lang.syntaxHighlighterFactory
         language="T4"
         implementationClass="com.jetbrains.fortea.highlighting.T4SyntaxHighlighterProvider"/>
-    <annotator
-        language="T4"
-        implementationClass="com.jetbrains.fortea.highlighting.T4Annotator"/>
 
     <stepsBeforeRunProvider
         implementation="com.jetbrains.fortea.configuration.run.task.T4CompileBeforeRunTaskProvider"

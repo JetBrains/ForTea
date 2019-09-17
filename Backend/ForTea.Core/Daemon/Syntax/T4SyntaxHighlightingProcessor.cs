@@ -1,10 +1,6 @@
 using System;
-using GammaJul.ForTea.Core.Daemon.Attributes.GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Daemon.Highlightings;
-using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
-using JetBrains.Annotations;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -14,6 +10,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 {
 	public sealed class T4SyntaxHighlightingProcessor : SyntaxHighlightingProcessor
 	{
+		private T4SyntaxHighlightingVisitor Visitor { get; } = new T4SyntaxHighlightingVisitor();
+
 		public override bool InteriorShouldBeProcessed(ITreeNode element, IHighlightingConsumer context)
 		{
 			var type = element.NodeType;
@@ -24,49 +22,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 
 		public override void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer context)
 		{
-			var type = element.NodeType;
-			if (type == ElementType.MACRO) HighlightMacro((IT4Macro) element, context);
-			else if (type == ElementType.ENVIRONMENT_VARIABLE)
-				HighlightEnvironmentVariable((IT4EnvironmentVariable) element, context);
-			else if (type == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE) HighlightValue(element, context);
-		}
-
-		private static void HighlightMacro(
-			[NotNull] IT4Macro element,
-			[NotNull] IHighlightingConsumer context
-		)
-		{
-			HighlightValue(element.Dollar, context);
-			HighlightValue(element.LeftParenthesis, context);
-			HighlightValue(element.RightParenthesis, context);
-			var value = element.RawAttributeValue;
-			if (value == null) return;
-			var range = value.GetDocumentRange();
-			context.AddHighlighting(new MacroHighlighting(range));
-		}
-
-		private static void HighlightEnvironmentVariable(
-			[NotNull] IT4EnvironmentVariable element,
-			[NotNull] IHighlightingConsumer context
-		)
-		{
-			foreach (var node in element.StartPercent)
-			{
-				HighlightValue(node, context);
-			}
-
-			var value = element.RawAttributeValue;
-			if (value == null) return;
-			var range = value.GetDocumentRange();
-			context.AddHighlighting(new EnvironmentVariableHighlighting(range));
-		}
-
-		private static void HighlightValue([CanBeNull] ITreeNode element, [NotNull] IHighlightingConsumer context)
-		{
-			if (element == null) return;
-			const string id = T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE;
-			var highlighting = new ReSharperSyntaxHighlighting(id, null, element.GetDocumentRange());
-			context.AddHighlighting(highlighting);
+			if (!(element is IT4TreeNode t4Element)) return;
+			t4Element.Accept(Visitor, context);
 		}
 
 		// These methods should never be called

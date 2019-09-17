@@ -66,7 +66,7 @@
     </Warning>
     <Warning name="DuplicateDirective" configurableSeverity="DuplicateDirective">
         <Parameter type="IT4Directive" name="directive"/>
-        <Message value="This directive was declared earlier and will be ignored"/>
+        <Message value="The directive will be ignored and can be safely removed"/>
         <Range>Directive.GetHighlightingRange()</Range>
         <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     </Warning>
@@ -92,7 +92,7 @@
         <Range>Name.GetHighlightingRange()</Range>
     </Warning>
     <Warning name="UnexpectedAttribute" configurableSeverity="UnexpectedAttribute">
-        <Parameter type="ITokenNode" name="name"/>
+        <Parameter type="IT4AttributeName" name="name"/>
         <Message value="Unexpected attribute"/>
         <Range>Name.GetHighlightingRange()</Range>
     </Warning>
