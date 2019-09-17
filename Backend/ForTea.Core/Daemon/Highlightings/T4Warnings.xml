@@ -23,7 +23,7 @@
                 <Description>Visual Basic is not supported</Description>
             </Tag>
             <Tag name="DuplicateDirective" default="WARNING">
-                <Title>This directive was declared earlier and will be ignored</Title>
+                <Title>The directive will be ignored and can be safely removed</Title>
                 <Description/>
             </Tag>
             <Tag name="RedundantInclude" default="WARNING">
