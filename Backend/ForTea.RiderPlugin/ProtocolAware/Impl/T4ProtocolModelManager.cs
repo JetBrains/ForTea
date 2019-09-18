@@ -107,6 +107,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		// (i.e. the generated transformation process) crashed
 		private void ExecutionSucceeded([NotNull] IT4File file)
 		{
+			Logger.Verbose("Execution of {0} succeeded", file.GetSourceFile()?.Name ?? "<null>");
 			Logger.Catch(() =>
 			{
 				// This call is not expected to fail, but just in case
@@ -118,6 +119,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			ExecutionManager.OnExecutionFinished(file);
 		}
 
-		private void ExecutionFailed([NotNull] IT4File file) => ExecutionManager.OnExecutionFinished(file);
+		private void ExecutionFailed([NotNull] IT4File file)
+		{
+			Logger.Verbose("Execution of {0} failed", file.GetSourceFile()?.Name ?? "<null>");
+			ExecutionManager.OnExecutionFinished(file);
+		}
 	}
 }

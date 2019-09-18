@@ -15,12 +15,18 @@ namespace JetBrains.ForTea.ReSharperPlugin
 	[ShellComponent]
 	public sealed class T4MacroResolver : T4MacroResolverBase
 	{
+		[NotNull]
+		private static Dictionary<string, string> ourEmptyDictionary { get; } = new Dictionary<string, string>();
+
 		public T4MacroResolver(IT4AssemblyNamePreprocessor preprocessor) : base(preprocessor)
 		{
 		}
 
-		public override IReadOnlyDictionary<string, string> Resolve(
-			IEnumerable<string> macros,
+		protected override Dictionary<string, string> ResolveAllLightMacrosInternal(IProjectFile file) =>
+			ourEmptyDictionary;
+
+		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(
+			IList<string> macros,
 			IProjectFile file
 		)
 		{
