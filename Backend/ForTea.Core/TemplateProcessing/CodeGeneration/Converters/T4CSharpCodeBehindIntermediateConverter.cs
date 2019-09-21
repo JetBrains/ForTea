@@ -94,7 +94,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		private void AppendHostInterface()
 		{
-			var provider = new T4TemplateResourceProvider(HostStubResourceName, this);
+			var provider = new T4TemplateResourceProvider(HostStubResourceName);
 			Result.AppendLine(provider.ProcessResource());
 		}
 

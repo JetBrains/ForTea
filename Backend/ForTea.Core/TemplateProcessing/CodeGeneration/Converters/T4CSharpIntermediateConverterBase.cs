@@ -202,7 +202,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected void AppendBaseClass()
 		{
 			string resource = !IntermediateResult.HasBaseClass ? BaseClassResourceName : ToStringInstanceHelperResource;
-			var provider = new T4TemplateResourceProvider(resource, this);
+			var provider = new T4TemplateResourceProvider(resource);
 			Result.Append(provider.ProcessResource(GeneratedBaseClassName));
 		}
 

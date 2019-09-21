@@ -63,7 +63,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
 		private void AppendHostDefinition()
 		{
-			var provider = new T4TemplateResourceProvider(HostResource, this);
+			var provider = new T4TemplateResourceProvider(HostResource);
 			string filePath = File.GetSourceFile().GetLocation().FullPath;
 			string macros = GenerateExpandableMacros();
 			string host = provider.ProcessResource(filePath, GeneratedClassName, macros);
@@ -89,7 +89,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		private void AppendMainContainer()
 		{
 			string resource = IntermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
-			var provider = new T4TemplateResourceProvider(resource, this);
+			var provider = new T4TemplateResourceProvider(resource);
 			string encoding = IntermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
 			string suffix = provider.ProcessResource(GeneratedClassName, encoding);
 			Result.Append(suffix);
@@ -101,7 +101,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
 		private void AppendAssemblyRegistering()
 		{
-			var provider = new T4TemplateResourceProvider(AssemblyRegisteringResource, this);
+			var provider = new T4TemplateResourceProvider(AssemblyRegisteringResource);
 			string references = GetReferences();
 			string registering = provider.ProcessResource(references);
 			Result.Append(registering);

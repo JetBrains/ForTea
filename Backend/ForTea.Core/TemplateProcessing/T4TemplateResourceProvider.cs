@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -13,9 +12,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 		private string Template { get; }
 
 		[NotNull]
-		private static string ReadTemplate([NotNull] string resourceName, [NotNull] Type caller)
+		private static string ReadTemplate([NotNull] string resourceName)
 		{
-			var assembly = Assembly.GetAssembly(caller);
+			var assembly = Assembly.GetExecutingAssembly();
 			using (var stream = assembly.GetManifestResourceStream(resourceName))
 			using (var reader = new StreamReader(stream.NotNull()))
 			{
@@ -36,7 +35,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 			return result;
 		}
 
-		public T4TemplateResourceProvider([NotNull] string resourceName, [NotNull] object caller) =>
-			Template = ReadTemplate(resourceName, caller.GetType());
+		public T4TemplateResourceProvider([NotNull] string resourceName) => Template = ReadTemplate(resourceName);
 	}
 }
