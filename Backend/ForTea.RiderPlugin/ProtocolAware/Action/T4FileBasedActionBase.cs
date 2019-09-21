@@ -15,15 +15,16 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
 	public abstract class T4FileBasedActionBase : IExecutableAction
 	{
-		public virtual bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
+		public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
 		{
 			var file = FindT4File(context);
 			if (file == null) return false;
 			var solution = FindSolution(context);
 			if (solution == null) return false;
-			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
-			return !executionManager.IsExecutionRunning(file);
+			return DoUpdate(file, solution);
 		}
+
+		protected virtual bool DoUpdate([NotNull] IT4File file, [NotNull] ISolution solution) => true;
 
 		public abstract void Execute(IDataContext context, DelegateExecute nextExecute);
 

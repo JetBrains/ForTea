@@ -9,7 +9,7 @@ import com.jetbrains.rider.icons.ReSharperCommonIcons.Debug
 import com.jetbrains.rider.icons.ReSharperUnitTestingIcons
 import javax.swing.Icon
 
-abstract class T4BackendAction(backendActionId: String, icon: Icon) :
+abstract class T4BackendAction(backendActionId: String, icon: Icon? = null) :
   RiderContextAwareAnAction(backendActionId, icon = icon) {
   override fun update(e: AnActionEvent) {
     val psiFile = e.dataContext.getData(CommonDataKeys.PSI_FILE)
@@ -23,8 +23,4 @@ abstract class T4BackendAction(backendActionId: String, icon: Icon) :
 
 class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", ReSharperUnitTestingIcons.RunTest)
 class T4DebugTemplateBackendAction : T4BackendAction("T4.DebugFromContext", Debug)
-class T4PreprocessTemplateBackendAction : RiderContextAwareAnAction("T4.PreprocessFromContext") {
-  override fun update(e: AnActionEvent) {
-    e.presentation.isEnabledAndVisible = e.dataContext.getData(CommonDataKeys.PSI_FILE)?.language == T4Language
-  }
-}
+class T4PreprocessTemplateBackendAction : T4BackendAction("T4.PreprocessFromContext")

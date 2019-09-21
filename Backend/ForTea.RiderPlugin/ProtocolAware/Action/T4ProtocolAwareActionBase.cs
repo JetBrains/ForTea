@@ -9,6 +9,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
 	public abstract class T4ProtocolAwareActionBase : T4FileBasedActionBase
 	{
+		protected override bool DoUpdate(IT4File file, ISolution solution)
+		{
+			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
+			return !executionManager.IsExecutionRunning(file);
+		}
+
 		public override void Execute(IDataContext context, DelegateExecute nextExecute)
 		{
 			var solution = FindSolution(context);
