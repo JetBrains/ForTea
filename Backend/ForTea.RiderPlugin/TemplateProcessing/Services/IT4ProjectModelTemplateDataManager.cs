@@ -1,11 +1,11 @@
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.Services
+namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
 {
 	public interface IT4ProjectModelTemplateDataManager
 	{
-		T4TemplateKind GetTemplateKind([NotNull] IProjectFile file);
 		void SetTemplateKind([NotNull] IProjectFile file, T4TemplateKind kind);
 
 		[CanBeNull]

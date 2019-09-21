@@ -1,9 +1,12 @@
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -11,7 +14,7 @@ using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
+namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters
 {
 	public sealed class T4CSharpExecutableIntermediateConverter : T4CSharpIntermediateConverter
 	{

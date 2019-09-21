@@ -1,8 +1,8 @@
-using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action

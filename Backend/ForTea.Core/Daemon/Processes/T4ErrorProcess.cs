@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private bool _afterLastFeatureErrorAdded;
 
 		[NotNull]
-		private IT4ProjectModelTemplateDataManager TemplateDataManager { get; }
+		private IT4TemplateKindProvider TemplateDataManager { get; }
 
 		public override void ProcessBeforeInterior(ITreeNode element)
 		{
@@ -134,7 +134,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		public T4ErrorProcess(
 			[NotNull] IT4File file,
 			[NotNull] IDaemonProcess daemonProcess,
-			[NotNull] IT4ProjectModelTemplateDataManager templateDataManager
+			[NotNull] IT4TemplateKindProvider templateDataManager
 		) : base(file, daemonProcess) => TemplateDataManager = templateDataManager;
 
 		protected override void AnalyzeFile(IT4File file)

@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
 		
 		[NotNull]
-		private IT4ProjectModelTemplateDataManager TemplateDataManager { get; }
+		private IT4TemplateKindProvider TemplateDataManager { get; }
 
 		public Tuple<IProjectPsiModuleHandler, IPsiModuleDecorator> OverrideHandler(
 			Lifetime lifetime,
@@ -44,7 +44,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
-			[NotNull] IT4ProjectModelTemplateDataManager templateDataManager
+			[NotNull] IT4TemplateKindProvider templateDataManager
 		)
 		{
 			_changeManager = changeManager;

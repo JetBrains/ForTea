@@ -2,9 +2,9 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
+namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference
 {
-	[DebuggerDisplay("{FullName}")]
+	[DebuggerDisplay("{" + nameof(FullName) + "}")]
 	public readonly struct T4AssemblyReferenceInfo
 	{
 		[NotNull]

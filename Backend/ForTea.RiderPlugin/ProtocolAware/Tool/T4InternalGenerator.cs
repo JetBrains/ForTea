@@ -52,7 +52,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 			using (projectFile.Locks.UsingReadLock())
 			{
 				if (!projectFile.LanguageType.Is<T4ProjectFileType>()) return false;
-				var dataManager = projectFile.GetSolution().GetComponent<IT4ProjectModelTemplateDataManager>();
+				var dataManager = projectFile.GetSolution().GetComponent<IT4TemplateKindProvider>();
 				var kind = dataManager.GetTemplateKind(projectFile);
 				return kind != T4TemplateKind.Unknown;
 			}
@@ -68,7 +68,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 			var file = projectFile.ToSourceFile()?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
 			if (file == null) return SingleFileCustomToolExecutionResult.NotExecuted;
 			var solution = file.GetSolution();
-			var dataManager = solution.GetComponent<IT4ProjectModelTemplateDataManager>();
+			var dataManager = solution.GetComponent<IT4TemplateKindProvider>();
 			var kind = dataManager.GetTemplateKind(projectFile);
 			if (kind is T4TemplateKind.Executable) Execute(file, solution);
 			if (kind is T4TemplateKind.Preprocessed) Preprocess(file, solution);

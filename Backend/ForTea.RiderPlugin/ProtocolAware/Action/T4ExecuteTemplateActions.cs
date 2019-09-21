@@ -10,6 +10,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action

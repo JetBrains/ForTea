@@ -1,10 +1,11 @@
 using System.Linq;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Properties;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.Services.Impl
+namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 {
 	[SolutionComponent]
 	public class T4ProjectModelTemplateDataManager : IT4ProjectModelTemplateDataManager
@@ -13,13 +14,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.Services.Impl
 		private ISolution Solution { get; }
 
 		public T4ProjectModelTemplateDataManager([NotNull] ISolution solution) => Solution = solution;
-
-		public T4TemplateKind GetTemplateKind(IProjectFile file)
-		{
-			var properties = file.Properties as ProjectFileProperties;
-			string customTool = properties?.CustomTool;
-			return T4TemplateManagerConstants.ToTemplateKind(customTool);
-		}
 
 		public void SetTemplateKind(IProjectFile file, T4TemplateKind kind) => Solution.InvokeUnderTransaction(cookie =>
 			cookie.EditFileProperties(file, properties =>

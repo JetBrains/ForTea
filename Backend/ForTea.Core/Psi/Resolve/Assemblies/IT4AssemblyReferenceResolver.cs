@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;

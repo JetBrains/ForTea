@@ -13,9 +13,9 @@ namespace GammaJul.ForTea.Core.Daemon.Stages
 	public sealed class T4ErrorStage : T4DaemonStageBase
 	{
 		[NotNull]
-		private IT4ProjectModelTemplateDataManager TemplateDataManager { get; }
+		private IT4TemplateKindProvider TemplateDataManager { get; }
 
-		public T4ErrorStage([NotNull] IT4ProjectModelTemplateDataManager templateDataManager) =>
+		public T4ErrorStage([NotNull] IT4TemplateKindProvider templateDataManager) =>
 			TemplateDataManager = templateDataManager;
 
 		protected override IDaemonStageProcess CreateProcess(

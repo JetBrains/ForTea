@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.PsiGen.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
@@ -81,12 +80,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public void Append([NotNull] T4CSharpCodeGenerationIntermediateResult other)
 		{
-			MyImportDescriptions.AddAll(other.ImportDescriptions);
+			MyImportDescriptions.AddRange(other.ImportDescriptions);
 			Encoding = Encoding ?? other.Encoding;
 			if (CollectedBaseClass.IsEmpty) CollectedBaseClass.Append(other.CollectedBaseClass);
-			MyTransformationDescriptions.AddAll(other.TransformationDescriptions);
-			MyFeatureDescriptions.AddAll(other.FeatureDescriptions);
-			MyParameterDescriptions.AddAll(other.ParameterDescriptions);
+			MyTransformationDescriptions.AddRange(other.TransformationDescriptions);
+			MyFeatureDescriptions.AddRange(other.FeatureDescriptions);
+			MyParameterDescriptions.AddRange(other.ParameterDescriptions);
 			// 'feature started' is intentionally ignored
 			HasHost = HasHost || other.HasHost;
 		}
