@@ -10,6 +10,7 @@ using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers;
 using JetBrains.Lifetimes;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
@@ -176,10 +177,14 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 
+			var project = file.GetProject();
+			var resolveContext = project?.IsMiscFilesProject() != false
+				? UniversalModuleReferenceContext.Instance
+				: this.GetResolveContextEx(file);
 			_assemblyReferenceManager = new T4AssemblyReferenceManager(
 				solution.GetComponent<IAssemblyFactory>(),
 				file,
-				file.SelectResolveContext()
+				resolveContext
 			);
 
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
