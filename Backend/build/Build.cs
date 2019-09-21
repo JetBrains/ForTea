@@ -73,7 +73,6 @@ internal class Build : NukeBuild {
 				var version = GetReleaseVersion();
 				var currentYear = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
 				var releaseNotes = GetReleaseNotes();
-				var wave = GetWaveVersion();
 
 				NuGetPack(s => s
 					.SetTargetPath(MainProjectDirectory / (MainProjectName + ".nuspec"))
@@ -82,7 +81,6 @@ internal class Build : NukeBuild {
 					.SetProperty("version", version)
 					.SetProperty("currentyear", currentYear)
 					.SetProperty("releasenotes", releaseNotes)
-					.SetProperty("wave", wave)
 					.SetProperty("configuration", Configuration.ToString())
 					.EnableNoPackageAnalysis());
 			});
@@ -112,19 +110,6 @@ internal class Build : NukeBuild {
 			.TakeWhile(x => !String.IsNullOrWhiteSpace(x))
 			.Select(x => $"\u2022{x.TrimStart('-')}")
 			.JoinNewLine();
-
-	private string GetWaveVersion()
-	{
-		var installedPackages = NuGetPackageResolver
-			.GetLocalInstalledPackages(MainProjectDirectory / (MainProjectName + ".csproj"))
-			.FirstOrDefault(x => x.Id == "Wave");
-		Console.WriteLine($"Selected wave location: {installedPackages?.FileName ?? "null"}");
-		return installedPackages
-			.NotNull("fullWaveVersion != null")
-			.Version
-			.Version
-			.ToString(2);
-	}
 
 	public static int Main()
 		=> Execute<Build>(x => x.Compile);
