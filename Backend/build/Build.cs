@@ -32,7 +32,7 @@ internal class Build : NukeBuild {
 	[Solution] private readonly Solution _solution;
 
 	private const string MainProjectName = "ForTea.ReSharperPlugin";
-
+	private const string WAVE = "193";
 	private AbsolutePath MainProjectDirectory => RootDirectory / MainProjectName;
 	private AbsolutePath OutputDirectory => RootDirectory / "output" / Configuration;
 
@@ -81,6 +81,7 @@ internal class Build : NukeBuild {
 					.SetProperty("version", version)
 					.SetProperty("currentyear", currentYear)
 					.SetProperty("releasenotes", releaseNotes)
+					.SetProperty("wave", WAVE)
 					.SetProperty("configuration", Configuration.ToString())
 					.EnableNoPackageAnalysis());
 			});
