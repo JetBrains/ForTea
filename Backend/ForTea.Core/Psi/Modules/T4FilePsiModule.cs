@@ -162,7 +162,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			file.GetProject().NotNull(),
 			file.Location.TryMakeRelativeTo(file.GetProject().NotNull().Location).FullPath,
 			coordinator,
-			t4Environment.TargetFrameworkId
+			file.SelectTargetFrameworkId()
 		)
 		{
 			File = file;
@@ -176,12 +176,10 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_t4Environment = t4Environment;
 			_resolver = resolver;
 
-			var resolveContext = this.GetResolveContextEx(file);
-
 			_assemblyReferenceManager = new T4AssemblyReferenceManager(
 				solution.GetComponent<IAssemblyFactory>(),
 				file,
-				resolveContext
+				file.SelectResolveContext()
 			);
 
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);

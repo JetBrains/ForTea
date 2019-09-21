@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Infra;
@@ -14,8 +15,6 @@ using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.References;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 
@@ -74,7 +73,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 
 		public FileSystemPath Resolve(IT4AssemblyDirective directive)
 		{
-			var t4File = directive.GetContainingFile().NotNull();
 			var targetAttribute = T4DirectiveInfoManager.Assembly.NameAttribute;
 			string assemblyNameOrFile = directive.GetFirstAttribute(targetAttribute)?.Value.GetText();
 			if (assemblyNameOrFile == null) return null;
@@ -85,7 +83,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			{
 				string resolved = new T4PathWithMacros(assemblyNameOrFile, sourceFile).ResolveString();
 				string path = Preprocessor.Preprocess(projectFile, resolved);
-				var resolveContext = t4File.GetPsiModule().GetResolveContextEx(projectFile);
+				var resolveContext = projectFile.SelectResolveContext();
 				var target = FindAssemblyReferenceTarget(path);
 				if (target == null) return null;
 				return Resolve(target, projectFile.GetProject().NotNull(), resolveContext);

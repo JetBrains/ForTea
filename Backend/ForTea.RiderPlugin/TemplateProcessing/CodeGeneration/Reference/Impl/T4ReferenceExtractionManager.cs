@@ -3,6 +3,7 @@ using System.Linq;
 using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -14,7 +15,7 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
+namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference.Impl
 {
 	[SolutionComponent]
 	public sealed class T4ReferenceExtractionManager : IT4ReferenceExtractionManager
@@ -54,9 +55,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 			);
 			var sourceFile = file.GetSourceFile().NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
-			var project = projectFile.GetProject().NotNull();
-			var psiModule = sourceFile.PsiModule;
-			var resolveContext = psiModule.GetResolveContextEx(projectFile);
+			var resolveContext = projectFile.SelectResolveContext();
 			return AssemblyReferenceResolver
 				.ResolveTransitiveDependencies(directReferences, resolveContext)
 				.AsList();
@@ -68,7 +67,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 			var sourceFile = file.GetSourceFile().NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			if (!(sourceFile.PsiModule is IT4FilePsiModule psiModule)) return EmptyList<IAssemblyFile>.Enumerable;
-			var resolveContext = psiModule.GetResolveContextEx(projectFile);
+			var resolveContext = projectFile.SelectResolveContext();
 			using (CompilationContextCookie.GetOrCreate(resolveContext))
 			{
 				return psiModule.RawReferences.SelectMany(it => it.GetFiles()).AsList();
@@ -80,7 +79,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference.Impl
 			var sourceFile = file.GetSourceFile().NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var psiModule = sourceFile.PsiModule;
-			var resolveContext = psiModule.GetResolveContextEx(projectFile);
+			var resolveContext = projectFile.SelectResolveContext();
 			using (CompilationContextCookie.GetOrCreate(resolveContext))
 			{
 				return PsiModules

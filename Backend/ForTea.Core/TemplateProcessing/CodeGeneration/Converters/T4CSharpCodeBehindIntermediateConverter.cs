@@ -111,9 +111,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			{
 				var projectFile = File.GetSourceFile()?.ToProjectFile();
 				if (projectFile == null) return GeneratedClassNameString;
-				var dataManager = File.GetSolution().GetComponent<IT4ProjectModelTemplateDataManager>();
-				var templateKind = dataManager.GetTemplateKind(projectFile);
-				if (templateKind != T4TemplateKind.Preprocessed) return GeneratedClassNameString;
+				var dataManager = File.GetSolution().GetComponent<IT4TemplateKindProvider>();
+				if (!dataManager.IsPreprocessedTemplate(projectFile)) return GeneratedClassNameString;
 				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
 				if (fileName == null) return GeneratedClassNameString;
 				if (!ValidityChecker.IsValidIdentifier(fileName)) return GeneratedClassNameString;
