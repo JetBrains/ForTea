@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using JetBrains.Application.Infra;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Metadata.Utils;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
@@ -106,7 +105,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			[NotNull] IList<T4AssemblyReferenceInfo> destination
 		)
 		{
-			var currentRuntimeResolver = new DotNetFrameworkCurrentRuntimeAssemblyResolver();
 			foreach (var directDependency in directDependencies)
 			{
 				if (destination.Any(it => it.FullName == directDependency.FullName)) continue;
@@ -115,13 +113,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 					.GetReferencedAssemblyNames(directDependency.Location)
 					.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(assemblyNameInfo =>
 					{
-						IAssemblyResolver resolver = new CombiningAssemblyResolver(
-							new AssemblyResolverOnFolders(directDependency.Location.Parent),
-							// This resolver might be redundant since the runtime
-							// will resolve such assemblies without any additional help,
-							// but let's resolve them, too, just in case
-							currentRuntimeResolver
-						);
+						var resolver = new AssemblyResolverOnFolders(directDependency.Location.Parent);
 						resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
 						if (path == null) return null;
 						return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
