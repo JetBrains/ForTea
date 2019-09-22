@@ -49,7 +49,8 @@ class T4BuildSessionView(
     val kind = toDiagnosticKind(message.buildMessageKind)
     val line = message.location.line + 1
     val column = message.location.column + 1
-    return BuildDiagnostic(kind, message.content, message.id, message.projectId, message.file ?: file, line, column)
+    val filePath = if (!message.file.isNullOrEmpty()) message.file else file
+    return BuildDiagnostic(kind, message.content, message.id, message.projectId, filePath, line, column)
   }
 
   private fun toDiagnosticKind(kind: T4BuildMessageKind) = when (kind) {

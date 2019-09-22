@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
@@ -43,7 +42,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendGeneratedMessage();
 			string ns = GetNamespace();
-			bool hasNamespace = !String.IsNullOrEmpty(ns);
+			AppendNamespacePrefix();
+			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
 			{
 				Result.AppendLine($"namespace {ns}");
@@ -61,13 +61,17 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			return Result;
 		}
 
+		protected virtual void AppendNamespacePrefix()
+		{
+		}
+
 		private void AppendNamespaceContents()
 		{
 			AppendImports();
-			AppendClasses(IntermediateResult.HasHost);
+			AppendClasses();
 		}
 
-		protected virtual void AppendClasses(bool hostspecific)
+		protected virtual void AppendClasses()
 		{
 			AppendClass();
 			AppendIndent();
@@ -76,7 +80,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		[CanBeNull]
-		private string GetNamespace() => File.GetSourceFile()?.Properties.GetDefaultNamespace();
+		protected string GetNamespace() => File.GetSourceFile()?.Properties.GetDefaultNamespace();
 
 		private void AppendImports()
 		{

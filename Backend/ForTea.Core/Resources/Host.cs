@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TextTemplating
         private const string RelativeUnsupportedMessage =
             "Relative include include path resolution is not supported yet.\n" +
             "Please, provide absolute path, use macros like $(SolutionDir) or\n" +
-            "contact support at https://youtrack.jetbrains.com";
+            "contact support at https://youtrack.jetbrains.com/newissue";
         
         public $(PARAMETER_1) transformation;
         
@@ -81,9 +81,10 @@ namespace Microsoft.VisualStudio.TextTemplating
         public string ResolveParameterValue(string directiveId, string processorName, string parameterName) =>
             string.Empty;
 
-        public global::System.AppDomain ProvideTemplatingAppDomain(string content) => AppDomain.CreateDomain("Generation App Domain");
+        public global::System.AppDomain ProvideTemplatingAppDomain(string content) =>
+            global::System.AppDomain.CreateDomain("Generation App Domain");
 
-        public void LogErrors(CompilerErrorCollection errors) =>
+        public void LogErrors(global::System.CodeDom.Compiler.CompilerErrorCollection errors) =>
             transformation.Errors.AddRange(errors);
 
         public void SetFileExtension(string extension) => FileExtension = extension;

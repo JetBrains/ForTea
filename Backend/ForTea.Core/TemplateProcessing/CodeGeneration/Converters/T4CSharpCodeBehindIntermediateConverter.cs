@@ -85,17 +85,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine(inspection);
 		}
 
-		protected override void AppendClasses(bool hostspecific)
+		protected override void AppendNamespacePrefix()
 		{
-			AppendClass();
-			AppendBaseClass();
-			if (hostspecific) AppendHostInterface();
-		}
-
-		private void AppendHostInterface()
-		{
-			var provider = new T4TemplateResourceProvider(HostStubResourceName);
-			Result.AppendLine(provider.ProcessResource());
+			if (!IntermediateResult.HasHost) return;
+			Result.AppendLine(new T4TemplateResourceProvider(HostStubResourceName).ProcessResource());
 		}
 
 		protected override void AppendHost()

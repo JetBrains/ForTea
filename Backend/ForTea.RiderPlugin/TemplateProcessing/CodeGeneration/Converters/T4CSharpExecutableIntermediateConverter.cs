@@ -40,13 +40,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
 		) : base(intermediateResult, file) => ReferenceExtractionManager = referenceExtractionManager;
 
+		protected override void AppendNamespacePrefix()
+		{
+			if (!IntermediateResult.HasHost) return;
+			AppendHostDefinition();
+		}
+
 		// When creating executable, it is better to put base class first,
 		// to make error messages more informative
-		protected override void AppendClasses(bool hostspecific)
+		protected override void AppendClasses()
 		{
 			AppendBaseClass();
 			AppendMainContainer();
-			if (hostspecific) AppendHostDefinition();
 			AppendClass();
 		}
 
@@ -66,8 +71,16 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			var provider = new T4TemplateResourceProvider(HostResource);
 			string filePath = File.GetSourceFile().GetLocation().FullPath;
 			string macros = GenerateExpandableMacros();
-			string host = provider.ProcessResource(filePath, GeneratedClassName, macros);
+			string host = provider.ProcessResource(filePath, GetGeneratedBaseClassFqn(), macros);
 			Result.Append(host);
+		}
+
+		[NotNull]
+		private string GetGeneratedBaseClassFqn()
+		{
+			string ns = GetNamespace();
+			if (ns.IsNullOrWhitespace()) return GeneratedBaseClassNameString;
+			return $"{ns}.{GeneratedBaseClassNameString}";
 		}
 
 		[NotNull]
