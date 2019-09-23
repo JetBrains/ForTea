@@ -8,6 +8,7 @@
 
 using GammaJul.ForTea.Core.Daemon.Attributes;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Feature.Services.Daemon.IdeaAttributes;
 using JetBrains.TextControl.DocumentMarkup;
 
 [assembly: RegisterHighlighterGroup(
@@ -32,19 +33,19 @@ using JetBrains.TextControl.DocumentMarkup;
     T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE,
     EffectType = EffectType.TEXT,
     GroupId = T4HighlightingAttributeIds.T4,
-    FallbackAttributeId = HighlightingAttributeIds.STRING
+    FallbackAttributeId = IdeaXmlHighlighterColorsAttributeIds.XML_ATTRIBUTE_VALUE
 )]
 [assembly: RegisterHighlighter(
     T4HighlightingAttributeIds.DIRECTIVE,
     EffectType = EffectType.TEXT,
     GroupId = T4HighlightingAttributeIds.T4,
-    FallbackAttributeId = HighlightingAttributeIds.KEYWORD
+    FallbackAttributeId = IdeaXmlHighlighterColorsAttributeIds.XML_TAG
 )]
 [assembly: RegisterHighlighter(
     T4HighlightingAttributeIds.DIRECTIVE_ATTRIBUTE,
     EffectType = EffectType.TEXT,
     GroupId = T4HighlightingAttributeIds.T4,
-    FallbackAttributeId = HighlightingAttributeIds.CONSTANT_IDENTIFIER_ATTRIBUTE
+    FallbackAttributeId = IdeaXmlHighlighterColorsAttributeIds.XML_ATTRIBUTE_NAME
 )]
 
 namespace GammaJul.ForTea.Core.Daemon.Attributes
