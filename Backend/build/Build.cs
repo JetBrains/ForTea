@@ -73,6 +73,7 @@ internal class Build : NukeBuild {
 				var version = GetReleaseVersion();
 				var currentYear = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
 				var releaseNotes = GetReleaseNotes();
+				Console.WriteLine($"Target wave: {WAVE}");
 
 				NuGetPack(s => s
 					.SetTargetPath(MainProjectDirectory / (MainProjectName + ".nuspec"))
