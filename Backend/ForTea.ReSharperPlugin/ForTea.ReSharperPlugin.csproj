@@ -9,9 +9,9 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.ReSharperPlugin</RootNamespace>
   </PropertyGroup>
-
+  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.ReSharper.SDK" Version="2019.2.0">
+    <PackageReference Include="JetBrains.ReSharper.SDK" Version="2019.3.0-eap01d">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" Version="10.0.30320" />
@@ -20,6 +20,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Daemon\Highlightings\T4ReSharperHighlightingAttributeIds.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>T4ReSharperHighlightingAttributeIds.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

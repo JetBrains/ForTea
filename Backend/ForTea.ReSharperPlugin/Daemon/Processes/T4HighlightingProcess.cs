@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Daemon.Processes;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
@@ -26,19 +27,13 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Processes {
 				return null;
 			
 			if (tokenType.IsTag)
-				return PredefinedHighlighterIds.HtmlServerSideScript;
+				return T4ReSharperHighlightingAttributeIds.BLOCK_MARKER;
 
 			if (tokenType == T4TokenNodeTypes.EQUAL)
-				return PredefinedHighlighterIds.Operator;
+				return T4ReSharperHighlightingAttributeIds.OPERATOR;
 
 			if (tokenType == T4TokenNodeTypes.QUOTE || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE)
-				return PredefinedHighlighterIds.AttributeValue;
-
-			if (tokenType == T4TokenNodeTypes.TOKEN) {
-				return element.Parent is IT4Directive
-					? PredefinedHighlighterIds.Directive
-					: PredefinedHighlighterIds.AttributeName;
-			}
+				return T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE;
 
 			return null;
 		}

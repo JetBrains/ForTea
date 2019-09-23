@@ -2,7 +2,6 @@ using JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.TextControl.DocumentMarkup;
 
-// TODO: remove remaining assembly directives
 [assembly: RegisterHighlighter(PredefinedHighlighterIds.Identifier, EffectType = EffectType.TEXT)]
 [assembly: RegisterHighlighter(PredefinedHighlighterIds.UserType, EffectType = EffectType.TEXT)]
 [assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeDelegate, EffectType = EffectType.TEXT)]
@@ -14,10 +13,6 @@ using JetBrains.TextControl.DocumentMarkup;
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings {
 	public static class PredefinedHighlighterIds {
 		public const string Comment = HighlightingAttributeIds.COMMENT;
-		public const string AttributeName = HighlightingAttributeIds.HTML_ATTRIBUTE_NAME;
-		public const string AttributeValue = HighlightingAttributeIds.HTML_ATTRIBUTE_VALUE;
-		public const string Directive = HighlightingAttributeIds.HTML_ELEMENT_NAME;
-		public const string HtmlServerSideScript = HighlightingAttributeIds.HTML_TAG_DELIMITER;
 		public const string Identifier = "Identifier";
 		public const string Keyword = HighlightingAttributeIds.KEYWORD;
 		public const string Number = HighlightingAttributeIds.NUMBER;
