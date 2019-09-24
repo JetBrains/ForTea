@@ -22,17 +22,6 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 		[CanBeNull] private readonly TargetFrameworkId _targetFrameworkId;
 		[CanBeNull] private IList<FileSystemPath> _includePaths;
 
-		public bool ShouldSupportOnceAttribute => VsVersion2.Major >= VsVersions.Vs2013;
-		public bool ShouldSupportAdvancedAttributes => VsVersion2.Major >= VsVersions.Vs2012;
-
-		/// <summary>
-		/// Gets the version of the Visual Studio we're running under,
-		/// two components only, <c>Major.Minor</c>.
-		/// Example: “8.0”.
-		/// </summary>
-		[NotNull]
-		private Version2 VsVersion2 => _vsEnvironmentInformation.VsVersion2;
-
 		/// <summary>Gets the target framework ID.</summary>
 		[NotNull]
 		public TargetFrameworkId TargetFrameworkId {

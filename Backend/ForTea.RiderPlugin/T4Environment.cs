@@ -15,9 +15,6 @@ namespace JetBrains.ForTea.RiderPlugin
 	[ShellComponent]
 	public sealed class T4Environment : IT4Environment
 	{
-		public bool ShouldSupportOnceAttribute => true;
-		public bool ShouldSupportAdvancedAttributes => true;
-
 		public TargetFrameworkId TargetFrameworkId { get; } =
 			TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, new Version(4, 7, 2));
 
