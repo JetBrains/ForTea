@@ -23,7 +23,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 	public sealed class T4InternalGenerator : ISingleFileCustomTool
 	{
 		public string Name => "Bundled T4 template executor";
-		public string ActionName => "Execute T4 generator";
+		public string ActionName => null;
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
 		public string[] CustomTools => new[] {"T4 Generator Custom Tool"};
 		public bool IsEnabled => true;
