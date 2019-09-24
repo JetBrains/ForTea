@@ -1,8 +1,10 @@
+using System;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.DocumentModel;
 using JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings;
 using JetBrains.ReSharper.Daemon.CSharp.Stages;
+using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
@@ -72,7 +74,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Processes {
 
 			string attributeId = GetHighlightingAttributeId(node);
 			if (attributeId != null)
-				context.AddHighlighting(new PredefinedHighlighting(attributeId, highlightingRange));
+				context.AddHighlighting(new ReSharperSyntaxHighlighting(attributeId, String.Empty,  highlightingRange));
 		}
 
 		[CanBeNull]
