@@ -7,8 +7,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.fortea.configuration.T4BuildSessionView
+import com.jetbrains.fortea.configuration.isSuccess
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
-import com.jetbrains.rider.model.T4BuildResultKind
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
@@ -38,7 +38,7 @@ class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunT
     val project = configuration.project
     val view = project.getComponent<T4BuildSessionView>()
     val executionRequest = configuration.parameters.request
-    if (executionRequest.isVisible) view.openWindow(project.lifetime)
+    if (executionRequest.isVisible) view.openWindow("T4 Build Started...")
     val finished = Semaphore()
     finished.down()
     var successful = false
@@ -54,7 +54,7 @@ class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunT
       try {
         val result = rdTaskResult.unwrap()
         successful = result.buildResultKind.isSuccess
-        if (executionRequest.isVisible) view.showT4BuildResult(project.lifetime, result.messages, path)
+        if (executionRequest.isVisible) view.showT4BuildResult(result, path)
       } finally {
         finished.up()
       }
@@ -67,12 +67,5 @@ class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunT
 
   companion object {
     val providerId = Key.create<T4CompileBeforeRunTask>("Compile T4")
-
-    private val T4BuildResultKind.isSuccess
-      get() = when (this) {
-        T4BuildResultKind.HasErrors -> false
-        T4BuildResultKind.HasWarnings -> true
-        T4BuildResultKind.Successful -> true
-      }
   }
 }
