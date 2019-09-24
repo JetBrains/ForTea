@@ -17,6 +17,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 		T4BuildResult ToT4BuildResult([NotNull] T4OutputGenerationException exception);
 
 		[NotNull]
+		T4BuildMessage ToT4BuildMessage(T4FailureRawData data);
+
+		[NotNull]
 		T4BuildResult SyntaxError([NotNull] ITreeNode node);
 
 		[NotNull]

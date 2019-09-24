@@ -12,7 +12,6 @@ import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
 import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rd.util.lifetime.onTermination
 import com.jetbrains.rdclient.util.idea.LifetimedProjectService
 import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.BuildToolWindowFactory
@@ -30,19 +29,19 @@ class T4BuildToolWindowFactory(
   private val lock = Any()
   private var context: BuildToolWindowContext? = null
 
-  fun getOrCreateContext(lifetime: Lifetime): BuildToolWindowContext {
+  fun getOrCreateContext(lifetime: Lifetime, windowHeader: String): BuildToolWindowContext {
     synchronized(lock) {
-      return context ?: create(lifetime)
+      return context ?: create(lifetime, windowHeader)
     }
   }
 
-  private fun create(lifetime: Lifetime): BuildToolWindowContext {
+  private fun create(lifetime: Lifetime, windowHeader: String): BuildToolWindowContext {
     val toolWindow = buildToolWindowFactory.getOrRegisterToolWindow()
     val contentManager = toolWindow.contentManager
     toolWindow.icon = AllIcons.Toolwindows.ToolWindowBuild
     // Required for hiding window without content
     val panel = BuildResultPanel(project, projectModelViewHost, componentLifetime)
-    val toolWindowContent = contentManager.factory.createContent(null, "T4 Build Results", true).apply {
+    val toolWindowContent = contentManager.factory.createContent(null, windowHeader, true).apply {
       StatusBarUtil.setStatusBarInfo(project, "")
       component = panel
       isCloseable = false
@@ -51,13 +50,12 @@ class T4BuildToolWindowFactory(
 
     contentManager.addContent(toolWindowContent)
     val ctx = BuildToolWindowContext(toolWindow, toolWindowContent, panel)
-    context = ctx
-    lifetime.onTermination {
+    lifetime.bracket({ context = ctx }, {
       synchronized(lock) {
         contentManager.removeContent(toolWindowContent, true)
         context = null
       }
-    }
+    })
     return ctx
   }
 

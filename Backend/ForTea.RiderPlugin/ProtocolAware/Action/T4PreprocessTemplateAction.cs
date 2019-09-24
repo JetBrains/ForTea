@@ -8,9 +8,11 @@ using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Host.Features;
+using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Rider.Model.Notifications;
+using JetBrains.Rider.Model;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
@@ -20,11 +22,18 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 		public override void Execute(IDataContext context, DelegateExecute nextExecute)
 		{
 			var solution = FindSolution(context).NotNull();
-			var file = FindT4File(context).NotNull();
-			var projectFile = file.GetSourceFile().ToProjectFile().NotNull();
+			var model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
 			var templateDataManager = solution.GetComponent<IT4ProjectModelTemplateDataManager>();
 			var statistics = solution.GetComponent<Application.ActivityTrackingNew.UsageStatistics>();
+			var converter = solution.GetComponent<IT4BuildMessageConverter>();
+
+			model.PreprocessingStarted();
+
+			var file = FindT4File(context).NotNull();
+			var projectFile = file.GetSourceFile().ToProjectFile().NotNull();
+			var location = new T4FileLocation(solution.GetComponent<ProjectModelViewHost>().GetIdByItem(projectFile));
+
 			statistics.TrackAction("T4.Template.Preprocess");
 			templateDataManager.SetTemplateKind(projectFile, T4TemplateKind.Preprocessed);
 			try
@@ -34,16 +43,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 				{
 					targetFileManager.SavePreprocessResults(file, message);
 				}
+
+				model.PreprocessingFinished(new T4PreprocessingResult(location, true, null));
 			}
 			catch (T4OutputGenerationException e)
 			{
-				// TODO: show as build output?
-				var notificationModel = new NotificationModel(
-					"Could not preprocess template",
-					$"File contains syntax errors:\n{e.FailureData.Message}",
-					true,
-					RdNotificationEntryType.ERROR);
-				solution.GetComponent<NotificationsModel>().Notification(notificationModel);
+				var message = converter.ToT4BuildMessage(e.FailureData);
+				var result = new T4PreprocessingResult(location, false, message);
+				model.PreprocessingFinished(result);
 			}
 		}
 	}

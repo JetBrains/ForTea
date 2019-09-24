@@ -44,8 +44,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
 		}
 
-		[NotNull]
-		private T4BuildMessage ToT4BuildMessage(T4FailureRawData data)
+		public T4BuildMessage ToT4BuildMessage(T4FailureRawData data)
 		{
 			var location = new T4Location(data.Line, data.Column);
 			int projectId = GetProjectId(data.File);
