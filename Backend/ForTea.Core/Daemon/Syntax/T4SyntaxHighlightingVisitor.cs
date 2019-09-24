@@ -11,6 +11,12 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 {
 	public sealed class T4SyntaxHighlightingVisitor : TreeNodeVisitor<IHighlightingConsumer>
 	{
+		[NotNull]
+		private IT4AttributeIdsProvider AttributeIdsProvider { get; }
+
+		public T4SyntaxHighlightingVisitor([NotNull] IT4AttributeIdsProvider attributeIdsProvider) =>
+			AttributeIdsProvider = attributeIdsProvider;
+
 		public override void VisitMacroNode(IT4Macro macroParam, IHighlightingConsumer context)
 		{
 			((IT4TreeNode) macroParam.Dollar).Accept(this, context);
@@ -41,7 +47,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void VisitNode(ITreeNode node, [NotNull] IHighlightingConsumer context)
 		{
 			if (!IsAttributeValue(node)) return;
-			const string id = T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE;
+			string id = AttributeIdsProvider.AttributeValueId;
 			var highlighting = new ReSharperSyntaxHighlighting(id, null, node.GetDocumentRange());
 			context.AddHighlighting(highlighting);
 		}
@@ -54,7 +60,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			[NotNull] IHighlightingConsumer context
 		)
 		{
-			const string id = T4HighlightingAttributeIds.DIRECTIVE;
+			string id = AttributeIdsProvider.DirectiveId;
 			var highlighting = new ReSharperSyntaxHighlighting(id, null, directiveParam.Name.GetDocumentRange());
 			context.AddHighlighting(highlighting);
 		}
@@ -64,7 +70,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			[NotNull] IHighlightingConsumer context
 		)
 		{
-			const string id = T4HighlightingAttributeIds.DIRECTIVE_ATTRIBUTE;
+			string id = AttributeIdsProvider.AttributeId;
 			var highlighting = new ReSharperSyntaxHighlighting(id, null, attributeNameParam.GetDocumentRange());
 			context.AddHighlighting(highlighting);
 		}

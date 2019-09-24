@@ -9,6 +9,10 @@ using JetBrains.TextControl.DocumentMarkup;
 [assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeInterface, EffectType = EffectType.TEXT)]
 [assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeTypeParameter, EffectType = EffectType.TEXT)]
 [assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeValueType, EffectType = EffectType.TEXT)]
+[assembly: RegisterHighlighter(PredefinedHighlighterIds.HtmlServerSideScript, EffectType = EffectType.TEXT)]
+[assembly: RegisterHighlighter(PredefinedHighlighterIds.HtmlElementName, EffectType = EffectType.TEXT)]
+[assembly: RegisterHighlighter(PredefinedHighlighterIds.HtmlAttributeName, EffectType = EffectType.TEXT)]
+[assembly: RegisterHighlighter(PredefinedHighlighterIds.HtmlAttributeValue, EffectType = EffectType.TEXT)]
 
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings {
 	public static class PredefinedHighlighterIds {
@@ -24,6 +28,12 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings {
 		public const string UserTypeInterface = "User Types(Interfaces)";
 		public const string UserTypeTypeParameter = "User Types(Type parameters)";
 		public const string UserTypeValueType = "User Types(Value types)";
+		// Black magic by GammaJul.
+		// Cannot get the code working without it
+		public const string HtmlServerSideScript = "HTML Server-Side Script";
+		public const string HtmlElementName = "HTML Element Name";
+		public const string HtmlAttributeName = "HTML Attribute Name";
+		public const string HtmlAttributeValue = "HTML Attribute Value";
 	}
 
 }

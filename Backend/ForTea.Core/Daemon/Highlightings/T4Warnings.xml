@@ -4,7 +4,7 @@
         GammaJul.ForTea.Core.Tree;
     </Usings>
     <SeverityConfiguration>
-        <Group name="T4HighlightingAttributeIds.T4">
+        <Group name="T4HighlightingAttributeGroup.ID">
             <Tag name="EscapedKeyword" default="WARNING">
                 <Title>Keyword will be escaped</Title>
                 <Description>

@@ -1,10 +1,10 @@
-using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Daemon.Processes;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings;
+using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -17,23 +17,18 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Processes {
 			string attributeId = GetHighlightingAttributeId(element);
 			if (attributeId != null) {
 				DocumentRange range = element.GetHighlightingRange();
-				AddHighlighting(range, new PredefinedHighlighting(attributeId, range));
+				AddHighlighting(range, new ReSharperSyntaxHighlighting(attributeId, string.Empty, range));
 			}
 		}
 
 		[CanBeNull]
 		private static string GetHighlightingAttributeId([NotNull] ITreeNode element) {
-			if (!(element.GetTokenType() is T4TokenNodeType tokenType))
-				return null;
-			
-			if (tokenType.IsTag)
-				return T4ReSharperHighlightingAttributeIds.BLOCK_MARKER;
-
-			if (tokenType == T4TokenNodeTypes.EQUAL)
-				return T4ReSharperHighlightingAttributeIds.OPERATOR;
-
-			if (tokenType == T4TokenNodeTypes.QUOTE || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE)
-				return T4HighlightingAttributeIds.RAW_ATTRIBUTE_VALUE;
+			if (!(element.GetTokenType() is T4TokenNodeType tokenType)) return null;
+			if (tokenType.IsTag) return PredefinedHighlighterIds.HtmlServerSideScript;
+			if (tokenType == T4TokenNodeTypes.QUOTE
+			    || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE
+				||tokenType == T4TokenNodeTypes.EQUAL)
+				return PredefinedHighlighterIds.HtmlAttributeName;
 
 			return null;
 		}

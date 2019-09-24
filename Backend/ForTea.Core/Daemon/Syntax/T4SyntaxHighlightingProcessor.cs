@@ -1,6 +1,9 @@
 using System;
+using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
+using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -10,8 +13,6 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 {
 	public sealed class T4SyntaxHighlightingProcessor : SyntaxHighlightingProcessor
 	{
-		private T4SyntaxHighlightingVisitor Visitor { get; } = new T4SyntaxHighlightingVisitor();
-
 		public override bool InteriorShouldBeProcessed(ITreeNode element, IHighlightingConsumer context)
 		{
 			var type = element.NodeType;
@@ -23,7 +24,9 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer context)
 		{
 			if (!(element is IT4TreeNode t4Element)) return;
-			t4Element.Accept(Visitor, context);
+			var provider = t4Element.GetSolution().GetComponent<IT4AttributeIdsProvider>();
+			var visitor = new T4SyntaxHighlightingVisitor(provider);
+			t4Element.Accept(visitor, context);
 		}
 
 		// These methods should never be called

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
@@ -43,10 +43,6 @@
     <CsLex Include="Parsing\Lexing\T4Lexer.lex" />
     <ParserGen Include="Parsing\T4.psi" />
     <None Include="Parsing\T4.psi" />
-    <None Update="Daemon\Attributes\T4HighlightingAttributeIds.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4HighlightingAttributeIds.cs</LastGenOutput>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
