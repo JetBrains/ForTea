@@ -1,33 +1,40 @@
-﻿![ForTea Logo](https://raw.github.com/MrJul/ForTea/master/Logo/ForTea%2032x32.png "ForTea Logo") Building ForTea plugin
---------------
+﻿![ForTea Logo](https://raw.github.com/MrJul/ForTea/master/Logo/ForTea%2032x32.png "ForTea Logo")
+
+ForTea plugin build instructions
+----
+Building R# plugin
+----
 To build R# plugin, run
 ```
-> cd Backend
-> .\build.ps1 pack
-```
-or
-```
-$ cd Backend
-$ bash ./build.sh pack
+cd Backend
+powershell .\build.ps1 pack
 ```
 Build outputs will be placed at `Backend/output/Debug/`
 
-To build Rider plugin:  
-Edit `Frontend/build.gradle.kts` and replace `version = "2019.3-SNAPSHOT"` with `version = "2019.2"` (line 53)  
-(That's a hack to make grammarkit-plugin work with branch 193. We are working on improving the situation)  
-Run  
-```
-cd Frontend
-gradlew :generateT4Parser
-```
-Edit `Frontend/build.gradle.kts` again and chage `baseVersion` back to `2019.3`.  
-Run  
+Building Rider plugin
+----
+Before the first build of Rider plugin, run
 ```
 cd Frontend
 gradlew :prepare
-cd ..\Backend
+cd ..
+```
+To build Rider plugin, run
+```
+cd Backend
 msbuild
 cd ..\Frontend
 gradlew :buildPlugin
 ```
 Build outputs will be placed at `Frontend/build/distributions/`
+  
+---
+To build plugin and run an experimantal instance of rider immediately, run
+```
+cd Backend
+msbuild
+cd ..\Frontend
+gradlew :runIde
+```
+Note: for the first run, you might need to `:buildPlugin`, then `:runIde` and manually install newly-built plugin into it. After that, plugin will be updated automatically.  
+Note 2: in Rider, there is a custom tool that finds and executes T4 generator from Visual Studio. You most likely want to disable it.
