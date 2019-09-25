@@ -25,9 +25,7 @@ class T4BuildSessionViewImpl(
   override fun openWindow(message: String) = windowFactory.application.invokeLater {
     val lifetime = windowLifetimes.next()
     currentWindowLifetime = lifetime
-    val context = initializeContext(lifetime,
-      ExecutingT4BuildHeader
-    )
+    val context = initializeContext(lifetime, ExecutingT4BuildHeader)
     context.clear()
     context.showToolWindowIfHidden(true)
     val buildEvent = MessageBuildEvent(null, BuildMessageKind.Message, message)
@@ -37,27 +35,19 @@ class T4BuildSessionViewImpl(
 
   override fun showT4BuildResult(result: T4BuildResult, file: String) = windowFactory.application.invokeLater {
     val lifetime = currentWindowLifetime ?: throw OperationsException("openWindow should be called first")
-    val context = initializeContext(lifetime,
-      ExecutingT4BuildHeader
-    )
-    context.updateStatus(result.buildResultKind.toBuildResultKind,
-      T4BuildHeader
-    )
+    val context = initializeContext(lifetime, ExecutingT4BuildHeader)
+    context.updateStatus(result.buildResultKind.toBuildResultKind, T4BuildHeader)
     showMessages(result, file, context)
     context.invalidatePanelMode()
   }
 
   override fun showT4PreprocessingResult(result: T4PreprocessingResult, file: String) = windowFactory.application.invokeLater {
     val lifetime = currentWindowLifetime ?: throw OperationsException("openWindow should be called first")
-    val context = initializeContext(lifetime,
-      PreprocessingT4Header
-    )
+    val context = initializeContext(lifetime, PreprocessingT4Header)
     val succeeded =
       if (result.succeeded) BuildResultKind.Successful
       else BuildResultKind.HasErrors
-    context.updateStatus(succeeded,
-      T4PreprocessingHeader
-    )
+    context.updateStatus(succeeded, T4PreprocessingHeader)
     val message = result.message ?: return@invokeLater
     context.addBuildEvent(toBuildDiagnostic(message, file))
     context.invalidatePanelMode()
