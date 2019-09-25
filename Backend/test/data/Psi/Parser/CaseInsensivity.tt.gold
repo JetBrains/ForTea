@@ -6,7 +6,8 @@ IT4File
     TEMPLATE: tEmPlate
     WHITE_SPACE:  
     IT4DirectiveAttribute
-      TOKEN: LanguagE
+      IT4AttributeName
+        TOKEN: LanguagE
       EQUAL: =
       QUOTE: "
       IT4AttributeValue
@@ -21,7 +22,8 @@ IT4File
     PARAMETER: PaRaMETER
     WHITE_SPACE:  
     IT4DirectiveAttribute
-      TOKEN: NaMe
+      IT4AttributeName
+        TOKEN: NaMe
       EQUAL: =
       QUOTE: "
       IT4AttributeValue
@@ -29,7 +31,8 @@ IT4File
       QUOTE: "
     WHITE_SPACE:  
     IT4DirectiveAttribute
-      TOKEN: tYPe
+      IT4AttributeName
+        TOKEN: tYPe
       EQUAL: =
       QUOTE: "
       IT4AttributeValue

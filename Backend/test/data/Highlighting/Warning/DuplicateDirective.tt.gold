@@ -4,5 +4,5 @@
 |<#@ output extension="cshtml" #>|(1)
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: This directive was declared earlier and will be ignored
-(1): ReSharper Dead Code: This directive was declared earlier and will be ignored
+(0): ReSharper Dead Code: The directive will be ignored and can be safely removed
+(1): ReSharper Dead Code: The directive will be ignored and can be safely removed

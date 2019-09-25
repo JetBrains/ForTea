@@ -6,7 +6,8 @@ IT4File
     ASSEMBLY: assembly
     WHITE_SPACE:  
     IT4DirectiveAttribute
-      TOKEN: name
+      IT4AttributeName
+        TOKEN: name
       EQUAL: =
       QUOTE: "
       IT4AttributeValue
