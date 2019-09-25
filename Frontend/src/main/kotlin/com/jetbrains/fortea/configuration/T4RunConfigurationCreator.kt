@@ -6,6 +6,7 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.process.NopProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.PathUtil
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationFactory
@@ -15,6 +16,7 @@ import com.jetbrains.rider.model.T4FileLocation
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
+import org.jetbrains.annotations.TestOnly
 
 class T4RunConfigurationCreator(
   private val project: Project,
@@ -70,5 +72,13 @@ class T4RunConfigurationCreator(
       PathUtil.getParentPath(t4Path)
     )
     return T4RunConfiguration(virtualFile.name, project, parameters)
+  }
+
+  @TestOnly
+  fun launchExecution(file: VirtualFile) {
+    val id = host.getItemsByVirtualFile(file).single().id
+    val request = T4ExecutionRequest(T4FileLocation(id), false)
+    val launcher = launcher(DefaultDebugExecutor.getDebugExecutorInstance())
+    launcher(request)
   }
 }
