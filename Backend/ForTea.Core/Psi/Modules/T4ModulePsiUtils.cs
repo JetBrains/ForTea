@@ -16,11 +16,16 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		}
 
 		[NotNull]
-		public static TargetFrameworkId SelectTargetFrameworkId([NotNull] this IProjectFile file)
+		public static TargetFrameworkId SelectTargetFrameworkId(
+			[NotNull] this IProjectFile file,
+			[NotNull] IT4Environment t4Environment
+		)
 		{
 			var project = file.GetProject();
 			if (project?.IsMiscFilesProject() != false) return UniversalModuleReferenceContext.Instance.TargetFramework;
-			return project.GetResolveContext().TargetFramework;
+			var containingTargetFrameworkId = project.GetResolveContext().TargetFramework;
+			if (containingTargetFrameworkId.IsNetFramework) return containingTargetFrameworkId;
+			return t4Environment.TargetFrameworkId;
 		}
 	}
 }

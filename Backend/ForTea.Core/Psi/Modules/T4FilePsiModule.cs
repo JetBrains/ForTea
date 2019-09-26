@@ -163,7 +163,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			file.GetProject().NotNull(),
 			file.Location.TryMakeRelativeTo(file.GetProject().NotNull().Location).FullPath,
 			coordinator,
-			file.SelectTargetFrameworkId()
+			file.SelectTargetFrameworkId(t4Environment)
 		)
 		{
 			File = file;
