@@ -30,9 +30,9 @@ internal class Build : NukeBuild {
 	[Parameter] public readonly string NuGetApiKey;
 
 	[Solution] private readonly Solution _solution;
-
+	private const string WAVE = "193";
+	private const string VERSION = "1.16.13";
 	private const string MainProjectName = "ForTea.ReSharperPlugin";
-	private const string WAVE = "192";
 	private AbsolutePath MainProjectDirectory => RootDirectory / MainProjectName;
 	private AbsolutePath OutputDirectory => RootDirectory / "output" / Configuration;
 
@@ -70,7 +70,6 @@ internal class Build : NukeBuild {
 		=> _ => _
 			.DependsOn(Compile)
 			.Executes(() => {
-				var version = GetReleaseVersion();
 				var currentYear = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
 				var releaseNotes = GetReleaseNotes();
 				Console.WriteLine($"Target wave: {WAVE}");
@@ -79,7 +78,7 @@ internal class Build : NukeBuild {
 					.SetTargetPath(MainProjectDirectory / (MainProjectName + ".nuspec"))
 					.SetBasePath(MainProjectDirectory)
 					.SetOutputDirectory(OutputDirectory)
-					.SetProperty("version", version)
+					.SetProperty("version", VERSION)
 					.SetProperty("currentyear", currentYear)
 					.SetProperty("releasenotes", releaseNotes)
 					.SetProperty("wave", WAVE)
