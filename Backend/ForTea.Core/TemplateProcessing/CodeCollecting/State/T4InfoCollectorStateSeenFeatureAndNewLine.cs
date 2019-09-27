@@ -7,6 +7,12 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
+	/// <summary>
+	/// All newlines that appear after a feature block should be ignored,
+	/// no matter how many of them there are.
+	/// After any non-newline token, however,
+	/// newlines should once again be taken into account
+	/// </summary>
 	public class T4InfoCollectorStateSeenFeatureAndNewLine : T4InfoCollectorStateBase
 	{
 		[NotNull]
@@ -22,7 +28,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 				case IT4FeatureBlock _:
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4ExpressionBlock _:
-					return new T4InfoCollectorStateInitial(Interrupter);
+					return new T4InfoCollectorStateSeenFeatureAndExpressionBlock(Interrupter);
 				default:
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE) return this;
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)

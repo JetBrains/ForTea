@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -7,12 +8,20 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
-	public sealed class T4InfoCollectorStateSeenFeature : T4InfoCollectorStateBase
+	/// <summary>
+	/// If a feature block is followed by newlines, they get ignored,
+	/// see <see cref="T4InfoCollectorStateSeenFeatureAndNewLine"/>.
+	/// This state represents that newlines should not be ignored anymore
+	/// because there is an expression block after a feature block
+	/// </summary>
+	public class T4InfoCollectorStateSeenFeatureAndExpressionBlock : T4InfoCollectorStateBase
 	{
 		[CanBeNull]
 		private IT4Token LastToken { get; set; }
 
-		public T4InfoCollectorStateSeenFeature([NotNull] IT4CodeGenerationInterrupter interrupter) : base(interrupter)
+		public T4InfoCollectorStateSeenFeatureAndExpressionBlock(
+			[NotNull] IT4CodeGenerationInterrupter interrupter
+		) : base(interrupter)
 		{
 		}
 
@@ -20,15 +29,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		{
 			switch (element)
 			{
-				case IT4FeatureBlock _: return this;
+				case IT4FeatureBlock _:
+					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4ExpressionBlock _:
-					return new T4InfoCollectorStateSeenFeatureAndExpressionBlock(Interrupter);
+					return this;
 				default:
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE)
-						return new T4InfoCollectorStateSeenFeatureAndNewLine(Interrupter);
+					{
+						var builder = new StringBuilder(Environment.NewLine);
+						return new T4InfoCollectorStateSeenFeatureAndText(builder, Interrupter, element);
+					}
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
 					{
-						// At this point, LastToken is initialized through ConsumeTokenSafe call
 						var builder = new StringBuilder(Convert(LastToken));
 						return new T4InfoCollectorStateSeenFeatureAndText(builder, Interrupter, element);
 					}

@@ -6,6 +6,12 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
+	/// <summary>
+	/// If a feature block is followed by newlines, they get ignored,
+	/// see <see cref="T4InfoCollectorStateSeenFeatureAndNewLine"/>.
+	/// This state represents that newlines should not be ignored anymore
+	/// because there is text after a feature block
+	/// </summary>
 	public class T4InfoCollectorStateSeenFeatureAndText : T4InfoCollectorStateBase
 	{
 		[NotNull]
@@ -32,7 +38,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 				case IT4FeatureBlock _:
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4ExpressionBlock _:
-					return new T4InfoCollectorStateSeenFeature(Interrupter);
+					return new T4InfoCollectorStateSeenFeatureAndExpressionBlock(Interrupter);
 				case IT4Token _: return this;
 				default:
 					var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
