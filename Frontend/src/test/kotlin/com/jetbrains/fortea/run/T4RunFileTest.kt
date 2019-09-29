@@ -9,11 +9,25 @@ import org.testng.annotations.Test
 class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatFileCanBeExecuted() = doTest()
   @Test fun testThatHostSpecificTemplateCanBeExecuted() = doTest()
-  @Test fun testThatHostCanSetResultExtension() = doTest(".cshtml")
+  @Test fun testThatHostCanSetResultExtension() {
+    doTest(".cshtml")
+    assertNoOutputWithExtension(".html")
+  }
+
   @Test fun testThatTtincludeFileCanBeIncluded() = doTest()
   @Test fun testThatCSharpFileCanBeIncluded() = doTest()
   @Test fun testThatVsMacrosAreResolved() = doTest()
   @Test fun testThatMsBuildPropertiesAreResolved() = doTest()
   @Test fun testThatAssemblyCanBeReferenced() = doTest()
-  // @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
+//  @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
+  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
+  @Test fun testThatTemplateCanProduceBigXml() = doTest()
+//  @Test fun testThatFileExtensionCanBeUpdatedCorrectly() {
+//    executeT4File()
+//    t4File.writeText(t4File.readText().replace(".fs", ".cs"))
+//    saveSolution()
+//    dumpExecutionResult(".cs")
+//    dumpCsproj()
+//    assertNoOutputWithExtension(".fs")
+//  }
 }

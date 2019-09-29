@@ -26,7 +26,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
   override val waitForCaches = true
   override fun getSolutionDirectoryName() = testMethod.name
 
-  private val t4File
+  protected val t4File
     get() = project
       .solutionDirectory
       .combine("Project")
@@ -69,7 +69,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
     if (dumpCsproj) dumpCsproj()
   }
 
-  private fun executeT4File() {
+  protected fun executeT4File() {
     val host = project.getComponent<ProjectModelViewHost>()
     val virtualFile = t4File.path.toVirtualFile(true).shouldNotBeNull()
     val id = host.getItemsByVirtualFile(virtualFile).single().id
@@ -85,7 +85,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
         && !it.name.endsWith(".gold")
     }
 
-  private fun saveSolution() {
+  protected fun saveSolution() {
     application.saveAll()
     waitForProjectModelReady(project)
     flushQueues()
@@ -93,7 +93,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
     project.getComponent<VfsWriteOperationsHost>().waitRefreshIsFinished()
   }
 
-  private fun dumpCsproj() = executeWithGold(csprojFile.path) {
+  protected fun dumpCsproj() = executeWithGold(csprojFile.path) {
     // Note:
     //   in tests, template execution starts directly,
     //   not via backend 'execute template' action.
@@ -102,7 +102,11 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
     it.print(csprojFile.readText())
   }
 
-  private fun dumpExecutionResult(resultExtension: String?) = executeWithGold(t4File.path) {
+  protected fun dumpExecutionResult(resultExtension: String? = null) = executeWithGold(t4File.path) {
     it.print(findOutputFile(resultExtension).readText())
   }
+
+  protected fun assertNoOutputWithExtension(extension: String) = assert(outputFileCandidates.none {
+    it.nameWithoutExtension == t4File.nameWithoutExtension && it.name.endsWith(extension)
+  })
 }

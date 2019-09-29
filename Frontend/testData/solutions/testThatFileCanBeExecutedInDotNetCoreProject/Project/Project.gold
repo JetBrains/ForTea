@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+      <None Update="Template.tt">
+        <LastGenOutput>Template.txt</LastGenOutput>
+      </None>
+      <None Update="Template.txt">
+        <DependentUpon>Template.tt</DependentUpon>
+      </None>
+    </ItemGroup>
+</Project>
