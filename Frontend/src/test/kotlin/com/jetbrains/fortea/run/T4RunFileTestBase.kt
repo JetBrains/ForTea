@@ -41,7 +41,8 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
       .shouldNotBeNull()
       .single()
 
-  private val outputFileCandidates = t4File.parentFile.listFiles().shouldNotBeNull()
+  private val outputFileCandidates
+    get() = t4File.parentFile.listFiles().shouldNotBeNull()
 
   private fun findOutputFile(resultExtension: String?): File {
     return if (resultExtension == null) outputFileCandidates.single {

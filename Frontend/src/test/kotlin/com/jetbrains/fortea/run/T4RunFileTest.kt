@@ -5,7 +5,7 @@ import org.testng.annotations.Test
 // Important note:
 //   method names will at some point be parsed as program arguments,
 //   so they cannot contain spaces!
-@Test
+
 class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatFileCanBeExecuted() = doTest()
   @Test fun testThatHostSpecificTemplateCanBeExecuted() = doTest()
