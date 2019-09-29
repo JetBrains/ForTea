@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.Managing;
@@ -159,12 +160,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			if (temporary == null) return;
 			var destinationLocation = GetDestinationLocation(file, temporary.Name);
 			destinationLocation.DeleteFile();
-			System.IO.File.Move(temporary.FullPath, destinationLocation.FullPath);
+			File.Move(temporary.FullPath, destinationLocation.FullPath);
 			Solution.InvokeUnderTransaction(cookie =>
 			{
-				UpdateProjectModel(file, destinationLocation, cookie);
+				var destination = UpdateProjectModel(file, destinationLocation, cookie);
 				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
 				UpdateLastGenOutput(file, destinationLocation, cookie);
+				UpdateGeneratedFileStatus(file, destination, cookie);
 			});
 		}
 
@@ -182,6 +184,20 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				projectFileProperties.CustomToolOutput = destinationLocation.Name;
 			});
 		}
+
+		private void UpdateGeneratedFileStatus(
+			[NotNull] IT4File source,
+			[NotNull] IProjectFile destination,
+			[NotNull] IProjectModelTransactionCookie cookie
+		) => cookie.EditFileProperties(destination, properties =>
+		{
+			var projectFile = source.GetSourceFile()?.ToProjectFile();
+			if (projectFile == null) return;
+			if (!(properties is ProjectFileProperties projectFileProperties)) return;
+			projectFileProperties.IsCustomToolOutput = true;
+			projectFileProperties.IsDesignTimeBuildInput = true;
+			projectFileProperties.DependsUponName = projectFile.Name;
+		});
 
 		private void RemoveLastGenOutputIfDifferent(
 			[NotNull] IT4File file,
@@ -207,7 +223,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			}
 		}
 
-		private void UpdateProjectModel(
+		[NotNull]
+		private IProjectFile UpdateProjectModel(
 			[NotNull] IT4File file,
 			[NotNull] FileSystemPath result,
 			[NotNull] IProjectModelTransactionCookie cookie
@@ -220,6 +237,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var sourceFile = destination.ToSourceFile();
 			if (sourceFile != null) SyncSymbolCaches(sourceFile);
 			RefreshFiles(destination.Location);
+			return destination;
 		}
 
 		public FileSystemPath SavePreprocessResults(IT4File file, string text)
