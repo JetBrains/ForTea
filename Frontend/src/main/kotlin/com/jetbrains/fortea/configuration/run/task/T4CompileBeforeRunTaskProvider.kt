@@ -9,6 +9,7 @@ import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.isSuccess
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
+import com.jetbrains.fortea.utils.startOrSync
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
@@ -61,7 +62,7 @@ class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunT
     }
 
     finished.waitFor()
-    if (!successful) model.executionAborted.fire(location)
+    if (!successful) model.executionAborted.startOrSync(location)
     return successful
   }
 

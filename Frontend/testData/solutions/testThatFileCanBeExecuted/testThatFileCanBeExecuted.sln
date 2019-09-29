@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testThatFileCanBeExecuted", "testThatFileCanBeExecuted\testThatFileCanBeExecuted.csproj", "{9C1D4403-76A0-4915-95EF-B57655EC3BC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project", "Project\Project.csproj", "{9C1D4403-76A0-4915-95EF-B57655EC3BC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

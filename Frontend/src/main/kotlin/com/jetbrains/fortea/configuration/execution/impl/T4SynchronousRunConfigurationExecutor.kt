@@ -11,7 +11,8 @@ import com.jetbrains.rider.projectView.ProjectModelViewHost
 
 class T4SynchronousRunConfigurationExecutor(
   project: Project,
-  host: ProjectModelViewHost
+  host: ProjectModelViewHost,
+  private val waitFunc: () -> Boolean
 ) : T4RunConfigurationExecutorBase(project, host) {
   private val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
 
@@ -39,10 +40,8 @@ class T4SynchronousRunConfigurationExecutor(
     waitPumping(finished)
   }
 
-  private tailrec fun waitPumping(finished: Semaphore) {
-    val acquired = finished.waitFor(10)
-    if (acquired) return
-    pumpMessages(10)
-    waitPumping(finished)
+  private fun waitPumping(finished: Semaphore) {
+    pumpMessages(waitFunc = waitFunc)
+    finished.waitFor()
   }
 }

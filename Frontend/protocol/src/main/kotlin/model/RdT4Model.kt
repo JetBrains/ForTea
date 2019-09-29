@@ -74,9 +74,9 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
 
     // Frontend calls this before executing file
     call("requestCompilation", T4FileLocation, T4BuildResult).async
-    signal("executionSucceeded", T4FileLocation).async
-    signal("executionFailed", T4FileLocation).async
-    signal("executionAborted", T4FileLocation).async
+    call("executionSucceeded", T4FileLocation, void).async
+    call("executionFailed", T4FileLocation, void).async
+    call("executionAborted", T4FileLocation, void).async
 
     call("getProjectDependencies", T4FileLocation, immutableList(int)).async
   }

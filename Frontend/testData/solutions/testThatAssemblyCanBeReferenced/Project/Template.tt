@@ -1,0 +1,4 @@
+﻿<#@ template language="C#" #>
+<#@ output extension="txt" #>
+<#@ assembly name="$(ProjectDir)Bar.dll" #>
+<#= new Bar().BarMethod #>

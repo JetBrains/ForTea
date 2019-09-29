@@ -9,6 +9,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
+import com.jetbrains.fortea.utils.startOrSync
 import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters
 import com.jetbrains.rider.model.BuildResultKind
@@ -64,7 +65,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
       }
     }
     finished.waitFor()
-    if (!result) model.executionAborted.fire(configuration.parameters.request.location)
+    if (!result) model.executionAborted.startOrSync(configuration.parameters.request.location)
     return result
   }
 

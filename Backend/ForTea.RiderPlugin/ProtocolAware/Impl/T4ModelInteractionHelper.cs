@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Core;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
@@ -49,18 +50,22 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			};
 
 		[NotNull]
-		public Action<T4FileLocation> Wrap(Action<IT4File> wrappee) => location => Logger.Catch(() =>
+		public Func<T4FileLocation, Unit> Wrap(Action<IT4File> wrappee) => location =>
 		{
-			using (ReadLockCookie.Create())
+			Logger.Catch(() =>
 			{
-				var file = Host
-					.GetItemById<IProjectFile>(location.Id)
-					?.ToSourceFile()
-					?.GetPsiFiles(T4Language.Instance)
-					.OfType<IT4File>()
-					.SingleItem();
-				if (file != null) wrappee(file);
-			}
-		});
+				using (ReadLockCookie.Create())
+				{
+					var file = Host
+						.GetItemById<IProjectFile>(location.Id)
+						?.ToSourceFile()
+						?.GetPsiFiles(T4Language.Instance)
+						.OfType<IT4File>()
+						.SingleItem();
+					if (file != null) wrappee(file);
+				}
+			});
+			return Unit.Instance;
+		};
 	}
 }

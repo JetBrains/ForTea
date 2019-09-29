@@ -1,0 +1,3 @@
+﻿<#@ template language="C#" #>
+<#@ output extension="txt" #>
+<#@ include file="$(ProjectDir)IncludeDirectory\Included.ttinclude" #>

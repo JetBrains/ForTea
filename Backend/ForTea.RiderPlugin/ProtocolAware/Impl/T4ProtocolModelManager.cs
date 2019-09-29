@@ -5,7 +5,6 @@ using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
-using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
@@ -44,7 +43,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private ILogger Logger { get; }
 
 		public T4ProtocolModelManager(
-			Lifetime lifetime,
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateCompiler compiler,
@@ -65,21 +63,17 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			ReferenceExtractionManager = referenceExtractionManager;
 			Host = host;
 			var model = solution.GetProtocolSolution().GetT4ProtocolModel();
-			RegisterCallbacks(lifetime, model, helper);
+			RegisterCallbacks(model, helper);
 		}
 
-		private void RegisterCallbacks(
-			Lifetime lifetime,
-			[NotNull] T4ProtocolModel model,
-			[NotNull] IT4ModelInteractionHelper helper
-		)
+		private void RegisterCallbacks([NotNull] T4ProtocolModel model, [NotNull] IT4ModelInteractionHelper helper)
 		{
 			model.RequestCompilation.Set(helper.Wrap(Compile, Converter.FatalError()));
 			model.GetConfiguration.Set(helper.Wrap(CalculateConfiguration, new T4ConfigurationModel("", "")));
 			model.GetProjectDependencies.Set(helper.Wrap(CalculateProjectDependencies, new List<int>()));
-			model.ExecutionSucceeded.Advise(lifetime, helper.Wrap(ExecutionSucceeded));
-			model.ExecutionFailed.Advise(lifetime, helper.Wrap(ExecutionFailed));
-			model.ExecutionAborted.Advise(lifetime, helper.Wrap(ExecutionFailed));
+			model.ExecutionSucceeded.Set(helper.Wrap(ExecutionSucceeded));
+			model.ExecutionFailed.Set(helper.Wrap(ExecutionFailed));
+			model.ExecutionAborted.Set(helper.Wrap(ExecutionFailed));
 		}
 
 		[CanBeNull]

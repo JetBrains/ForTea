@@ -1,0 +1,4 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ output extension="html" #>
+<# Host.SetFileExtension("cshtml"); #>
+<html/>
