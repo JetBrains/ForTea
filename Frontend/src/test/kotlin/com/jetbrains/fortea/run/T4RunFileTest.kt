@@ -5,6 +5,7 @@ import com.intellij.execution.impl.ExecutionManagerKtImpl
 import com.intellij.openapi.components.ServiceManager
 import com.jetbrains.fortea.configuration.execution.impl.T4SynchronousRunConfigurationExecutor
 import com.jetbrains.rdclient.util.idea.toVirtualFile
+import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
 import com.jetbrains.rider.model.T4ExecutionRequest
 import com.jetbrains.rider.model.T4FileLocation
 import com.jetbrains.rider.projectView.ProjectModelViewHost
@@ -13,6 +14,9 @@ import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.framework.combine
 import com.jetbrains.rider.test.framework.executeWithGold
+import com.jetbrains.rider.test.framework.flushQueues
+import com.jetbrains.rider.test.scriptingApi.waitAllCommandsFinished
+import com.jetbrains.rider.util.idea.application
 import com.jetbrains.rider.util.idea.getComponent
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
@@ -63,9 +67,9 @@ class T4RunFileTest : BaseTestWithSolution() {
 
   private fun doTest() {
     executeT4File()
+    saveSolution()
     dumpExecutionResult()
-    // TODO: dump csproj, too
-    // dumpCsproj()
+    dumpCsproj()
   }
 
   private fun executeT4File() {
@@ -76,7 +80,21 @@ class T4RunFileTest : BaseTestWithSolution() {
     T4SynchronousRunConfigurationExecutor(project, host).execute(request)
   }
 
-  private fun dumpCsproj() = executeWithGold(csprojFile.path) { it.print(csprojFile.readText()) }
+  private fun saveSolution() {
+    application.saveAll()
+    flushQueues()
+    waitAllCommandsFinished()
+    project.getComponent<VfsWriteOperationsHost>().waitRefreshIsFinished()
+  }
+
+  private fun dumpCsproj() = executeWithGold(csprojFile.path) {
+    // Note:
+    //   in tests, template execution starts directly,
+    //   not via backend 'execute template' action.
+    //   Template type meanwhile is only updated from that action.
+    //   This is why in csproj file <Generator> tag will be missing
+    it.print(csprojFile.readText())
+  }
 
   private fun dumpExecutionResult() = executeWithGold(t4File.path) { it.print(outputFile.readText()) }
 }
