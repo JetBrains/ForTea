@@ -1,5 +1,4 @@
 using GammaJul.ForTea.Core.Daemon.Attributes;
-using JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings;
 using JetBrains.ProjectModel;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
@@ -7,8 +6,8 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 	[SolutionComponent]
 	public sealed class T4ReSharperAttributeIdsProvider : IT4AttributeIdsProvider
 	{
-		public string DirectiveId => PredefinedHighlighterIds.HtmlElementName;
-		public string AttributeId => PredefinedHighlighterIds.HtmlAttributeName;
-		public string AttributeValueId => PredefinedHighlighterIds.HtmlAttributeValue;
+		public string DirectiveId => T4ReSharperCustomHighlightingIds.DIRECTIVE;
+		public string AttributeId => T4ReSharperCustomHighlightingIds.DIRECTIVE_ATTRIBUTE;
+		public string AttributeValueId => T4ReSharperCustomHighlightingIds.ATTRIBUTE_VALUE;
 	}
 }
