@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Psi.Invalidation.Impl;
 using JetBrains.Annotations;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
@@ -9,6 +10,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 	/// <summary>
 	/// Manages the include dependencies between T4 files,
 	/// to be able to refresh includers when the included files change.
+	/// Is effectively a wrapper that helps to update <see cref="T4FileDependencyGraph">the real graph</see>
 	/// </summary>
 	[PsiComponent]
 	public class T4FileDependencyManager
@@ -20,12 +22,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		private object Locker { get; } = new object();
 
 		[NotNull]
-		private OneToSetMap<FileSystemPath, FileSystemPath> IncluderToIncludees { get; } =
-			new OneToSetMap<FileSystemPath, FileSystemPath>();
-
-		[NotNull]
-		private OneToSetMap<FileSystemPath, FileSystemPath> IncludeeToIncluders { get; } =
-			new OneToSetMap<FileSystemPath, FileSystemPath>();
+		private IT4FileDependencyGraph Graph { get; } = new T4FileDependencyGraph();
 
 		[NotNull]
 		private IPsiServices PsiServices { get; }
@@ -48,18 +45,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		{
 			lock (Locker)
 			{
-				foreach (var includee in IncluderToIncludees[includer])
-				{
-					IncludeeToIncluders.Remove(includee, includer);
-				}
-
-				IncluderToIncludees.RemoveKey(includer);
-				if (includees.Count <= 0) return;
-				IncluderToIncludees.AddRange(includer, includees);
-				foreach (var includee in includees)
-				{
-					IncludeeToIncluders.Add(includee, includer);
-				}
+				Graph.UpdateIncludes(includer, includees);
 			}
 		}
 
@@ -73,11 +59,11 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		}
 
 		[NotNull]
-		public HashSet<FileSystemPath> GetIncluders([NotNull] FileSystemPath includee)
+		public IEnumerable<FileSystemPath> GetIncluders([NotNull] FileSystemPath includee)
 		{
 			lock (Locker)
 			{
-				return new HashSet<FileSystemPath>(IncludeeToIncluders[includee]);
+				return new HashSet<FileSystemPath>(Graph.GetIncluders(includee));
 			}
 		}
 
