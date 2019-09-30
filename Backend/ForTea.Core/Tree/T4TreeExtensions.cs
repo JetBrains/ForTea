@@ -25,7 +25,11 @@ namespace GammaJul.ForTea.Core.Tree
 		)
 		{
 			if (string.IsNullOrEmpty(attributeName)) return null;
-			return directive?.Attributes.Where(it => it.Name.GetText() == attributeName)?.FirstOrDefault()?.Value;
+			return directive
+				?.Attributes
+				.Where(it => string.Equals(it.Name.GetText(), attributeName, StringComparison.OrdinalIgnoreCase))
+				?.FirstOrDefault()
+				?.Value;
 		}
 
 		[CanBeNull]
