@@ -25,6 +25,7 @@ class T4RunFileTest : T4RunFileTestBase() {
 //  @Test fun testThatFileExtensionCanBeUpdatedCorrectly() {
 //    executeT4File()
 //    t4File.writeText(t4File.readText().replace(".fs", ".cs"))
+//    executeT4File()
 //    saveSolution()
 //    dumpExecutionResult(".cs")
 //    dumpCsproj()
