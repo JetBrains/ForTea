@@ -30,7 +30,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 
 			model.PreprocessingStarted();
 
-			var file = FindT4File(context).NotNull();
+			var file = FindT4File(context, solution).NotNull();
 			var projectFile = file.GetSourceFile().ToProjectFile().NotNull();
 			var location = new T4FileLocation(solution.GetComponent<ProjectModelViewHost>().GetIdByItem(projectFile));
 

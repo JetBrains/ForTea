@@ -98,7 +98,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			Model.RequestDebug.Start(new T4ExecutionRequest(GetT4FileLocation(file), true));
 		}
 
-		public bool IsExecutionRunning(IT4File file) => RunningFiles.Contains(file.GetSourceFile().GetLocation());
+		private bool IsExecutionRunning([NotNull] IT4File file) => IsExecutionRunning(file.GetSourceFile().NotNull());
+
+		public bool IsExecutionRunning(IPsiSourceFile file) => RunningFiles.Contains(file.GetLocation());
 
 		public void OnExecutionFinished(IT4File file)
 		{

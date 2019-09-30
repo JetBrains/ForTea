@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
+using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Altering.Resources;
@@ -78,7 +79,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		private static void Execute([NotNull] IT4File file, [NotNull] ISolution solution)
 		{
 			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
-			if (manager.IsExecutionRunning(file)) return;
+			if (manager.IsExecutionRunning(file.GetSourceFile().NotNull())) return;
 			manager.ExecuteSilently(file);
 		}
 
