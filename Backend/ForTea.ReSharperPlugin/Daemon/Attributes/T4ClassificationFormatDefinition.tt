@@ -30,12 +30,12 @@ using JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes;
             "directive",
             this,
             backgroundColor: Color.Transparent,
-            foregroundColor: Color.Purple),
+            foregroundColor: ColorTranslator.FromHtml("#EE82EE")),
         new T4ColoredIdentifier(
             "directive attribute",
             this,
             backgroundColor: Color.Transparent,
-            foregroundColor: Color.DarkBlue),
+            foregroundColor: ColorTranslator.FromHtml("#569CD6")),
         new T4ColoredIdentifier(
             "attribute value",
             this,
@@ -72,7 +72,9 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
     foreach (var identifier in identifiers)
     {
 #>
-		public const string <#= ToConstantIdentifier(identifier.Name) #> = "<#= ToPrintable(identifier.Name) #>";
+		public const string <#= ToConstantIdentifier(identifier.Name)
+#> = "<#= ToPrintable(identifier.Name)
+#>";
 <#
     }
 #>
@@ -104,18 +106,14 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 <#
 		          if (identifier.BackgroundColor.A != 0)
 		          {
-#>			BackgroundColor = Color.FromRgb(<#
-		              PrintColorComponents(identifier.BackgroundColor);
-#>);
+#>			BackgroundColor = Color.FromRgb(<# PrintColorComponents(identifier.BackgroundColor); #>);
 <#
 		          }
 #>
 <#
 		          if (identifier.ForegroundColor.A != 0)
 		          {
-#>			ForegroundColor = Color.FromRgb(<#
-		              PrintColorComponents(identifier.ForegroundColor);
-#>);
+#>			ForegroundColor = Color.FromRgb(<# PrintColorComponents(identifier.ForegroundColor); #>);
 <#
 		          }
 #>
@@ -138,7 +136,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 
     private void PrintHexColor(Color color)
     {
-#>#<#= color.R.ToString("X2") #><#= color.G.ToString("X2")#><#= color.B.ToString("X2") #><#+
+#>#<#= color.R.ToString("X2") #><#= color.G.ToString("X2") #><#= color.B.ToString("X2") #><#+
     }
 
     private sealed class T4ColoredIdentifier

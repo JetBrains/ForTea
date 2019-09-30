@@ -28,7 +28,7 @@ using JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes;
 	T4ReSharperCustomHighlightingIds.DIRECTIVE,
 	GroupId = T4HighlightingAttributeGroup.ID,
 	EffectType = EffectType.TEXT,
-	ForegroundColor = "#800080",
+	ForegroundColor = "#EE82EE",
 	BackgroundColor = "#FFFFFF",
 	Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
 	VSPriority = VSPriority.IDENTIFIERS
@@ -37,7 +37,7 @@ using JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes;
 	T4ReSharperCustomHighlightingIds.DIRECTIVE_ATTRIBUTE,
 	GroupId = T4HighlightingAttributeGroup.ID,
 	EffectType = EffectType.TEXT,
-	ForegroundColor = "#00008B",
+	ForegroundColor = "#569CD6",
 	BackgroundColor = "#FFFFFF",
 	Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
 	VSPriority = VSPriority.IDENTIFIERS
@@ -108,7 +108,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 		public DirectiveClassificationFormatDefinition()
 		{
 			DisplayName = Name;
-			ForegroundColor = Color.FromRgb(0x80, 0x00, 0x80);
+			ForegroundColor = Color.FromRgb(0xEE, 0x82, 0xEE);
 		}
 		
 		[Export, Name(Name), BaseDefinition("formal language")]
@@ -133,7 +133,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 		public DirectiveAttributeClassificationFormatDefinition()
 		{
 			DisplayName = Name;
-			ForegroundColor = Color.FromRgb(0x00, 0x00, 0x8B);
+			ForegroundColor = Color.FromRgb(0x56, 0x9C, 0xD6);
 		}
 		
 		[Export, Name(Name), BaseDefinition("formal language")]
