@@ -59,7 +59,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				Guard.StartProcessing(File.GetSourceFile().NotNull());
 				File.ProcessDescendants(this);
 				string suffix = Result.State.ProduceBeforeEof();
-				if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+				if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
 				Guard.EndProcessing();
 				return Results.Pop();
 			}
@@ -128,7 +128,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public override void VisitIncludeDirectiveNode(IT4IncludeDirective includeDirectiveParam)
 		{
 			string suffix = Result.State.ProduceBeforeEof();
-			if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
+			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
 			Guard.TryEndProcessing(includeDirectiveParam.Path.Resolve());
 			var intermediateResults = Results.Pop();
 			Result.Append(intermediateResults);
@@ -209,7 +209,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			if (lookahead is IT4Token) return;
 			string produced = Result.State.Produce(lookahead);
-			if (produced.IsNullOrEmpty()) return;
+			if (string.IsNullOrEmpty(produced)) return;
 			AppendTransformation(produced);
 		}
 

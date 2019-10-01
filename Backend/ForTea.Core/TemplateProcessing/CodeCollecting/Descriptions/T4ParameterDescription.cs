@@ -45,8 +45,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			string typeText = typeToken?.GetText();
 			var nameToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.NameAttribute.Name);
 			string nameText = nameToken?.GetText();
-			if (typeText?.IsNullOrEmpty() != false) return null;
-			if (nameText?.IsNullOrEmpty() != false) return null;
+			if (string.IsNullOrEmpty(typeText)) return null;
+			if (string.IsNullOrEmpty(nameText)) return null;
 			return new T4ParameterDescription(typeToken, nameToken, typeText, nameText);
 		}
 	}
