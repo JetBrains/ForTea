@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using JetBrains.Annotations;
 using JetBrains.Application.FileSystemTracker;
 using JetBrains.Diagnostics;
@@ -17,10 +18,12 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 {
 	/// <summary>A component that manages <see cref="IDocument"/>s for files outside the solution.</summary>
 	[SolutionComponent]
-	internal sealed class T4OutsideSolutionSourceFileManager : IPsiModuleFactory
+	internal sealed class T4OutsideSolutionSourceFileManager : IPsiModuleFactory, IDisposable
 	{
+		// This might cause some memory leaks on IPsiSourceFile.
+		// Can be replaced with reference counting if that issue turns out to be important
 		[NotNull]
-		private StrongToWeakDictionary<FileSystemPath, IPsiSourceFile> SourceFiles { get; }
+		private ConcurrentDictionary<FileSystemPath, IPsiSourceFile> SourceFiles { get; }
 
 		[NotNull]
 		private IProjectFileExtensions ProjectFileExtensions { get; }
@@ -36,43 +39,6 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 
 		public HybridCollection<IPsiModule> Modules => new HybridCollection<IPsiModule>(PsiModule);
 
-		[NotNull]
-		public IPsiSourceFile GetOrCreateSourceFile([NotNull] FileSystemPath path)
-		{
-			Assertion.Assert(path.IsAbsolute, "path.IsAbsolute");
-			lock (SourceFiles)
-			{
-				if (SourceFiles.TryGetValue(path, out var existing) && existing != null) return existing;
-				var newlyCreated = new T4OutsideSolutionSourceFile(
-					ProjectFileExtensions,
-					PsiProjectFileTypeCoordinator,
-					PsiModule,
-					path,
-					sf => sf.Location.ExistsFile,
-					sf => new T4OutsideSolutionSourceFileProperties(),
-					DocumentManager,
-					EmptyResolveContext.Instance);
-				SourceFiles[path] = newlyCreated;
-				return newlyCreated;
-			}
-		}
-
-		public bool HasSourceFile([NotNull] FileSystemPath path)
-		{
-			lock (SourceFiles)
-			{
-				return SourceFiles.ContainsKey(path);
-			}
-		}
-
-		public void DeleteSourceFile([NotNull] FileSystemPath path)
-		{
-			lock (SourceFiles)
-			{
-				SourceFiles.Remove(path);
-			}
-		}
-
 		public T4OutsideSolutionSourceFileManager(
 			Lifetime lifetime,
 			[NotNull] IProjectFileExtensions projectFileExtensions,
@@ -86,7 +52,8 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 			ProjectFileExtensions = projectFileExtensions;
 			PsiProjectFileTypeCoordinator = psiProjectFileTypeCoordinator;
 			DocumentManager = documentManager;
-			SourceFiles = new StrongToWeakDictionary<FileSystemPath, IPsiSourceFile>(lifetime);
+			SourceFiles = new ConcurrentDictionary<FileSystemPath, IPsiSourceFile>();
+			lifetime.OnTermination(this);
 			PsiModule = new PsiModuleOnFileSystemPaths(
 				solution,
 				"T4OutsideSolution",
@@ -95,7 +62,31 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 				fileSystemTracker,
 				lifetime,
 				false);
-			lifetime.OnTermination(SourceFiles);
 		}
+
+		[NotNull]
+		public IPsiSourceFile GetOrCreateSourceFile([NotNull] FileSystemPath path)
+		{
+			Assertion.Assert(path.IsAbsolute, "path.IsAbsolute");
+			return SourceFiles.GetOrAdd(path, _ => new T4OutsideSolutionSourceFile(
+				ProjectFileExtensions,
+				PsiProjectFileTypeCoordinator,
+				PsiModule,
+				path,
+				sf => sf.Location.ExistsFile,
+				sf => new T4OutsideSolutionSourceFileProperties(),
+				DocumentManager,
+				EmptyResolveContext.Instance)
+			);
+		}
+
+		public bool HasSourceFile([NotNull] FileSystemPath path) => SourceFiles.ContainsKey(path);
+
+		public void DeleteSourceFile([NotNull] FileSystemPath path)
+		{
+			SourceFiles.TryRemove(path, out var _);
+		}
+
+		public void Dispose() => SourceFiles.Clear();
 	}
 }
