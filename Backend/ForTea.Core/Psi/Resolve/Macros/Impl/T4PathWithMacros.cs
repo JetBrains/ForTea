@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.FileType;
+using GammaJul.ForTea.Core.Psi.OutsideSolution;
+using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;

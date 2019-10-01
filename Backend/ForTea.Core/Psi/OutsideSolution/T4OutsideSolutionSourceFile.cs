@@ -7,13 +7,15 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi {
-
-	internal sealed class T4OutsideSolutionSourceFile : NavigateablePsiSourceFileWithLocation, IPsiSourceFile {
-
-		public new IDocument Document {
-			get {
-				IDocument document = base.Document;
+namespace GammaJul.ForTea.Core.Psi.OutsideSolution
+{
+	internal sealed class T4OutsideSolutionSourceFile : NavigateablePsiSourceFileWithLocation, IPsiSourceFile
+	{
+		public new IDocument Document
+		{
+			get
+			{
+				var document = base.Document;
 				document.SetOutsideSolutionPath(Location);
 				return document;
 			}
@@ -28,19 +30,17 @@ namespace GammaJul.ForTea.Core.Psi {
 			Func<PsiSourceFileFromPath, IPsiSourceFileProperties> propertiesFactory,
 			DocumentManager documentManager,
 			IModuleReferenceResolveContext resolveContext
+		) : base(
+			projectFileExtensions,
+			projectFileTypeCoordinator,
+			module,
+			path,
+			validityCheck,
+			propertiesFactory,
+			documentManager,
+			resolveContext
 		)
-			: base(
-				projectFileExtensions,
-				projectFileTypeCoordinator,
-				module,
-				path,
-				validityCheck,
-				propertiesFactory,
-				documentManager,
-				resolveContext
-			) {
+		{
 		}
-		
 	}
-
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 
-namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
+namespace GammaJul.ForTea.Core.Psi.Utils
 {
 	public sealed class T4IncludeGuard
 	{

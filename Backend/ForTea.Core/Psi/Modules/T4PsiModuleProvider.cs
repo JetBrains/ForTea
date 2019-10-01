@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Invalidation;
+using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;

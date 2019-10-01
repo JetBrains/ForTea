@@ -1,4 +1,5 @@
 using System;
+using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
