@@ -40,6 +40,8 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 		}
 
 		public IEnumerable<FileSystemPath> GetIncluders(FileSystemPath includee) => ReversedIncludeGraph[includee];
-		public FileSystemPath FindBestRoot(FileSystemPath includee) => throw new System.NotImplementedException();
+
+		public FileSystemPath FindBestRoot(FileSystemPath includee) =>
+			new T4GraphSinkSearcher(ReversedIncludeGraph).FindClosestSink(includee);
 	}
 }

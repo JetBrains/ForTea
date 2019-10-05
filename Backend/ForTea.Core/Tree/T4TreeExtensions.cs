@@ -8,6 +8,7 @@ using GammaJul.ForTea.Core.Psi.Utils;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
@@ -78,7 +79,7 @@ namespace GammaJul.ForTea.Core.Tree
 		[NotNull, ItemNotNull]
 		public static IEnumerable<IT4File> GetIncludedFilesRecursive(
 			[NotNull] this IT4File file,
-			[NotNull] T4IncludeGuard guard
+			[NotNull] T4IncludeGuard<IPsiSourceFile> guard
 		)
 		{
 			var sourceFile = file.GetSourceFile();

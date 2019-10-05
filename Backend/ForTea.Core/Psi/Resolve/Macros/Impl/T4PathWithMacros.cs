@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.Tree;
@@ -11,7 +10,6 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
@@ -53,14 +51,12 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			OutsideSolutionManager = Solution.GetComponent<T4OutsideSolutionSourceFileManager>();
 		}
 
-		public IT4File ResolveT4File(T4IncludeGuard guard)
+		public IT4File ResolveT4File(T4IncludeGuard<IPsiSourceFile> guard)
 		{
 			if (!ResolvePath().ExistsFile) return null;
 			var target = Resolve();
 			if (target == null) return null;
 			if (!guard.CanProcess(target)) return null;
-			if (target.LanguageType.Is<T4ProjectFileType>())
-				return (IT4File) target.GetPrimaryPsiFile();
 			return BuildT4Tree(target);
 		}
 

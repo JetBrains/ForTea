@@ -13,9 +13,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generat
 	public sealed class T4CSharpExecutableCodeGenerator : T4CSharpCodeGenerator
 	{
 		public T4CSharpExecutableCodeGenerator(
-			[NotNull] IT4File file,
+			[NotNull] IT4File actualFile,
 			[NotNull] ISolution solution
-		) : base(file, solution)
+		) : base(actualFile, solution)
 		{
 		}
 
@@ -23,8 +23,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generat
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
 		)
 		{
-			var referenceExtractionManager = File.GetSolution().GetComponent<IT4ReferenceExtractionManager>();
-			return new T4CSharpExecutableIntermediateConverter(intermediateResult, File, referenceExtractionManager);
+			var referenceExtractionManager = ActualFile.GetSolution().GetComponent<IT4ReferenceExtractionManager>();
+			return new T4CSharpExecutableIntermediateConverter(intermediateResult, ActualFile, referenceExtractionManager);
 		}
 	}
 }

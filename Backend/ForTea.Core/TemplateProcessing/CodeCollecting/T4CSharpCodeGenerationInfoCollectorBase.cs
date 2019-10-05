@@ -12,7 +12,6 @@ using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
@@ -26,7 +25,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4EncodingsManager EncodingsManager { get; }
 
 		[NotNull]
-		private T4IncludeGuard Guard { get; }
+		private T4IncludeGuard<IPsiSourceFile> Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
@@ -44,7 +43,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Guard = new T4IncludeGuard();
+			Guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 

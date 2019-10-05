@@ -13,7 +13,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 	/// Is effectively a wrapper that helps to update <see cref="T4FileDependencyGraph">the real graph</see>
 	/// </summary>
 	[PsiComponent]
-	public class T4FileDependencyManager
+	public sealed class T4FileDependencyManager
 	{
 		[NotNull]
 		private ILogger Logger { get; }
@@ -22,7 +22,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		private object Locker { get; } = new object();
 
 		[NotNull]
-		private IT4FileDependencyGraph Graph { get; } = new T4FileDependencyGraph();
+		public IT4FileDependencyGraph Graph { get; } = new T4FileDependencyGraph();
 
 		[NotNull]
 		private IPsiServices PsiServices { get; }

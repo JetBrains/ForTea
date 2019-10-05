@@ -1,13 +1,11 @@
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public class T4ParameterDescription : T4ElementDescriptionBase
+	public sealed class T4ParameterDescription : T4ElementDescriptionBase
 	{
 		[NotNull]
 		public ITreeNode TypeToken { get; }
@@ -29,7 +27,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			[NotNull] ITreeNode nameToken,
 			[NotNull] string typeString,
 			[NotNull] string nameString
-		) : base(typeToken.GetContainingFile().As<IT4File>().NotNull())
+		) : base(typeToken.GetSourceFile())
 		{
 			TypeToken = typeToken;
 			NameToken = nameToken;

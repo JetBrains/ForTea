@@ -15,7 +15,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 	public class T4IncludeAwareDaemonProcessVisitor : IRecursiveElementProcessor
 	{
 		[NotNull]
-		private T4IncludeGuard Guard { get; }
+		private T4IncludeGuard<IPsiSourceFile> Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private List<HighlightingInfo> MyHighlightings { get; } = new List<HighlightingInfo>();
@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		public T4IncludeAwareDaemonProcessVisitor([NotNull] IPsiSourceFile initialFile)
 		{
 			HasSeenRecursiveInclude = false;
-			Guard = new T4IncludeGuard();
+			Guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
 			Guard.StartProcessing(initialFile);
 		}
 

@@ -2,23 +2,21 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
-using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public class T4ExpressionDescription : T4AppendableElementDescriptionBase
+	public sealed class T4ExpressionDescription : T4AppendableElementDescriptionBase
 	{
 		[NotNull]
 		private IT4Code Source { get; }
 
-		public T4ExpressionDescription([NotNull] IT4Code source) :
-			base(source.GetContainingFile().As<IT4File>().NotNull()) => Source = source;
+		public T4ExpressionDescription([NotNull] IT4Code source) : base(source.GetSourceFile()) => Source = source;
 
 		public override void AppendContent(
 			T4CSharpCodeGenerationResult destination,
 			IT4ElementAppendFormatProvider provider,
-			IT4File context
+			IPsiSourceFile context
 		)
 		{
 			if (!provider.ShouldBreakExpressionWithLineDirective) AppendAllContent(destination, provider, context);
@@ -28,7 +26,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		private void AppendAllContentBreakingExpression(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4ElementAppendFormatProvider provider,
-			[NotNull] IT4File context
+			[NotNull] IPsiSourceFile context
 		)
 		{
 			destination.AppendLine(provider.Indent);
@@ -44,7 +42,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		private void AppendAllContent(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4ElementAppendFormatProvider provider,
-			[NotNull] IT4File context
+			[NotNull] IPsiSourceFile context
 		)
 		{
 			destination.AppendLine(provider.Indent);
@@ -79,12 +77,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		private void AppendMainContent(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4ElementAppendFormatProvider provider,
-			[NotNull] IT4File context
+			[NotNull] IPsiSourceFile context
 		)
 		{
 			destination.Append(provider.CodeCommentStart);
 			provider.AppendCompilationOffset(destination, GetOffset(Source));
-			if (HasSameSource(context)) provider.AppendMappedIfNeeded(destination, Source);
+			if (HasSameSourceFile(context)) provider.AppendMappedIfNeeded(destination, Source);
 			else destination.Append(Source.GetText());
 			destination.Append(provider.CodeCommentEnd);
 		}

@@ -1,39 +1,42 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Psi.Utils
 {
-	public sealed class T4IncludeGuard
+	public sealed class T4IncludeGuard<T> where T : class
 	{
-		[NotNull, ItemCanBeNull]
-		private ISet<IPsiSourceFile> SeenFiles { get; }
+		[NotNull]
+		private IEqualityComparer<T> Comparer { get; }
 
 		[NotNull, ItemCanBeNull]
-		private Stack<IPsiSourceFile> FilesBeingProcessed { get; }
+		private ISet<T> SeenFiles { get; }
 
-		public T4IncludeGuard()
+		[NotNull, ItemCanBeNull]
+		private Stack<T> FilesBeingProcessed { get; }
+
+		public T4IncludeGuard([NotNull] EqualityComparer<T> comparer)
 		{
-			FilesBeingProcessed = new Stack<IPsiSourceFile>();
-			SeenFiles = new HashSet<IPsiSourceFile>();
+			Comparer = comparer;
+			FilesBeingProcessed = new Stack<T>();
+			SeenFiles = new HashSet<T>();
 		}
 
-		public bool CanProcess([NotNull] IPsiSourceFile file) => !FilesBeingProcessed.Contains(file);
+		public bool CanProcess([NotNull] T file) => !FilesBeingProcessed.Contains(file);
 
-		public void StartProcessing([CanBeNull] IPsiSourceFile file)
+		public void StartProcessing([CanBeNull] T file)
 		{
 			FilesBeingProcessed.Push(file);
 			SeenFiles.Add(file);
 		}
 
-		public bool HasSeenFile([NotNull] IPsiSourceFile file) => SeenFiles.Contains(file);
+		public bool HasSeenFile([NotNull] T file) => SeenFiles.Contains(file);
 		public void EndProcessing() => FilesBeingProcessed.Pop();
 		public bool IsOnTopLevel => FilesBeingProcessed.Count == 1;
 
-		public void TryEndProcessing([CanBeNull] IPsiSourceFile file)
+		public void TryEndProcessing([CanBeNull] T file)
 		{
 			if (file == null) return;
-			if (FilesBeingProcessed.Peek() == file) FilesBeingProcessed.Pop();
+			if (FilesBeingProcessed.Peek().Equals(file)) FilesBeingProcessed.Pop();
 		}
 	}
 }

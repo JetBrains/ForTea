@@ -18,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 		IPsiSourceFile Resolve();
 
 		[CanBeNull]
-		IT4File ResolveT4File([NotNull] T4IncludeGuard guard);
+		IT4File ResolveT4File([NotNull] T4IncludeGuard<IPsiSourceFile> guard);
 
 		bool IsEmpty { get; }
 	}

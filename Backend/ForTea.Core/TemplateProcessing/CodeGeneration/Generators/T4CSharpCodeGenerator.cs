@@ -13,14 +13,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 	public class T4CSharpCodeGenerator : T4CSharpCodeGeneratorBase
 	{
 		public T4CSharpCodeGenerator(
-			[NotNull] IT4File file,
+			[NotNull] IT4File actualFile,
 			[NotNull] ISolution solution
-		) : base(file) => Collector = new T4CSharpCodeGenerationInfoCollector(file, solution);
+		) : base(actualFile) => Collector = new T4CSharpCodeGenerationInfoCollector(actualFile, solution);
 
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		) => new T4CSharpIntermediateConverter(intermediateResult, File);
+		) => new T4CSharpIntermediateConverter(intermediateResult, ActualFile);
 	}
 }
