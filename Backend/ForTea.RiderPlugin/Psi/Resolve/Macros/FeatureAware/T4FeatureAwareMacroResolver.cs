@@ -94,7 +94,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 
 		private void AddMsBuildMacros(Dictionary<string, string> result)
 		{
-			var buildTool = SolutionToolset.CurrentBuildTool;
+			var buildTool = SolutionToolset.GetBuildTool();
 			if (buildTool == null) return;
 			var container = MsBuildProperties.Get(buildTool);
 			if (container == null) return;
