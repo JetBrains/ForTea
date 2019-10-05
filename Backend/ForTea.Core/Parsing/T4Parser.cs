@@ -15,7 +15,6 @@ namespace GammaJul.ForTea.Core.Parsing
 		[NotNull]
 		public IT4File Parse() => (IT4File) ParseFile();
 
-		// TODO: set range translator
 		IFile IParser.ParseFile() => (IFile) ParseFile();
 
 		public T4Parser([NotNull] ILexer lexer)
@@ -26,6 +25,8 @@ namespace GammaJul.ForTea.Core.Parsing
 
 		public override TreeElement ParseFile()
 		{
+			// Since the included files are not part of PSI,
+			// the default range translator will do
 			var file = ParseFileInternal();
 			T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
 			return file;
