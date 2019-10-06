@@ -80,11 +80,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			[NotNull] IPsiSourceFile context
 		)
 		{
-			destination.Append(provider.CodeCommentStart);
+			destination.Append(provider.ExpressionCommentStart);
 			provider.AppendCompilationOffset(destination, GetOffset(Source));
 			if (HasSameSourceFile(context)) provider.AppendMappedIfNeeded(destination, Source);
 			else destination.Append(Source.GetText());
-			destination.Append(provider.CodeCommentEnd);
+			destination.Append(provider.ExpressionCommentEnd);
 		}
 
 		private void AppendOpeningLineDirective(

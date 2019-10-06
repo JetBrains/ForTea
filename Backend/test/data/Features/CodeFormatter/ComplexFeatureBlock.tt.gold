@@ -1,13 +1,13 @@
-﻿<# int x = 0; #>
+﻿<#
+  int x = 0;
+#>
 <#+
-
-    public static void Foo(int number, string line)
+  public static void Foo(int number, string line)
+  {
+    for (int i = 0; i < number; i += 1)
     {
-        for (int i = 0; i < number; i += 1)
-        {
-            Write(line);
-        }
+      Write(line);
     }
-
+  }
 #>
 {caret}

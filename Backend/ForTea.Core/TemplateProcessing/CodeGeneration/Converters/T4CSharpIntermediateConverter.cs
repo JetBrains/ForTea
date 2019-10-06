@@ -169,6 +169,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => "";
 		public override string CodeCommentEnd => "";
+		public override string ExpressionCommentStart => "";
+		public override string ExpressionCommentEnd => "";
 		public override string Indent => new string(' ', CurrentIndent * 4); // TODO: use user indents?
 		public override bool ShouldBreakExpressionWithLineDirective => false;
 
