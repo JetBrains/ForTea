@@ -20,5 +20,8 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		/// </summary>
 		[NotNull]
 		FileSystemPath FindBestRoot([NotNull] FileSystemPath includee);
+
+		[NotNull, ItemNotNull]
+		IEnumerable<FileSystemPath> FindIndirectIncludesTransitiveClosure([NotNull] FileSystemPath path);
 	}
 }
