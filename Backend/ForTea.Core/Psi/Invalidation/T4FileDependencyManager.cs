@@ -30,9 +30,6 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		[CanBeNull]
 		private T4FileDependencyInvalidator Invalidator { get; set; }
 
-		[NotNull]
-		private HashSet<FileSystemPath> FilesBeingCommitted { get; } = new HashSet<FileSystemPath>();
-
 		public T4FileDependencyManager(Lifetime lifetime, [NotNull] IPsiServices psiServices, [NotNull] ILogger logger)
 		{
 			PsiServices = psiServices;
@@ -77,10 +74,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 				Invalidator = null;
 			}
 
-			if (invalidator == null) return;
-			invalidator.CommittedFilePaths.RemoveWhere(FilesBeingCommitted.Contains);
-			FilesBeingCommitted.AddRange(invalidator.CommittedFilePaths);
-			invalidator.CommitNeededDocuments();
+			invalidator?.CommitNeededDocuments();
 		}
 
 		private void OnBeforeFilesCommit()
