@@ -106,7 +106,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			foreach (var description in IntermediateResult.ImportDescriptions)
 			{
-				description.AppendContent(Result, this, File);
+				description.AppendContent(Result, this, File.GetSourceFile());
 			}
 		}
 
@@ -124,7 +124,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformMethod();
 			foreach (var description in IntermediateResult.FeatureDescriptions)
 			{
-				description.AppendContent(Result, this, File);
+				description.AppendContent(Result, this, File.GetSourceFile());
 			}
 
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
@@ -187,7 +187,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine();
 			foreach (var description in IntermediateResult.TransformationDescriptions)
 			{
-				description.AppendContent(Result, this, File);
+				description.AppendContent(Result, this, File.GetSourceFile());
 			}
 
 			AppendIndent();

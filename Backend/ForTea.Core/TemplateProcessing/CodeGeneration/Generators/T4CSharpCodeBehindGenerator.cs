@@ -1,8 +1,14 @@
+using System.Linq;
+using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Files;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -15,15 +21,52 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 	/// </summary>
 	internal sealed class T4CSharpCodeBehindGenerator : T4CSharpCodeGeneratorBase
 	{
-		public T4CSharpCodeBehindGenerator(
-			[NotNull] IT4File file,
-			[NotNull] ISolution solution
-		) : base(file) => Collector = new T4CSharpCodeBehindGenerationInfoCollector(file, solution);
+		[NotNull]
+		private ISolution Solution { get; }
 
-		protected override T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
+		[NotNull]
+		private T4FileDependencyManager DependencyManager { get; }
+
+		public T4CSharpCodeBehindGenerator(
+			[NotNull] IT4File actualFile,
+			[NotNull] ISolution solution
+		) : base(actualFile)
+		{
+			Solution = solution;
+			DependencyManager = solution.GetComponent<T4FileDependencyManager>();
+		}
+
+		protected override T4CSharpCodeGenerationInfoCollectorBase Collector =>
+			new T4CSharpCodeBehindGenerationInfoCollector(Root, Solution);
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		) => new T4CSharpCodeBehindIntermediateConverter(intermediateResult, File);
+		) => new T4CSharpCodeBehindIntermediateConverter(intermediateResult, ActualFile);
+
+		/// <summary>
+		/// In generated code-behind, we use root file to provide intelligent support for 
+		/// </summary>
+		[NotNull]
+		private IT4File Root
+		{
+			get
+			{
+				var sourceLocation = ActualFile.GetSourceFile().GetLocation();
+				var rootLocation = DependencyManager.Graph.FindBestRoot(sourceLocation);
+				var rootPsiSourceFile = Solution
+					.FindProjectItemsByLocation(rootLocation)
+					.OfType<IProjectFile>()
+					.SingleOrDefault()
+					?.ToSourceFile();
+				if (ActualFile.GetSourceFile() == rootPsiSourceFile)
+					return ActualFile;
+
+				var root = rootPsiSourceFile
+					?.GetPsiFiles<T4Language>()
+					.OfType<IT4File>()
+					.Single();
+				return root.NotNull();
+			}
+		}
 	}
 }

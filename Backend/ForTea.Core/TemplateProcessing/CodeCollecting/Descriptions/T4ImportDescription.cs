@@ -3,7 +3,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
@@ -17,7 +17,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		private string Presentation { get; }
 
 		private T4ImportDescription([NotNull] ITreeNode source, [NotNull] string presentation) :
-			base(source.GetContainingFile().As<IT4File>().NotNull())
+			base(source.GetSourceFile())
 		{
 			Source = source;
 			Presentation = presentation;
@@ -36,14 +36,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		public override void AppendContent(
 			T4CSharpCodeGenerationResult destination,
 			IT4ElementAppendFormatProvider provider,
-			IT4File context
+			IPsiSourceFile context
 		)
 		{
 			destination.Append(provider.Indent);
 			destination.AppendLine(GetLineDirectiveText(Source));
 			provider.AppendCompilationOffset(destination, GetOffset(Source));
 			destination.Append("using ");
-			if (HasSameSource(context)) destination.AppendMapped(Source);
+			if (HasSameSourceFile(context)) destination.AppendMapped(Source);
 			else destination.Append(Presentation);
 			destination.AppendLine(";");
 			destination.Append(provider.Indent);

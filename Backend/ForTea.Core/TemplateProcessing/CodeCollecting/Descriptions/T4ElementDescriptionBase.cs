@@ -1,15 +1,15 @@
-using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
 	public abstract class T4ElementDescriptionBase
 	{
 		[CanBeNull]
-		private IT4File Origin { get; }
+		private IPsiSourceFile SourceFile { get; }
 
-		protected T4ElementDescriptionBase([CanBeNull] IT4File source = null) => Origin = source;
+		protected T4ElementDescriptionBase([CanBeNull] IPsiSourceFile source = null) => SourceFile = source;
 
-		public bool HasSameSource([NotNull] IT4File file) => file == Origin;
+		public bool HasSameSourceFile([CanBeNull] IPsiSourceFile file) => file == SourceFile;
 	}
 }

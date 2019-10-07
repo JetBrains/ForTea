@@ -8,7 +8,8 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration {
-
+	/// TODO: replace
+	/// with <see cref="JetBrains.ReSharper.Psi.Web.Generation.GenerationResults"> standard implementation</see>
 	/// <summary>Holds a generated result for code-behind generation.</summary>
 	public sealed class T4CSharpCodeGenerationResult {
 
@@ -75,7 +76,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration {
 		/// <param name="file">The T4 file that will be used for code-behind generation.</param>
 		public T4CSharpCodeGenerationResult([NotNull] IT4File file) {
 			Builder = new StringBuilder(1024);
-			GeneratedRangeMap = new GeneratedRangeMapTree(file);
+			GeneratedRangeMap = GeneratedRangeMapFactory.CreateGeneratedRangeMap(file);
 		}
 
 	}

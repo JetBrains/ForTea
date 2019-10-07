@@ -12,17 +12,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		private const string DefaultErrorMessage = "ErrorGeneratingOutput";
 
 		[NotNull]
-		protected IT4File File { get; }
+		protected IT4File ActualFile { get; }
 
 		/// <summary>Initializes a new instance of the <see cref="T4CSharpCodeGeneratorBase"/> class.</summary>
-		/// <param name="file">The associated T4 file whose C# code behind will be generated.</param>
-		protected T4CSharpCodeGeneratorBase([NotNull] IT4File file) =>
-			File = file ?? throw new ArgumentNullException(nameof(file));
+		/// <param name="actualFile">The associated T4 file whose C# code behind will be generated.</param>
+		protected T4CSharpCodeGeneratorBase([NotNull] IT4File actualFile) =>
+			ActualFile = actualFile ?? throw new ArgumentNullException(nameof(actualFile));
 
 		[NotNull]
 		public T4CSharpCodeGenerationResult Generate() =>
 			CreateConverter(Collector.Collect()).Convert();
 
+		[NotNull]
 		public T4CSharpCodeGenerationResult GenerateSafe()
 		{
 			try
@@ -31,7 +32,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 			}
 			catch (T4OutputGenerationException)
 			{
-				var result = new T4CSharpCodeGenerationResult(File);
+				var result = new T4CSharpCodeGenerationResult(ActualFile);
 				result.Append(DefaultErrorMessage);
 				return result;
 			}

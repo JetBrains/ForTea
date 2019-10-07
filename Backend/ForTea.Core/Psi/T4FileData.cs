@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi {
@@ -60,7 +61,7 @@ namespace GammaJul.ForTea.Core.Psi {
 		public T4FileData([NotNull] IT4File t4File)
 		{
 			HandleDirectives(t4File);
-			var guard = new T4IncludeGuard();
+			var guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
 			foreach (var includedFile in t4File.GetIncludedFilesRecursive(guard))
 			{
 				HandleDirectives(includedFile);
