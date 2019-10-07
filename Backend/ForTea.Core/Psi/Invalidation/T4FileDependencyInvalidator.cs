@@ -33,7 +33,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		public void CommitNeededDocuments()
 		{
 			if (CommittedFilePaths.Count == 0) return;
-			bool markedAsDirty = false;
+			bool markedAsDirty;
 
 			// Mark includers file as dirty if their included files have changed.
 			using (WriteLockCookie.Create())
@@ -41,13 +41,14 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 				var includers = CommittedFilePaths
 					.SelectMany(committedFilePath => FileDependencyManager.GetIncluders(committedFilePath))
 					.Where(includer => !CommittedFilePaths.Contains(includer))
+					.Distinct() // Avoid unnecessary work
 					.SelectMany(includer => PsiServices.Solution.FindProjectItemsByLocation(includer))
-					.OfType<IProjectFile>();
-				foreach (var includer in includers
-				)
+					.OfType<IProjectFile>()
+					.AsList();
+				markedAsDirty = includers.Any();
+				foreach (var includer in includers)
 				{
 					PsiServices.MarkAsDirty(includer);
-					markedAsDirty = true;
 				}
 			}
 
