@@ -54,8 +54,6 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 			}
 		}
 
-		public IEnumerable<FileSystemPath> GetIncluders(FileSystemPath includee) => ReversedIncludeGraph[includee];
-
 		public FileSystemPath FindBestRoot(FileSystemPath includee) => SinkSearcher.FindClosestSink(includee);
 
 		public IEnumerable<FileSystemPath> FindIndirectIncludesTransitiveClosure(FileSystemPath path) =>
