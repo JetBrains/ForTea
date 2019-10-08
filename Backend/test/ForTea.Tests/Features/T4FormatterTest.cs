@@ -1,4 +1,3 @@
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
@@ -27,14 +26,16 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("SmallLoop")]
 		[TestCase("StatementAfterTargetLanguage")]
 		[TestCase("StatementsAroundTargetLanguage")]
-		[TestCase("StatementAndFeatureBlocks", Ignore = "Not implemented")]
+		[TestCase("StatementAndFeatureBlocks")]
 		[TestCase("FeatureBlock")]
 		[TestCase("RemovingIndent")]
 		[TestCase("MisplacedBlockEnd")]
-		[TestCase("ExpressionBlock", Ignore = "Not implemented")]
+		[TestCase("ExpressionBlock")]
 		[TestCase("ComplexFeatureBlock")]
 		[TestCase("BrokenFeatureBlock")]
 		[TestCase("InnerClasses")]
+		[TestCase("SemiBrokenBlock")]
+		[TestCase("OneLineStatement")]
 		public void TestFormatter([NotNull] string name) => DoOneTest(name);
 
 		protected override void DoTest(Lifetime lifetime, IProject testProject)

@@ -13,6 +13,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		string ExpressionWritingSuffix { get; }
 		string CodeCommentStart { get; }
 		string CodeCommentEnd { get; }
+		string ExpressionCommentStart { get; }
+		string ExpressionCommentEnd { get; }
 		string Indent { get; }
 		bool ShouldBreakExpressionWithLineDirective { get; }
 
