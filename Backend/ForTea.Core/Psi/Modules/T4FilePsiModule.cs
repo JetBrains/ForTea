@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
@@ -58,12 +59,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[ItemNotNull]
 		protected override IEnumerable<IPsiSourceFile> GetSourceFiles() => new[] {SourceFile};
 
-		private void OnDataFileChanged(Pair<IPsiSourceFile, T4FileDataDiff> pair) {
-			(IPsiSourceFile first, T4FileDataDiff second) = pair;
-
-			if (first != SourceFile)
-				return;
-
+		private void OnDataFileChanged(Pair<IPsiSourceFile, T4DeclaredAssembliesDiff> pair) {
+			(IPsiSourceFile first, T4DeclaredAssembliesDiff second) = pair;
+			if (first != SourceFile) return;
 			if (_shellLocks.IsWriteAccessAllowed())
 				OnDataFileChanged(second);
 			else {
@@ -74,7 +72,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 		/// <summary>Called when the associated data file changed: added/removed assemblies or includes.</summary>
 		/// <param name="dataDiff">The difference between the old and new data.</param>
-		private void OnDataFileChanged([NotNull] T4FileDataDiff dataDiff) {
+		private void OnDataFileChanged([NotNull] T4DeclaredAssembliesDiff dataDiff) {
 			_shellLocks.AssertWriteAccessAllowed();
 			bool hasChanges = true;
 			_resolver.InvalidateAssemblies(
@@ -193,7 +191,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			var documentManager = solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(file, documentManager);
 
-			solution.GetComponent<T4FileDataCache>().FileDataChanged.Advise(lifetime, OnDataFileChanged);
+			solution.GetComponent<T4DeclaredAssembliesCache>().FileDataChanged.Advise(lifetime, OnDataFileChanged);
 			AddBaseReferences();
 		}
 	}

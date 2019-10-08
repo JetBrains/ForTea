@@ -9,56 +9,53 @@ using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi {
-	internal sealed class T4FileData {
+namespace GammaJul.ForTea.Core.Psi.Cache
+{
+	internal sealed class T4DeclaredAssembliesInfo
+	{
 		[NotNull, ItemNotNull]
 		private readonly JetHashSet<IT4PathWithMacros> ReferencedAssemblies = new JetHashSet<IT4PathWithMacros>();
 
 		private void HandleDirectives([NotNull] IT4File file)
 		{
 			var assemblyDirectives = file.Blocks.OfType<IT4AssemblyDirective>();
+			string assemblyAttributeName = T4DirectiveInfoManager.Assembly.NameAttribute.Name;
 			foreach (var directive in assemblyDirectives)
 			{
-				HandleAssemblyDirective(directive);
+				string assemblyNameOrFile = directive.GetAttributeValueByName(assemblyAttributeName);
+				if (assemblyNameOrFile.IsNullOrWhitespace()) continue;
+				ReferencedAssemblies.Add(new T4PathWithMacros(assemblyNameOrFile, directive.GetSourceFile().NotNull()));
 			}
-		}
-
-		/// <summary>Handles an assembly directive.</summary>
-		/// <param name="directive">The directive containing a potential assembly reference.</param>
-		private void HandleAssemblyDirective([NotNull] IT4AssemblyDirective directive) {
-			string assemblyNameOrFile = directive
-				.GetAttributeValueByName(T4DirectiveInfoManager.Assembly.NameAttribute.Name);
-			if (assemblyNameOrFile.IsNullOrWhitespace()) return;
-			ReferencedAssemblies.Add(new T4PathWithMacros(assemblyNameOrFile, directive.GetSourceFile().NotNull()));
 		}
 
 		/// <summary>Computes a difference between this data and another one.</summary>
-		/// <param name="oldData">The old data.</param>
+		/// <param name="oldDeclaredAssembliesInfo">The old data.</param>
 		/// <returns>
-		/// An instance of <see cref="T4FileDataDiff"/> containing the difference between the two data,
+		/// An instance of <see cref="T4DeclaredAssembliesDiff"/> containing the difference between the two data,
 		/// or <c>null</c> if there are no differences.
 		/// </returns>
 		[CanBeNull]
-		public T4FileDataDiff DiffWith([CanBeNull] T4FileData oldData) {
-
-			if (oldData == null) {
+		public T4DeclaredAssembliesDiff DiffWith([CanBeNull] T4DeclaredAssembliesInfo oldDeclaredAssembliesInfo)
+		{
+			if (oldDeclaredAssembliesInfo == null)
+			{
 				if (ReferencedAssemblies.Count == 0) return null;
-				return new T4FileDataDiff(ReferencedAssemblies, EmptyList<IT4PathWithMacros>.InstanceList);
+				return new T4DeclaredAssembliesDiff(ReferencedAssemblies, EmptyList<IT4PathWithMacros>.InstanceList);
 			}
 
-			oldData.ReferencedAssemblies.Compare(
+			oldDeclaredAssembliesInfo.ReferencedAssemblies.Compare(
 				ReferencedAssemblies,
 				out JetHashSet<IT4PathWithMacros> addedAssemblies,
 				out JetHashSet<IT4PathWithMacros> removedAssemblies
 			);
-			
+
 			if (addedAssemblies.Count == 0 && removedAssemblies.Count == 0) return null;
-			return new T4FileDataDiff(addedAssemblies, removedAssemblies);
+			return new T4DeclaredAssembliesDiff(addedAssemblies, removedAssemblies);
 		}
 
-		/// <summary>Initializes a new instance of the <see cref="T4FileData"/> class.</summary>
+		/// <summary>Initializes a new instance of the <see cref="T4DeclaredAssembliesInfo"/> class.</summary>
 		/// <param name="t4File">The T4 file that will be scanned for data.</param>
-		public T4FileData([NotNull] IT4File t4File)
+		public T4DeclaredAssembliesInfo([NotNull] IT4File t4File)
 		{
 			HandleDirectives(t4File);
 			var guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
@@ -67,7 +64,5 @@ namespace GammaJul.ForTea.Core.Psi {
 				HandleDirectives(includedFile);
 			}
 		}
-
 	}
-
 }

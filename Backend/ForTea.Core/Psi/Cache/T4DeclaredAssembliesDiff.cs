@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 
-namespace GammaJul.ForTea.Core.Psi {
-
-	/// <summary>Represents the difference between two <see cref="T4FileData" />.</summary>
-	public sealed class T4FileDataDiff {
-
+namespace GammaJul.ForTea.Core.Psi.Cache
+{
+	/// <summary>Represents the difference between two <see cref="T4DeclaredAssembliesInfo" />.</summary>
+	public sealed class T4DeclaredAssembliesDiff
+	{
 		/// <summary>Gets an enumeration of all added assemblies.</summary>
 		[NotNull]
 		[ItemNotNull]
@@ -17,14 +17,13 @@ namespace GammaJul.ForTea.Core.Psi {
 		[ItemNotNull]
 		public IEnumerable<IT4PathWithMacros> RemovedAssemblies { get; }
 
-		public T4FileDataDiff(
+		public T4DeclaredAssembliesDiff(
 			[NotNull] [ItemNotNull] IEnumerable<IT4PathWithMacros> addedAssemblies,
 			[NotNull] [ItemNotNull] IEnumerable<IT4PathWithMacros> removedAssemblies
-		) {
+		)
+		{
 			AddedAssemblies = addedAssemblies;
 			RemovedAssemblies = removedAssemblies;
 		}
-
 	}
-
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -41,7 +42,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 			[NotNull] IProjectFile file);
 
 		public void InvalidateAssemblies(
-			T4FileDataDiff dataDiff,
+			T4DeclaredAssembliesDiff dataDiff,
 			ref bool hasChanges,
 			IProjectFile file,
 			T4AssemblyReferenceManager referenceManager
