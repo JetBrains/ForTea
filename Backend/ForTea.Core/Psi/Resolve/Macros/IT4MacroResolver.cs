@@ -17,14 +17,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 		[NotNull]
 		IReadOnlyDictionary<string, string> ResolveAllLightMacros([NotNull] IProjectFile file);
 
-		// TODO: move somewhere else. Wtf Macro resolver handles assemblies?
-		void InvalidateAssemblies(
-			[NotNull] T4DeclaredAssembliesDiff dataDiff,
-			ref bool hasChanges,
-			[NotNull] IProjectFile file,
-			[NotNull] T4AssemblyReferenceManager referenceManager
-		);
-
 		bool IsSupported([NotNull] IT4Macro macro);
 	}
 }

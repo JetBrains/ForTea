@@ -15,6 +15,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		/// It is only possible to track this by choosing the most complete context for each file,
 		/// i.e. the uppermost file that includes the current one.
 		/// </summary>
+		/// TODO: cache root?
 		[NotNull]
 		FileSystemPath FindBestRoot([NotNull] FileSystemPath includee);
 

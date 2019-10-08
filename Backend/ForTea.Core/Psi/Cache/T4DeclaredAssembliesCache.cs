@@ -27,8 +27,10 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		public T4DeclaredAssembliesCache(Lifetime lifetime, [NotNull] PsiFiles psiFiles)
 		{
-			FileDataChanged =
-				new Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>>(lifetime, "T4DeclaredAssembliesCache.FileDataChanged");
+			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>>(
+				lifetime,
+				"T4DeclaredAssembliesCache.FileDataChanged"
+			);
 			lifetime.Bracket(
 				() => psiFiles.PsiFileCreated += OnPsiFileChanged,
 				() => psiFiles.PsiFileCreated -= OnPsiFileChanged
