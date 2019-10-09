@@ -39,14 +39,14 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 
 		public HybridCollection<IPsiModule> Modules => new HybridCollection<IPsiModule>(PsiModule);
 
-		public T4OutsideSolutionSourceFileManager(
-			Lifetime lifetime,
+		public T4OutsideSolutionSourceFileManager(Lifetime lifetime,
 			[NotNull] IProjectFileExtensions projectFileExtensions,
 			[NotNull] PsiProjectFileTypeCoordinator psiProjectFileTypeCoordinator,
 			[NotNull] DocumentManager documentManager,
 			[NotNull] ISolution solution,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IFileSystemTracker fileSystemTracker
+			[NotNull] IFileSystemTracker fileSystemTracker,
+			[NotNull] PsiSourceFileWithLocationTracker psiSourceFileWithLocationTracker
 		)
 		{
 			ProjectFileExtensions = projectFileExtensions;
@@ -61,6 +61,7 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 				t4Environment.TargetFrameworkId,
 				fileSystemTracker,
 				lifetime,
+				psiSourceFileWithLocationTracker,
 				false);
 		}
 
