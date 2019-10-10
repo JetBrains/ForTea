@@ -11,7 +11,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 	public interface IT4ReferenceExtractionManager
 	{
 		[NotNull, ItemNotNull]
-		IEnumerable<PortableExecutableReference> ExtractPortableReferencesTransitive([NotNull] IT4File file, Lifetime lifetime);
+		IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(
+			Lifetime lifetime,
+			[NotNull] IT4File file);
 
 		[NotNull]
 		IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive([NotNull] IT4File file);

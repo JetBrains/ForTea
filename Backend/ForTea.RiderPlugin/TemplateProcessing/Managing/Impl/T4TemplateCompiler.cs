@@ -71,7 +71,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			{
 				try
 				{
-					var references = ReferenceExtractionManager.ExtractPortableReferencesTransitive(file, lifetime);
+					var references = ReferenceExtractionManager.ExtractPortableReferencesTransitive(lifetime, file);
 					string code = GenerateCode(file);
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);
 					var compilation = CreateCompilation(code, references, executablePath);
