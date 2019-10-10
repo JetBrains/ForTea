@@ -79,7 +79,7 @@ namespace GammaJul.ForTea.Core.Tree
 		[NotNull, ItemNotNull]
 		public static IEnumerable<IT4File> GetThisIncludedFilesRecursive([NotNull] this IT4File file)
 		{
-			var guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
+			var guard = new T4IncludeGuard<IPsiSourceFile>();
 			return file.GetThisIncludedFilesRecursive(guard);
 		}
 

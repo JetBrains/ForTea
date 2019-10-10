@@ -5,18 +5,14 @@ namespace GammaJul.ForTea.Core.Psi.Utils
 {
 	public sealed class T4IncludeGuard<T> where T : class
 	{
-		[NotNull]
-		private IEqualityComparer<T> Comparer { get; }
-
 		[NotNull, ItemCanBeNull]
 		private ISet<T> SeenFiles { get; }
 
 		[NotNull, ItemCanBeNull]
 		private Stack<T> FilesBeingProcessed { get; }
 
-		public T4IncludeGuard([NotNull] EqualityComparer<T> comparer)
+		public T4IncludeGuard()
 		{
-			Comparer = comparer;
 			FilesBeingProcessed = new Stack<T>();
 			SeenFiles = new HashSet<T>();
 		}
@@ -36,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Utils
 		public void TryEndProcessing([CanBeNull] T file)
 		{
 			if (file == null) return;
-			if (FilesBeingProcessed.Peek().Equals(file)) FilesBeingProcessed.Pop();
+			if (EqualityComparer<T>.Default.Equals(FilesBeingProcessed.Peek(), file)) FilesBeingProcessed.Pop();
 		}
 	}
 }
