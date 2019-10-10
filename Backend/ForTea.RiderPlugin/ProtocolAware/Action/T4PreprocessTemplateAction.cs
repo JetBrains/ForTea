@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
@@ -44,11 +45,11 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 					targetFileManager.SavePreprocessResults(file, message);
 				}
 
-				model.PreprocessingFinished(new T4PreprocessingResult(location, true, null));
+				model.PreprocessingFinished(new T4PreprocessingResult(location, true, new List<T4BuildMessage>()));
 			}
 			catch (T4OutputGenerationException e)
 			{
-				var message = converter.ToT4BuildMessage(e.FailureData);
+				var message = converter.ToT4BuildMessages(e.FailureDatum);
 				var result = new T4PreprocessingResult(location, false, message);
 				model.PreprocessingFinished(result);
 			}
