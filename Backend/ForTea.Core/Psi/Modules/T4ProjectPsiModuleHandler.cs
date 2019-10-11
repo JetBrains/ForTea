@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -45,7 +44,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IProject project,
-			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
 			[NotNull] IT4TemplateKindProvider manager
 		) : base(handler) => _t4PsiModuleProvider = new T4PsiModuleProvider(
@@ -53,7 +51,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			project.Locks,
 			changeManager,
 			t4Environment,
-			resolver,
 			coordinator,
 			manager
 		);

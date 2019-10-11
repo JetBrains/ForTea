@@ -77,24 +77,30 @@ namespace GammaJul.ForTea.Core.Tree
 			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
 
 		[NotNull, ItemNotNull]
-		public static IEnumerable<IT4File> GetIncludedFilesRecursive(
+		public static IEnumerable<IT4File> GetThisIncludedFilesRecursive([NotNull] this IT4File file)
+		{
+			var guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
+			return file.GetThisIncludedFilesRecursive(guard);
+		}
+
+		[NotNull, ItemNotNull]
+		private static IEnumerable<IT4File> GetThisIncludedFilesRecursive(
 			[NotNull] this IT4File file,
 			[NotNull] T4IncludeGuard<IPsiSourceFile> guard
 		)
 		{
+			yield return file;
 			var sourceFile = file.GetSourceFile();
 			if (sourceFile == null || !guard.CanProcess(sourceFile)) yield break;
 			guard.StartProcessing(sourceFile);
 			var includedFiles = file.Blocks.OfType<IT4IncludeDirective>()
 				.Select(include => include.Path.ResolveT4File(guard))
 				.Where(resolution => resolution != null);
-			foreach (var includedFile in includedFiles)
+			foreach (var recursiveInclude in includedFiles
+				.SelectMany(includedFile => includedFile.GetThisIncludedFilesRecursive(guard))
+			)
 			{
-				yield return includedFile;
-				foreach (var recursiveInclude in includedFile.GetIncludedFilesRecursive(guard))
-				{
-					yield return recursiveInclude;
-				}
+				yield return recursiveInclude;
 			}
 		}
 

@@ -15,7 +15,6 @@ using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.References;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
@@ -62,13 +61,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			AssemblyReferenceTarget target,
 			IProject project,
 			IModuleReferenceResolveContext resolveContext
-		)
-		{
-			using (new ILoggerStructuredEx.PhaseCookieDisposable(Logger.Verbose(), target.Name, "Resolution time"))
-			{
-				return ResolveManager.Resolve(target, project, resolveContext);
-			}
-		}
+		) => ResolveManager.Resolve(target, project, resolveContext);
 
 		public FileSystemPath Resolve(IT4AssemblyDirective directive)
 		{

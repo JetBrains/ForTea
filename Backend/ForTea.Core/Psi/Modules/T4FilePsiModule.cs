@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
@@ -20,10 +20,10 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Web.Impl.PsiModules;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Modules {
-
+namespace GammaJul.ForTea.Core.Psi.Modules
+{
 	/// <summary>PSI module managing a single T4 file.</summary>
-	public class T4FilePsiModule : ProjectPsiModuleBase, IT4FilePsiModule
+	public sealed class T4FilePsiModule : ProjectPsiModuleBase, IT4FilePsiModule
 	{
 		private readonly Lifetime _lifetime;
 		[NotNull] private readonly T4AssemblyReferenceManager _assemblyReferenceManager;
@@ -31,11 +31,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IShellLocks _shellLocks;
 		[NotNull] private readonly IT4Environment _t4Environment;
-		[NotNull] private readonly IT4MacroResolver _resolver;
+
+		[NotNull]
+		private T4AssemblyReferenceInvalidator AssemblyReferenceInvalidator { get; }
 
 		[NotNull]
 		private IProjectFile File { get; }
-		
+
 		private IChangeProvider ChangeProvider { get; } = new FakeChangeProvider();
 
 		/// <summary>
@@ -49,41 +51,37 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		/// always <see cref="JetBrains.ProjectModel.ProjectFileType"/>.
 		/// </summary>
 		public override ProjectFileType ProjectFileType => T4ProjectFileType.Instance;
-		
+
 		/// <summary>Returns the source file associated with this PSI module.</summary>
-		[NotNull]
 		public IPsiSourceFile SourceFile { get; }
 
-		[NotNull]
-		[ItemNotNull]
+		[NotNull, ItemNotNull]
 		protected override IEnumerable<IPsiSourceFile> GetSourceFiles() => new[] {SourceFile};
 
-		private void OnDataFileChanged(Pair<IPsiSourceFile, T4FileDataDiff> pair) {
-			(IPsiSourceFile first, T4FileDataDiff second) = pair;
-
-			if (first != SourceFile)
-				return;
-
+		private void OnFileDataChanged(Pair<IPsiSourceFile, T4DeclaredAssembliesDiff> pair)
+		{
+			(IPsiSourceFile first, T4DeclaredAssembliesDiff second) = pair;
+			if (first != SourceFile) return;
 			if (_shellLocks.IsWriteAccessAllowed())
-				OnDataFileChanged(second);
-			else {
+				OnFileDataChanged(second);
+			else
+			{
 				_shellLocks.ExecuteOrQueueEx(_lifetime, "T4PsiModuleOnFileDataChanged",
-					() => _shellLocks.ExecuteWithWriteLock(() => OnDataFileChanged(second)));
+					() => _shellLocks.ExecuteWithWriteLock(() => OnFileDataChanged(second)));
 			}
 		}
 
 		/// <summary>Called when the associated data file changed: added/removed assemblies or includes.</summary>
 		/// <param name="dataDiff">The difference between the old and new data.</param>
-		private void OnDataFileChanged([NotNull] T4FileDataDiff dataDiff) {
+		private void OnFileDataChanged([NotNull] T4DeclaredAssembliesDiff dataDiff)
+		{
 			_shellLocks.AssertWriteAccessAllowed();
-			bool hasChanges = true;
-			_resolver.InvalidateAssemblies(
+			bool hasChanges = AssemblyReferenceInvalidator.InvalidateAssemblies(
 				dataDiff,
-				ref hasChanges,
 				File,
 				_assemblyReferenceManager
 			);
-			
+
 			if (!hasChanges) return;
 
 			// tells the world the module has changed
@@ -93,7 +91,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_shellLocks.ExecuteOrQueueEx("T4PsiModuleChange",
 				() => _changeManager.ExecuteAfterChange(
 					() => _shellLocks.ExecuteWithWriteLock(
-						() => _changeManager.OnProviderChanged(ChangeProvider, changeBuilder.Result, SimpleTaskExecutor.Instance)
+						() => _changeManager.OnProviderChanged(ChangeProvider, changeBuilder.Result,
+							SimpleTaskExecutor.Instance)
 					)
 				)
 			);
@@ -115,7 +114,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			.SelectNotNull(cookie => cookie.Assembly);
 
 		[NotNull]
-		private PsiProjectFile CreateSourceFile([NotNull] IProjectFile projectFile, [NotNull] DocumentManager documentManager)
+		private PsiProjectFile CreateSourceFile([NotNull] IProjectFile projectFile,
+			[NotNull] DocumentManager documentManager)
 			=> new PsiProjectFile(
 				this,
 				projectFile,
@@ -144,7 +144,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_assemblyReferenceManager.References.Clear();
 		}
 
-		private void AddBaseReferences() {
+		private void AddBaseReferences()
+		{
 			_assemblyReferenceManager.TryAddReference("mscorlib");
 			_assemblyReferenceManager.TryAddReference("System");
 			foreach (string assemblyName in _t4Environment.TextTemplatingAssemblyNames)
@@ -157,7 +158,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator
 		) : base(
 			file.GetProject().NotNull(),
@@ -172,10 +172,10 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 			var solution = file.GetSolution();
 			_psiModules = solution.GetComponent<IPsiModules>();
+			AssemblyReferenceInvalidator = solution.GetComponent<T4AssemblyReferenceInvalidator>();
 			_changeManager = changeManager;
 			_shellLocks = shellLocks;
 			_t4Environment = t4Environment;
-			_resolver = resolver;
 
 			var project = file.GetProject();
 			var resolveContext = project?.IsMiscFilesProject() != false
@@ -193,7 +193,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			var documentManager = solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(file, documentManager);
 
-			solution.GetComponent<T4FileDataCache>().FileDataChanged.Advise(lifetime, OnDataFileChanged);
+			solution.GetComponent<T4DeclaredAssembliesCache>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
 			AddBaseReferences();
 		}
 	}

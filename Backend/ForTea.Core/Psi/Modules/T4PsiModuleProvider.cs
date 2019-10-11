@@ -4,7 +4,6 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -29,7 +28,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly IShellLocks _shellLocks;
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IT4Environment _t4Environment;
-		[NotNull] private readonly IT4MacroResolver _resolver;
 		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
 
 		[NotNull]
@@ -147,7 +145,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_changeManager,
 				_shellLocks,
 				_t4Environment,
-				_resolver,
 				_coordinator
 			);
 			_modules[projectFile] = new ModuleWrapper(psiModule, lifetimeDefinition);
@@ -210,7 +207,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
 			[NotNull] IT4TemplateKindProvider templateDataManager
 		)
@@ -219,7 +215,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_shellLocks = shellLocks;
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
-			_resolver = resolver;
 			_coordinator = coordinator;
 			TemplateDataManager = templateDataManager;
 		}

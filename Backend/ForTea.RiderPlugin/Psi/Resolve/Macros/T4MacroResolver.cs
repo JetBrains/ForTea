@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -18,10 +17,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 		[NotNull]
 		protected ISolution Solution { get; }
 
-		public T4MacroResolver(
-			[NotNull] ISolution solution,
-			[NotNull] IT4AssemblyNamePreprocessor preprocessor
-		) : base(preprocessor) => Solution = solution;
+		public T4MacroResolver([NotNull] ISolution solution) => Solution = solution;
 
 		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(IList<string> macros,
 			IProjectFile file) => EmptyDictionary<string, string>.Instance;
