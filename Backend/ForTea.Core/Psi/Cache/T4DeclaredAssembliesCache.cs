@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Psi.FileType;
+using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
@@ -19,14 +20,22 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	public sealed class T4DeclaredAssembliesCache
 	{
 		[NotNull]
+		private T4FileDependencyManager DependencyManager { get; }
+
+		[NotNull]
 		private WeakToStrongDictionary<IPsiSourceFile, T4DeclaredAssembliesInfo> DeclaredAssemblyInfos { get; } =
 			new WeakToStrongDictionary<IPsiSourceFile, T4DeclaredAssembliesInfo>();
 
 		[NotNull]
 		public Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>> FileDataChanged { get; }
 
-		public T4DeclaredAssembliesCache(Lifetime lifetime, [NotNull] PsiFiles psiFiles)
+		public T4DeclaredAssembliesCache(
+			Lifetime lifetime,
+			[NotNull] PsiFiles psiFiles,
+			[NotNull] T4FileDependencyManager dependencyManager
+		)
 		{
+			DependencyManager = dependencyManager;
 			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>>(
 				lifetime,
 				"T4DeclaredAssembliesCache.FileDataChanged"
@@ -64,7 +73,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		{
 			var sourceFile = t4File.GetSourceFile();
 			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
-			var newData = new T4DeclaredAssembliesInfo(t4File);
+			var newData = new T4DeclaredAssembliesInfo(t4File, DependencyManager);
 			T4DeclaredAssembliesInfo existingDeclaredAssembliesInfo;
 			lock (DeclaredAssemblyInfos)
 			{

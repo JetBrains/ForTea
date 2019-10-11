@@ -36,7 +36,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			[NotNull] IBuildToolWellKnownPropertiesStore msBuildProperties,
 			[NotNull] RiderProcessStartInfoEnvironment environment,
 			[NotNull] ILogger logger
-		) : base(solution, preprocessor)
+		) : base(solution)
 		{
 			MsBuildProperties = msBuildProperties;
 			SolutionToolset = solutionToolset;

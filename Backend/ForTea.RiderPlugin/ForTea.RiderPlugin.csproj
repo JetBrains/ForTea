@@ -27,4 +27,9 @@
       <LastGenOutput>T4ExecuteTemplateActions.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Features\Folding\T4CodeFoldingAttributes.cs">
+      <DependentUpon>T4CodeFoldingAttributes.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

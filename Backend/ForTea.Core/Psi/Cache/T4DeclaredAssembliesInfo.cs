@@ -1,12 +1,16 @@
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
@@ -16,7 +20,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		[NotNull, ItemNotNull]
 		private readonly JetHashSet<IT4PathWithMacros> ReferencedAssemblies = new JetHashSet<IT4PathWithMacros>();
 
-		private void HandleDirectives([NotNull] IT4File file)
+		private void HandleAssemblyDirectives([NotNull] IT4File file)
 		{
 			var assemblyDirectives = file.Blocks.OfType<IT4AssemblyDirective>();
 			string assemblyAttributeName = T4DirectiveInfoManager.Assembly.NameAttribute.Name;
@@ -53,15 +57,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			return new T4DeclaredAssembliesDiff(addedAssemblies, removedAssemblies);
 		}
 
-		/// <summary>Initializes a new instance of the <see cref="T4DeclaredAssembliesInfo"/> class.</summary>
-		/// <param name="t4File">The T4 file that will be scanned for data.</param>
-		public T4DeclaredAssembliesInfo([NotNull] IT4File t4File)
+		public T4DeclaredAssembliesInfo([NotNull] IT4File baseFile, [NotNull] T4FileDependencyManager dependencyManager)
 		{
 			HandleDirectives(t4File);
 			var guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
 			foreach (var includedFile in t4File.GetIncludedFilesRecursive(guard))
 			{
-				HandleDirectives(includedFile);
+				HandleAssemblyDirectives(file);
 			}
 		}
 	}
