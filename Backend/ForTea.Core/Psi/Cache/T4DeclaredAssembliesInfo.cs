@@ -67,7 +67,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 				.Select(PsiSourceFileExtensions.ToSourceFile)
 				.Single()
 				.BuildT4Tree();
-			foreach (var file in rootFile.GetThisIncludedFilesRecursive())
+			foreach (var file in rootFile.GetThisAndIncludedFilesRecursive())
 			{
 				HandleAssemblyDirectives(file);
 			}
