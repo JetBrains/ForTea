@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Invalidation.Impl;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
@@ -15,6 +16,8 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 	[PsiComponent]
 	public sealed class T4FileDependencyManager
 	{
+		private T4CommitStage _stage = T4CommitStage.UserChangeApplication;
+
 		[NotNull]
 		private ILogger Logger { get; }
 
@@ -31,12 +34,32 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		private T4FileDependencyInvalidator Invalidator { get; set; }
 
 		[NotNull]
-		private HashSet<FileSystemPath> FilesBeingCommitted { get; } = new HashSet<FileSystemPath>();
+		private IShellLocks Locks { get; }
 
-		public T4FileDependencyManager(Lifetime lifetime, [NotNull] IPsiServices psiServices, [NotNull] ILogger logger)
+		private T4CommitStage Stage
+		{
+			get
+			{
+				Locks.AssertMainThread();
+				return _stage;
+			}
+			set
+			{
+				Locks.AssertMainThread();
+				_stage = value;
+			}
+		}
+
+		public T4FileDependencyManager(
+			Lifetime lifetime,
+			[NotNull] IPsiServices psiServices,
+			[NotNull] ILogger logger,
+			[NotNull] IShellLocks locks
+		)
 		{
 			PsiServices = psiServices;
 			Logger = logger;
+			Locks = locks;
 			psiServices.Files.ObserveBeforeCommit(lifetime, OnBeforeFilesCommit);
 			psiServices.Files.ObserveAfterCommit(lifetime, OnAfterFilesCommit);
 		}
@@ -58,18 +81,9 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 			}
 		}
 
-		[NotNull]
-		public IEnumerable<FileSystemPath> GetIncluders([NotNull] FileSystemPath includee)
-		{
-			lock (Locker)
-			{
-				return new HashSet<FileSystemPath>(Graph.GetIncluders(includee));
-			}
-		}
-
 		private void OnAfterFilesCommit()
 		{
-			Logger.Verbose("OnAfterFilesCommit");
+			Logger.Verbose("OnAfterFilesCommit, Stage = {0}", Stage);
 			T4FileDependencyInvalidator invalidator;
 			lock (Locker)
 			{
@@ -77,18 +91,25 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 				Invalidator = null;
 			}
 
-			if (invalidator == null) return;
-			invalidator.CommittedFilePaths.RemoveWhere(FilesBeingCommitted.Contains);
-			FilesBeingCommitted.AddRange(invalidator.CommittedFilePaths);
-			invalidator.CommitNeededDocuments();
+			Stage = T4CommitStage.DependencyInvalidation;
+			invalidator?.CommitNeededDocuments();
+			Stage = T4CommitStage.UserChangeApplication;
 		}
 
 		private void OnBeforeFilesCommit()
 		{
-			var invalidator = new T4FileDependencyInvalidator(this, PsiServices);
-			lock (Locker)
+			Logger.Verbose("OnBeforeFilesCommit. Stage = {0}", Stage);
+			switch (Stage)
 			{
-				Invalidator = invalidator;
+				case T4CommitStage.UserChangeApplication:
+					lock (Locker)
+					{
+						Invalidator = new T4FileDependencyInvalidator(this, PsiServices);
+					}
+
+					return;
+				case T4CommitStage.DependencyInvalidation:
+					return;
 			}
 		}
 	}

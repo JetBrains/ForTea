@@ -4,12 +4,12 @@ using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 
 namespace GammaJul.ForTea.Core.Psi
 {
@@ -17,40 +17,48 @@ namespace GammaJul.ForTea.Core.Psi
 	public sealed class T4SecondaryDocumentGenerationResult : SecondaryDocumentGenerationResult
 	{
 		[NotNull]
+		private ILogger Logger { get; } =
+			JetBrains.Util.Logging.Logger.GetLogger<T4SecondaryDocumentGenerationResult>();
+
+		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
 
 		[NotNull]
-		private IEnumerable<IT4IncludeDirective> IncludedFiles { get; }
+		private IEnumerable<IT4IncludeDirective> IncludeDirectives { get; }
+
+		[NotNull, ItemNotNull]
+		private IEnumerable<FileSystemPath> IncludedFiles => IncludeDirectives
+			.Select(include => include.Path.ResolvePath())
+			.Where(path => !path.IsEmpty);
 
 		[NotNull]
 		private T4FileDependencyManager T4FileDependencyManager { get; }
 
+		[NotNull]
+		private IT4IndirectIncludeInvalidator IndirectIncludeInvalidator { get; }
+
 		public override void CommitChanges()
 		{
-			Logger.GetLogger<T4SecondaryDocumentGenerationResult>().Verbose("CommitChanges");
+			Logger.Verbose("CommitChanges in {0}", SourceFile.Name);
 			var location = SourceFile.GetLocation();
 			if (location.IsEmpty) return;
 			var projectFile = SourceFile.ToProjectFile();
 			IEnumerable<FileSystemPath> includePaths;
 			if (projectFile == null)
 			{
-				includePaths = IncludedFiles
-					.Select(include => include.Path.ResolvePath())
-					.Where(path => !path.IsEmpty);
+				includePaths = IncludedFiles;
 			}
 			else
 			{
 				using (T4MacroResolveContextCookie.Create(projectFile))
 				{
-					includePaths = IncludedFiles
-						.Select(include => include.Path.ResolvePath())
-						.Where(path => !path.IsEmpty)
-						.AsList();
+					includePaths = IncludedFiles.AsList();
 				}
 			}
 
 			T4FileDependencyManager.UpdateIncludes(location, new HashSet<FileSystemPath>(includePaths));
 			T4FileDependencyManager.TryGetCurrentInvalidator()?.AddCommittedFilePath(location);
+			// IndirectIncludeInvalidator.InvalidateIndirectIncludes(location);
 		}
 
 		public T4SecondaryDocumentGenerationResult(
@@ -60,12 +68,14 @@ namespace GammaJul.ForTea.Core.Psi
 			[NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
 			[NotNull] ILexerFactory lexerFactory,
 			[NotNull] T4FileDependencyManager t4FileDependencyManager,
-			[NotNull] IEnumerable<IT4IncludeDirective> includedFiles
+			[NotNull] IEnumerable<IT4IncludeDirective> includeDirectives,
+			[NotNull] IT4IndirectIncludeInvalidator indirectIncludeInvalidator
 		) : base(text, language, secondaryRangeTranslator, lexerFactory)
 		{
 			SourceFile = sourceFile;
 			T4FileDependencyManager = t4FileDependencyManager;
-			IncludedFiles = includedFiles;
+			IncludeDirectives = includeDirectives;
+			IndirectIncludeInvalidator = indirectIncludeInvalidator;
 		}
 	}
 }

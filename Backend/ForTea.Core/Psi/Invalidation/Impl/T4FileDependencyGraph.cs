@@ -9,19 +9,34 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 	/// </summary>
 	public sealed class T4FileDependencyGraph : IT4FileDependencyGraph
 	{
+		public T4FileDependencyGraph()
+		{
+			DirectIncludeGraph = new OneToSetMap<FileSystemPath, FileSystemPath>();
+			ReversedIncludeGraph = new OneToSetMap<FileSystemPath, FileSystemPath>();
+			SinkSearcher = new T4GraphSinkSearcher(ReversedIncludeGraph);
+			IndirectIncludeSearcher =
+				new T4IndirectIncludeTransitiveClosureSearcher(DirectIncludeGraph, ReversedIncludeGraph);
+		}
+
 		/// <summary>
 		/// Also known as IncluderToIncludees
 		/// </summary>
 		[NotNull]
-		private OneToSetMap<FileSystemPath, FileSystemPath> DirectIncludeGraph { get; } =
-			new OneToSetMap<FileSystemPath, FileSystemPath>();
+		private OneToSetMap<FileSystemPath, FileSystemPath> DirectIncludeGraph { get; }
 
 		/// <summary>
 		/// Also known as IncludeeToIncluders
 		/// </summary>
 		[NotNull]
-		private OneToSetMap<FileSystemPath, FileSystemPath> ReversedIncludeGraph { get; } =
-			new OneToSetMap<FileSystemPath, FileSystemPath>();
+		private OneToSetMap<FileSystemPath, FileSystemPath> ReversedIncludeGraph { get; }
+
+		// This class is not stateless, but all of it's state is stored in the graph and this updated correctly
+		[NotNull]
+		private T4GraphSinkSearcher SinkSearcher { get; }
+
+		// Same note as SinkSearcher
+		[NotNull]
+		private T4IndirectIncludeTransitiveClosureSearcher IndirectIncludeSearcher { get; }
 
 		public void UpdateIncludes(FileSystemPath includer, ICollection<FileSystemPath> includees)
 		{
@@ -39,9 +54,9 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 			}
 		}
 
-		public IEnumerable<FileSystemPath> GetIncluders(FileSystemPath includee) => ReversedIncludeGraph[includee];
+		public FileSystemPath FindBestRoot(FileSystemPath includee) => SinkSearcher.FindClosestSink(includee);
 
-		public FileSystemPath FindBestRoot(FileSystemPath includee) =>
-			new T4GraphSinkSearcher(ReversedIncludeGraph).FindClosestSink(includee);
+		public IEnumerable<FileSystemPath> FindIndirectIncludesTransitiveClosure(FileSystemPath path) =>
+			IndirectIncludeSearcher.FindClosure(path);
 	}
 }

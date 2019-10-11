@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
+import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -20,7 +21,7 @@ buildscript {
 }
 
 plugins {
-  id("org.jetbrains.intellij") version "0.4.9"
+  id("org.jetbrains.intellij") version "0.4.10"
   id("org.jetbrains.grammarkit") version "2018.1.7"
 }
 
@@ -148,6 +149,10 @@ configure<RdgenParams> {
 }
 
 tasks {
+  withType<RunIdeTask> {
+    maxHeapSize = "1500m"
+  }
+
   withType<PrepareSandboxTask> {
     val files = pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
     val paths = files.map { File(backendPluginPath, it) }

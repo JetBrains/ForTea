@@ -8,9 +8,6 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 	{
 		void UpdateIncludes([NotNull] FileSystemPath includer, [NotNull] ICollection<FileSystemPath> includees);
 
-		[NotNull, ItemNotNull]
-		IEnumerable<FileSystemPath> GetIncluders([NotNull] FileSystemPath includee);
-
 		/// <summary>
 		/// This is used for building correct PSI for .ttinclude files.
 		/// T4 includes are similar to C++ ones, and symbols used in them
@@ -20,5 +17,8 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		/// </summary>
 		[NotNull]
 		FileSystemPath FindBestRoot([NotNull] FileSystemPath includee);
+
+		[NotNull, ItemNotNull]
+		IEnumerable<FileSystemPath> FindIndirectIncludesTransitiveClosure([NotNull] FileSystemPath path);
 	}
 }

@@ -1,6 +1,6 @@
 using System.Linq;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Invalidation;
+using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Files;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -61,10 +60,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 				if (ActualFile.GetSourceFile() == rootPsiSourceFile)
 					return ActualFile;
 
-				var root = rootPsiSourceFile
-					?.GetPsiFiles<T4Language>()
-					.OfType<IT4File>()
-					.Single();
+				var root = rootPsiSourceFile?.BuildT4Tree();
 				return root.NotNull();
 			}
 		}
