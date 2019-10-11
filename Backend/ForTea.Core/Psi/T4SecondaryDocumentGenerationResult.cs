@@ -4,7 +4,6 @@ using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Files;
@@ -16,10 +15,6 @@ namespace GammaJul.ForTea.Core.Psi
 	/// <summary>Specialization of <see cref="SecondaryDocumentGenerationResult"/> that add dependencies between a file and its includes.</summary>
 	public sealed class T4SecondaryDocumentGenerationResult : SecondaryDocumentGenerationResult
 	{
-		[NotNull]
-		private ILogger Logger { get; } =
-			JetBrains.Util.Logging.Logger.GetLogger<T4SecondaryDocumentGenerationResult>();
-
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
 
@@ -34,12 +29,8 @@ namespace GammaJul.ForTea.Core.Psi
 		[NotNull]
 		private T4FileDependencyManager T4FileDependencyManager { get; }
 
-		[NotNull]
-		private IT4IndirectIncludeInvalidator IndirectIncludeInvalidator { get; }
-
 		public override void CommitChanges()
 		{
-			Logger.Verbose("CommitChanges in {0}", SourceFile.Name);
 			var location = SourceFile.GetLocation();
 			if (location.IsEmpty) return;
 			var projectFile = SourceFile.ToProjectFile();
@@ -58,7 +49,6 @@ namespace GammaJul.ForTea.Core.Psi
 
 			T4FileDependencyManager.UpdateIncludes(location, new HashSet<FileSystemPath>(includePaths));
 			T4FileDependencyManager.TryGetCurrentInvalidator()?.AddCommittedFilePath(location);
-			// IndirectIncludeInvalidator.InvalidateIndirectIncludes(location);
 		}
 
 		public T4SecondaryDocumentGenerationResult(
@@ -68,14 +58,12 @@ namespace GammaJul.ForTea.Core.Psi
 			[NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
 			[NotNull] ILexerFactory lexerFactory,
 			[NotNull] T4FileDependencyManager t4FileDependencyManager,
-			[NotNull] IEnumerable<IT4IncludeDirective> includeDirectives,
-			[NotNull] IT4IndirectIncludeInvalidator indirectIncludeInvalidator
+			[NotNull] IEnumerable<IT4IncludeDirective> includeDirectives
 		) : base(text, language, secondaryRangeTranslator, lexerFactory)
 		{
 			SourceFile = sourceFile;
 			T4FileDependencyManager = t4FileDependencyManager;
 			IncludeDirectives = includeDirectives;
-			IndirectIncludeInvalidator = indirectIncludeInvalidator;
 		}
 	}
 }

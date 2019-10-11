@@ -19,9 +19,6 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		private T4CommitStage _stage = T4CommitStage.UserChangeApplication;
 
 		[NotNull]
-		private ILogger Logger { get; }
-
-		[NotNull]
 		private object Locker { get; } = new object();
 
 		[NotNull]
@@ -53,12 +50,10 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		public T4FileDependencyManager(
 			Lifetime lifetime,
 			[NotNull] IPsiServices psiServices,
-			[NotNull] ILogger logger,
 			[NotNull] IShellLocks locks
 		)
 		{
 			PsiServices = psiServices;
-			Logger = logger;
 			Locks = locks;
 			psiServices.Files.ObserveBeforeCommit(lifetime, OnBeforeFilesCommit);
 			psiServices.Files.ObserveAfterCommit(lifetime, OnAfterFilesCommit);
@@ -83,7 +78,6 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 
 		private void OnAfterFilesCommit()
 		{
-			Logger.Verbose("OnAfterFilesCommit, Stage = {0}", Stage);
 			T4FileDependencyInvalidator invalidator;
 			lock (Locker)
 			{
@@ -98,7 +92,6 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 
 		private void OnBeforeFilesCommit()
 		{
-			Logger.Verbose("OnBeforeFilesCommit. Stage = {0}", Stage);
 			switch (Stage)
 			{
 				case T4CommitStage.UserChangeApplication:
