@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core.Psi.Modules
@@ -12,7 +13,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		{
 			var project = file.GetProject();
 			if (project?.IsMiscFilesProject() != false) return UniversalModuleReferenceContext.Instance;
-			return project.GetResolveContext();
+			return file.GetPsiModule().GetResolveContextEx(file);
 		}
 
 		[NotNull]
