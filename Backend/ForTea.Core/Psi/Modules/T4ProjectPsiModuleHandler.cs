@@ -31,8 +31,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			PsiModuleChangeBuilder changeBuilder
 		)
 		{
-			if (!_t4PsiModuleProvider.OnProjectFileChanged(projectFile, ref changeType, changeBuilder))
-				base.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder);
+			var requestedChange = _t4PsiModuleProvider.OnProjectFileChanged(projectFile, changeType, changeBuilder);
+			if (requestedChange == null) return;
+			base.OnProjectFileChanged(projectFile, oldLocation, requestedChange.Value, changeBuilder);
 		}
 
 		public override IEnumerable<IPsiSourceFile> GetPsiSourceFilesFor(IProjectFile projectFile)

@@ -32,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			PsiModuleChange.ChangeType changeType,
 			[NotNull] PsiModuleChangeBuilder changeBuilder,
 			[NotNull] FileSystemPath oldLocation
-		) => _t4PsiModuleProvider.OnProjectFileChanged(projectFile, ref changeType, changeBuilder);
+		) => _t4PsiModuleProvider.OnProjectFileChanged(projectFile, changeType, changeBuilder);
 
 		public T4MiscFilesProjectPsiModuleProvider(
 			Lifetime lifetime,

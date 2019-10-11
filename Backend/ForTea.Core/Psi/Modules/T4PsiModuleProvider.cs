@@ -69,39 +69,39 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			: EmptyList<IPsiSourceFile>.InstanceList;
 		}
 
-		/// <summary>Processes changes for specific project file and returns a list of corresponding source file changes.</summary>
+		/// <summary>
+		/// Processes changes for specific project file and sets up a list of corresponding source file changes.
+		/// </summary>
 		/// <param name="projectFile">The project file.</param>
 		/// <param name="changeType">Type of the change.</param>
 		/// <param name="changeBuilder">The change builder used to populate changes.</param>
-		/// <returns>Whether the provider has handled the file change.</returns>
-		public bool OnProjectFileChanged(
+		/// <returns><see cref="PsiModuleChange.ChangeType"/> if further changing is required, null otherwise</returns>
+		public PsiModuleChange.ChangeType? OnProjectFileChanged(
 			[NotNull] IProjectFile projectFile,
-			ref PsiModuleChange.ChangeType changeType,
+			PsiModuleChange.ChangeType changeType,
 			[NotNull] PsiModuleChangeBuilder changeBuilder
 		) {
-			if (!_t4Environment.IsSupported)
-				return false;
-
+			if (!_t4Environment.IsSupported) return changeType;
 			_shellLocks.AssertWriteAccessAllowed();
 			ModuleWrapper moduleWrapper;
-			
-			switch (changeType) {
-
+			switch (changeType)
+			{
 				case PsiModuleChange.ChangeType.Added:
+					// A PSI module was added. That could have happened due to creating a new 
 					// Preprocessed .tt files should be handled by R# itself as if it's a normal project file,
 					// so that it has access to the current project types.
 					if (projectFile.LanguageType.Is<T4ProjectFileType>()
 					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
 					{
 						AddFile(projectFile, changeBuilder);
-						return true;
+						return null;
 					}
 					break;
 
 				case PsiModuleChange.ChangeType.Removed:
 					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
 						RemoveFile(projectFile, changeBuilder, moduleWrapper);
-						return true;
+						return null;
 					}
 					break;
 
@@ -109,13 +109,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
 						if (!TemplateDataManager.IsPreprocessedTemplate(projectFile)) {
 							ModifyFile(changeBuilder, moduleWrapper);
-							return true;
+							return null;
 						}
 
 						// The T4 file went from Transformed to Preprocessed, it doesn't need a T4PsiModule anymore.
 						RemoveFile(projectFile, changeBuilder, moduleWrapper);
-						changeType = PsiModuleChange.ChangeType.Added;
-						return false;
+						return PsiModuleChange.ChangeType.Added;
 					}
 
 					// The T4 file went from Preprocessed to Transformed, it now needs a T4PsiModule.
@@ -123,15 +122,14 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
 					{
 						AddFile(projectFile, changeBuilder);
-						changeType = PsiModuleChange.ChangeType.Removed;
-						return false;
+						return PsiModuleChange.ChangeType.Removed;
 					}
 
 					break;
 
 			}
 
-			return false;
+			return changeType;
 		}
 
 		private void AddFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder) {
