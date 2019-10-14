@@ -19,7 +19,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatVsMacrosAreResolved() = doTest()
   @Test fun testThatMsBuildPropertiesAreResolved() = doTest()
   @Test fun testThatAssemblyCanBeReferenced() = doTest()
-//  @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
+  @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
 //  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
   @Test fun testThatTemplateCanProduceBigXml() = doTest()
 //  @Test fun testThatTemplateIsCaseInsensitive() = doTest()

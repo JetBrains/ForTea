@@ -10,7 +10,7 @@ public int Foo(int arg) => arg + 2;
 <#+
 public int Bar(int arg) => arg + 2;
 #>
-{caret}
+
 
 
 

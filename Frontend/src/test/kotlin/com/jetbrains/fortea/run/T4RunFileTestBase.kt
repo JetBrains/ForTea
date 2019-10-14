@@ -30,7 +30,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
     get() = project
       .solutionDirectory
       .combine("Project")
-      .listFiles { _, name -> name.endsWith(".tt") }
+      .listFiles { _, name -> name.endsWith(".tt") or name.endsWith(".t4") }
       .shouldNotBeNull()
       .single()
 

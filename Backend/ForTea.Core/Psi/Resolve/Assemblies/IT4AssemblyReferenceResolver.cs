@@ -35,5 +35,11 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 		IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
 			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
 			[NotNull] IModuleReferenceResolveContext resolveContext);
+
+		[NotNull]
+		IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
+			[NotNull, ItemNotNull] IList<FileSystemPath> directDependencies,
+			[NotNull] IModuleReferenceResolveContext resolveContext
+		);
 	}
 }

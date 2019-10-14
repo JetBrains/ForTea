@@ -47,29 +47,23 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			var directives = file.GetThisAndIncludedFilesRecursive()
 				.SelectMany(it => it.BlocksEnumerable)
 				.OfType<IT4AssemblyDirective>();
-			var result = new List<MetadataReference>();
 			var errors = new FrugalLocalList<T4FailureRawData>();
-			foreach (var directive in directives)
+			var directDependencies = directives.SelectNotNull(directive =>
 			{
 				var resolved = AssemblyReferenceResolver.Resolve(directive);
 				if (resolved == null)
 				{
 					errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
-					continue;
 				}
 
-				var metadataReference = Cache.GetMetadataReference(lifetime, resolved);
-				if (metadataReference == null)
-				{
-					errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
-					continue;
-				}
-
-				result.Add(metadataReference);
-			}
+				return resolved;
+			}).AsList();
 
 			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
-
+			var result = AssemblyReferenceResolver.ResolveTransitiveDependencies(
+				directDependencies,
+				file.GetSourceFile().NotNull().ToProjectFile().NotNull().SelectResolveContext()
+			).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
 			AddBaseReferences(lifetime, result, file.GetSourceFile().NotNull());
 			return result;
 		}
