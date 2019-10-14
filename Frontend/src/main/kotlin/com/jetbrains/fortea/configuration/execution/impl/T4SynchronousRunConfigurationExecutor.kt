@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.projectView.ProjectModelViewHost
+import org.jetbrains.annotations.TestOnly
 
 class T4SynchronousRunConfigurationExecutor(
   project: Project,
@@ -17,6 +18,7 @@ class T4SynchronousRunConfigurationExecutor(
   private val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
 
   override fun executeConfiguration(configuration: RunnerAndConfigurationSettings) {
+    isExecutionRunning = true
     val builder: ExecutionEnvironmentBuilder
     try {
       builder = ExecutionEnvironmentBuilder.create(executor, configuration)
@@ -42,6 +44,11 @@ class T4SynchronousRunConfigurationExecutor(
 
   private fun waitPumping(finished: Semaphore) {
     pumpMessages(waitFunc = waitFunc)
-    finished.waitFor()
+    finished.waitFor(10)
+  }
+
+  companion object {
+    @get:TestOnly
+    var isExecutionRunning = false
   }
 }
