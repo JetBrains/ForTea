@@ -15,7 +15,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
 {
-	internal sealed class T4DeclaredAssembliesInfo
+	public sealed class T4DeclaredAssembliesInfo
 	{
 		[NotNull, ItemNotNull]
 		private readonly JetHashSet<IT4PathWithMacros> ReferencedAssemblies = new JetHashSet<IT4PathWithMacros>();
