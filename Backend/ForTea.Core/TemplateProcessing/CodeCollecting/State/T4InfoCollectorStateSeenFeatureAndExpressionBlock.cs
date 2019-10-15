@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
@@ -36,7 +37,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 				default:
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE)
 					{
-						var builder = new StringBuilder(Environment.NewLine);
+						var builder = new StringBuilder(StringLiteralConverter.EscapeToRegular(Environment.NewLine));
 						return new T4InfoCollectorStateSeenFeatureAndText(builder, Interrupter, element);
 					}
 					else if (element.NodeType == T4TokenNodeTypes.RAW_TEXT)
