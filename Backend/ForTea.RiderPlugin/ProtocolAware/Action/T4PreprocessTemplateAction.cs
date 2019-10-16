@@ -36,7 +36,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			var location = new T4FileLocation(solution.GetComponent<ProjectModelViewHost>().GetIdByItem(projectFile));
 
 			statistics.TrackAction("T4.Template.Preprocess");
-			templateDataManager.SetTemplateKind(projectFile, T4TemplateKind.Preprocessed);
 			try
 			{
 				string message = new T4CSharpCodeGenerator(file, solution).Generate().RawText;
@@ -52,6 +51,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 				var message = converter.ToT4BuildMessages(e.FailureDatum);
 				var result = new T4PreprocessingResult(location, false, message);
 				model.PreprocessingFinished(result);
+			}
+			finally
+			{
+				templateDataManager.SetTemplateKind(projectFile, T4TemplateKind.Preprocessed);
 			}
 		}
 	}
