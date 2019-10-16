@@ -55,5 +55,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			coordinator,
 			manager
 		);
+
+		public override bool InternalsVisibleTo(IPsiModule moduleTo, IPsiModule moduleFrom)
+		{
+			if (!(moduleTo is T4FilePsiModule)) return base.InternalsVisibleTo(moduleTo, moduleFrom);
+			if (moduleFrom is IAssemblyPsiModule) return false;
+			return true;
+		}
 	}
 }

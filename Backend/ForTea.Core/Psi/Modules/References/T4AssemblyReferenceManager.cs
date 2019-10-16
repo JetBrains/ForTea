@@ -9,7 +9,7 @@ using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.References;
 
-namespace GammaJul.ForTea.Core.Psi
+namespace GammaJul.ForTea.Core.Psi.Modules.References
 {
 	public sealed class T4AssemblyReferenceManager
 	{
