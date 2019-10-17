@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Invalidation
@@ -17,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		/// </summary>
 		/// TODO: cache root?
 		[NotNull]
-		FileSystemPath FindBestRoot([NotNull] FileSystemPath includee);
+		IProjectFile FindBestRoot([NotNull] IProjectFile file);
 
 		[NotNull, ItemNotNull]
 		IEnumerable<FileSystemPath> FindIndirectIncludesTransitiveClosure([NotNull] FileSystemPath path);

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
@@ -9,6 +11,9 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 	/// </summary>
 	public sealed class T4FileDependencyGraph : IT4FileDependencyGraph
 	{
+		[NotNull]
+		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4FileDependencyGraph>();
+
 		public T4FileDependencyGraph()
 		{
 			DirectIncludeGraph = new OneToSetMap<FileSystemPath, FileSystemPath>();
@@ -54,7 +59,25 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 			}
 		}
 
-		public FileSystemPath FindBestRoot(FileSystemPath includee) => SinkSearcher.FindClosestSink(includee);
+		public IProjectFile FindBestRoot(IProjectFile file)
+		{
+			var rootPath = FindBestRoot(file.Location);
+			var root = file
+				.GetSolution()
+				.FindProjectItemsByLocation(rootPath)
+				.OfType<IProjectFile>()
+				.SingleOrDefault();
+			if (root == null)
+			{
+				Logger.Warn("Could not determine best root for a file");
+				return file;
+			}
+
+			return root;
+		}
+
+		[NotNull]
+		private FileSystemPath FindBestRoot([NotNull] FileSystemPath includee) => SinkSearcher.FindClosestSink(includee);
 
 		public IEnumerable<FileSystemPath> FindIndirectIncludesTransitiveClosure(FileSystemPath path) =>
 			IndirectIncludeSearcher.FindClosure(path);

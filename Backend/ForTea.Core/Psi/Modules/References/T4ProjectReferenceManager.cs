@@ -39,8 +39,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		{
 			get
 			{
-				var rootPath = FileDependencyManager.Graph.FindBestRoot(ProjectFile.Location);
-				var root = Solution.FindProjectItemsByLocation(rootPath).OfType<IProjectFile>().Single();
+				var root = FileDependencyManager.Graph.FindBestRoot(ProjectFile);
 				if (TemplateKindProvider.GetTemplateKind(root) != T4TemplateKind.Preprocessed) return null;
 				return root.GetProject();
 			}
