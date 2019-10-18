@@ -35,7 +35,8 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 		{
 			var project = file.GetProject();
 			if (project == null) return;
-			result.Add("Configuration", project.ProjectProperties.ActiveConfigurations.Configurations.Single().Name);
+			var configuration = project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem();
+			if (configuration != null) result.Add("Configuration", configuration.Name);
 			result.Add("TargetDir",
 				project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent
 					.FullPathWithTrailingPathSeparator());
