@@ -30,6 +30,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			"GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs";
 
 		protected override string GeneratedClassName => GeneratedClassNameString;
+		protected override string GeneratedBaseClassName => GeneratedBaseClassNameString;
 
 		[NotNull]
 		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
@@ -79,8 +80,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		private string GetGeneratedBaseClassFqn()
 		{
 			string ns = GetNamespace();
-			if (ns.IsNullOrWhitespace()) return GeneratedBaseClassNameString;
-			return $"{ns}.{GeneratedBaseClassNameString}";
+			if (ns.IsNullOrWhitespace()) return GeneratedBaseClassName;
+			return $"{ns}.{GeneratedBaseClassName}";
 		}
 
 		[NotNull]
