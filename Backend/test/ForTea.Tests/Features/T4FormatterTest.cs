@@ -36,6 +36,7 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("InnerClasses")]
 		[TestCase("SemiBrokenBlock")]
 		[TestCase("OneLineStatement")]
+		[TestCase("StatementBlockAfterExpressionBlock")]
 		public void TestFormatter([NotNull] string name) => DoOneTest(name);
 
 		protected override void DoTest(Lifetime lifetime, IProject testProject)
