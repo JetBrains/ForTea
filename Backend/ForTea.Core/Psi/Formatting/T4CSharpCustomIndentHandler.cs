@@ -99,7 +99,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			var blockStart = codeBlock.GetTreeStartOffset();
 			int nodeStart = originalRange.StartOffset.Offset;
 			if (!HasLineBreak(codeBlock, nodeStart, blockStart)) return null;
-			if (HasVisibleTokenBefore(rangeTranslator, node)) return null;
+			if (HasStatementsBefore(rangeTranslator, node)) return null;
 			return settings.Settings.GetIndentStr();
 		}
 
@@ -123,7 +123,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		}
 
 		[Pure]
-		private static bool HasVisibleTokenBefore(
+		private static bool HasStatementsBefore(
 			[NotNull] ISecondaryRangeTranslator rangeTranslator,
 			[NotNull] ITreeNode node
 		) => node.GetFirstTokenIn()
@@ -133,8 +133,19 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			.Select(rangeTranslator.GeneratedToOriginal)
 			.Where(originalRange => originalRange.IsValid())
 			.SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
-			.SelectNotNull(it => it.GetParentOfType<IT4CodeBlock>())
-			.Any();
+			.Any(IsInStatement);
+
+		private static bool IsInStatement([NotNull] ITreeNode node)
+		{
+			switch (node.GetParentOfType<IT4CodeBlock>())
+			{
+				case null:
+				case IT4ExpressionBlock _:
+					return false;
+				default:
+					return true;
+			}
+		}
 
 		[Pure]
 		private static bool HasLineBreak([NotNull] IT4CodeBlock codeBlock, int nodeStart, TreeOffset blockStart) =>
