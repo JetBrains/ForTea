@@ -25,7 +25,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			var solution = FindSolution(context).NotNull();
 			var model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			var targetFileManager = solution.GetComponent<IT4TargetFileManager>();
-			var templateDataManager = solution.GetComponent<IT4ProjectModelTemplateDataManager>();
 			var statistics = solution.GetComponent<Application.ActivityTrackingNew.UsageStatistics>();
 			var converter = solution.GetComponent<IT4BuildMessageConverter>();
 
@@ -51,10 +50,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 				var message = converter.ToT4BuildMessages(e.FailureDatum);
 				var result = new T4PreprocessingResult(location, false, message);
 				model.PreprocessingFinished(result);
-			}
-			finally
-			{
-				templateDataManager.SetTemplateKind(projectFile, T4TemplateKind.Preprocessed);
 			}
 		}
 	}
