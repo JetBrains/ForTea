@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Parsing
 {
-	public static class T4ParsingContextGuardHelper
+	public static class T4ParsingContextHelper
 	{
 		[NotNull]
 		private static ThreadLocal<IT4IncludeGuard<FileSystemPath>> Guard { get; } =
@@ -27,5 +27,7 @@ namespace GammaJul.ForTea.Core.Parsing
 				Guard.Value.EndProcessing();
 			}
 		}
+
+		public static void Reset() => Guard.Value = new T4BasicIncludeGuard();
 	}
 }

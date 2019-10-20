@@ -1,9 +1,10 @@
+using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Parser;
-using GammaJul.ForTea.Core.Psi.Utils;
-using GammaJul.ForTea.Core.Tree;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -21,9 +22,11 @@ namespace GammaJul.ForTea.Core.Parsing
 		[CanBeNull]
 		private IPsiSourceFile SourceFile { get; }
 
+		/// <note>
+		/// Since the other ParseFile method is used in some external places,
+		/// this method should not contain any additional logic
+		/// </note>
 		[NotNull]
-		public IT4File Parse() => (IT4File) ParseFile();
-
 		IFile IParser.ParseFile() => (IFile) ParseFile();
 
 		public T4Parser([NotNull] ILexer lexer, [CanBeNull] IPsiSourceFile sourceFile)
@@ -33,12 +36,30 @@ namespace GammaJul.ForTea.Core.Parsing
 			SetLexer(new T4FilteringLexer(lexer));
 		}
 
+		[NotNull]
 		public override TreeElement ParseFile()
 		{
-			var file = (File) ParseFileInternal();
-			T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
-			// file.DocumentRangeTranslator = TODO
-			return file;
+			var result = ParseFileWithoutCleanup();
+			T4ParsingContextHelper.Reset();
+			return result;
+		}
+
+		[NotNull]
+		private File ParseFileWithoutCleanup()
+		{
+			var result = T4ParsingContextHelper.ExecuteGuarded(
+				SourceFile.GetLocation(),
+				false,
+				() =>
+				{
+					var file = (File) ParseFileInternal();
+					T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
+					// file.DocumentRangeTranslator = TODO
+					return file;
+				}
+			);
+			if (result == null) throw new InvalidOperationException("Attempted to parse same file recursively twice");
+			return result;
 		}
 
 		public override TreeElement ParseDirective()
@@ -69,17 +90,28 @@ namespace GammaJul.ForTea.Core.Parsing
 			var project = sourceFile.GetProject();
 			if (project == null) return directive;
 			var includeFile =
-				T4ParsingContextGuardHelper.ExecuteGuarded(path, directive.Once, () => GetProjectFile(project, path));
+				T4ParsingContextHelper.ExecuteGuarded(path, directive.Once, () => GetProjectFile(project, path));
 			if (includeFile == null) return directive;
 			var includedSourceFile = includeFile.ToSourceFile();
 			if (includedSourceFile == null) return directive;
-			var subTree = (File) includedSourceFile.BuildT4Tree();
+			var subTree = BuildIncludedT4Tree(includedSourceFile);
 			directive.AppendNewChild(subTree);
 			return directive;
 		}
 
+		[NotNull]
+		private static File BuildIncludedT4Tree([NotNull] IPsiSourceFile target)
+		{
+			var languageService = T4Language.Instance.LanguageService().NotNull();
+			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			var file = new T4Parser(lexer, target).ParseFileWithoutCleanup();
+			file.SetSourceFile(target);
+			return file;
+		}
+
 		[CanBeNull]
 		private static IProjectFile GetProjectFile([NotNull] IProject project, [NotNull] FileSystemPath path) =>
+			// If there are many, let's pick random because why not. They are going to have equal contents anyway
 			project.GetSolution().FindProjectItemsByLocation(path).OfType<IProjectFile>().FirstOrDefault();
 	}
 }
