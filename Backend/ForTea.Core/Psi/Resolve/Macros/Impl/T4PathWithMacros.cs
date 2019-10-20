@@ -51,7 +51,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			OutsideSolutionManager = Solution.GetComponent<T4OutsideSolutionSourceFileManager>();
 		}
 
-		public IT4File ResolveT4File(T4IncludeGuard<IPsiSourceFile> guard)
+		public IT4File ResolveT4File(IT4IncludeGuard<IPsiSourceFile> guard)
 		{
 			if (!ResolvePath().ExistsFile) return null;
 			var target = Resolve();

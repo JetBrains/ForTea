@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
-using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Utils;
+using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -15,7 +15,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 	public class T4IncludeAwareDaemonProcessVisitor : IRecursiveElementProcessor
 	{
 		[NotNull]
-		private T4IncludeGuard<IPsiSourceFile> Guard { get; }
+		private IT4IncludeGuard<IPsiSourceFile> Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private List<HighlightingInfo> MyHighlightings { get; } = new List<HighlightingInfo>();
@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		public T4IncludeAwareDaemonProcessVisitor([NotNull] IPsiSourceFile initialFile)
 		{
 			HasSeenRecursiveInclude = false;
-			Guard = new T4IncludeGuard<IPsiSourceFile>();
+			Guard = new T4ContextTrackingIncludeGuard();
 			Guard.StartProcessing(initialFile);
 		}
 
@@ -39,6 +39,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public void ProcessAfterInterior(ITreeNode element)
 		{
+			if (!(element is IT4IncludeDirective include)) return;
+			Guard.EndProcessing();
+			if (HasSeenRecursiveInclude) ReportRecursiveInclude(include);
 		}
 
 		public bool ProcessingIsFinished => false;
@@ -94,25 +97,13 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 				}
 			}
 
-			var destination = include.Path.ResolveT4File(Guard);
-			if (destination == null || sourceFile == null)
+			if (sourceFile == null)
 			{
 				ReportUnresolvedPath(include);
 				return;
 			}
 
 			Guard.StartProcessing(sourceFile);
-			var projectFile = sourceFile.ToProjectFile();
-			if (projectFile == null) destination.ProcessDescendants(this);
-			else
-			{
-				using (T4MacroResolveContextCookie.Create(projectFile))
-				{
-					destination.ProcessDescendants(this);
-				}
-			}
-			Guard.EndProcessing();
-			if (HasSeenRecursiveInclude) ReportRecursiveInclude(include);
 		}
 
 		private void ReportDuplicateDirective([NotNull] IT4Directive directive)

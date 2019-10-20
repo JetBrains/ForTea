@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Psi.Utils;
+using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
@@ -79,14 +80,14 @@ namespace GammaJul.ForTea.Core.Tree
 		[NotNull, ItemNotNull]
 		public static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive([NotNull] this IT4File file)
 		{
-			var guard = new T4IncludeGuard<IPsiSourceFile>();
+			var guard = new T4ContextTrackingIncludeGuard();
 			return file.GetThisAndIncludedFilesRecursive(guard);
 		}
 
 		[NotNull, ItemNotNull]
 		private static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive(
 			[NotNull] this IT4File file,
-			[NotNull] T4IncludeGuard<IPsiSourceFile> guard
+			[NotNull] IT4IncludeGuard<IPsiSourceFile> guard
 		)
 		{
 			yield return file;

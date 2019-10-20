@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Utils;
+using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
@@ -25,7 +26,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4EncodingsManager EncodingsManager { get; }
 
 		[NotNull]
-		private T4IncludeGuard<IPsiSourceFile> Guard { get; }
+		private IT4IncludeGuard<IPsiSourceFile> Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
@@ -43,7 +44,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Guard = new T4IncludeGuard<IPsiSourceFile>();
+			Guard = new T4ContextTrackingIncludeGuard();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
@@ -78,7 +79,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(null);
+				Guard.StartProcessing(File.GetSourceFile().NotNull());
 				return;
 			}
 
