@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -44,26 +45,24 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 			Logger.Verbose("{0} T4 files were committed during the current commit", committedFilesCount);
 			if (committedFilesCount == 0) return;
 
-			bool markedAsDirty;
-
+			var targets = CommittedFilePaths
+				.SelectMany(Graph.FindIndirectIncludesTransitiveClosure)
+				.Distinct()
+				.SelectMany(target => PsiServices.Solution.FindProjectItemsByLocation(target))
+				.OfType<IProjectFile>()
+				.AsList();
 			using (WriteLockCookie.Create())
 			{
-				var includers = CommittedFilePaths
-					.SelectMany(FileDependencyManager.Graph.FindIndirectIncludesTransitiveClosure)
-					.Distinct()
-					.SelectMany(includer => PsiServices.Solution.FindProjectItemsByLocation(includer))
-					.OfType<IProjectFile>()
-					.AsList();
-				markedAsDirty = includers.Any();
-				Logger.Verbose("Marked {0} files as dirty because their dependencies changed", includers.Count);
-				foreach (var includer in includers)
+				Logger.Verbose("Marked {0} files as dirty because their dependencies changed", targets.Count);
+				foreach (var includer in targets)
 				{
 					PsiServices.MarkAsDirty(includer);
 				}
 			}
 
 			// Re-commit all documents again if needed, we need a clean state here.
-			if (markedAsDirty) PsiServices.Files.CommitAllDocuments();
+			if (targets.Any()) PsiServices.Files.CommitAllDocuments();
+			DeclaresAssembliesManager.UpdateReferences(targets);
 		}
 	}
 }
