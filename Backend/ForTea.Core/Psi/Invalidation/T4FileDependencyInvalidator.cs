@@ -14,21 +14,26 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		private HashSet<FileSystemPath> CommittedFilePaths { get; } = new HashSet<FileSystemPath>();
 
 		[NotNull]
-		private T4FileDependencyManager FileDependencyManager { get; }
+		private IT4FileDependencyGraph Graph { get; }
 
 		[NotNull]
 		private IPsiServices PsiServices { get; }
 
 		[NotNull]
+		private T4DeclaredAssembliesManager DeclaresAssembliesManager { get; }
+
+		[NotNull]
 		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4FileDependencyInvalidator>();
 
 		public T4FileDependencyInvalidator(
-			[NotNull] T4FileDependencyManager fileDependencyManager,
-			[NotNull] IPsiServices psiServices
+			[NotNull] IPsiServices psiServices,
+			[NotNull] IT4FileDependencyGraph graph,
+			[NotNull] T4DeclaredAssembliesManager declaresAssembliesManager
 		)
 		{
-			FileDependencyManager = fileDependencyManager;
 			PsiServices = psiServices;
+			Graph = graph;
+			DeclaresAssembliesManager = declaresAssembliesManager;
 		}
 
 		public void AddCommittedFilePath(FileSystemPath path) => CommittedFilePaths.Add(path);

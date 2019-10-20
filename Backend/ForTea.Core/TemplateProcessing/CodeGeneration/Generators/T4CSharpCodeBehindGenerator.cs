@@ -1,5 +1,6 @@
+using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Invalidation;
-using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
@@ -23,7 +24,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		private ISolution Solution { get; }
 
 		[NotNull]
-		private T4FileDependencyManager DependencyManager { get; }
+		private IT4FileDependencyGraph Graph { get; }
 
 		public T4CSharpCodeBehindGenerator(
 			[NotNull] IT4File actualFile,
@@ -31,7 +32,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		) : base(actualFile)
 		{
 			Solution = solution;
-			DependencyManager = solution.GetComponent<T4FileDependencyManager>();
+			Graph = solution.GetComponent<IT4FileDependencyGraph>();
 		}
 
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector =>
@@ -42,7 +43,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		) => new T4CSharpCodeBehindIntermediateConverter(intermediateResult, ActualFile);
 
 		/// <summary>
-		/// In generated code-behind, we use root file to provide intelligent support for 
+		/// In generated code-behind, we use root file to provide intelligent support for indirectly included files,
+		/// i.e. files that are included alongside with the current file into somewhere else.
 		/// </summary>
 		[NotNull]
 		private IT4File Root
@@ -50,7 +52,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 			get
 			{
 				var projectFile = ActualFile.GetSourceFile().ToProjectFile().NotNull();
-				var rootPsiSourceFile = DependencyManager.Graph.FindBestRoot(projectFile).ToSourceFile();
+				var rootPsiSourceFile = Graph.FindBestRoot(projectFile).ToSourceFile();
+				// Since primary and secondary PSI files are built simultaneously,
+				// by this moment the primary PSI has not yet been registered in caches.
+				// Therefore requesting it would cause
+				// constructing a brand new primary and secondary PSI,
+				// leading to StackOverflowExceptions.
+				// This is why this corner case has to be dealt with separately.
 				if (ActualFile.GetSourceFile() == rootPsiSourceFile) return ActualFile;
 				var root = rootPsiSourceFile?.BuildT4Tree();
 				return root.NotNull();

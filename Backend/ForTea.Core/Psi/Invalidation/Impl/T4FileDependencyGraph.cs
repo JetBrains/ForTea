@@ -9,6 +9,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 	/// <summary>
 	/// Track dependencies between T4 files: which file was included in which.
 	/// </summary>
+	[SolutionComponent]
 	public sealed class T4FileDependencyGraph : IT4FileDependencyGraph
 	{
 		[NotNull]

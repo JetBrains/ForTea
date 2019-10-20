@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.Invalidation.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
@@ -25,10 +26,13 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		private object Locker { get; } = new object();
 
 		[NotNull]
-		public IT4FileDependencyGraph Graph { get; } = new T4FileDependencyGraph();
+		private IT4FileDependencyGraph Graph { get; }
 
 		[NotNull]
 		private IPsiServices PsiServices { get; }
+
+		[NotNull]
+		private T4DeclaredAssembliesManager DeclaredAssembliesManager { get; }
 
 		[CanBeNull]
 		private T4FileDependencyInvalidator Invalidator { get; set; }
@@ -54,12 +58,16 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 			Lifetime lifetime,
 			[NotNull] IPsiServices psiServices,
 			[NotNull] ILogger logger,
-			[NotNull] IShellLocks locks
+			[NotNull] IShellLocks locks,
+			[NotNull] T4DeclaredAssembliesManager declaredAssembliesManager,
+			[NotNull] IT4FileDependencyGraph graph
 		)
 		{
 			PsiServices = psiServices;
 			Logger = logger;
 			Locks = locks;
+			DeclaredAssembliesManager = declaredAssembliesManager;
+			Graph = graph;
 			psiServices.Files.ObserveBeforeCommit(lifetime, OnBeforeFilesCommit);
 			psiServices.Files.ObserveAfterCommit(lifetime, OnAfterFilesCommit);
 		}
@@ -84,6 +92,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		private void OnAfterFilesCommit()
 		{
 			Logger.Verbose("OnAfterFilesCommit, Stage = {0}", Stage);
+			if (Stage == T4CommitStage.DependencyInvalidation) return;
 			T4FileDependencyInvalidator invalidator;
 			lock (Locker)
 			{
@@ -104,7 +113,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 				case T4CommitStage.UserChangeApplication:
 					lock (Locker)
 					{
-						Invalidator = new T4FileDependencyInvalidator(this, PsiServices);
+						Invalidator = new T4FileDependencyInvalidator(PsiServices, Graph, DeclaredAssembliesManager);
 					}
 
 					return;

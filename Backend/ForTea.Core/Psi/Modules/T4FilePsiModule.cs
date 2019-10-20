@@ -197,7 +197,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			var documentManager = solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(file, documentManager);
 
-			solution.GetComponent<T4DeclaredAssembliesCache>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
+			solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
 			AddBaseReferences();
 		}
 	}

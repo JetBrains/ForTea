@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Tree;
@@ -17,21 +19,17 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	/// It cannot be implemented like ordinary cache because it needs PSI to build.
 	/// </summary>
 	[PsiComponent]
-	public sealed class T4DeclaredAssembliesCache
+	public sealed class T4DeclaredAssembliesManager
 	{
 		[NotNull]
-		private T4FileDependencyManager DependencyManager { get; }
+		private IT4FileDependencyGraph Graph { get; }
 
 		[NotNull]
 		public Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>> FileDataChanged { get; }
 
-		public T4DeclaredAssembliesCache(
-			Lifetime lifetime,
-			[NotNull] PsiFiles psiFiles,
-			[NotNull] T4FileDependencyManager dependencyManager
-		)
+		public T4DeclaredAssembliesManager(Lifetime lifetime, [NotNull] IT4FileDependencyGraph graph)
 		{
-			DependencyManager = dependencyManager;
+			Graph = graph;
 			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>>(
 				lifetime,
 				"T4DeclaredAssembliesCache.FileDataChanged"
@@ -68,7 +66,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		{
 			var sourceFile = t4File.GetSourceFile();
 			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
-			var newData = new T4DeclaredAssembliesInfo(t4File, DependencyManager);
+			var newData = new T4DeclaredAssembliesInfo(t4File, Graph);
 			var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
 			sourceFile.SetDeclaredAssembliesInfo(newData);
 			var diff = newData.DiffWith(existingDeclaredAssembliesInfo);

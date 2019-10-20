@@ -23,7 +23,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 	public sealed class T4ProjectReferenceManager
 	{
 		[NotNull]
-		private T4FileDependencyManager FileDependencyManager { get; }
+		private IT4FileDependencyGraph Graph { get; }
 
 		[NotNull]
 		private IT4TemplateKindProvider TemplateKindProvider { get; }
@@ -39,7 +39,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		{
 			get
 			{
-				var root = FileDependencyManager.Graph.FindBestRoot(ProjectFile);
+				var root = Graph.FindBestRoot(ProjectFile);
 				if (TemplateKindProvider.GetTemplateKind(root) != T4TemplateKind.Preprocessed) return null;
 				return root.GetProject();
 			}
@@ -50,7 +50,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 			[NotNull] ISolution solution
 		)
 		{
-			FileDependencyManager = solution.GetComponent<T4FileDependencyManager>();
+			Graph = solution.GetComponent<IT4FileDependencyGraph>();
 			TemplateKindProvider = solution.GetComponent<IT4TemplateKindProvider>();
 			ProjectFile = projectFile;
 			Solution = solution;
