@@ -13,6 +13,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using Microsoft.CodeAnalysis;
@@ -44,9 +45,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file)
 		{
-			var directives = file.GetThisAndIncludedFilesRecursive()
-				.SelectMany(it => it.BlocksEnumerable)
-				.OfType<IT4AssemblyDirective>();
+			var directives = file.Children().OfType<IT4AssemblyDirective>();
 			var errors = new FrugalLocalList<T4FailureRawData>();
 			var directDependencies = directives.SelectNotNull(directive =>
 			{
