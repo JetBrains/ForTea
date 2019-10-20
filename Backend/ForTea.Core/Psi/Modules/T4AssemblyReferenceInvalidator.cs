@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		)
 		{
 			bool result = false;
-			using (T4MacroResolveContextCookie.Create(file))
+			using (T4MacroResolveContextCookie.GetOrCreate(file))
 			using (AssemblyNamePreprocessor.Prepare(file))
 			{
 				// removes the assembly references from the old assembly directives

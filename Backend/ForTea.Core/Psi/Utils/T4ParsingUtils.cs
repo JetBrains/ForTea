@@ -1,8 +1,11 @@
+using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Utils
 {
@@ -13,7 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Utils
 		{
 			var languageService = T4Language.Instance.LanguageService().NotNull();
 			var lexer = (T4Lexer) languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			var file = new T4Parser(lexer).Parse();
+			var file = new T4Parser(lexer, target).Parse();
 			file.SetSourceFile(target);
 			return file;
 		}

@@ -53,7 +53,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			var projectFile = File.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(File, Interrupter);
-			using (T4MacroResolveContextCookie.Create(projectFile))
+			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
 			{
 				Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
 				Guard.StartProcessing(File.GetSourceFile().NotNull());
@@ -93,17 +93,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				return;
 			}
 
-			var resolved = include.Path.ResolveT4File(Guard).NotNull();
+			var resolved = (IT4File) include.LastChild;
 			Guard.StartProcessing(sourceFile);
-			var projectFile = sourceFile.ToProjectFile();
-			if (projectFile == null) resolved.ProcessDescendants(this);
-			else
-			{
-				using (T4MacroResolveContextCookie.Create(projectFile))
-				{
-					resolved.ProcessDescendants(this);
-				}
-			}
+			resolved?.ProcessDescendants(this);
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)

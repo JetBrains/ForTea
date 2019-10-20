@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 		/// <param name="sourceFile">The source file.</param>
 		/// <returns>A T4 parser that operates onto <paramref name="lexer"/>.</returns>
 		public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile) =>
-			new T4Parser(lexer);
+			new T4Parser(lexer, sourceFile);
 
 		/// <summary>
 		/// Gets a cache provider for T4 files.

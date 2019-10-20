@@ -28,7 +28,7 @@ namespace GammaJul.ForTea.Core.Psi.Utils.Impl
 		public void StartProcessing(IPsiSourceFile file)
 		{
 			FilesBeingProcessed.Push(file);
-			Contexts.Push(T4MacroResolveContextCookie.Create(file.ToProjectFile()));
+			Contexts.Push(T4MacroResolveContextCookie.GetOrCreate(file.ToProjectFile()));
 			SeenFiles.Add(file);
 		}
 
