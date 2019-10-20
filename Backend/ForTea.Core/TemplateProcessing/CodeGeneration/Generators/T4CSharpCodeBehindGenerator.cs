@@ -60,9 +60,33 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 				// leading to StackOverflowExceptions.
 				// This is why this corner case has to be dealt with separately.
 				if (ActualFile.GetSourceFile() == rootPsiSourceFile) return ActualFile;
-				var root = rootPsiSourceFile?.BuildT4Tree();
-				return root.NotNull();
+				// It is NOT safe to assume that PSI for the root file can be built
+				// The primary PSI only relies on source files.
+				// The secondary PSI only relies on the primary PSI of
+				// either the current file, or a file that includes it.
+				// In most cases it means that PSI construction
+				// is well-ordered and we would be able to call rootPsiSourceFile.GetPrimaryPsi,
+				// except for the edge case of recursion in includes,
+				// which would cause StackOverflowExceptions
+				// TODO: somehow deal with that edge case and avoid building a new tree
+				return BuildT4Tree(rootPsiSourceFile.NotNull());
 			}
+		}
+
+		/// <note>
+		/// This method builds PSI from scratch,
+		/// which might cause creepy StackOverflowExceptions,
+		/// difficult-to-catch bugs and performance issues!
+		/// Use it VERY carefully!
+		/// </note>
+		[NotNull]
+		private static IT4File BuildT4Tree([NotNull] IPsiSourceFile target)
+		{
+			var languageService = T4Language.Instance.LanguageService().NotNull();
+			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			var file = (IT4File) new T4Parser(lexer, target).ParseFile();
+			file.SetSourceFile(target);
+			return file;
 		}
 	}
 }
