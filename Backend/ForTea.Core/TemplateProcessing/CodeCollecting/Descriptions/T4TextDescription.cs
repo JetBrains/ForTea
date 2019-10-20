@@ -5,14 +5,14 @@ using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4TextDescription : T4AppendableElementDescriptionBase
+	public sealed class T4TextDescription : T4ElementDescriptionBase, IT4AppendableElementDescription
 	{
 		[NotNull]
 		private string Text { get; }
 
 		public T4TextDescription([NotNull] string text) => Text = text;
 
-		public override void AppendContent(
+		public void AppendContent(
 			T4CSharpCodeGenerationResult destination,
 			IT4ElementAppendFormatProvider provider,
 			IPsiSourceFile context

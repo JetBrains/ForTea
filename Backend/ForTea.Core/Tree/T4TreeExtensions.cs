@@ -21,7 +21,7 @@ namespace GammaJul.ForTea.Core.Tree
 	public static class T4TreeExtensions
 	{
 		[CanBeNull]
-		public static ITreeNode GetAttributeValueToken(
+		public static IT4TreeNode GetAttributeValueToken(
 			[CanBeNull] this IT4Directive directive,
 			[CanBeNull] string attributeName
 		)
@@ -40,20 +40,20 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] string attributeName
 		) => directive.GetAttributeValueToken(attributeName)?.GetText();
 
-		public static Pair<ITreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
+		public static Pair<IT4TreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
 			[NotNull] this IT4Directive directive,
 			[NotNull] string attributeName
 		)
 		{
 			var valueToken = directive.GetAttributeValueToken(attributeName);
 			if (valueToken == null)
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
 			string value = valueToken.GetText();
 			if (value.IsNullOrWhitespace())
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
-			return new Pair<ITreeNode, string>(valueToken, value);
+			return new Pair<IT4TreeNode, string>(valueToken, value);
 		}
 
 		[NotNull]
