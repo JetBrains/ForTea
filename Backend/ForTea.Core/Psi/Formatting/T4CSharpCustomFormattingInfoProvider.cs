@@ -38,18 +38,11 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		public override SpaceType GetBlockSpaceType(
 			[NotNull] CSharpFmtStageContext ctx,
 			[NotNull] CSharpCodeFormattingContext context
-		)
-		{
-			var candidates = Providers
-				.Select(provider => provider.Provide(ctx))
-				.Where(provided => provided.HasValue)
-				.Select(provided => provided.Value);
-			foreach (var provided in candidates)
-			{
-				return provided;
-			}
-
-			return SpaceType.VerticalNearBrackets;
-		}
+		) => Providers
+			.Select(provider => provider.Provide(ctx))
+			.Where(provided => provided.HasValue)
+			.Select(provided => provided.Value)
+			// default(SpaceType) == SpaceType.Default
+			.FirstOrDefault();
 	}
 }
