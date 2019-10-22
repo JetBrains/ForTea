@@ -126,17 +126,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			Result.Append(intermediateResults);
 		}
 
-		public override void VisitAssemblyDirectiveNode(IT4AssemblyDirective assemblyDirectiveParam)
-		{
-			// TODO: resolve assemblies here
-		}
-
-		public override void VisitCleanupBehaviorDirectiveNode(
-			IT4CleanupBehaviorDirective cleanupBehaviorDirectiveParam)
-		{
-			// TODO: should anything be done here?
-		}
-
 		public override void VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam)
 		{
 			var description = T4ImportDescription.FromDirective(importDirectiveParam);
