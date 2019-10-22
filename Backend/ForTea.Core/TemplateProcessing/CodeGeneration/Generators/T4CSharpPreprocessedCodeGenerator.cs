@@ -1,8 +1,12 @@
+using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -31,6 +35,22 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		) => new T4CSharpIntermediateConverter(intermediateResult, ActualFile);
+		) => new T4CSharpIntermediateConverter(intermediateResult, File);
+
+		/// <note>
+		/// This method builds PSI from scratch,
+		/// which might cause creepy StackOverflowExceptions,
+		/// difficult-to-catch bugs and performance issues!
+		/// Use it VERY carefully!
+		/// </note>
+		[NotNull]
+		private static IT4File BuildT4Tree([NotNull] IPsiSourceFile target)
+		{
+			var languageService = T4Language.Instance.LanguageService().NotNull();
+			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			var file = (IT4File) new T4Parser(lexer, target).ParseFile();
+			file.SetSourceFile(target);
+			return file;
+		}
 	}
 }
