@@ -11,23 +11,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		[NotNull]
 		private IT4TreeNode Source { get; }
 
-		[NotNull]
-		private string Presentation { get; }
-
-		private T4ImportDescription([NotNull] IT4TreeNode source, [NotNull] string presentation)
-		{
-			Source = source;
-			Presentation = presentation;
-		}
+		private T4ImportDescription([NotNull] IT4TreeNode source) => Source = source;
 
 		[CanBeNull]
 		public static T4ImportDescription FromDirective([NotNull] IT4Directive directive)
 		{
-			(var source, string presentation) =
+			(var source, string _) =
 				directive.GetAttributeValueIgnoreOnlyWhitespace(T4DirectiveInfoManager.Import.NamespaceAttribute.Name);
 			if (source == null) return null;
-			if (presentation == null) return null;
-			return new T4ImportDescription(source, presentation);
+			return new T4ImportDescription(source);
 		}
 
 		public void AppendContent(

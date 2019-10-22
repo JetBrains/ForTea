@@ -156,7 +156,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 			[NotNull] CodeStructureElement parentElement,
 			[NotNull] CSharpCodeStructureProcessingState state
 		) {
-			foreach (IMultipleDeclarationMember declarationMember in declaration.Declarators) {
+			foreach (IMultipleDeclarationMember declarationMember in declaration.DeclaratorsEnumerable) {
 				if (!declarationMember.IsSynthetic())
 					ProcessCSharpDeclaration(declarationMember, parentElement, state);
 			}

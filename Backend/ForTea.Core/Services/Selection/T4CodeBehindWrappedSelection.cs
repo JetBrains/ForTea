@@ -17,8 +17,7 @@ namespace GammaJul.ForTea.Core.Services.Selection {
 		public ISelectedRange Parent {
 			get {
 				ISelectedRange parent = _codeBehindRange.Parent;
-				if (parent != null && parent.Range.IsValid())
-					return new T4CodeBehindWrappedSelection(_file, parent);
+				if (parent?.Range.IsValid() == true) return new T4CodeBehindWrappedSelection(_file, parent);
 				ITreeNode node = _file.FindNodeAt(Range);
 				return node == null ? null : new T4NodeSelection(_file, node);
 			}
