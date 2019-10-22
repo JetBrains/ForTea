@@ -40,7 +40,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 			if (lastWriteTimeUtc == PreviousExecutedFileWriteTime) return;
 			PreviousExecutedFileWriteTime = lastWriteTimeUtc;
 			var solution = file.GetSolution();
-			string message = new T4CSharpCodeGenerator(file, solution).Generate().RawText;
+			string message = new T4CSharpPreprocessedCodeGenerator(file, solution).Generate().RawText;
 			solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "T4 template preprocessing", () =>
 			{
 				using (WriteLockCookie.Create())

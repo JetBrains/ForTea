@@ -10,9 +10,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 	/// This class preprocesses T4 file
 	/// to produce C# file that can be compiled and run correctly.
 	/// </summary>
-	public class T4CSharpCodeGenerator : T4CSharpCodeGeneratorBase
+	public class T4CSharpPreprocessedCodeGenerator : T4CSharpCodeGeneratorBase
 	{
-		public T4CSharpCodeGenerator(
+		/// <summary>
+		/// In generated code-behind, we use root file to provide intelligent support for indirectly included files,
+		/// i.e. files that are included alongside with the current file into somewhere else.
+		/// When generating code to be executed or placed into the project,
+		/// there's no need to keep track of the context.
+		/// Since the context is part of the primary PSI,
+		/// we have to re-create the PSI from scratch
+		/// </summary>
+		protected override IT4File File => BuildT4Tree(base.File.GetSourceFile().NotNull());
+
+		public T4CSharpPreprocessedCodeGenerator(
 			[NotNull] IT4File actualFile,
 			[NotNull] ISolution solution
 		) : base(actualFile) => Collector = new T4CSharpCodeGenerationInfoCollector(actualFile, solution);

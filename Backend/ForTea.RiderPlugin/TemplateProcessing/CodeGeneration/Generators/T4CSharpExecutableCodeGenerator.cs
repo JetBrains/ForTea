@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generators
 {
-	public sealed class T4CSharpExecutableCodeGenerator : T4CSharpCodeGenerator
+	public sealed class T4CSharpExecutableCodeGenerator : T4CSharpPreprocessedCodeGenerator
 	{
 		public T4CSharpExecutableCodeGenerator(
 			[NotNull] IT4File actualFile,
@@ -23,8 +23,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generat
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
 		)
 		{
-			var referenceExtractionManager = ActualFile.GetSolution().GetComponent<IT4ReferenceExtractionManager>();
-			return new T4CSharpExecutableIntermediateConverter(intermediateResult, ActualFile, referenceExtractionManager);
+			var referenceExtractionManager = File.GetSolution().GetComponent<IT4ReferenceExtractionManager>();
+			return new T4CSharpExecutableIntermediateConverter(intermediateResult, File, referenceExtractionManager);
 		}
 	}
 }

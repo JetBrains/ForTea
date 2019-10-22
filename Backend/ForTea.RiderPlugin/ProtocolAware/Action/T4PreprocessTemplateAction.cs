@@ -36,7 +36,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			statistics.TrackAction("T4.Template.Preprocess");
 			try
 			{
-				string message = new T4CSharpCodeGenerator(file, solution).Generate().RawText;
+				string message = new T4CSharpPreprocessedCodeGenerator(file, solution).Generate().RawText;
 				using (WriteLockCookie.Create())
 				{
 					targetFileManager.SavePreprocessResults(file, message);
