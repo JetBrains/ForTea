@@ -1,4 +1,3 @@
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Application.Components;
 using JetBrains.ProjectModel;
