@@ -55,22 +55,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 
 			Result.Append("        private global::");
-			if (description.HasSameSourceFile(File.GetSourceFile()))
-			{
-				var type = description.TypeToken;
-				if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
-				Result.AppendMapped(type);
-			}
-			else Result.Append(description.TypeString);
+			var type = description.TypeToken;
+			if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
+			Result.AppendMapped(type);
 
 			Result.Append(" ");
-			if (description.HasSameSourceFile(File.GetSourceFile()))
-			{
-				var name = description.NameToken;
-				if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
-				Result.AppendMapped(name);
-			}
-			else Result.Append(description.NameString);
+			var name = description.NameToken;
+			if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
+			Result.AppendMapped(name);
 
 			Result.Append(" => ");
 			Result.Append(description.FieldNameString);

@@ -2,38 +2,35 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4ExpressionDescription : T4ElementDescriptionBase, IT4AppendableElementDescription
+	public sealed class T4ExpressionDescription : IT4AppendableElementDescription
 	{
 		[NotNull]
 		private IT4Code Source { get; }
 
-		public T4ExpressionDescription([NotNull] IT4Code source) : base(source.GetSourceFile()) => Source = source;
+		public T4ExpressionDescription([NotNull] IT4Code source) => Source = source;
 
 		public void AppendContent(
 			T4CSharpCodeGenerationResult destination,
-			IT4ElementAppendFormatProvider provider,
-			IPsiSourceFile context
+			IT4ElementAppendFormatProvider provider
 		)
 		{
-			if (!provider.ShouldBreakExpressionWithLineDirective) AppendAllContent(destination, provider, context);
-			else AppendAllContentBreakingExpression(destination, provider, context);
+			if (!provider.ShouldBreakExpressionWithLineDirective) AppendAllContent(destination, provider);
+			else AppendAllContentBreakingExpression(destination, provider);
 		}
 
 		private void AppendAllContentBreakingExpression(
 			[NotNull] T4CSharpCodeGenerationResult destination,
-			[NotNull] IT4ElementAppendFormatProvider provider,
-			[NotNull] IPsiSourceFile context
+			[NotNull] IT4ElementAppendFormatProvider provider
 		)
 		{
 			destination.AppendLine(provider.Indent);
 			AppendContentPrefix(destination, provider);
 			destination.AppendLine();
 			AppendOpeningLineDirective(destination, provider);
-			AppendMainContent(destination, provider, context);
+			AppendMainContent(destination, provider);
 			destination.AppendLine();
 			AppendClosingLineDirective(destination, provider);
 			AppendContentSuffix(destination, provider);
@@ -41,14 +38,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		private void AppendAllContent(
 			[NotNull] T4CSharpCodeGenerationResult destination,
-			[NotNull] IT4ElementAppendFormatProvider provider,
-			[NotNull] IPsiSourceFile context
+			[NotNull] IT4ElementAppendFormatProvider provider
 		)
 		{
 			destination.AppendLine(provider.Indent);
 			AppendOpeningLineDirective(destination, provider);
 			AppendContentPrefix(destination, provider);
-			AppendMainContent(destination, provider, context);
+			AppendMainContent(destination, provider);
 			AppendContentSuffix(destination, provider);
 			destination.AppendLine(provider.Indent);
 			AppendClosingLineDirective(destination, provider);
@@ -76,14 +72,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		private void AppendMainContent(
 			[NotNull] T4CSharpCodeGenerationResult destination,
-			[NotNull] IT4ElementAppendFormatProvider provider,
-			[NotNull] IPsiSourceFile context
+			[NotNull] IT4ElementAppendFormatProvider provider
 		)
 		{
 			destination.Append(provider.CodeCommentStart);
 			provider.AppendCompilationOffset(destination, Source);
-			if (HasSameSourceFile(context)) provider.AppendMappedIfNeeded(destination, Source);
-			else destination.Append(Source.GetText());
+			provider.AppendMappedIfNeeded(destination, Source);
 			destination.Append(provider.CodeCommentEnd);
 		}
 

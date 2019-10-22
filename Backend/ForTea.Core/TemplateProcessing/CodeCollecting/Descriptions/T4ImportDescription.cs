@@ -3,11 +3,10 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4ImportDescription : T4ElementDescriptionBase, IT4AppendableElementDescription
+	public sealed class T4ImportDescription : IT4AppendableElementDescription
 	{
 		[NotNull]
 		private IT4TreeNode Source { get; }
@@ -15,8 +14,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		[NotNull]
 		private string Presentation { get; }
 
-		private T4ImportDescription([NotNull] IT4TreeNode source, [NotNull] string presentation) :
-			base(source.GetSourceFile())
+		private T4ImportDescription([NotNull] IT4TreeNode source, [NotNull] string presentation)
 		{
 			Source = source;
 			Presentation = presentation;
@@ -34,16 +32,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		public void AppendContent(
 			T4CSharpCodeGenerationResult destination,
-			IT4ElementAppendFormatProvider provider,
-			IPsiSourceFile context
+			IT4ElementAppendFormatProvider provider
 		)
 		{
 			destination.Append(provider.Indent);
 			provider.AppendLineDirective(destination, Source);
 			provider.AppendCompilationOffset(destination, Source);
 			destination.Append("using ");
-			if (HasSameSourceFile(context)) destination.AppendMapped(Source);
-			else destination.Append(Presentation);
+			destination.AppendMapped(Source);
 			destination.AppendLine(";");
 			destination.Append(provider.Indent);
 			destination.AppendLine("#line default");
