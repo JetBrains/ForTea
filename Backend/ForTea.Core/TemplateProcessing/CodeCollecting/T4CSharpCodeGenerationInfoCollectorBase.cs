@@ -9,7 +9,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -56,7 +55,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
 			{
 				Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-				Guard.StartProcessing(File.GetSourceFile().NotNull());
+				Guard.StartProcessing(File.LogicalPsiSourceFile);
 				File.ProcessDescendants(this);
 				string suffix = Result.State.ProduceBeforeEof();
 				if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
@@ -79,7 +78,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(File.GetSourceFile().NotNull());
+				Guard.StartProcessing(File.LogicalPsiSourceFile);
 				return;
 			}
 

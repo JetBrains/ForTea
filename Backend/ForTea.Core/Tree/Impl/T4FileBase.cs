@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Psi;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
@@ -32,5 +33,12 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 		public abstract void Accept(TreeNodeVisitor visitor);
 		public abstract void Accept<TContext>(TreeNodeVisitor<TContext> visitor, TContext context);
 		public abstract TReturn Accept<TContext, TReturn>(TreeNodeVisitor<TContext, TReturn> visitor, TContext context);
+
+		[NotNull]
+		// ReSharper disable once NotNullMemberIsNotInitialized it is initialized by parser
+		public IPsiSourceFile LogicalPsiSourceFile { get; internal set; }
+
+		[CanBeNull]
+		public IPsiSourceFile PhysicalPsiSourceFile => GetSourceFile();
 	}
 }

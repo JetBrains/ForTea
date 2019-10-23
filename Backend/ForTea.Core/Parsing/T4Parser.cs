@@ -60,6 +60,7 @@ namespace GammaJul.ForTea.Core.Parsing
 					{
 						var translator = new T4DocumentRangeTranslator(file, SourceFile);
 						file.DocumentRangeTranslator = translator;
+						file.LogicalPsiSourceFile = SourceFile;
 					}
 
 					return file;
