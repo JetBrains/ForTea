@@ -29,9 +29,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt
 		{
 			var file = node.GetContainingFile().As<IT4File>().NotNull();
 			file.GetSolution().Locks.AssertReadAccessAllowed();
-			var offset = node.GetTreeStartOffset();
-			var sourceFile = file.GetSourceFile().NotNull();
-			var coords = sourceFile.Document.GetCoordsByOffset(offset.Offset);
+			var offset = node.GetDocumentStartOffset();
+			var coords = offset.Document.GetCoordsByOffset(offset.Offset);
 			return new T4FailureRawData((int) coords.Line, (int) coords.Column, file, message);
 		}
 	}
