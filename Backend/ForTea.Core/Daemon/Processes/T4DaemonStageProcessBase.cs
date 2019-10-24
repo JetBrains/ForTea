@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
@@ -35,7 +36,10 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			AnalyzeFile(File);
 			File.ProcessDescendants(this);
-			commiter(new DaemonStageResult(_highlightings.ToArray()));
+			var solution = File.GetSolution();
+			var relevantHighlightings = _highlightings
+				.Where(info => info.Range.Document.GetPsiSourceFile(solution) == File.PhysicalPsiSourceFile);
+			commiter(new DaemonStageResult(relevantHighlightings.ToArray()));
 		}
 
 		protected virtual void AnalyzeFile([NotNull] IT4File file)
