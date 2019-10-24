@@ -12,7 +12,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace GammaJul.ForTea.Core.Daemon.Processes
 {
 	// TODO: make it actually visitor
-	public class T4IncludeAwareDaemonProcessVisitor : IRecursiveElementProcessor
+	public sealed class T4IncludeAwareDaemonProcessVisitor : IRecursiveElementProcessor
 	{
 		[NotNull]
 		private IT4IncludeGuard<IPsiSourceFile> Guard { get; }
@@ -108,7 +108,6 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ReportDuplicateDirective([NotNull] IT4Directive directive)
 		{
-			if (!Guard.IsOnTopLevel) return;
 			var warning = new DuplicateDirectiveWarning(directive);
 			var highlightingInfo = new HighlightingInfo(directive.GetHighlightingRange(), warning);
 			MyHighlightings.Add(highlightingInfo);
@@ -119,14 +118,12 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ReportUnresolvedPath([NotNull] IT4IncludeDirective include)
 		{
-			if (!Guard.IsOnTopLevel) return;
 			var name = include.Name;
 			AddHighlighting(name, new UnresolvedIncludeWarning(name));
 		}
 
 		private void ReportRecursiveInclude([NotNull] IT4IncludeDirective include)
 		{
-			if (!Guard.IsOnTopLevel) return;
 			var value = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value;
 			if (value == null) return;
 			AddHighlighting(value, new RecursiveIncludeError(value));
@@ -134,7 +131,6 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ReportRedundantInclude([NotNull] IT4IncludeDirective include)
 		{
-			if (!Guard.IsOnTopLevel) return;
 			var value = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value;
 			if (value == null) return;
 			AddHighlighting(value, new RedundantIncludeWarning(include));
