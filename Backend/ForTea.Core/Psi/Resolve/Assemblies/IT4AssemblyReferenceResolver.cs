@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.References;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
@@ -23,6 +24,12 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 
 		[CanBeNull]
 		FileSystemPath Resolve([NotNull] IT4AssemblyDirective directive);
+
+		/// <note>
+		/// assemblyName is assumed to NOT contain macros
+		/// </note>
+		[CanBeNull]
+		FileSystemPath Resolve([NotNull] string assemblyNameOrFile, [NotNull] IPsiSourceFile sourceFile);
 
 		[NotNull]
 		IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(

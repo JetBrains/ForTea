@@ -3,6 +3,7 @@ using System.Linq;
 using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -13,6 +14,7 @@ using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures;
 using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference.Impl
@@ -40,13 +42,61 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
-		public IEnumerable<PortableExecutableReference> ExtractPortableReferencesTransitive(
-			IT4File file,
-			Lifetime lifetime
-		) => ExtractReferenceLocationsTransitive(file)
-			.Select(it => it.Location)
-			.SelectNotNull(it => Cache.GetMetadataReference(lifetime, it))
-			.AsList();
+		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file)
+		{
+			var directives = file.GetThisIncludedFilesRecursive()
+				.SelectMany(it => it.BlocksEnumerable)
+				.OfType<IT4AssemblyDirective>();
+			var result = new List<MetadataReference>();
+			var errors = new FrugalLocalList<T4FailureRawData>();
+			foreach (var directive in directives)
+			{
+				var resolved = AssemblyReferenceResolver.Resolve(directive);
+				if (resolved == null)
+				{
+					errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
+					continue;
+				}
+
+				var metadataReference = Cache.GetMetadataReference(lifetime, resolved);
+				if (metadataReference == null)
+				{
+					errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
+					continue;
+				}
+
+				result.Add(metadataReference);
+			}
+
+			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
+
+			AddBaseReferences(lifetime, result, file.GetSourceFile().NotNull());
+			return result;
+		}
+
+		private void AddBaseReferences(
+			Lifetime lifetime,
+			[NotNull, ItemNotNull] List<MetadataReference> result,
+			[NotNull] IPsiSourceFile getSourceFile
+		)
+		{
+			TryAddReference(lifetime, result, getSourceFile, "mscorlib");
+			TryAddReference(lifetime, result, getSourceFile, "System");
+		}
+
+		private void TryAddReference(
+			Lifetime lifetime,
+			[NotNull, ItemNotNull] List<MetadataReference> result,
+			[NotNull] IPsiSourceFile getSourceFile,
+			[NotNull] string assemblyName
+		)
+		{
+			var resolved = AssemblyReferenceResolver.Resolve(assemblyName, getSourceFile);
+			if (resolved == null) return;
+			var metadataReference = Cache.GetMetadataReference(lifetime, resolved);
+			if (metadataReference == null) return;
+			result.Add(metadataReference);
+		}
 
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{

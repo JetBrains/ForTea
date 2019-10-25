@@ -59,9 +59,15 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		public T4DeclaredAssembliesInfo([NotNull] IT4File baseFile, [NotNull] T4FileDependencyManager dependencyManager)
 		{
-			HandleDirectives(t4File);
-			var guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
-			foreach (var includedFile in t4File.GetIncludedFilesRecursive(guard))
+			var rootLocation = dependencyManager.Graph.FindBestRoot(baseFile.GetSourceFile().NotNull().GetLocation());
+			var rootFile = baseFile
+				.GetSolution()
+				.FindProjectItemsByLocation(rootLocation)
+				.OfType<IProjectFile>()
+				.Select(PsiSourceFileExtensions.ToSourceFile)
+				.Single()
+				.BuildT4Tree();
+			foreach (var file in rootFile.GetThisIncludedFilesRecursive())
 			{
 				HandleAssemblyDirectives(file);
 			}

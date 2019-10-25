@@ -69,7 +69,13 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			string assemblyNameOrFile = directive.GetFirstAttribute(targetAttribute)?.Value.GetText();
 			if (assemblyNameOrFile == null) return null;
 			var sourceFile = directive.GetSourceFile();
-			var projectFile = sourceFile?.ToProjectFile();
+			if (sourceFile == null) return null;
+			return Resolve(assemblyNameOrFile, sourceFile);
+		}
+
+		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
+		{
+			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return null;
 			using (Preprocessor.Prepare(projectFile))
 			{
