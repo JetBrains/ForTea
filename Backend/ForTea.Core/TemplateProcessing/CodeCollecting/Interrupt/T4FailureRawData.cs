@@ -27,7 +27,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt
 
 		public static T4FailureRawData FromElement([NotNull] ITreeNode node, [NotNull] string message)
 		{
-			var file = node.GetContainingFile().As<IT4File>().NotNull();
+			var file = node.GetContainingFile() as IT4File;
+			Assertion.AssertNotNull(file, "file != null");
 			file.GetSolution().Locks.AssertReadAccessAllowed();
 			var offset = node.GetTreeStartOffset();
 			var sourceFile = file.GetSourceFile().NotNull();
