@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.FileType;
+using GammaJul.ForTea.Core.Psi.Modules.References;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
@@ -27,6 +28,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 	{
 		private readonly Lifetime _lifetime;
 		[NotNull] private readonly T4AssemblyReferenceManager _assemblyReferenceManager;
+		[NotNull] private readonly T4ProjectReferenceManager _projectReferenceManager;
 		[NotNull] private readonly IPsiModules _psiModules;
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IShellLocks _shellLocks;
@@ -105,6 +107,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				.SelectNotNull(assembly => _psiModules.GetPrimaryPsiModule(assembly, TargetFrameworkId))
 				.Select(it => new PsiModuleReference(it));
 			references.AddRange(moduleReferences);
+			references.AddRange(_projectReferenceManager.GetProjectReference());
 			return references.GetReferences();
 		}
 
@@ -186,6 +189,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				file,
 				resolveContext
 			);
+			_projectReferenceManager = new T4ProjectReferenceManager(file, solution);
 
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
 			changeManager.AddDependency(lifetime, _psiModules, ChangeProvider);

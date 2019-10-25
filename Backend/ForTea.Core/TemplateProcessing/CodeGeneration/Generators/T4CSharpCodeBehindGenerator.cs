@@ -1,4 +1,3 @@
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
@@ -50,16 +49,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		{
 			get
 			{
-				var sourceLocation = ActualFile.GetSourceFile().GetLocation();
-				var rootLocation = DependencyManager.Graph.FindBestRoot(sourceLocation);
-				var rootPsiSourceFile = Solution
-					.FindProjectItemsByLocation(rootLocation)
-					.OfType<IProjectFile>()
-					.SingleOrDefault()
-					?.ToSourceFile();
-				if (ActualFile.GetSourceFile() == rootPsiSourceFile)
-					return ActualFile;
-
+				var projectFile = ActualFile.GetSourceFile().ToProjectFile().NotNull();
+				var rootPsiSourceFile = DependencyManager.Graph.FindBestRoot(projectFile).ToSourceFile();
+				if (ActualFile.GetSourceFile() == rootPsiSourceFile) return ActualFile;
 				var root = rootPsiSourceFile?.BuildT4Tree();
 				return root.NotNull();
 			}

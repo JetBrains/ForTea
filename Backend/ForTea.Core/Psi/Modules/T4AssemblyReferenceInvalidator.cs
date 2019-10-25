@@ -1,5 +1,6 @@
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
+using GammaJul.ForTea.Core.Psi.Modules.References;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using JetBrains.Annotations;

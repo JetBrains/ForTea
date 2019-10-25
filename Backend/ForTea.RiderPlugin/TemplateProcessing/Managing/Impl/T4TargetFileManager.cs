@@ -4,6 +4,8 @@ using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.Managing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.changes;
+using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers.Transactions;
@@ -12,6 +14,9 @@ using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Properties;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.Caches.SymbolCache;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
@@ -19,10 +24,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 	/// Note that this component is overridden in
 	/// <see cref="JetBrains.ForTea.RiderPlugin.ProtocolAware.T4TargetFileManager">protocol</see> namespace 
 	[SolutionComponent]
-	public sealed class T4TargetFileManager : IT4TargetFileManager
+	public class T4TargetFileManager : IT4TargetFileManager
 	{
 		[NotNull]
-		private ISolution Solution { get; }
+		protected ISolution Solution { get; }
 
 		[NotNull]
 		private IShellLocks Locks { get; }
@@ -227,7 +232,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
-			return GetOrCreateSameDestinationFile(cookie, file, result);
+			var destination = GetOrCreateSameDestinationFile(cookie, file, result);
+			SyncDocuments(destination.Location);
+			var sourceFile = destination.ToSourceFile();
+			if (sourceFile != null) SyncSymbolCaches(sourceFile);
+			RefreshFiles(destination.Location);
+			return destination;
 		}
 
 		public FileSystemPath SavePreprocessResults(IT4File file, string text)
@@ -235,7 +245,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
 			FileSystemPath destinationLocation = null;
-			IProjectFile destination;
+			IProjectFile destination = null;
 			Solution.InvokeUnderTransaction(cookie =>
 			{
 				string destinationName = GetPreprocessingTargetFileName(file);
@@ -245,7 +255,33 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
 				UpdateLastGenOutput(file, destinationLocation, cookie);
 			});
+			SyncDocuments(destinationLocation);
+			var sourceFile = destination.ToSourceFile();
+			if (sourceFile != null) SyncSymbolCaches(sourceFile);
+			RefreshFiles(destinationLocation);
 			return destinationLocation;
+		}
+
+		protected virtual void SyncDocuments([NotNull] FileSystemPath destinationLocation)
+		{
+		}
+
+		protected virtual void RefreshFiles([NotNull] FileSystemPath destinationLocation)
+		{
+		}
+
+		private void SyncSymbolCaches([NotNull] IPsiSourceFile changedFile)
+		{
+			var changeManager = Solution.GetPsiServices().GetComponent<ChangeManager>();
+			var invalidateCacheChange = new InvalidateCacheChange(
+				Solution.GetComponent<SymbolCache>(),
+				new[] {changedFile},
+				true);
+
+			using (WriteLockCookie.Create())
+			{
+				changeManager.OnProviderChanged(Solution, invalidateCacheChange, SimpleTaskExecutor.Instance);
+			}
 		}
 	}
 }

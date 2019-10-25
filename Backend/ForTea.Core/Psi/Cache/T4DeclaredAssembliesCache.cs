@@ -23,10 +23,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		private T4FileDependencyManager DependencyManager { get; }
 
 		[NotNull]
-		private WeakToStrongDictionary<IPsiSourceFile, T4DeclaredAssembliesInfo> DeclaredAssemblyInfos { get; } =
-			new WeakToStrongDictionary<IPsiSourceFile, T4DeclaredAssembliesInfo>();
-
-		[NotNull]
 		public Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>> FileDataChanged { get; }
 
 		public T4DeclaredAssembliesCache(
@@ -48,7 +44,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 				() => psiFiles.AfterPsiChanged += OnPsiChanged,
 				() => psiFiles.AfterPsiChanged -= OnPsiChanged
 			);
-			lifetime.OnTermination(DeclaredAssemblyInfos);
 		}
 
 		/// <summary>Called when a PSI file is created.</summary>
@@ -74,13 +69,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			var sourceFile = t4File.GetSourceFile();
 			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
 			var newData = new T4DeclaredAssembliesInfo(t4File, DependencyManager);
-			T4DeclaredAssembliesInfo existingDeclaredAssembliesInfo;
-			lock (DeclaredAssemblyInfos)
-			{
-				DeclaredAssemblyInfos.TryGetValue(sourceFile, out existingDeclaredAssembliesInfo);
-				DeclaredAssemblyInfos[sourceFile] = newData;
-			}
-
+			var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
+			sourceFile.SetDeclaredAssembliesInfo(newData);
 			var diff = newData.DiffWith(existingDeclaredAssembliesInfo);
 			if (diff == null) return;
 			FileDataChanged.Fire(Pair.Of(sourceFile, diff));

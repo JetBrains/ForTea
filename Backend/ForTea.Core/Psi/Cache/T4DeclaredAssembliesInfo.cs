@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
@@ -8,14 +7,12 @@ using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
 {
-	internal sealed class T4DeclaredAssembliesInfo
+	public sealed class T4DeclaredAssembliesInfo
 	{
 		[NotNull, ItemNotNull]
 		private readonly JetHashSet<IT4PathWithMacros> ReferencedAssemblies = new JetHashSet<IT4PathWithMacros>();
@@ -59,14 +56,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		public T4DeclaredAssembliesInfo([NotNull] IT4File baseFile, [NotNull] T4FileDependencyManager dependencyManager)
 		{
-			var rootLocation = dependencyManager.Graph.FindBestRoot(baseFile.GetSourceFile().NotNull().GetLocation());
-			var rootFile = baseFile
-				.GetSolution()
-				.FindProjectItemsByLocation(rootLocation)
-				.OfType<IProjectFile>()
-				.Select(PsiSourceFileExtensions.ToSourceFile)
-				.Single()
-				.BuildT4Tree();
+			var projectFile = baseFile.GetSourceFile().NotNull().ToProjectFile().NotNull();
+			var rootLocation = dependencyManager.Graph.FindBestRoot(projectFile);
+			var rootFile = rootLocation.ToSourceFile().NotNull().BuildT4Tree();
 			foreach (var file in rootFile.GetThisAndIncludedFilesRecursive())
 			{
 				HandleAssemblyDirectives(file);

@@ -87,7 +87,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			switch (changeType)
 			{
 				case PsiModuleChange.ChangeType.Added:
-					// A PSI module was added. That could have happened due to creating a new 
 					// Preprocessed .tt files should be handled by R# itself as if it's a normal project file,
 					// so that it has access to the current project types.
 					if (projectFile.LanguageType.Is<T4ProjectFileType>()
