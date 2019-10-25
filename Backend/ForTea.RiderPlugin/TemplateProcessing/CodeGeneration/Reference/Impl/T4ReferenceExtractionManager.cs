@@ -77,21 +77,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		private void AddBaseReferences(
 			Lifetime lifetime,
 			[NotNull, ItemNotNull] List<MetadataReference> result,
-			[NotNull] IPsiSourceFile getSourceFile
+			[NotNull] IPsiSourceFile sourceFile
 		)
 		{
-			TryAddReference(lifetime, result, getSourceFile, "mscorlib");
-			TryAddReference(lifetime, result, getSourceFile, "System");
+			TryAddReference(lifetime, result, sourceFile, "mscorlib");
+			TryAddReference(lifetime, result, sourceFile, "System");
 		}
 
 		private void TryAddReference(
 			Lifetime lifetime,
 			[NotNull, ItemNotNull] List<MetadataReference> result,
-			[NotNull] IPsiSourceFile getSourceFile,
+			[NotNull] IPsiSourceFile sourceFile,
 			[NotNull] string assemblyName
 		)
 		{
-			var resolved = AssemblyReferenceResolver.Resolve(assemblyName, getSourceFile);
+			var resolved = AssemblyReferenceResolver.Resolve(assemblyName, sourceFile);
 			if (resolved == null) return;
 			var metadataReference = Cache.GetMetadataReference(lifetime, resolved);
 			if (metadataReference == null) return;
