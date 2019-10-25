@@ -19,10 +19,10 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatVsMacrosAreResolved() = doTest()
   @Test fun testThatMsBuildPropertiesAreResolved() = doTest()
   @Test fun testThatAssemblyCanBeReferenced() = doTest()
-//  @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
-  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
+  @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
+//  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
   @Test fun testThatTemplateCanProduceBigXml() = doTest()
-  // @Test fun testThatTemplateIsCaseInsensitive() = doTest()
+//  @Test fun testThatTemplateIsCaseInsensitive() = doTest()
 //  @Test fun testThatFileExtensionCanBeUpdatedCorrectly() {
 //    executeT4File()
 //    t4File.writeText(t4File.readText().replace(".fs", ".cs"))
@@ -32,4 +32,12 @@ class T4RunFileTest : T4RunFileTestBase() {
 //    dumpCsproj()
 //    assertNoOutputWithExtension(".fs")
 //  }
+  @Test fun testThatVsDefaultTemplateCanBeExecuted() = doTest()
+  @Test fun testThatDefaultExtensionIsCs() = doTest(".cs")
+  @Test fun testThatFileWithT4ExtensionCanBeExecuted() = doTest()
+  @Test fun testThatExtensionCanContainDot() = doTest(".txt")
+  @Test fun testThatExtensionCanBeWithoutDot() = doTest(".txt")
+  @Test fun testTemplateWithLineBreakMess() = doTest()
+  @Test fun testThatFeatureBlocksCanContainManyNewLines() = doTest()
+  @Test fun testHowTextInFeatureIsHandled() = doTest()
 }

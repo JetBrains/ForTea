@@ -30,7 +30,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
     get() = project
       .solutionDirectory
       .combine("Project")
-      .listFiles { _, name -> name.endsWith(".tt") }
+      .listFiles { _, name -> name.endsWith(".tt") or name.endsWith(".t4") }
       .shouldNotBeNull()
       .single()
 
@@ -74,21 +74,15 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
     val virtualFile = t4File.path.toVirtualFile(true).shouldNotBeNull()
     val id = host.getItemsByVirtualFile(virtualFile).single().id
     val request = T4ExecutionRequest(T4FileLocation(id), false)
-    T4SynchronousRunConfigurationExecutor(project, host, ::isExecutionFinished).execute(request)
+    T4SynchronousRunConfigurationExecutor(project, host) {
+      !T4SynchronousRunConfigurationExecutor.isExecutionRunning
+    }.execute(request)
   }
-
-  private val isExecutionFinished: Boolean
-    get() = outputFileCandidates.any {
-      it.nameWithoutExtension == t4File.nameWithoutExtension
-        && it.name != t4File.name
-        && !it.name.endsWith(".tmp")
-        && !it.name.endsWith(".gold")
-    }
 
   protected fun saveSolution() {
     application.saveAll()
-    waitForProjectModelReady(project)
     flushQueues()
+    waitForProjectModelReady(project)
     waitAllCommandsFinished()
     project.getComponent<VfsWriteOperationsHost>().waitRefreshIsFinished()
   }

@@ -1,0 +1,28 @@
+<#@ output extension=".txt" #>
+----
+<# Foo(); #>
+----
+<# Bar(); #>
+----
+<#+
+public void Foo()
+{ #>
+
+Nontrivial text
+<#+
+} #>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<#+ public void Bar() { } #>
