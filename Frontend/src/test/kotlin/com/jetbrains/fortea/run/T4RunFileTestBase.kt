@@ -88,11 +88,6 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
   }
 
   protected fun dumpCsproj() = executeWithGold(csprojFile.path) {
-    // Note:
-    //   in tests, template execution starts directly,
-    //   not via backend 'execute template' action.
-    //   Template type meanwhile is only updated from that action.
-    //   This is why in csproj file <Generator> tag will be missing
     it.print(csprojFile.readText())
   }
 

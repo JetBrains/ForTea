@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="SimpleFile.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>SimpleFile.txt</LastGenOutput>
     </Content>
     <Content Include="SimpleFile.txt">
