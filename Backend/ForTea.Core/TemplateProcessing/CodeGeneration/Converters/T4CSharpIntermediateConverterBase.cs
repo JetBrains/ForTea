@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Psi.Impl.Shared;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
@@ -199,7 +200,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		private void AppendBaseClassName()
 		{
-			if (IntermediateResult.HasBaseClass) Result.Append(IntermediateResult.CollectedBaseClass);
+			if (IntermediateResult.HasBaseClass)
+			{
+				// Hack!
+				// It is intended for 2019.3 EAP 1 and should not appear in later versions!
+				var baseClass = IntermediateResult.CollectedBaseClass;
+				var map = (GeneratedRangeMapTree) baseClass.GeneratedRangeMap;
+				var baseSource = map.SourceFile;
+				if (baseSource != File.GetSourceFile()) Result.Append(baseClass.RawText);
+				else Result.Append(baseClass);
+			}
 			else Result.Append(GeneratedBaseClassName);
 		}
 
