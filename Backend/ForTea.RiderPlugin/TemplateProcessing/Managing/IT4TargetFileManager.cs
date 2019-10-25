@@ -14,7 +14,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 
 		void TryProcessExecutionResults([NotNull] IT4File file);
 
-		[NotNull]
-		FileSystemPath SavePreprocessResults([NotNull] IT4File file, [NotNull] string text);
+		void SavePreprocessResults([NotNull] IT4File file, [NotNull] string text);
 	}
 }

@@ -1,49 +1,47 @@
 using System.IO;
 using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing;
-using GammaJul.ForTea.Core.TemplateProcessing.Managing;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application.changes;
-using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers.Transactions;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Properties;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Caches;
-using JetBrains.ReSharper.Psi.Caches.SymbolCache;
-using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
-	/// Note that this component is overridden in
-	/// <see cref="JetBrains.ForTea.RiderPlugin.ProtocolAware.T4TargetFileManager">protocol</see> namespace 
 	[SolutionComponent]
-	public class T4TargetFileManager : IT4TargetFileManager
+	public sealed class T4TargetFileManager : IT4TargetFileManager
 	{
 		[NotNull]
-		protected ISolution Solution { get; }
+		private ISolution Solution { get; }
 
 		[NotNull]
 		private IShellLocks Locks { get; }
 
 		[NotNull]
-		private IT4TargetFileChecker TargetFileChecker { get; }
+		private IT4ProjectModelTemplateMetadataManager TemplateMetadataManager { get; }
+
+		[NotNull]
+		private IT4OutputFileRefresher OutputFileRefresher { get; }
 
 		public T4TargetFileManager(
 			[NotNull] ISolution solution,
-			[NotNull] IT4TargetFileChecker targetFileChecker,
-			[NotNull] IShellLocks locks
+			[NotNull] IShellLocks locks,
+			[NotNull] IT4ProjectModelTemplateMetadataManager templateMetadataManager,
+			[NotNull] IT4OutputFileRefresher outputFileRefresher
 		)
 		{
 			Solution = solution;
-			TargetFileChecker = targetFileChecker;
 			Locks = locks;
+			TemplateMetadataManager = templateMetadataManager;
+			OutputFileRefresher = outputFileRefresher;
 		}
 
 		public FileSystemPath GetTemporaryExecutableLocation(IT4File file)
@@ -161,43 +159,23 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var destinationLocation = GetDestinationLocation(file, temporary.Name);
 			destinationLocation.DeleteFile();
 			File.Move(temporary.FullPath, destinationLocation.FullPath);
+			var sourceFile = file.GetSourceFile().NotNull();
+			var projectFile = sourceFile.ToProjectFile().NotNull();
+			IProjectFile destination = null;
 			Solution.InvokeUnderTransaction(cookie =>
 			{
-				var destination = UpdateProjectModel(file, destinationLocation, cookie);
+				destination = UpdateProjectModel(file, destinationLocation, cookie);
 				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
-				UpdateLastGenOutput(file, destinationLocation, cookie);
-				UpdateGeneratedFileStatus(file, destination, cookie);
+				TemplateMetadataManager.UpdateTemplateMetadata(
+					cookie,
+					projectFile,
+					T4TemplateKind.Executable,
+					destinationLocation
+				);
+				TemplateMetadataManager.UpdateGeneratedFileMetadata(cookie, destination, projectFile);
 			});
+			OutputFileRefresher.Refresh(destination);
 		}
-
-		private void UpdateLastGenOutput(
-			[NotNull] IT4File file,
-			[NotNull] FileSystemPath destinationLocation,
-			[NotNull] IProjectModelTransactionCookie cookie
-		)
-		{
-			var projectFile = file.GetSourceFile()?.ToProjectFile();
-			if (projectFile == null) return;
-			cookie.EditFileProperties(projectFile, properties =>
-			{
-				if (!(properties is ProjectFileProperties projectFileProperties)) return;
-				projectFileProperties.CustomToolOutput = destinationLocation.Name;
-			});
-		}
-
-		private void UpdateGeneratedFileStatus(
-			[NotNull] IT4File source,
-			[NotNull] IProjectFile destination,
-			[NotNull] IProjectModelTransactionCookie cookie
-		) => cookie.EditFileProperties(destination, properties =>
-		{
-			var projectFile = source.GetSourceFile()?.ToProjectFile();
-			if (projectFile == null) return;
-			if (!(properties is ProjectFileProperties projectFileProperties)) return;
-			projectFileProperties.IsCustomToolOutput = true;
-			projectFileProperties.IsDesignTimeBuildInput = true;
-			projectFileProperties.DependsUponName = projectFile.Name;
-		});
 
 		private void RemoveLastGenOutputIfDifferent(
 			[NotNull] IT4File file,
@@ -207,17 +185,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		{
 			var projectFile = file.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return;
-			if (!(projectFile.Properties is ProjectFileProperties properties)) return;
-			string output = properties.CustomToolOutput;
-			var folder = projectFile.ParentFolder;
-			if (folder == null) return;
-			var suspects = folder
-				.GetSubItems(output)
-				.ToList()
-				.OfType<IProjectFile>()
-				.Where(it => TargetFileChecker.IsGeneratedFrom(it, projectFile))
-				.Where(it => it.Location != destinationLocation);
-			foreach (var suspect in suspects)
+			foreach (var suspect in TemplateMetadataManager
+				.FindLastGenOutput(projectFile)
+				.Where(it => it.Location != destinationLocation)
+			)
 			{
 				cookie.Remove(suspect);
 			}
@@ -233,16 +204,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertReadAccessAllowed();
 			Locks.AssertWriteAccessAllowed();
 			var destination = GetOrCreateSameDestinationFile(cookie, file, result);
-			SyncDocuments(destination.Location);
-			var sourceFile = destination.ToSourceFile();
-			if (sourceFile != null) SyncSymbolCaches(sourceFile);
-			RefreshFiles(destination.Location);
 			return destination;
 		}
 
-		public FileSystemPath SavePreprocessResults(IT4File file, string text)
+		public void SavePreprocessResults(IT4File file, string text)
 		{
 			Locks.AssertReadAccessAllowed();
+			var sourceFile = file.GetSourceFile().NotNull();
+			var projectFile = sourceFile.ToProjectFile().NotNull();
 			Locks.AssertWriteAccessAllowed();
 			FileSystemPath destinationLocation = null;
 			IProjectFile destination = null;
@@ -251,37 +220,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				string destinationName = GetPreprocessingTargetFileName(file);
 				destination = GetOrCreateSameDestinationFile(cookie, file, destinationName);
 				destinationLocation = destination.Location;
-				destinationLocation.WriteAllText(text);
 				RemoveLastGenOutputIfDifferent(file, cookie, destinationLocation);
-				UpdateLastGenOutput(file, destinationLocation, cookie);
+				TemplateMetadataManager.UpdateTemplateMetadata(
+					cookie,
+					projectFile,
+					T4TemplateKind.Preprocessed,
+					destinationLocation
+				);
+				TemplateMetadataManager.UpdateGeneratedFileMetadata(cookie, destination, projectFile);
 			});
-			SyncDocuments(destinationLocation);
-			var sourceFile = destination.ToSourceFile();
-			if (sourceFile != null) SyncSymbolCaches(sourceFile);
-			RefreshFiles(destinationLocation);
-			return destinationLocation;
-		}
-
-		protected virtual void SyncDocuments([NotNull] FileSystemPath destinationLocation)
-		{
-		}
-
-		protected virtual void RefreshFiles([NotNull] FileSystemPath destinationLocation)
-		{
-		}
-
-		private void SyncSymbolCaches([NotNull] IPsiSourceFile changedFile)
-		{
-			var changeManager = Solution.GetPsiServices().GetComponent<ChangeManager>();
-			var invalidateCacheChange = new InvalidateCacheChange(
-				Solution.GetComponent<SymbolCache>(),
-				new[] {changedFile},
-				true);
-
-			using (WriteLockCookie.Create())
-			{
-				changeManager.OnProviderChanged(Solution, invalidateCacheChange, SimpleTaskExecutor.Instance);
-			}
+			destinationLocation.WriteAllText(text);
+			OutputFileRefresher.Refresh(destination);
 		}
 	}
 }

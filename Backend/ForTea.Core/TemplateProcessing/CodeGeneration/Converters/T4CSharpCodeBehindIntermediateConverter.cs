@@ -100,18 +100,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
 		}
 
+		[CanBeNull]
+		private string TryGetGeneratedClassNameFromFile()
+		{
+			var projectFile = File.GetSourceFile()?.ToProjectFile();
+			if (projectFile == null) return null;
+			var dataManager = File.GetSolution().GetComponent<IT4TemplateKindProvider>();
+			if (!dataManager.IsPreprocessedTemplate(projectFile)) return null;
+			string fileName = File.GetSourceFile()?.Name.WithoutExtension();
+			if (fileName == null) return null;
+			if (!ValidityChecker.IsValidIdentifier(fileName)) return null;
+			return fileName;
+		}
+
 		protected override string GeneratedClassName
 		{
 			get
 			{
-				var projectFile = File.GetSourceFile()?.ToProjectFile();
-				if (projectFile == null) return GeneratedClassNameString;
-				var dataManager = File.GetSolution().GetComponent<IT4TemplateKindProvider>();
-				if (!dataManager.IsPreprocessedTemplate(projectFile)) return GeneratedClassNameString;
-				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-				if (fileName == null) return GeneratedClassNameString;
-				if (!ValidityChecker.IsValidIdentifier(fileName)) return GeneratedClassNameString;
-				return fileName;
+				string name = TryGetGeneratedClassNameFromFile();
+				if (name == null) return GeneratedClassNameString;
+				return name + "Base";
 			}
 		}
 

@@ -6,6 +6,7 @@ using JetBrains.Application.UI.Actions;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
@@ -23,13 +24,27 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			if (file == null) return;
 			var executionManager = solution.GetComponent<IT4TemplateExecutionManager>();
 			var statistics = solution.GetComponent<Application.ActivityTrackingNew.UsageStatistics>();
-			var dataManager = solution.GetComponent<IT4ProjectModelTemplateDataManager>();
+			var dataManager = solution.GetComponent<IT4ProjectModelTemplateMetadataManager>();
 			var projectFile = file.GetSourceFile().NotNull().ToProjectFile().NotNull();
-			dataManager.SetTemplateKind(projectFile, T4TemplateKind.Executable);
-			statistics.TrackAction(ActionId);
-			// Template kind might have changed
-			solution.GetPsiServices().Files.CommitAllDocuments();
+			UpdateTemplateKind(solution, dataManager, projectFile, statistics);
 			Execute(executionManager, file);
+		}
+
+		// It is necessary to modify template kind
+		// before execution because this affects
+		// the context in which its assemblies are resolved
+		private void UpdateTemplateKind(
+			[NotNull] ISolution solution,
+			[NotNull] IT4ProjectModelTemplateMetadataManager dataManager,
+			[NotNull] IProjectFile projectFile,
+			[NotNull] Application.ActivityTrackingNew.UsageStatistics statistics
+		)
+		{
+			solution.InvokeUnderTransaction(cookie =>
+				dataManager.UpdateTemplateMetadata(cookie, projectFile, T4TemplateKind.Executable));
+			statistics.TrackAction(ActionId);
+			// Apply the changes, just in case the template kind was different
+			solution.GetPsiServices().Files.CommitAllDocuments();
 		}
 
 		protected abstract void Execute([NotNull] IT4TemplateExecutionManager executionManager, [NotNull] IT4File file);

@@ -157,6 +157,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 		}
 
+		protected override string GeneratedBaseClassName => GeneratedClassName + "Base";
+
 		protected override void AppendIndent(int size)
 		{
 			// TODO: use user indents?

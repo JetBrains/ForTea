@@ -220,7 +220,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual string GeneratedClassName => GeneratedClassNameString;
 
 		[NotNull]
-		private string GeneratedBaseClassName => GeneratedBaseClassNameString;
+		protected virtual string GeneratedBaseClassName => GeneratedBaseClassNameString;
 
 		protected abstract void AppendSyntheticAttribute();
 

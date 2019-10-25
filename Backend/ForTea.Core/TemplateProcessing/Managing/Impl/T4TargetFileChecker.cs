@@ -8,14 +8,14 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.TemplateProcessing.Managing.Impl
 {
 	[SolutionComponent]
-	public class T4TargetFileChecker : IT4TargetFileChecker
+	public sealed class T4TargetFileChecker : IT4TargetFileChecker
 	{
 		public bool IsPreprocessResult(IProjectFile suspect) => IsActionResult(suspect, T4TemplateKind.Preprocessed);
 		public bool IsGenerationResult(IProjectFile suspect) => IsActionResult(suspect, T4TemplateKind.Executable);
 
 		public bool IsGeneratedFrom(IProjectFile generated, IProjectFile source)
 		{
-			// TODO: check AutoGen and DesignTime, too
+			// cannot check AutoGen and DesignTime, because they are not added in .NET Core projects
 			if (!(generated.Properties is ProjectFileProperties generatedProperties)) return false;
 			return generatedProperties.DependsUponName == source.Name;
 		}
