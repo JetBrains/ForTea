@@ -43,7 +43,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
+			Guard = new T4IncludeGuard<IPsiSourceFile>();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 

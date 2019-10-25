@@ -1,10 +1,16 @@
 using System;
+using JetBrains.Util.dataStructures;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt
 {
-	public class T4OutputGenerationException : Exception
+	public sealed class T4OutputGenerationException : Exception
 	{
-		public T4FailureRawData FailureData { get; }
-		public T4OutputGenerationException(T4FailureRawData failureData) => FailureData = failureData;
+		public FrugalLocalList<T4FailureRawData> FailureDatum { get; }
+
+		public T4OutputGenerationException(T4FailureRawData failureData) =>
+			FailureDatum = FrugalLocalList<T4FailureRawData>.Of(failureData);
+
+		public T4OutputGenerationException(FrugalLocalList<T4FailureRawData> failureDatum) =>
+			FailureDatum = failureDatum;
 	}
 }

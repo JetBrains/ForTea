@@ -44,7 +44,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file)
 		{
-			var directives = file.GetThisIncludedFilesRecursive()
+			var directives = file.GetThisAndIncludedFilesRecursive()
 				.SelectMany(it => it.BlocksEnumerable)
 				.OfType<IT4AssemblyDirective>();
 			var result = new List<MetadataReference>();

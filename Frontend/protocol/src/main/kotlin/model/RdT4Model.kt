@@ -50,7 +50,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   val T4PreprocessingResult = structdef {
     field("location", T4FileLocation)
     field("succeeded", bool)
-    field("message", T4BuildMessage.nullable)
+    field("message", immutableList(T4BuildMessage))
   }
 
   val T4ExecutionRequest = structdef {

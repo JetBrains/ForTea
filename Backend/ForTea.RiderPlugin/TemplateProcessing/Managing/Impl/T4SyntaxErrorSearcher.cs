@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.Tree;
@@ -12,11 +11,11 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
 	[SolutionComponent]
-	public class T4SyntaxErrorSearcher : IT4SyntaxErrorSearcher
+	public sealed class T4SyntaxErrorSearcher : IT4SyntaxErrorSearcher
 	{
 		public ITreeNode FindErrorElement(IT4File file)
 		{
-			var guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
+			var guard = new T4IncludeGuard<IPsiSourceFile>();
 			return FindErrorElement(file, guard);
 		}
 

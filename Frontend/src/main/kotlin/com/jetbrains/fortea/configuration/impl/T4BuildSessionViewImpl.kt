@@ -48,8 +48,7 @@ class T4BuildSessionViewImpl(
       if (result.succeeded) BuildResultKind.Successful
       else BuildResultKind.HasErrors
     context.updateStatus(succeeded, T4PreprocessingHeader)
-    val message = result.message ?: return@invokeLater
-    context.addBuildEvent(toBuildDiagnostic(message, file))
+    result.message.map { toBuildDiagnostic(it, file) }.forEach(context::addBuildEvent)
     context.invalidatePanelMode()
   }
 

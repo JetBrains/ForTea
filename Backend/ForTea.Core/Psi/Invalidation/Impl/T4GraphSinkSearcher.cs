@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 		[NotNull]
 		public FileSystemPath FindClosestSink([NotNull] FileSystemPath source)
 		{
-			var guard = new T4IncludeGuard<FileSystemPath>(EqualityComparer<FileSystemPath>.Default);
+			var guard = new T4IncludeGuard<FileSystemPath>();
 			guard.StartProcessing(source);
 			ISet<FileSystemPath> previousLayer;
 			ISet<FileSystemPath> currentLayer = new JetHashSet<FileSystemPath>(new[] {source});

@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		public T4IncludeAwareDaemonProcessVisitor([NotNull] IPsiSourceFile initialFile)
 		{
 			HasSeenRecursiveInclude = false;
-			Guard = new T4IncludeGuard<IPsiSourceFile>(EqualityComparer<IPsiSourceFile>.Default);
+			Guard = new T4IncludeGuard<IPsiSourceFile>();
 			Guard.StartProcessing(initialFile);
 		}
 
