@@ -42,10 +42,10 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 				.SelectMany(dirtyLocation => Solution
 					.FindProjectItemsByLocation(dirtyLocation)
 					.OfType<IProjectFile>()
-				);
+				).AsList();
+			Logger.Verbose("Marked {0} files as dirty because their dependencies changed", dirties.Count);
 			foreach (var dirty in dirties)
 			{
-				Logger.Verbose("Update in {0} => dirty {1}", updatedFile.Name, dirty.Name);
 				PsiServices.MarkAsDirty(dirty);
 			}
 		}

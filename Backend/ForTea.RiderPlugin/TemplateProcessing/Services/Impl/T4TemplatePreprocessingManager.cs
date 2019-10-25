@@ -33,7 +33,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 
 		public void Preprocess(IT4File file)
 		{
-			Logger.Verbose("Preprocessing {0}", file.GetSourceFile()?.Name);
+			Logger.Verbose("Preprocessing a file");
 			var psiSourceFile = file.GetSourceFile();
 			if (psiSourceFile == null) return;
 			var lastWriteTimeUtc = psiSourceFile.LastWriteTimeUtc;

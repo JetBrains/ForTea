@@ -62,7 +62,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		public T4BuildResult Compile(Lifetime lifetime, IT4File file)
 		{
-			Logger.Verbose("Compiling {0}", file.GetSourceFile()?.Name);
+			Logger.Verbose("Compiling a file");
 			Locks.AssertReadAccessAllowed();
 
 			var error = ErrorSearcher.FindErrorElement(file);
