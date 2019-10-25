@@ -75,7 +75,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 
 		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{
-			var projectFile = sourceFile.ToProjectFile();
+			var projectFile = sourceFile.ToProjectFile() ?? T4MacroResolveContextCookie.ProjectFile;
 			if (projectFile == null) return null;
 			using (Preprocessor.Prepare(projectFile))
 			{
