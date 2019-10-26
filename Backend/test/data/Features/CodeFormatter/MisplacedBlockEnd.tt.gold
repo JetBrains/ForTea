@@ -1,7 +1,7 @@
 ﻿Hello!<#
-    if (true)
-    {
+  if (true)
+  {
 #>Hello again!<#
-    }
+  }
 #>
 {caret}

@@ -1,1 +1,1 @@
-rootProject.name = "ForTea.Frontend"
+rootProject.name = "ForTea"

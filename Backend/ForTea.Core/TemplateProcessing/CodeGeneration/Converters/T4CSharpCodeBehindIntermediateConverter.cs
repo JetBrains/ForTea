@@ -15,8 +15,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	public sealed class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
 		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
-		public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
-		public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
+		[NotNull] public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
+		[NotNull] public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
+		[NotNull] public const string ExpressionCommentStartText = "/*_T4\x200CExpressionStart*/";
+		[NotNull] public const string ExpressionCommentEndText = "/*_T4\x200CExpressionEnd*/";
 
 		[NotNull, ItemNotNull]
 		private IEnumerable<string> DisabledPropertyInspections { get; } = new[]
@@ -101,9 +103,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			return fileName;
 		}
 
-		protected override string GeneratedClassName => TryGetGeneratedClassNameFromFile() ?? GeneratedClassNameString;
-
-		protected override string GeneratedBaseClassName
+		protected override string GeneratedClassName
 		{
 			get
 			{
@@ -123,6 +123,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => CodeCommentStartText;
 		public override string CodeCommentEnd => CodeCommentEndText;
+		public override string ExpressionCommentStart => ExpressionCommentStartText;
+		public override string ExpressionCommentEnd => ExpressionCommentEndText;
 		public override string Indent => "";
 		public override bool ShouldBreakExpressionWithLineDirective => false;
 

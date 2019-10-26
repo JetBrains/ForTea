@@ -16,10 +16,6 @@ namespace GammaJul.ForTea.Core.Psi
 	public sealed class T4SecondaryDocumentGenerationResult : SecondaryDocumentGenerationResult
 	{
 		[NotNull]
-		private ILogger Logger { get; } =
-			JetBrains.Util.Logging.Logger.GetLogger<T4SecondaryDocumentGenerationResult>();
-
-		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
 
 		[NotNull]
@@ -35,7 +31,6 @@ namespace GammaJul.ForTea.Core.Psi
 
 		public override void CommitChanges()
 		{
-			Logger.Verbose("CommitChanges in {0}", SourceFile.Name);
 			var location = SourceFile.GetLocation();
 			if (location.IsEmpty) return;
 			var projectFile = SourceFile.ToProjectFile();

@@ -254,6 +254,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		public abstract string CodeCommentStart { get; }
 		public abstract string CodeCommentEnd { get; }
+		public abstract string ExpressionCommentStart { get; }
+		public abstract string ExpressionCommentEnd { get; }
 		public abstract string Indent { get; }
 		public abstract bool ShouldBreakExpressionWithLineDirective { get; }
 		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node);

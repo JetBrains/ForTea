@@ -26,14 +26,18 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("SmallLoop")]
 		[TestCase("StatementAfterTargetLanguage")]
 		[TestCase("StatementsAroundTargetLanguage")]
-		[TestCase("StatementAndFeatureBlocks", Ignore = "Not implemented")]
+		[TestCase("StatementAndFeatureBlocks")]
 		[TestCase("FeatureBlock")]
 		[TestCase("RemovingIndent")]
 		[TestCase("MisplacedBlockEnd")]
-		[TestCase("ExpressionBlock", Ignore = "Not implemented")]
+		[TestCase("ExpressionBlock")]
 		[TestCase("ComplexFeatureBlock")]
 		[TestCase("BrokenFeatureBlock")]
 		[TestCase("InnerClasses")]
+		[TestCase("SemiBrokenBlock")]
+		[TestCase("OneLineStatement")]
+		[TestCase("StatementBlockAfterExpressionBlock")]
+		[TestCase("ImportDirective")]
 		public void TestFormatter([NotNull] string name) => DoOneTest(name);
 
 		protected override void DoTest(Lifetime lifetime, IProject testProject)
