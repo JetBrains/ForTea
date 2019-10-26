@@ -46,7 +46,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file)
 		{
-			// Logical source file == physical source
+			Assertion.Assert(file.PhysicalPsiSourceFile == file.LogicalPsiSourceFile,
+				"file.PhysicalPsiSourceFile == file.LogicalPsiSourceFile");
 			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var directives = file.Children<IT4AssemblyDirective>();
