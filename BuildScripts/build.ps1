@@ -47,11 +47,11 @@ Write-Host "Building T4 backend"
 Push-Location -Path $backendPath
 Try {
     If ($Verbose -eq $true) {
-        msbuild ForTea.Backend.sln
+        msbuild -m ForTea.Backend.sln
         $code = $LastExitCode
     }
     Else {
-        msbuild ForTea.Backend.sln > $null
+        msbuild -m ForTea.Backend.sln > $null
         $code = $LastExitCode
     }
     If ($code -ne 0) { throw "Could not compile backend. MsBuild exit code: $code." }    
