@@ -19,9 +19,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		private ISolution Solution { get; }
 
 		public T4CSharpCodeBehindGenerator(
-			[NotNull] IT4File actualFile,
+			[NotNull] IT4File file,
 			[NotNull] ISolution solution
-		) : base(actualFile) => Solution = solution;
+		) : base(file) => Solution = solution;
 
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector =>
 			new T4CSharpCodeBehindGenerationInfoCollector(File, Solution);

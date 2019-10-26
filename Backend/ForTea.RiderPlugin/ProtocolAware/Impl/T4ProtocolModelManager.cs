@@ -9,6 +9,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
@@ -88,10 +89,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
 		);
 
-		private T4BuildResult Compile([NotNull] IT4File t4File)
+		private T4BuildResult Compile([NotNull] IPsiSourceFile sourceFile)
 		{
 			T4BuildResult result = null;
-			Solution.GetLifetime().UsingNested(nested => result = Compiler.Compile(nested, t4File));
+			Solution.GetLifetime().UsingNested(nested => result = Compiler.Compile(nested, sourceFile));
 			return result;
 		}
 

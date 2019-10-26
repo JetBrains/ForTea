@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
@@ -8,6 +9,7 @@ using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generators;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
@@ -56,10 +58,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		[NotNull]
-		public T4BuildResult Compile(Lifetime lifetime, IT4File file)
+		public T4BuildResult Compile(Lifetime lifetime, IPsiSourceFile sourceFile)
 		{
 			Logger.Verbose("Compiling a file");
 			Locks.AssertReadAccessAllowed();
+			// Since we need no context when compiling a file, we need to build the tree manually
+			var file = sourceFile.BuildT4Tree();
 			var error = file.ThisAndDescendants<IErrorElement>().Collect();
 			if (!error.IsEmpty()) return Converter.SyntaxErrors(error);
 

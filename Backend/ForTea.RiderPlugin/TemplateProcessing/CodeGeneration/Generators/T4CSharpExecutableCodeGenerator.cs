@@ -13,9 +13,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generat
 	public sealed class T4CSharpExecutableCodeGenerator : T4CSharpPreprocessedCodeGenerator
 	{
 		public T4CSharpExecutableCodeGenerator(
-			[NotNull] IT4File actualFile,
+			[NotNull] IT4File file,
 			[NotNull] ISolution solution
-		) : base(actualFile, solution)
+		) : base(file, solution)
 		{
 		}
 

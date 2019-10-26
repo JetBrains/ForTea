@@ -12,12 +12,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		private const string DefaultErrorMessage = "ErrorGeneratingOutput";
 
 		[NotNull]
-		protected virtual IT4File File { get; }
+		protected IT4File File { get; }
 
-		/// <summary>Initializes a new instance of the <see cref="T4CSharpCodeGeneratorBase"/> class.</summary>
-		/// <param name="actualFile">The associated T4 file whose C# code behind will be generated.</param>
-		protected T4CSharpCodeGeneratorBase([NotNull] IT4File actualFile) =>
-			File = actualFile ?? throw new ArgumentNullException(nameof(actualFile));
+		protected T4CSharpCodeGeneratorBase([NotNull] IT4File file) => File = file;
 
 		[NotNull]
 		public T4CSharpCodeGenerationResult Generate() =>
