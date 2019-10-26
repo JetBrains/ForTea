@@ -113,7 +113,6 @@ namespace GammaJul.ForTea.Core.Parsing
 			var languageService = T4Language.Instance.LanguageService().NotNull();
 			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
 			var file = new T4Parser(lexer, target).ParseFileWithoutCleanup();
-			file.SetSourceFile(target);
 			return file;
 		}
 

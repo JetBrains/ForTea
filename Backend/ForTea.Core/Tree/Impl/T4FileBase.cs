@@ -39,6 +39,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 		public IPsiSourceFile LogicalPsiSourceFile { get; internal set; }
 
 		[CanBeNull]
-		public IPsiSourceFile PhysicalPsiSourceFile => GetSourceFile();
+		public IPsiSourceFile PhysicalPsiSourceFile => parent?.GetSourceFile() ?? GetSourceFile();
 	}
 }
