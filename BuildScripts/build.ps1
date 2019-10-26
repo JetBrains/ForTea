@@ -9,12 +9,16 @@ $frontendPath = "..\Frontend"
 
 $gradleArgs = @()
 If ($Verbose -eq $true) { Write-Host "Will build rider plugin" }
-$gradleArgs += ":buildPlugin"
 If ($runFrontendTests -eq $true) {
     $gradleArgs += ":test"
 }
 If ($run -eq $true) {
+    $mainWorkName = "Running IDE"
     $gradleArgs += ":runIde"
+}
+Else {
+    $mainWorkName = "Building T4 Frontend"
+    $gradleArgs += ":buildPlugin"
 }
 If ($Verbose -eq $true) {
     $gradleArgs += "--info"
@@ -60,7 +64,7 @@ Finally {
     Pop-Location
 }
 
-Write-Host "Building T4 frontend"
+Write-Host $mainWorkName
 Push-Location -Path $frontendPath
 Try {
     If ($Verbose -eq $true) {
@@ -68,7 +72,7 @@ Try {
         $code = $LastExitCode
     }
     Else {
-        .\gradlew $gradleArgs > $null
+        .\gradlew $gradleArgs 2>&1> $null
         $code = $LastExitCode
     }
     If ($code -ne 0) { throw "Main gradle work failed. Gradlew exit code: $code." }
