@@ -233,5 +233,21 @@ namespace GammaJul.ForTea.Core.Tree
 
 			return null;
 		}
+
+		[NotNull, ItemNotNull]
+		public static IEnumerable<IT4FileLikeNode> GetThisAndIncludedFilesRecursive([NotNull] this IT4FileLikeNode node)
+		{
+			yield return node;
+			foreach (var transitiveInclude in node.Includes.SelectMany(GetThisAndIncludedFilesRecursive))
+			{
+				yield return transitiveInclude;
+			}
+		}
+
+		private static bool ContainsIncludeContext([NotNull] this IT4File file) =>
+			file.LogicalPsiSourceFile == file.PhysicalPsiSourceFile;
+
+		public static void AssertContainsNoIncludeContext([NotNull] this IT4File file) =>
+			Assertion.Assert(file.ContainsIncludeContext(), "PSI file should not contain any include context");
 	}
 }

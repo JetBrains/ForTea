@@ -40,7 +40,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
 			[NotNull] IT4File file,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
-		) : base(intermediateResult, file) => ReferenceExtractionManager = referenceExtractionManager;
+		) : base(intermediateResult, file)
+		{
+			file.AssertContainsNoIncludeContext();
+			ReferenceExtractionManager = referenceExtractionManager;
+		}
 
 		protected override void AppendNamespacePrefix()
 		{

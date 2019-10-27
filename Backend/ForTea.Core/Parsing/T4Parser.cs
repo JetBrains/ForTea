@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -21,7 +22,10 @@ namespace GammaJul.ForTea.Core.Parsing
 		private ILexer OriginalLexer { get; }
 
 		[CanBeNull]
-		private IPsiSourceFile SourceFile { get; }
+		private IPsiSourceFile LogicalSourceFile { get; }
+
+		[CanBeNull]
+		private IPsiSourceFile PhysicalSourceFile { get; }
 
 		/// <note>
 		/// Since the other ParseFile method is used in some external places,
@@ -30,10 +34,15 @@ namespace GammaJul.ForTea.Core.Parsing
 		[NotNull]
 		IFile IParser.ParseFile() => (IFile) ParseFile();
 
-		public T4Parser([NotNull] ILexer lexer, [CanBeNull] IPsiSourceFile sourceFile)
+		public T4Parser(
+			[NotNull] ILexer lexer,
+			[CanBeNull] IPsiSourceFile logicalSourceFile,
+			[CanBeNull] IPsiSourceFile physicalSourceFile
+		)
 		{
 			OriginalLexer = lexer;
-			SourceFile = sourceFile;
+			LogicalSourceFile = logicalSourceFile;
+			PhysicalSourceFile = physicalSourceFile;
 			SetLexer(new T4FilteringLexer(lexer));
 		}
 
@@ -41,7 +50,8 @@ namespace GammaJul.ForTea.Core.Parsing
 		public override TreeElement ParseFile()
 		{
 			var result = ParseFileWithoutCleanup();
-			result.SetSourceFile(SourceFile);
+			ResolveIncludes(result);
+			result.SetSourceFile(PhysicalSourceFile);
 			T4ParsingContextHelper.Reset();
 			return result;
 		}
@@ -50,17 +60,17 @@ namespace GammaJul.ForTea.Core.Parsing
 		private File ParseFileWithoutCleanup()
 		{
 			var result = T4ParsingContextHelper.ExecuteGuarded(
-				SourceFile.GetLocation(),
+				LogicalSourceFile.GetLocation(),
 				false,
 				() =>
 				{
 					var file = (File) ParseFileInternal();
 					T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
-					if (SourceFile != null)
+					if (LogicalSourceFile != null)
 					{
-						var translator = new T4DocumentRangeTranslator(file, SourceFile);
+						var translator = new T4DocumentRangeTranslator(file);
 						file.DocumentRangeTranslator = translator;
-						file.LogicalPsiSourceFile = SourceFile;
+						file.LogicalPsiSourceFile = LogicalSourceFile;
 					}
 
 					return file;
@@ -88,37 +98,47 @@ namespace GammaJul.ForTea.Core.Parsing
 			return HandleErrorInDirective(result, new UnexpectedToken("Missing directive name"));
 		}
 
-		[NotNull]
-		public override TreeElement ParseIncludeDirective()
+		private void ResolveIncludes([NotNull] IT4File file)
 		{
-			var directive = (IncludeDirective) base.ParseIncludeDirective();
-			var sourceFile = SourceFile;
-			if (sourceFile == null) return directive;
+			foreach (var includeDirective in file.Blocks.OfType<IncludeDirective>())
+			{
+				var includedFile = ResolveIncludeDirective(includeDirective);
+				if (includedFile == null) continue;
+				includeDirective.parent.AddChildAfter(includedFile, includeDirective);
+			}
+		}
+
+		[CanBeNull]
+		private CompositeElement ResolveIncludeDirective([NotNull] IncludeDirective directive)
+		{
+			var sourceFile = LogicalSourceFile;
+			if (sourceFile == null) return null;
 			var path = directive.GetPathForParsing(sourceFile).ResolvePath();
 			var project = sourceFile.GetProject();
-			if (project == null) return directive;
+			if (project == null) return null;
 			var includeFile =
 				T4ParsingContextHelper.ExecuteGuarded(path, directive.Once, () => GetProjectFile(project, path));
-			if (includeFile == null) return directive;
-			var includedSourceFile = includeFile.ToSourceFile();
-			if (includedSourceFile == null) return directive;
-			var subTree = BuildIncludedT4Tree(includedSourceFile);
-			directive.AppendNewChild(subTree);
-			return directive;
+			var includedSourceFile = includeFile?.ToSourceFile();
+			if (includedSourceFile == null) return null;
+			return BuildIncludedT4Tree(includedSourceFile);
 		}
 
 		[NotNull]
-		private static File BuildIncludedT4Tree([NotNull] IPsiSourceFile target)
+		private CompositeElement BuildIncludedT4Tree([NotNull] IPsiSourceFile target)
 		{
 			var languageService = T4Language.Instance.LanguageService().NotNull();
 			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			var file = new T4Parser(lexer, target).ParseFileWithoutCleanup();
-			return file;
+			// We need to parse File here, not IncludedFile,
+			// because File makes some important error recovery and token reinsertion
+			return IncludedFile.FromOtherNode(new T4Parser(lexer, target, PhysicalSourceFile).ParseFileWithoutCleanup());
 		}
 
 		[CanBeNull]
 		private static IProjectFile GetProjectFile([NotNull] IProject project, [NotNull] FileSystemPath path) =>
 			// If there are many, let's pick random because why not. They are going to have equal contents anyway
 			project.GetSolution().FindProjectItemsByLocation(path).OfType<IProjectFile>().FirstOrDefault();
+
+		[Obsolete("This method should never be called", true)]
+		public override TreeElement ParseIncludedFile() => throw new InvalidOperationException();
 	}
 }

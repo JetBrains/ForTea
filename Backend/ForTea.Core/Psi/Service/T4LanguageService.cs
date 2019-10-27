@@ -46,7 +46,7 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 			if (sourceFile == null)
 			{
 				Logger.Warn("Creating parser for null sourceFile");
-				return new T4Parser(lexer, null);
+				return new T4Parser(lexer, null, null);
 			}
 
 			var projectFile = sourceFile.ToProjectFile();
@@ -54,7 +54,7 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 			var graph = solution.GetComponent<IT4FileDependencyGraph>();
 			var rootSourceFile = graph.FindBestRoot(projectFile).ToSourceFile().NotNull();
 			var rootLexer = GetPrimaryLexerFactory().CreateLexer(rootSourceFile.Document.Buffer);
-			return new T4Parser(rootLexer, rootSourceFile);
+			return new T4Parser(rootLexer, rootSourceFile, sourceFile);
 		}
 
 		/// <summary>

@@ -11,11 +11,11 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 	internal struct T4OffsetFromFile
 	{
 		[CanBeNull]
-		public IT4File Root { get; }
+		public IT4FileLikeNode Root { get; }
 
 		public int Offset { get; }
 
-		public T4OffsetFromFile(int offset, [CanBeNull] IT4File root)
+		public T4OffsetFromFile(int offset, [CanBeNull] IT4FileLikeNode root)
 		{
 			Offset = offset;
 			Root = root;
