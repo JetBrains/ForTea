@@ -1,9 +1,6 @@
 using System;
-using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
-using JetBrains.Annotations;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -24,8 +21,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer context)
 		{
 			if (!(element is IT4TreeNode t4Element)) return;
-			var provider = t4Element.GetSolution().GetComponent<IT4AttributeIdsProvider>();
-			var visitor = new T4SyntaxHighlightingVisitor(provider);
+			var visitor = new T4SyntaxHighlightingVisitor();
 			t4Element.Accept(visitor, context);
 		}
 

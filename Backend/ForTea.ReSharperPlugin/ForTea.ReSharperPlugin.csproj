@@ -21,23 +21,4 @@
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Daemon\Attributes\T4ClassificationFormatDefinition.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4ClassificationFormatDefinition.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Daemon\Attributes\T4ClassificationFormatDefinition.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>T4ClassificationFormatDefinition.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
 </Project>
