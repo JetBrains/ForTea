@@ -30,11 +30,8 @@ namespace JetBrains.ForTea.Tests
 	/// which causes serious troubles.
 	/// JetBrains.Roslyn.References.Repack causes most headache.
 	/// </summary>
-	/// <summary>
-	/// Must be in the namespace which contains all the tests needing the shell.
-	/// This class creates the test environment before running tests in the namespaces under it, and destroys it after all the tests.
-	/// </summary>
-	/// <remarks>Use for extension testing</remarks>
+#pragma warning disable
+#pragma warning disable all
 	public abstract class T4ExtensionTestEnvironmentAssembly<TTestEnvironmentZone> :
 		TestEnvironmentAssembly<TTestEnvironmentZone>
 		where TTestEnvironmentZone : ITestsEnvZone
