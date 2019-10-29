@@ -15,7 +15,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			IHighlightingConsumer consumer
 		)
 		{
-			if (element.PrevSiblings().Any(it => it is IT4FeatureBlock)) return;
+			if (!element.PrevSiblings().Any(it => it is IT4FeatureBlock)) return;
 			consumer.AddHighlighting(new StatementAfterFeatureError(element));
 		}
 	}
