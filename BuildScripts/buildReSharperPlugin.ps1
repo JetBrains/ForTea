@@ -3,8 +3,7 @@
 )
 
 If ($Verbose -eq $true) { Write-Host "Building R# plugin..." }
-Push-Location -Path $backedPath
-Write-Host "pushed location"
+Push-Location -Path ..\Backend
 Try {
     .\build.ps1 pack
     $code = $LastExitCode
