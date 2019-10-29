@@ -48,7 +48,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			{
 				_ when infos.Count < 0 => "",
 				0 => throw new InvalidOperationException(),
-				1 => "Missing required attribute: {0}".FormatEx(infos.Single()),
+				1 => "Missing required attribute: {0}".FormatEx(infos.Single().Name),
 				_ => infos
 					.Take(infos.Count - 1)
 					.Aggregate(
