@@ -4,12 +4,9 @@ using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
-using GammaJul.ForTea.Core.Psi.Utils;
-using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
@@ -76,34 +73,6 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] DirectiveAttributeInfo info
 		) => directive.Attributes.FirstOrDefault(it =>
 			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
-
-		[NotNull, ItemNotNull]
-		public static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive([NotNull] this IT4File file)
-		{
-			var guard = new T4ContextTrackingIncludeGuard();
-			return file.GetThisAndIncludedFilesRecursive(guard);
-		}
-
-		[NotNull, ItemNotNull]
-		private static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive(
-			[NotNull] this IT4File file,
-			[NotNull] IT4IncludeGuard<IPsiSourceFile> guard
-		)
-		{
-			yield return file;
-			var sourceFile = file.GetSourceFile();
-			if (sourceFile == null || !guard.CanProcess(sourceFile)) yield break;
-			guard.StartProcessing(sourceFile);
-			var includedFiles = file.Blocks.OfType<IT4IncludeDirective>()
-				.Select(include => include.Path.ResolveT4File(guard))
-				.Where(resolution => resolution != null);
-			foreach (var recursiveInclude in includedFiles
-				.SelectMany(includedFile => includedFile.GetThisAndIncludedFilesRecursive(guard))
-			)
-			{
-				yield return recursiveInclude;
-			}
-		}
 
 		/// <summary>Gets a T4 block containing a specified C# node.</summary>
 		/// <typeparam name="T">The type of expected T4 container node.</typeparam>

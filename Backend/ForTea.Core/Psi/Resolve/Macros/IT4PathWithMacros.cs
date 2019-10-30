@@ -1,5 +1,3 @@
-using GammaJul.ForTea.Core.Psi.Utils;
-using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
@@ -16,10 +14,5 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 
 		[CanBeNull]
 		IPsiSourceFile Resolve();
-
-		[CanBeNull]
-		IT4File ResolveT4File([NotNull] IT4IncludeGuard<IPsiSourceFile> guard);
-
-		bool IsEmpty { get; }
 	}
 }

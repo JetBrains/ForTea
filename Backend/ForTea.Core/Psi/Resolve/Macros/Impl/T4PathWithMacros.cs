@@ -2,12 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
-using GammaJul.ForTea.Core.Psi.Utils;
-using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
@@ -49,15 +45,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
 			OutsideSolutionManager = Solution.GetComponent<T4OutsideSolutionSourceFileManager>();
-		}
-
-		public IT4File ResolveT4File(IT4IncludeGuard<IPsiSourceFile> guard)
-		{
-			if (!ResolvePath().ExistsFile) return null;
-			var target = Resolve();
-			if (target == null) return null;
-			if (!guard.CanProcess(target)) return null;
-			return target.BuildT4Tree();
 		}
 
 		public IPsiSourceFile Resolve()
@@ -145,7 +132,5 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 				return (RawPath.GetHashCode() * 397) ^ SourceFile.GetHashCode();
 			}
 		}
-
-		public bool IsEmpty => RawPath.IsEmpty();
 	}
 }

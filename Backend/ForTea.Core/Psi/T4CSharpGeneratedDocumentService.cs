@@ -46,7 +46,6 @@ namespace GammaJul.ForTea.Core.Psi
 			LanguageService csharpLanguageService = CSharpLanguage.Instance.LanguageService();
 			if (csharpLanguageService == null) return null;
 			var t4FileDependencyManager = solution.GetComponent<T4FileDependencyManager>();
-			var indirectIncludeInvalidator = solution.GetComponent<IT4IndirectIncludeInvalidator>();
 
 			return new T4SecondaryDocumentGenerationResult(
 				modificationInfo.SourceFile,
@@ -55,8 +54,7 @@ namespace GammaJul.ForTea.Core.Psi
 				new RangeTranslatorWithGeneratedRangeMap(result.GeneratedRangeMap),
 				csharpLanguageService.GetPrimaryLexerFactory(),
 				t4FileDependencyManager,
-				t4File.Blocks.OfType<IT4IncludeDirective>(),
-				indirectIncludeInvalidator
+				t4File.Blocks.OfType<IT4IncludeDirective>()
 			);
 		}
 
