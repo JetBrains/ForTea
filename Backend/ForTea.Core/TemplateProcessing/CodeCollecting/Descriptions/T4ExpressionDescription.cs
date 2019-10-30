@@ -6,14 +6,14 @@ using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4ExpressionDescription : T4AppendableElementDescriptionBase
+	public sealed class T4ExpressionDescription : T4ElementDescriptionBase, IT4AppendableElementDescription
 	{
 		[NotNull]
 		private IT4Code Source { get; }
 
 		public T4ExpressionDescription([NotNull] IT4Code source) : base(source.GetSourceFile()) => Source = source;
 
-		public override void AppendContent(
+		public void AppendContent(
 			T4CSharpCodeGenerationResult destination,
 			IT4ElementAppendFormatProvider provider,
 			IPsiSourceFile context
@@ -81,7 +81,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		)
 		{
 			destination.Append(provider.CodeCommentStart);
-			provider.AppendCompilationOffset(destination, GetOffset(Source));
+			provider.AppendCompilationOffset(destination, Source);
 			if (HasSameSourceFile(context)) provider.AppendMappedIfNeeded(destination, Source);
 			else destination.Append(Source.GetText());
 			destination.Append(provider.CodeCommentEnd);
@@ -93,7 +93,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		)
 		{
 			destination.Append(provider.Indent);
-			destination.AppendLine(GetLineDirectiveText(Source));
+			provider.AppendLineDirective(destination, Source);
 		}
 
 		private static void AppendContentPrefix(

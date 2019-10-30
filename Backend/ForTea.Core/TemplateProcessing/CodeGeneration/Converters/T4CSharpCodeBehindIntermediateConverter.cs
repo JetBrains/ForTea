@@ -136,8 +136,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		public override string Indent => "";
 		public override bool ShouldBreakExpressionWithLineDirective => false;
 
-		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
 		{
+		}
+
+		public override void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
+		{
+			// Line directives in code-behind affect nothing anyway.
+			// The mapping between the code and the document
+			// is handled by document range translators.
 		}
 
 		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>

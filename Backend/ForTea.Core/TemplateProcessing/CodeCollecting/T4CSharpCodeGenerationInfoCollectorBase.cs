@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Utils;
+using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
@@ -25,7 +26,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4EncodingsManager EncodingsManager { get; }
 
 		[NotNull]
-		private T4IncludeGuard<IPsiSourceFile> Guard { get; }
+		private IT4IncludeGuard<IPsiSourceFile> Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
@@ -43,7 +44,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Guard = new T4IncludeGuard<IPsiSourceFile>();
+			Guard = new T4ContextTrackingIncludeGuard();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
@@ -52,7 +53,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			var projectFile = File.GetSourceFile()?.ToProjectFile();
 			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(File, Interrupter);
-			using (T4MacroResolveContextCookie.Create(projectFile))
+			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
 			{
 				Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
 				Guard.StartProcessing(File.GetSourceFile().NotNull());
@@ -78,7 +79,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(null);
+				Guard.StartProcessing(File.GetSourceFile().NotNull());
 				return;
 			}
 
@@ -92,17 +93,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				return;
 			}
 
-			var resolved = include.Path.ResolveT4File(Guard).NotNull();
+			var resolved = (IT4File) include.LastChild;
 			Guard.StartProcessing(sourceFile);
-			var projectFile = sourceFile.ToProjectFile();
-			if (projectFile == null) resolved.ProcessDescendants(this);
-			else
-			{
-				using (T4MacroResolveContextCookie.Create(projectFile))
-				{
-					resolved.ProcessDescendants(this);
-				}
-			}
+			resolved?.ProcessDescendants(this);
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)

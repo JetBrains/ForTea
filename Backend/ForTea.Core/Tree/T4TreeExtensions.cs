@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Psi.Utils;
+using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
@@ -20,7 +21,7 @@ namespace GammaJul.ForTea.Core.Tree
 	public static class T4TreeExtensions
 	{
 		[CanBeNull]
-		public static ITreeNode GetAttributeValueToken(
+		public static IT4TreeNode GetAttributeValueToken(
 			[CanBeNull] this IT4Directive directive,
 			[CanBeNull] string attributeName
 		)
@@ -39,20 +40,20 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] string attributeName
 		) => directive.GetAttributeValueToken(attributeName)?.GetText();
 
-		public static Pair<ITreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
+		public static Pair<IT4TreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
 			[NotNull] this IT4Directive directive,
 			[NotNull] string attributeName
 		)
 		{
 			var valueToken = directive.GetAttributeValueToken(attributeName);
 			if (valueToken == null)
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
 			string value = valueToken.GetText();
 			if (value.IsNullOrWhitespace())
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
-			return new Pair<ITreeNode, string>(valueToken, value);
+			return new Pair<IT4TreeNode, string>(valueToken, value);
 		}
 
 		[NotNull]
@@ -79,14 +80,14 @@ namespace GammaJul.ForTea.Core.Tree
 		[NotNull, ItemNotNull]
 		public static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive([NotNull] this IT4File file)
 		{
-			var guard = new T4IncludeGuard<IPsiSourceFile>();
+			var guard = new T4ContextTrackingIncludeGuard();
 			return file.GetThisAndIncludedFilesRecursive(guard);
 		}
 
 		[NotNull, ItemNotNull]
 		private static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive(
 			[NotNull] this IT4File file,
-			[NotNull] T4IncludeGuard<IPsiSourceFile> guard
+			[NotNull] IT4IncludeGuard<IPsiSourceFile> guard
 		)
 		{
 			yield return file;

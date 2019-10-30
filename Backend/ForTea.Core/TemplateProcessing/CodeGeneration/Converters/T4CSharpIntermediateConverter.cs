@@ -3,10 +3,10 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DocumentModel;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Util;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -174,9 +174,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		public override string Indent => new string(' ', CurrentIndent * 4); // TODO: use user indents?
 		public override bool ShouldBreakExpressionWithLineDirective => false;
 
-		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
 		{
 			// In preprocessed file, behave like VS
+		}
+
+		public override void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
+		{
+			var sourceFile = node.GetSourceFile().NotNull();
+			int line = (int) sourceFile.Document.GetCoordsByOffset(node.GetDocumentStartOffset().Offset).Line;
+			destination.AppendLine($"#line {line + 1} \"{sourceFile.GetLocation()}\"");
 		}
 
 		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>

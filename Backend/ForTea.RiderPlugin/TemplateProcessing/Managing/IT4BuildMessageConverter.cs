@@ -18,10 +18,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 		T4BuildResult ToT4BuildResult([NotNull] T4OutputGenerationException exception);
 
 		[NotNull]
-		List<T4BuildMessage> ToT4BuildMessages(FrugalLocalList<T4FailureRawData> data);
+		List<T4BuildMessage> ToT4BuildMessages([NotNull] IEnumerable<T4FailureRawData> data);
 
 		[NotNull]
-		T4BuildResult SyntaxError([NotNull] ITreeNode node);
+		T4BuildResult SyntaxErrors([NotNull] IEnumerable<ITreeNode> nodes);
 
 		[NotNull]
 		T4BuildResult FatalError();

@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Tree.Impl
 {
@@ -15,8 +16,19 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 				.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase)
 			?? false;
 
-		public IT4PathWithMacros Path =>
-			CreateIncludePath(this.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value?.GetText());
+		[CanBeNull]
+		private string RawPath =>
+			this.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value?.GetText();
+
+		public IT4PathWithMacros Path => CreateIncludePath(RawPath);
+
+		[NotNull]
+		public IT4PathWithMacros GetPathForParsing([NotNull] IPsiSourceFile file)
+		{
+			string rawPath = RawPath;
+			if (rawPath == null) return T4EmptyPathWithMacros.Instance;
+			return new T4PathWithMacros(rawPath, file);
+		}
 
 		private IT4PathWithMacros CreateIncludePath([CanBeNull] string includeFileName)
 		{
