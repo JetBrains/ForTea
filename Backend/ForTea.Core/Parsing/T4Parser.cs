@@ -51,9 +51,28 @@ namespace GammaJul.ForTea.Core.Parsing
 		{
 			var result = ParseFileWithoutCleanup();
 			ResolveIncludes(result);
+			SetUpRangeTranslators(result);
 			result.SetSourceFile(PhysicalSourceFile);
 			T4ParsingContextHelper.Reset();
 			return result;
+		}
+
+		private static void SetUpRangeTranslators([NotNull] File file)
+		{
+			file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file);
+			foreach (var include in file.Includes.Cast<IncludedFile>())
+			{
+				SetUpRangeTranslators(include);
+			}
+		}
+
+		private static void SetUpRangeTranslators([NotNull] IncludedFile file)
+		{
+			file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file);
+			foreach (var include in file.IncludedFilesEnumerable.Cast<IncludedFile>())
+			{
+				SetUpRangeTranslators(include);
+			}
 		}
 
 		[NotNull]
@@ -66,13 +85,7 @@ namespace GammaJul.ForTea.Core.Parsing
 				{
 					var file = (File) ParseFileInternal();
 					T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
-					if (LogicalSourceFile != null)
-					{
-						var translator = new T4DocumentRangeTranslator(file);
-						file.DocumentRangeTranslator = translator;
-						file.LogicalPsiSourceFile = LogicalSourceFile;
-					}
-
+					if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
 					return file;
 				}
 			);
@@ -130,7 +143,8 @@ namespace GammaJul.ForTea.Core.Parsing
 			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
 			// We need to parse File here, not IncludedFile,
 			// because File makes some important error recovery and token reinsertion
-			return IncludedFile.FromOtherNode(new T4Parser(lexer, target, PhysicalSourceFile).ParseFileWithoutCleanup());
+			return IncludedFile.FromOtherNode(new T4Parser(lexer, target, PhysicalSourceFile)
+				.ParseFileWithoutCleanup());
 		}
 
 		[CanBeNull]

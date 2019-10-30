@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Parsing.Ranges;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -11,7 +10,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 {
 	internal partial class IncludedFile
 	{
-		public IDocumentRangeTranslator DocumentRangeTranslator { get; private set; }
+		public IDocumentRangeTranslator DocumentRangeTranslator { get; internal set; }
 		public IPsiSourceFile LogicalPsiSourceFile { get; private set; }
 		public IPsiSourceFile PhysicalPsiSourceFile => GetSourceFile();
 		public IEnumerable<IT4IncludedFile> Includes => this.Children<IT4IncludedFile>();
@@ -26,7 +25,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 			}
 
 			includedFile.LogicalPsiSourceFile = node.LogicalPsiSourceFile;
-			includedFile.DocumentRangeTranslator = new T4DocumentRangeTranslator(includedFile);
 			return includedFile;
 		}
 	}

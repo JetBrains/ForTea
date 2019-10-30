@@ -7,7 +7,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 {
 	public struct T4FileSector
 	{
-		public T4FileSector(TreeTextRange range, [CanBeNull] IT4FileLikeNode include, int precedingIncludeLength)
+		public T4FileSector(TreeTextRange range, [CanBeNull] IT4IncludedFile include, int precedingIncludeLength)
 		{
 			Range = range;
 			Include = include;
@@ -17,7 +17,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 		public int PrecedingIncludeLength { get; }
 		public TreeTextRange Range { get; }
 		[CanBeNull]
-		public IT4FileLikeNode Include { get; }
+		public IT4IncludedFile Include { get; }
 		public bool IsValid() => Range.IsValid() && PrecedingIncludeLength >= 0;
 		public void AssertValid() => Assertion.Assert(IsValid(), "IsValid()");
 	}

@@ -33,7 +33,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 				// There has to be a gap for the 'include directive' between them
 				var range = new TreeTextRange(previousIncludeEnd, includeRange.StartOffset);
 				// The part of file that goes in between includes
-				yield return new T4FileSector(range, FileLikeNode, currentIncludeLength);
+				yield return new T4FileSector(range, null, currentIncludeLength);
 				// The include itself
 				yield return new T4FileSector(includeRange, include, currentIncludeLength);
 				previousIncludeEnd = include.GetTreeEndOffset();
@@ -47,7 +47,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 			if (previousIncludeEnd == fileEnd) yield break;
 			// Otherwise, this would be a valid range
 			var lastRange = new TreeTextRange(previousIncludeEnd, fileEnd);
-			yield return new T4FileSector(lastRange, FileLikeNode, currentIncludeLength);
+			yield return new T4FileSector(lastRange, null, currentIncludeLength);
 		}
 
 		private static void ValidateSectors([NotNull] IEnumerable<T4FileSector> sectors)
@@ -90,7 +90,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 				return sector;
 			}
 
-			return new T4FileSector(TreeTextRange.InvalidRange, FileLikeNode, 0);
+			return new T4FileSector(TreeTextRange.InvalidRange, null, 0);
 		}
 	}
 }

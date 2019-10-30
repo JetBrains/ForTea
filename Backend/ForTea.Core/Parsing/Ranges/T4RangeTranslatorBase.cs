@@ -21,7 +21,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 		protected IPsiSourceFile SourceFile => FileLikeNode.LogicalPsiSourceFile;
 
 		[NotNull, ItemNotNull]
-		protected IEnumerable<IT4FileLikeNode> Includes => FileLikeNode.Includes;
+		protected IEnumerable<IT4IncludedFile> Includes => FileLikeNode.Includes;
 
 		protected T4RangeTranslatorBase([NotNull] IT4FileLikeNode fileLikeNode) => FileLikeNode = fileLikeNode;
 	}
