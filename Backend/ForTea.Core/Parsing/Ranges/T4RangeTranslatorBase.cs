@@ -12,17 +12,17 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 		/// It can be booth real T4 file and T4 file included into another one.
 		/// </summary>
 		[NotNull]
-		protected IT4FileLikeNode IncludeOwner { get; }
+		protected IT4FileLikeNode FileLikeNode { get; }
 
 		/// <summary>
-		/// The source file from which the <see cref="IncludeOwner"/> is built.
+		/// The source file from which the <see cref="FileLikeNode"/> is built.
 		/// </summary>
 		[NotNull]
-		protected IPsiSourceFile SourceFile => IncludeOwner.LogicalPsiSourceFile;
+		protected IPsiSourceFile SourceFile => FileLikeNode.LogicalPsiSourceFile;
 
 		[NotNull, ItemNotNull]
-		protected IEnumerable<IT4FileLikeNode> Includes => IncludeOwner.Includes;
+		protected IEnumerable<IT4FileLikeNode> Includes => FileLikeNode.Includes;
 
-		protected T4RangeTranslatorBase([NotNull] IT4FileLikeNode includeOwner) => IncludeOwner = includeOwner;
+		protected T4RangeTranslatorBase([NotNull] IT4FileLikeNode fileLikeNode) => FileLikeNode = fileLikeNode;
 	}
 }

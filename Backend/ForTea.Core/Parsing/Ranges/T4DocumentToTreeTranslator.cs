@@ -9,7 +9,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 {
 	public sealed class T4DocumentToTreeTranslator : T4RangeTranslatorBase
 	{
-		public T4DocumentToTreeTranslator([NotNull] IT4FileLikeNode includeOwner) : base(includeOwner)
+		public T4DocumentToTreeTranslator([NotNull] IT4FileLikeNode fileLikeNode) : base(fileLikeNode)
 		{
 		}
 
@@ -17,7 +17,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 		{
 			if (!documentRange.IsValid()) return TreeTextRange.InvalidRange;
 			if (!SourceFile.IsValid()) return TreeTextRange.InvalidRange;
-			if (!IncludeOwner.IsValid()) return TreeTextRange.InvalidRange;
+			if (!FileLikeNode.IsValid()) return TreeTextRange.InvalidRange;
 
 			if (documentRange.Document != SourceFile.Document)
 			{
@@ -33,7 +33,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 			// The range is in the same document as the source file we are responsible for,
 			// so we have no choice but to handle the request ourselves
 			(int documentStartOffset, int documentEndOffset) = documentRange.TextRange;
-			var rootStartOffset = IncludeOwner.GetTreeStartOffset();
+			var rootStartOffset = FileLikeNode.GetTreeStartOffset();
 
 			// No includes, tree and document are matching
 			if (!Includes.Any())

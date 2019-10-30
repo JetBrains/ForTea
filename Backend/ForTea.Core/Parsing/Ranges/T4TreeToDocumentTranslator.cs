@@ -10,17 +10,16 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 {
 	public sealed class T4TreeToDocumentTranslator : T4RangeTranslatorBase
 	{
-		public T4TreeToDocumentTranslator([NotNull] IT4FileLikeNode includeOwner) : base(includeOwner)
+		public T4TreeToDocumentTranslator([NotNull] IT4FileLikeNode fileLikeNode) : base(fileLikeNode)
 		{
 		}
 
 		public DocumentRange Translate(TreeTextRange range)
 		{
 			if (!range.IsValid() || !SourceFile.IsValid()) return DocumentRange.InvalidRange;
-			// If it is possible to find those offsets in the root file,
-			// find them in the root file.
-			// Try searching in included files only otherwise
-			var atStart = FindIncludeAtOffset(range.StartOffset, true);
+			// The start offset has to be situated as deep as possible
+			// because there's no way for a highlighting to start at the root level but
+			var atStart = FindIncludeAtOffset(range.StartOffset, false);
 			var atEnd = FindIncludeAtOffset(range.EndOffset, atStart.Root == null);
 
 			var include = atStart.Root;
@@ -32,7 +31,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 			// Let the included file handle the request
 			if (include != null) return include.DocumentRangeTranslator.Translate(range);
 			// The range is in the current document, handle it
-			int rootStartOffset = IncludeOwner.GetTreeStartOffset().Offset;
+			int rootStartOffset = FileLikeNode.GetTreeStartOffset().Offset;
 			var resultingTextRange = new TextRange(atStart.Offset - rootStartOffset, atEnd.Offset - rootStartOffset);
 			var documentRange = new DocumentRange(SourceFile.Document, resultingTextRange);
 			return documentRange;
