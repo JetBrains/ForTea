@@ -10,7 +10,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 		protected override void Execute(IT4TemplateExecutionManager executionManager, IT4File file) =>
 			executionManager.Execute(file);
 
-		protected override string ActionId => T4StatisticIdBundle.Run;
+		protected override string ActionId => T4StatisticIdBundle.RunFromContextMenu;
 	}
 
 	[Action(T4ActionIdBundle.Debug, T4TemplateExecutionNameBundle.Debug)]
@@ -19,6 +19,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 		protected override void Execute(IT4TemplateExecutionManager executionManager, IT4File file) =>
 			executionManager.Debug(file);
 
-		protected override string ActionId => T4StatisticIdBundle.Debug;
+		protected override string ActionId => T4StatisticIdBundle.DebugFromContextMenu;
 	}
 }

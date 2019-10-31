@@ -36,7 +36,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var location = new T4FileLocation(solution.GetComponent<ProjectModelViewHost>().GetIdByItem(projectFile));
 
-			statistics.TrackAction(T4StatisticIdBundle.Preprocess);
+			statistics.TrackAction(T4StatisticIdBundle.PreprocessFromContextMenu);
 			try
 			{
 				var contextFreeTree = sourceFile.BuildT4Tree();
