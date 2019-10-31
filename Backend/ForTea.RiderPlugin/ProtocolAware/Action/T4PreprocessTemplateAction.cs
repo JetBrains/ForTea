@@ -6,6 +6,7 @@ using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
@@ -17,7 +18,7 @@ using JetBrains.Util.dataStructures;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
-	[Action("T4.PreprocessFromContext", "Preprocess Template")]
+	[Action(T4ActionIdBundle.Preprocess, T4TemplateExecutionNameBundle.Preprocess)]
 	public sealed class T4PreprocessTemplateAction : T4FileBasedActionBase
 	{
 		public override void Execute(IDataContext context, DelegateExecute nextExecute)
@@ -35,7 +36,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var location = new T4FileLocation(solution.GetComponent<ProjectModelViewHost>().GetIdByItem(projectFile));
 
-			statistics.TrackAction("T4.Template.Preprocess");
+			statistics.TrackAction(T4StatisticIdBundle.Preprocess);
 			try
 			{
 				var contextFreeTree = sourceFile.BuildT4Tree();

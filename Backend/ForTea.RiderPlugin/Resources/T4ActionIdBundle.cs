@@ -6,7 +6,8 @@ namespace JetBrains.ForTea.RiderPlugin.Resources
 	/// </summary>
 	public static class T4ActionIdBundle
 	{
-		public const string Execute = "T4.ExecuteFromContext";
+		public const string Run = "T4.ExecuteFromContext";
 		public const string Debug = "T4.DebugFromContext";
+		public const string Preprocess = "T4.PreprocessFromContext";
 	}
 }

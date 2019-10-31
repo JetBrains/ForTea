@@ -4,7 +4,7 @@ using JetBrains.ForTea.RiderPlugin.Resources;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
-	[Action(T4ActionIdBundle.Execute, T4TemplateExecutionNameBundle.Run)]
+	[Action(T4ActionIdBundle.Run, T4TemplateExecutionNameBundle.Run)]
 	public sealed class T4ExecuteTemplateAction : T4ExecuteTemplateActionBase
 	{
 		protected override void Execute(IT4TemplateExecutionManager executionManager, IT4File file) =>

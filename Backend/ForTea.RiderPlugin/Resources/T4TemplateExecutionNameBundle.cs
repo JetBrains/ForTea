@@ -7,5 +7,6 @@ namespace JetBrains.ForTea.RiderPlugin.Resources
 	{
 		public const string Run = "Execute Template";
 		public const string Debug = "Debug Template";
+		public const string Preprocess = "Preprocess Template";
 	}
 }
