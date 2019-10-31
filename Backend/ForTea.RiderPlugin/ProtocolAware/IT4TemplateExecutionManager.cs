@@ -6,6 +6,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
 	public interface IT4TemplateExecutionManager
 	{
+		void UpdateTemplateKind([NotNull] IT4File file);
 		void Execute([NotNull] IT4File file);
 		void ExecuteSilently([NotNull] IT4File file);
 		void Debug([NotNull] IT4File file);
