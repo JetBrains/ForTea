@@ -23,14 +23,12 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		// Here I have the guarantee that new instance of this class is created for every analysis pass
 		private bool SeenOutputDirective { get; set; }
 		private bool SeenTemplateDirective { get; set; }
-		private bool HasSeenRecursiveInclude { get; set; }
 
 		[NotNull, ItemNotNull]
 		public IReadOnlyList<HighlightingInfo> Highlightings => MyHighlightings;
 
 		public T4IncludeAwareDaemonProcessVisitor([NotNull] IPsiSourceFile initialFile)
 		{
-			HasSeenRecursiveInclude = false;
 			Guard = new T4ContextTrackingIncludeGuard();
 			Guard.StartProcessing(initialFile);
 		}
@@ -39,9 +37,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public void ProcessAfterInterior(ITreeNode element)
 		{
-			if (!(element is IT4IncludeDirective include)) return;
-			Guard.EndProcessing();
-			if (HasSeenRecursiveInclude) ReportRecursiveInclude(include);
+			if (element is IT4IncludedFile) Guard.EndProcessing();
 		}
 
 		public bool ProcessingIsFinished => false;
@@ -52,6 +48,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			{
 				case IT4IncludeDirective include:
 					ProcessInclude(include);
+					break;
+				case IT4IncludedFile include:
+					Guard.StartProcessing(include.LogicalPsiSourceFile);
 					break;
 				case IT4Directive directive:
 					ProcessDirective(directive);
@@ -81,29 +80,17 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		private void ProcessInclude([NotNull] IT4IncludeDirective include)
 		{
 			var sourceFile = include.Path.Resolve();
-			if (sourceFile != null)
-			{
-				if (!Guard.CanProcess(sourceFile))
-				{
-					HasSeenRecursiveInclude = true;
-					ReportRecursiveInclude(include);
-					return;
-				}
-
-				if (include.Once && Guard.HasSeenFile(sourceFile))
-				{
-					ReportRedundantInclude(include);
-					return;
-				}
-			}
-
 			if (sourceFile == null)
 			{
 				ReportUnresolvedPath(include);
 				return;
 			}
 
-			Guard.StartProcessing(sourceFile);
+			if (!Guard.CanProcess(sourceFile)) return;
+			if (include.Once && Guard.HasSeenFile(sourceFile))
+			{
+				ReportRedundantInclude(include);
+			}
 		}
 
 		private void ReportDuplicateDirective([NotNull] IT4Directive directive)
@@ -120,13 +107,6 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			var name = include.Name;
 			AddHighlighting(name, new UnresolvedIncludeWarning(name));
-		}
-
-		private void ReportRecursiveInclude([NotNull] IT4IncludeDirective include)
-		{
-			var value = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value;
-			if (value == null) return;
-			AddHighlighting(value, new RecursiveIncludeError(value));
 		}
 
 		private void ReportRedundantInclude([NotNull] IT4IncludeDirective include)

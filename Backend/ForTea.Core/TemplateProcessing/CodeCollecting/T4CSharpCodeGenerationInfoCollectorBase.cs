@@ -92,7 +92,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				return;
 			}
 
-			var resolved = (IT4File) include.LastChild;
+			var resolved = (IT4IncludedFile) include.NextSibling;
 			Guard.StartProcessing(sourceFile);
 			resolved?.ProcessDescendants(this);
 		}

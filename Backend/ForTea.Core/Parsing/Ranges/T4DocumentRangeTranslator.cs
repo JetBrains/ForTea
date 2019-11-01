@@ -14,10 +14,10 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 		[NotNull]
 		private T4TreeToDocumentTranslator TreeToDocumentTranslator { get; }
 
-		public T4DocumentRangeTranslator([NotNull] IT4File file, [NotNull] IPsiSourceFile sourceFile)
+		public T4DocumentRangeTranslator([NotNull] IT4FileLikeNode file)
 		{
-			DocumentToTreeTranslator = new T4DocumentToTreeTranslator(file, sourceFile);
-			TreeToDocumentTranslator = new T4TreeToDocumentTranslator(file, sourceFile);
+			DocumentToTreeTranslator = new T4DocumentToTreeTranslator(file);
+			TreeToDocumentTranslator = new T4TreeToDocumentTranslator(file);
 		}
 
 		public DocumentRange Translate(TreeTextRange range) => TreeToDocumentTranslator.Translate(range);

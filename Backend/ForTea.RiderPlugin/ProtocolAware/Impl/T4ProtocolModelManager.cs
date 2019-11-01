@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.ProjectModel;
+using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
@@ -78,8 +80,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		}
 
 		[CanBeNull]
-		private List<int> CalculateProjectDependencies([NotNull] IT4File file) => ReferenceExtractionManager
-			.GetProjectDependencies(file)
+		private List<int> CalculateProjectDependencies([NotNull] IPsiSourceFile file) => ReferenceExtractionManager
+			.GetProjectDependencies(file.BuildT4Tree())
 			.Select(it => Host.GetIdByProjectModelElement(it))
 			.AsList();
 
