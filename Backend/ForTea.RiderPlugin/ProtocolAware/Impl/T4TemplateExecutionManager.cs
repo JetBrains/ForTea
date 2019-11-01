@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
+using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Rider.Model;
@@ -25,6 +28,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private T4ProtocolModel Model { get; }
 
 		[NotNull]
+		private ISolution Solution { get; }
+
+		[NotNull]
+		private IT4ProjectModelTemplateMetadataManager TemplateMetadataManager { get; }
+
+		[NotNull]
 		private ProjectModelViewHost ProjectModelViewHost { get; }
 
 		[NotNull]
@@ -37,14 +46,27 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			[NotNull] ISolution solution,
 			[NotNull] ProjectModelViewHost projectModelViewHost,
 			[NotNull] NotificationsModel notificationsModel,
-			[NotNull] ILogger logger
+			[NotNull] ILogger logger,
+			[NotNull] IT4ProjectModelTemplateMetadataManager templateMetadataManager
 		)
 		{
+			Solution = solution;
 			ProjectModelViewHost = projectModelViewHost;
 			NotificationsModel = notificationsModel;
 			Logger = logger;
+			TemplateMetadataManager = templateMetadataManager;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RunningFiles = new HashSet<FileSystemPath>();
+		}
+
+		public void UpdateTemplateKind(IT4File file)
+		{
+			Logger.Verbose("Updating template kind");
+			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile().NotNull();
+			Solution.InvokeUnderTransaction(cookie =>
+				TemplateMetadataManager.UpdateTemplateMetadata(cookie, projectFile, T4TemplateKind.Executable));
+			// Apply the changes, just in case the template kind was different
+			Solution.GetPsiServices().Files.CommitAllDocuments();
 		}
 
 		public void Execute(IT4File file)
@@ -99,7 +121,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		}
 
 		private bool IsExecutionRunning([NotNull] IT4File file) => IsExecutionRunning(file.GetSourceFile().NotNull());
-
 		public bool IsExecutionRunning(IPsiSourceFile file) => RunningFiles.Contains(file.GetLocation());
 
 		public void OnExecutionFinished(IT4File file)

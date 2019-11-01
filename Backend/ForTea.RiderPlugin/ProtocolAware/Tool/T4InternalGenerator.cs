@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Altering.Resources;
@@ -65,7 +66,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
 			Logger.Verbose("Got request to execute a file");
-			Statistics.TrackAction("T4.Template.Execution.Background");
 			var file = projectFile.ToSourceFile()?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
 			if (file == null) return SingleFileCustomToolExecutionResult.NotExecuted;
 			var solution = file.GetSolution();
@@ -76,14 +76,18 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 			return SingleFileCustomToolExecutionResult.NotExecuted;
 		}
 
-		private static void Execute([NotNull] IT4File file, [NotNull] ISolution solution)
+		private void Execute([NotNull] IT4File file, [NotNull] ISolution solution)
 		{
+			Statistics.TrackAction(T4StatisticIdBundle.RunSilently);
 			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
 			if (manager.IsExecutionRunning(file.GetSourceFile().NotNull())) return;
 			manager.ExecuteSilently(file);
 		}
 
-		private static void Preprocess([NotNull] IT4File file, [NotNull] ISolution solution) =>
-			solution.GetComponent<IT4TemplatePreprocessingManager>().Preprocess(file);
+		private void Preprocess([NotNull] IT4File file, [NotNull] ISolution solution)
+		{
+			Statistics.TrackAction(T4StatisticIdBundle.PreprocessSilently);
+			solution.GetComponent<IT4TemplatePreprocessingManager>().TryPreprocess(file);
+		}
 	}
 }
