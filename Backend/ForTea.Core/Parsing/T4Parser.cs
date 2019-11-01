@@ -56,7 +56,12 @@ namespace GammaJul.ForTea.Core.Parsing
 				{
 					var file = (File) ParseFileInternal();
 					T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
-					// file.DocumentRangeTranslator = TODO
+					if (SourceFile != null)
+					{
+						var translator = new T4DocumentRangeTranslator(file, SourceFile);
+						file.DocumentRangeTranslator = translator;
+					}
+
 					return file;
 				}
 			);
