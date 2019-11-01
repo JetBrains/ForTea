@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
@@ -153,13 +154,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
 		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
 		{
-			var offset = node
+			int documentOffset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node).Offset;
+			var lineOffset = node
 				.GetSourceFile()
 				.NotNull()
 				.Document
-				.GetCoordsByOffset(node.GetDocumentStartOffset().Offset)
+				.GetCoordsByOffset(documentOffset)
 				.Column;
-			for (var i = Int32<DocColumn>.O; i < offset; i++)
+			for (var i = Int32<DocColumn>.O; i < lineOffset; i++)
 			{
 				destination.Append(" ");
 			}

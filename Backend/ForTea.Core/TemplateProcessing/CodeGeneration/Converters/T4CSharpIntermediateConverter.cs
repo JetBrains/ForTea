@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
@@ -6,7 +7,6 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Util;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -151,8 +151,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			get
 			{
-				string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-				if (fileName != null && ValidityChecker.IsValidIdentifier(fileName)) return fileName;
+				File.AssertContainsNoIncludeContext();
+				string fileName = File.LogicalPsiSourceFile.Name.WithoutExtension();
+				if (ValidityChecker.IsValidIdentifier(fileName)) return fileName;
 				return GeneratedClassNameString;
 			}
 		}
@@ -184,7 +185,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		public override void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
 		{
 			var sourceFile = node.GetSourceFile().NotNull();
-			int line = (int) sourceFile.Document.GetCoordsByOffset(node.GetDocumentStartOffset().Offset).Line;
+			int offset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node).Offset;
+			int line = (int) sourceFile.Document.GetCoordsByOffset(offset).Line;
 			destination.AppendLine($"#line {line + 1} \"{sourceFile.GetLocation()}\"");
 		}
 
