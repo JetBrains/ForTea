@@ -7,7 +7,9 @@ using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Rider.Model;
 using JetBrains.TextControl.DocumentMarkup;
 using JetBrains.UI.RichText;
 using JetBrains.UI.ThemedIcons;
@@ -52,7 +54,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 					var statistics = solution.GetComponent<Application.ActivityTrackingNew.UsageStatistics>();
 					statistics.TrackAction(T4StatisticIdBundle.PreprocessFromGutter);
 					var preprocessingManager = solution.GetComponent<IT4TemplatePreprocessingManager>();
-					preprocessingManager.Preprocess(file);
+					var model = solution.GetProtocolSolution().GetT4ProtocolModel();
+					model.PreprocessingStarted();
+					model.PreprocessingFinished(preprocessingManager.Preprocess(file));
 				}),
 				new RichText(T4TemplateExecutionNameBundle.Preprocess),
 				null,
