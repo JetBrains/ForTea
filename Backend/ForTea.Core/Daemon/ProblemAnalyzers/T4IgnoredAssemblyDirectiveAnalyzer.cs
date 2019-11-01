@@ -22,7 +22,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var solution = sourceFile.GetSolution();
 			var templateKindProvider = solution.GetComponent<IT4TemplateKindProvider>();
-			if (!templateKindProvider.IsPreprocessedTemplate(projectFile)) return;
+			if (!templateKindProvider.IsRootPreprocessedTemplate(projectFile)) return;
 			consumer.AddHighlighting(new IgnoredAssemblyDirectiveWarning(element));
 		}
 	}

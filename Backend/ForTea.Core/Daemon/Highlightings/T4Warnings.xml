@@ -6,21 +6,16 @@
     <SeverityConfiguration>
         <Group name="T4HighlightingAttributeGroup.ID">
             <Tag name="EscapedKeyword" default="WARNING">
-                <Title>Keyword will be escaped</Title>
-                <Description>
-                    In T4, keywords are automatically escaped, which might cause errors in generated code
-                </Description>
+                <Title>Keyword will be escaped during code generation</Title>
+                <Description/>
             </Tag>
             <Tag name="IgnoredAssemblyDirective" default="WARNING">
-                <Title>Ignored assembly directive</Title>
-                <Description>
-                    Assembly directives are ignored in runtime templates. Use the assembly references of the project
-                    instead.
-                </Description>
+                <Title>The directive will be ignored and can be safely removed</Title>
+                <Description/>
             </Tag>
             <Tag name="NoSupportForVB" default="WARNING">
                 <Title>Visual Basic is not supported</Title>
-                <Description>Visual Basic is not supported</Description>
+                <Description/>
             </Tag>
             <Tag name="DuplicateDirective" default="WARNING">
                 <Title>The directive will be ignored and can be safely removed</Title>
@@ -28,23 +23,23 @@
             </Tag>
             <Tag name="RedundantInclude" default="WARNING">
                 <Title>Redundant include</Title>
-                <Description>This file was included before, so this directive will be ignored</Description>
+                <Description/>
             </Tag>
             <Tag name="UnresolvedInclude" default="WARNING">
-                <Title>Unresolved include path</Title>
-                <Description>Could not find the file to include</Description>
+                <Title>Unresolved include</Title>
+                <Description/>
             </Tag>
             <Tag name="UnresolvedAssembly" default="WARNING">
                 <Title>Unresolved assembly</Title>
-                <Description>Could not find .dll file to reference</Description>
+                <Description/>
             </Tag>
             <Tag name="UnexpectedDirective" default="WARNING">
-                <Title>Unexpected directive</Title>
-                <Description>This directive is unexpected and will be ignored</Description>
+                <Title>The directive is unknown and will be ignored</Title>
+                <Description/>
             </Tag>
             <Tag name="UnexpectedAttribute" default="WARNING">
-                <Title>Unexpected attribute</Title>
-                <Description>This attribute is unexpected and will be ignored</Description>
+                <Title>The attribute is unknown and will be ignored</Title>
+                <Description/>
             </Tag>
         </Group>
     </SeverityConfiguration>
