@@ -9,12 +9,10 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.Processes
 {
-	public class T4ProblemAnalyzerProcess : IDaemonStageProcess
+	public sealed class T4ProblemAnalyzerProcess : T4DaemonStageProcessBase
 	{
 		[NotNull]
 		private IT4File File { get; }
-
-		public IDaemonProcess DaemonProcess { get; }
 
 		[NotNull]
 		private ElementProblemAnalyzerRegistrar Registrar { get; }
@@ -26,23 +24,22 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			[NotNull] IT4File file,
 			[NotNull] IDaemonProcess daemonProcess,
 			[NotNull] ElementProblemAnalyzerRegistrar registrar,
-			IContextBoundSettingsStore settings
-		)
+			[NotNull] IContextBoundSettingsStore settings
+		) : base(daemonProcess)
 		{
 			File = file;
-			DaemonProcess = daemonProcess;
 			Registrar = registrar;
 			Settings = settings;
 		}
 
-		public void Execute(Action<DaemonStageResult> committer)
+		protected override void DoExecute(Action<DaemonStageResult> committer)
 		{
 			var consumer = new FilteringHighlightingConsumer(DaemonProcess.SourceFile, File, Settings);
 			File.ProcessThisAndDescendants(new Processor(this, consumer));
 			committer.Invoke(new DaemonStageResult(consumer.Highlightings));
 		}
 
-		private void Process(ITreeNode element, IHighlightingConsumer context)
+		private void Process([NotNull] ITreeNode element, [NotNull] IHighlightingConsumer context)
 		{
 			var analyzerRunKind = ElementProblemAnalyzerRunKind.FullDaemon;
 			var interruptCheck = DaemonProcess.GetCheckForInterrupt();
@@ -52,7 +49,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			analyzerDispatcher.Run(element, context);
 		}
 
-		private class Processor : IRecursiveElementProcessor
+		private sealed class Processor : IRecursiveElementProcessor
 		{
 			public Processor([NotNull] T4ProblemAnalyzerProcess daemonProcess, [NotNull] IHighlightingConsumer consumer)
 			{

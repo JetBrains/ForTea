@@ -11,26 +11,19 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 	/// <summary>
 	/// Performs some specific analysis that cannot be done through problem analyzers
 	/// </summary>
-	public class T4IncludeAwareDaemonProcess : IDaemonStageProcess
+	public sealed class T4IncludeAwareDaemonProcess : T4DaemonStageProcessBase
 	{
 		[NotNull]
 		private IT4File File { get; }
 
-		public IDaemonProcess DaemonProcess { get; }
-
 		public T4IncludeAwareDaemonProcess(
 			[NotNull] IT4File file,
 			[NotNull] IDaemonProcess daemonProcess
-		)
-		{
-			File = file;
-			DaemonProcess = daemonProcess;
-		}
+		) : base(daemonProcess) => File = file;
 
-		public void Execute(Action<DaemonStageResult> committer)
+		protected override void DoExecute(Action<DaemonStageResult> committer)
 		{
 			var psiSourceFile = File.LogicalPsiSourceFile;
-			var solution = psiSourceFile.GetSolution();
 			var projectFile = psiSourceFile.ToProjectFile();
 			if (projectFile == null) return;
 			var visitor = new T4IncludeAwareDaemonProcessVisitor(psiSourceFile);
@@ -41,7 +34,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 			var relevantHighlightings = visitor
 				.Highlightings
-				.Where(info => info.Range.Document.GetPsiSourceFile(solution) == File.PhysicalPsiSourceFile);
+				// TODO: remove this line once @alexander.kirsanov adds similar filtering before adding highlightings
+				// to the RangeableContainer
+				.Where(info => info.Range.Document == File.PhysicalPsiSourceFile?.Document);
 			committer(new DaemonStageResult(relevantHighlightings.ToArray()));
 		}
 	}
