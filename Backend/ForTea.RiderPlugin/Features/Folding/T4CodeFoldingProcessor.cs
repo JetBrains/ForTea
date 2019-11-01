@@ -29,9 +29,11 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 
 		public override void VisitDirectiveNode(IT4Directive directiveParam, FoldingHighlightingConsumer context)
 		{
-			if (!directiveParam.IsVisibleInDocument()) return;
-			DirectiveFoldingStart ??= directiveParam.GetDocumentStartOffset();
-			DirectiveFoldingEnd = directiveParam.GetDocumentEndOffset();
+			// It is necessary to determine offset like this
+			// because using a <see cref="TreeNodeExtensions.GetDocumentStartOffset(ITreeNode)"/>
+			// would yield incorrect results in some edge cases
+			DirectiveFoldingStart ??= directiveParam.GetDocumentRange().StartOffset;
+			DirectiveFoldingEnd = directiveParam.GetDocumentRange().EndOffset;
 		}
 
 		public override void VisitNode(ITreeNode node, FoldingHighlightingConsumer context)
@@ -62,6 +64,8 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 			if (DirectiveFoldingStart == null || DirectiveFoldingEnd == null) return;
 			var range = new DocumentRange(DirectiveFoldingStart.Value, DirectiveFoldingEnd.Value);
 			context.AddDefaultPriorityFolding(T4CodeFoldingAttributes.Directive, range, "<#@ ... #>");
+			DirectiveFoldingStart = null;
+			DirectiveFoldingEnd = null;
 		}
 
 		public override void VisitExpressionBlockNode(
