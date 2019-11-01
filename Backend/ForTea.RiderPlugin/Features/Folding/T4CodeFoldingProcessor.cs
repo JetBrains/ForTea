@@ -16,7 +16,7 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 		/// might reside very deep in the include tree,
 		/// so we have to traverse more than just the top layer
 		public bool InteriorShouldBeProcessed(ITreeNode element, FoldingHighlightingConsumer context) =>
-			element is IT4File || element is IT4IncludeDirective;
+			element is IT4IncludedFile;
 
 		public bool IsProcessingFinished(FoldingHighlightingConsumer context) => false;
 
@@ -36,13 +36,11 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 
 		public override void VisitNode(ITreeNode node, FoldingHighlightingConsumer context)
 		{
-			if (!(node is IT4TreeNode t4Node)) return;
-			// We had to visit contents of T4 directives.
-			// Now we have to filter the irrelevant ones away
-			if (t4Node.IsDirectlyInsideDirective()) return;
+			if (!(node is IT4TreeNode)) return;
 			// Since this is a function that does not specify
 			// what exactly we visited,
-			// we must be visiting a token
+			// we must be visiting a token,
+			// i.e. either newline or raw text
 			if (node.NodeType == T4TokenNodeTypes.NEW_LINE) return;
 			ProduceDirectiveFolding(context);
 		}
