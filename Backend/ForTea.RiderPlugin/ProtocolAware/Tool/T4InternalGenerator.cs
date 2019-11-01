@@ -64,7 +64,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		[NotNull]
 		public ISingleFileCustomToolExecutionResult Execute(IProjectFile projectFile)
 		{
-			Logger.Verbose("Got request to execute {0}", projectFile.Name);
+			Logger.Verbose("Got request to execute a file");
 			Statistics.TrackAction("T4.Template.Execution.Background");
 			var file = projectFile.ToSourceFile()?.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleOrDefault();
 			if (file == null) return SingleFileCustomToolExecutionResult.NotExecuted;

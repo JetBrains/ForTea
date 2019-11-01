@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.Psi.Modules;
+using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
@@ -45,46 +46,53 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file)
 		{
-			var directives = file.Children().OfType<IT4AssemblyDirective>();
+			Assertion.Assert(file.PhysicalPsiSourceFile == file.LogicalPsiSourceFile,
+				"file.PhysicalPsiSourceFile == file.LogicalPsiSourceFile");
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
+			var projectFile = sourceFile.ToProjectFile().NotNull();
+			var directives = file.Children<IT4AssemblyDirective>();
 			var errors = new FrugalLocalList<T4FailureRawData>();
-			var directDependencies = directives.SelectNotNull(directive =>
+			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
 			{
-				var resolved = AssemblyReferenceResolver.Resolve(directive);
-				if (resolved == null)
+				var directDependencies = directives.SelectNotNull(directive =>
 				{
-					errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
-				}
+					var resolved = AssemblyReferenceResolver.Resolve(directive);
+					if (resolved == null)
+					{
+						errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
+					}
 
-				return resolved;
-			}).AsList();
+					return resolved;
+				}).AsList();
 
-			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
-			var result = AssemblyReferenceResolver.ResolveTransitiveDependencies(
-				directDependencies,
-				file.GetSourceFile().NotNull().ToProjectFile().NotNull().SelectResolveContext()
-			).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
-			AddBaseReferences(lifetime, result, file.GetSourceFile().NotNull());
-			return result;
+				if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
+				var result = AssemblyReferenceResolver.ResolveTransitiveDependencies(
+					directDependencies,
+					projectFile.SelectResolveContext()
+				).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
+				AddBaseReferences(lifetime, result, sourceFile);
+				return result;
+			}
 		}
 
 		private void AddBaseReferences(
 			Lifetime lifetime,
 			[NotNull, ItemNotNull] List<MetadataReference> result,
-			[NotNull] IPsiSourceFile getSourceFile
+			[NotNull] IPsiSourceFile sourceFile
 		)
 		{
-			TryAddReference(lifetime, result, getSourceFile, "mscorlib");
-			TryAddReference(lifetime, result, getSourceFile, "System");
+			TryAddReference(lifetime, result, sourceFile, "mscorlib");
+			TryAddReference(lifetime, result, sourceFile, "System");
 		}
 
 		private void TryAddReference(
 			Lifetime lifetime,
 			[NotNull, ItemNotNull] List<MetadataReference> result,
-			[NotNull] IPsiSourceFile getSourceFile,
+			[NotNull] IPsiSourceFile sourceFile,
 			[NotNull] string assemblyName
 		)
 		{
-			var resolved = AssemblyReferenceResolver.Resolve(assemblyName, getSourceFile);
+			var resolved = AssemblyReferenceResolver.Resolve(assemblyName, sourceFile);
 			if (resolved == null) return;
 			var metadataReference = Cache.GetMetadataReference(lifetime, resolved);
 			if (metadataReference == null) return;

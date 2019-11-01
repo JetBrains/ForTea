@@ -30,17 +30,13 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		[NotNull]
 		private IModuleReferenceResolveManager ResolveManager { get; }
 
-		[NotNull]
-		private ILogger Logger { get; }
-
-		public T4AssemblyReferenceResolver([NotNull] IModuleReferenceResolveManager resolveManager,
-			[NotNull] ILogger logger,
+		public T4AssemblyReferenceResolver(
+			[NotNull] IModuleReferenceResolveManager resolveManager,
 			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
 			[NotNull] AssemblyInfoDatabase assemblyInfoDatabase
 		)
 		{
 			ResolveManager = resolveManager;
-			Logger = logger;
 			Preprocessor = preprocessor;
 			AssemblyInfoDatabase = assemblyInfoDatabase;
 		}
@@ -75,7 +71,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 
 		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{
-			var projectFile = sourceFile.ToProjectFile();
+			var projectFile = sourceFile.ToProjectFile() ?? T4MacroResolveContextCookie.ProjectFile;
 			if (projectFile == null) return null;
 			using (Preprocessor.Prepare(projectFile))
 			{

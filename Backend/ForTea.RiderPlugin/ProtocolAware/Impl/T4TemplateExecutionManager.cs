@@ -13,7 +13,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
 	[SolutionComponent]
-	public class T4TemplateExecutionManager : IT4TemplateExecutionManager
+	public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
 		[NotNull]
 		private ISet<FileSystemPath> RunningFiles { get; }
@@ -49,7 +49,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		public void Execute(IT4File file)
 		{
-			Logger.Verbose("Trying to execute {0}", file.GetSourceFile()?.Name);
+			Logger.Verbose("Trying to execute a file");
 			lock (ExecutionLocker)
 			{
 				if (IsExecutionRunning(file))
@@ -66,7 +66,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		public void ExecuteSilently(IT4File file)
 		{
-			Logger.Verbose("Trying to execute silently {0}", file.GetSourceFile()?.Name);
+			Logger.Verbose("Trying to execute a file silently");
 			lock (ExecutionLocker)
 			{
 				if (IsExecutionRunning(file))
@@ -83,7 +83,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 
 		public void Debug(IT4File file)
 		{
-			Logger.Verbose("Trying to debug {0}", file.GetSourceFile()?.Name);
+			Logger.Verbose("Trying to debug a file");
 			lock (ExecutionLocker)
 			{
 				if (IsExecutionRunning(file))

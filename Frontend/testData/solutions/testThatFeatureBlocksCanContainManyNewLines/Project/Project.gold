@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Template.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Template.txt</LastGenOutput>
     </Content>
     <Content Include="Template.txt">

@@ -1,55 +1,56 @@
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Daemon.CodeFolding;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 {
 	public sealed class T4CodeFoldingProcessor : TreeNodeVisitor<FoldingHighlightingConsumer>, ICodeFoldingProcessor
 	{
-		private int? DirectiveFoldingStart { get; set; }
-		private int? DirectiveFoldingEnd { get; set; }
+		private DocumentOffset? DirectiveFoldingStart { get; set; }
+		private DocumentOffset? DirectiveFoldingEnd { get; set; }
 
-		// We are only interested in top-level structures, such as blocks
-		public bool InteriorShouldBeProcessed(ITreeNode element, FoldingHighlightingConsumer context) => false;
+		/// The directives we are interested in
+		/// might reside very deep in the include tree,
+		/// so we have to traverse more than just the top layer
+		public bool InteriorShouldBeProcessed(ITreeNode element, FoldingHighlightingConsumer context) =>
+			element is IT4File || element is IT4IncludeDirective;
+
 		public bool IsProcessingFinished(FoldingHighlightingConsumer context) => false;
 
 		public void ProcessBeforeInterior(ITreeNode element, FoldingHighlightingConsumer context)
 		{
 			if (!(element is IT4TreeNode t4Element)) return;
+			if (!t4Element.IsVisibleInDocument()) return;
 			t4Element.Accept(this, context);
 		}
 
 		public override void VisitDirectiveNode(IT4Directive directiveParam, FoldingHighlightingConsumer context)
 		{
-			DirectiveFoldingStart = DirectiveFoldingStart ?? directiveParam.GetTreeStartOffset().Offset;
-			DirectiveFoldingEnd = directiveParam.GetTreeEndOffset().Offset;
+			if (!directiveParam.IsVisibleInDocument()) return;
+			DirectiveFoldingStart ??= directiveParam.GetDocumentStartOffset();
+			DirectiveFoldingEnd = directiveParam.GetDocumentEndOffset();
 		}
 
 		public override void VisitNode(ITreeNode node, FoldingHighlightingConsumer context)
 		{
-			// Must be token
+			if (!(node is IT4TreeNode t4Node)) return;
+			// We had to visit contents of T4 directives.
+			// Now we have to filter the irrelevant ones away
+			if (t4Node.IsDirectlyInsideDirective()) return;
+			// Since this is a function that does not specify
+			// what exactly we visited,
+			// we must be visiting a token
 			if (node.NodeType == T4TokenNodeTypes.NEW_LINE) return;
-			ProduceDirectiveFolding(node, context);
+			ProduceDirectiveFolding(context);
 		}
 
-		private void ProduceDirectiveFolding([NotNull] ITreeNode node, [NotNull] FoldingHighlightingConsumer context) =>
-			ProduceDirectiveFolding(node.GetSourceFile().NotNull(), context);
-
-		private void ProduceDirectiveFolding(
-			[NotNull] IPsiSourceFile psiSourceFile,
-			[NotNull] FoldingHighlightingConsumer context
-		)
+		private void ProduceDirectiveFolding([NotNull] FoldingHighlightingConsumer context)
 		{
 			if (DirectiveFoldingStart == null || DirectiveFoldingEnd == null) return;
-			var range = new DocumentRange(
-				psiSourceFile.Document,
-				new TextRange(DirectiveFoldingStart.Value, DirectiveFoldingEnd.Value));
+			var range = new DocumentRange(DirectiveFoldingStart.Value, DirectiveFoldingEnd.Value);
 			context.AddDefaultPriorityFolding(T4CodeFoldingAttributes.Directive, range, "<#@ ... #>");
 			DirectiveFoldingStart = null;
 			DirectiveFoldingEnd = null;
@@ -58,10 +59,10 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 		public void ProcessAfterInterior(ITreeNode element, FoldingHighlightingConsumer context)
 		{
 			if (element.NextSibling != null) return;
+			if (!(element is IT4TreeNode t4Element)) return;
+			if (!t4Element.IsVisibleInDocument()) return;
 			if (DirectiveFoldingStart == null || DirectiveFoldingEnd == null) return;
-			var range = new DocumentRange(
-				element.GetSourceFile().NotNull().Document,
-				new TextRange(DirectiveFoldingStart.Value, DirectiveFoldingEnd.Value));
+			var range = new DocumentRange(DirectiveFoldingStart.Value, DirectiveFoldingEnd.Value);
 			context.AddDefaultPriorityFolding(T4CodeFoldingAttributes.Directive, range, "<#@ ... #>");
 		}
 
@@ -80,11 +81,15 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 			[NotNull] FoldingHighlightingConsumer context
 		) => AddFolding(context, T4CodeFoldingAttributes.StatementBlock, statementBlockParam, "<# ... #>");
 
-		private void AddFolding(
+		private static void AddFolding(
 			[NotNull] FoldingHighlightingConsumer context,
 			[NotNull] string id,
-			[NotNull] ITreeNode node,
+			[NotNull] IT4TreeNode node,
 			[NotNull] string replacement
-		) => context.AddDefaultPriorityFolding(id, node.GetDocumentRange(), replacement);
+		)
+		{
+			if (!node.IsVisibleInDocument()) return;
+			context.AddDefaultPriorityFolding(id, node.GetDocumentRange(), replacement);
+		}
 	}
 }

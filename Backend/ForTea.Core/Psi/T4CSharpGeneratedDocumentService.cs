@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
-using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -22,20 +21,14 @@ namespace GammaJul.ForTea.Core.Psi
 {
 	/// <summary>This class will generate a C# code-behind from a T4 file.</summary>
 	[GeneratedDocumentService(typeof(T4ProjectFileType))]
-	public class T4CSharpGeneratedDocumentService : GeneratedDocumentServiceBase
+	public sealed class T4CSharpGeneratedDocumentService : GeneratedDocumentServiceBase
 	{
 		private static IEnumerable<PsiLanguageType> PsiLanguageTypes => new PsiLanguageType[] {CSharpLanguage.Instance};
-
-		[NotNull]
-		private ILogger Logger { get; }
-
-		public T4CSharpGeneratedDocumentService([NotNull] ILogger logger) => Logger = logger;
 
 		/// <summary>Generates a C# file from a T4 file.</summary>
 		/// <param name="modificationInfo">The modifications that occurred in the T4 file.</param>
 		public override ISecondaryDocumentGenerationResult Generate(PrimaryFileModificationInfo modificationInfo)
 		{
-			Logger.Verbose("Building secondary PSI for {0}", modificationInfo.SourceFile.Name);
 			if (!(modificationInfo.NewPsiFile is IT4File t4File)) return null;
 			if (!T4DirectiveInfoManager.GetLanguageType(t4File).Is<CSharpLanguage>()) return null;
 

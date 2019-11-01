@@ -63,7 +63,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 			var output = T4DirectiveInfoManager.Output;
 			var attributes = file
 				.GetDirectives(output)
-				.SelectMany(outputDirective => outputDirective.Attributes)
+				.SelectMany(outputDirective => outputDirective.AttributesEnumerable)
 				.Where(attribute => string.Equals(attribute.Name.GetText(), output.ExtensionAttribute.Name));
 			var query = attributes.Select(attribute => attribute.Value.GetText());
 

@@ -25,7 +25,7 @@ using BlockNavigator = JetBrains.ReSharper.Psi.CSharp.Tree.BlockNavigator;
 namespace GammaJul.ForTea.Core.Psi.Formatting
 {
 	[ShellComponent]
-	public class T4CSharpCustomIndentHandler : ICustomIndentHandler
+	public sealed class T4CSharpCustomIndentHandler : ICustomIndentHandler
 	{
 		[CanBeNull]
 		public string Indent(
@@ -40,20 +40,20 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			if (!IsInT4File(node)) return null;
 			if (indentType == CustomIndentType.RelativeNodeCalculation) return node.GetIndentViaDocument();
 			if (IsEndComment(node)) return IndentBlockEnd();
-			if (IsTransformTextMember(node)) return IndentTransformTextMember(node, indentType);
-			if (IsFeatureBlockMember(node)) return IndentFeatureBlockMember(node);
+			if (IsTransformTextMember(node)) return IndentTransformTextMember(node, indentType, settings);
+			if (IsFeatureBlockMember(node)) return IndentFeatureBlockMember(node, settings);
 			return null;
 		}
 
 		[Pure]
 		[CanBeNull]
-		private string IndentFeatureBlockMember([NotNull] ITreeNode node)
+		private string IndentFeatureBlockMember([NotNull] ITreeNode node, FmtSettings<CSharpFormatSettingsKey> settings)
 		{
 			// In feature blocks, there are class features declared
 			if (!IsClassFeature(node)) return null;
 			bool isTopLevel = node.Parent?.GetParentsOfType<IClassLikeDeclaration>().IsSingle() ?? false;
 			if (!isTopLevel) return null;
-			return "    ";
+			return settings.Settings.GetIndentStr();
 		}
 
 		[Pure]
@@ -64,7 +64,8 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		[CanBeNull]
 		private string IndentTransformTextMember(
 			[NotNull] ITreeNode node,
-			CustomIndentType indentType
+			CustomIndentType indentType,
+			FmtSettings<CSharpFormatSettingsKey> settings
 		)
 		{
 			var rangeTranslator = GetRangeTranslator(node);
@@ -98,13 +99,15 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			var blockStart = codeBlock.GetTreeStartOffset();
 			int nodeStart = originalRange.StartOffset.Offset;
 			if (!HasLineBreak(codeBlock, nodeStart, blockStart)) return null;
-			if (HasVisibleTokenBefore(rangeTranslator, node)) return null;
-			return "    "; // TODO: use settings
+			if (HasStatementsBefore(rangeTranslator, node)) return null;
+			return settings.Settings.GetIndentStr();
 		}
 
-		private static RangeTranslatorWithGeneratedRangeMap GetRangeTranslator(ITreeNode node) =>
+		[NotNull]
+		private static RangeTranslatorWithGeneratedRangeMap GetRangeTranslator([NotNull] ITreeNode node) =>
 			node.GetContainingNode<IFile>(true).NotNull().GetRangeTranslator();
 
+		[CanBeNull]
 		private static string CalculateRelativeIndentInTransformText(
 			[NotNull] ITreeNode node,
 			[NotNull] ISecondaryRangeTranslator rangeTranslator
@@ -120,7 +123,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		}
 
 		[Pure]
-		private static bool HasVisibleTokenBefore(
+		private static bool HasStatementsBefore(
 			[NotNull] ISecondaryRangeTranslator rangeTranslator,
 			[NotNull] ITreeNode node
 		) => node.GetFirstTokenIn()
@@ -130,14 +133,25 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			.Select(rangeTranslator.GeneratedToOriginal)
 			.Where(originalRange => originalRange.IsValid())
 			.SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
-			.SelectNotNull(it => it.GetParentOfType<IT4CodeBlock>())
-			.Any();
+			.Any(IsInStatement);
+
+		private static bool IsInStatement([NotNull] ITreeNode node)
+		{
+			switch (node.GetParentOfType<IT4CodeBlock>())
+			{
+				case null:
+				case IT4ExpressionBlock _:
+					return false;
+				default:
+					return true;
+			}
+		}
 
 		[Pure]
 		private static bool HasLineBreak([NotNull] IT4CodeBlock codeBlock, int nodeStart, TreeOffset blockStart) =>
 			codeBlock.GetText().Substring(0, nodeStart - blockStart.Offset).IndexOf('\n') >= 0;
 
-		[Pure]
+		[Pure, CanBeNull]
 		private static string GetIndentFromPreviousStatement(
 			[NotNull] ITreeNode node,
 			[NotNull] RangeTranslatorWithGeneratedRangeMap rangeTranslator
@@ -184,10 +198,17 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			node.GetFirstTokenIn().GetT4ContainerFromCSharpNode<IT4FeatureBlock>() != null;
 
 		[Pure]
-		private static bool IsEndComment([NotNull] ITreeNode node) =>
-			node is ITokenNode tokenNode
-			&& tokenNode.GetTokenType().IsComment
-			&& tokenNode.GetText() == T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
+		private static bool IsEndComment([NotNull] ITreeNode node)
+		{
+			if (!(node is ITokenNode tokenNode)) return false;
+			if (!tokenNode.GetTokenType().IsComment) return false;
+			switch (tokenNode.GetText())
+			{
+				case T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText:
+				case T4CSharpCodeBehindIntermediateConverter.ExpressionCommentEndText: return true;
+				default: return false;
+			}
+		}
 
 		[Pure]
 		private static bool IsClassFeature([NotNull] ITreeNode node) =>

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Utils.Impl;
-using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using JetBrains.Annotations;
 using JetBrains.Util;
 

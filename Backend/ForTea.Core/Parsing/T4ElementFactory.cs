@@ -28,13 +28,6 @@ namespace GammaJul.ForTea.Core.Parsing {
 		public static IT4FeatureBlock CreateFeatureBlock([CanBeNull] string code)
 			=> (IT4FeatureBlock) CreateTreeAndGetFirstChild("<#+" + code + "#>");
 
-		/// <summary>Creates a new expression block (&lt;#= ... #&gt;).</summary>
-		/// <param name="code">The code that will be contained in the block.</param>
-		/// <returns>A new instance of <see cref="IT4ExpressionBlock"/>.</returns>
-		[NotNull]
-		public static IT4ExpressionBlock CreateExpressionBlock([CanBeNull] string code)
-			=> (IT4ExpressionBlock) CreateTreeAndGetFirstChild("<#=" + code + "#>");
-
 		/// <summary>Creates a new directive (&lt;#@ ... #&gt;).</summary>
 		/// <param name="directiveName">Name of the directive.</param>
 		/// <param name="attributes">The directive attributes.</param>

@@ -5,7 +5,6 @@ using JetBrains.IDE;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Navigation;
 using JetBrains.ReSharper.Feature.Services.Occurrences;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 {

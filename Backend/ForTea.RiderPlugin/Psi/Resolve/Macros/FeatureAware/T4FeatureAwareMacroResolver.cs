@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
 using JetBrains.Platform.MsBuildHost.ProjectModel;
@@ -31,7 +30,6 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 
 		public T4FeatureAwareMacroResolver(
 			[NotNull] ISolution solution,
-			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
 			[NotNull] ISolutionToolset solutionToolset,
 			[NotNull] IBuildToolWellKnownPropertiesStore msBuildProperties,
 			[NotNull] RiderProcessStartInfoEnvironment environment,

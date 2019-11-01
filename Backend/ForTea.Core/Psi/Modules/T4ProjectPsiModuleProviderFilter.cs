@@ -1,5 +1,4 @@
 using System;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -41,7 +40,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		public T4ProjectPsiModuleProviderFilter(
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IT4MacroResolver resolver,
 			[NotNull] PsiProjectFileTypeCoordinator coordinator,
 			[NotNull] IT4TemplateKindProvider templateDataManager
 		)

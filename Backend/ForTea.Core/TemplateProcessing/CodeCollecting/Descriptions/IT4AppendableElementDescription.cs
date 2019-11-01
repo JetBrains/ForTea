@@ -1,7 +1,6 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
@@ -9,7 +8,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 	{
 		void AppendContent(
 			[NotNull] T4CSharpCodeGenerationResult destination,
-			[NotNull] IT4ElementAppendFormatProvider provider,
-			[CanBeNull] IPsiSourceFile context);
+			[NotNull] IT4ElementAppendFormatProvider provider);
 	}
 }

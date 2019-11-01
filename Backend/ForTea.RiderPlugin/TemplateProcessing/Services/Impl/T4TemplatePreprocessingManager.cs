@@ -1,4 +1,5 @@
 using System;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -12,7 +13,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 {
 	[SolutionComponent]
-	public class T4TemplatePreprocessingManager : IT4TemplatePreprocessingManager
+	public sealed class T4TemplatePreprocessingManager : IT4TemplatePreprocessingManager
 	{
 		private DateTime PreviousExecutedFileWriteTime { get; set; }
 
@@ -33,14 +34,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 
 		public void Preprocess(IT4File file)
 		{
-			Logger.Verbose("Preprocessing {0}", file.GetSourceFile()?.Name);
-			var psiSourceFile = file.GetSourceFile();
+			Logger.Verbose("Preprocessing a file");
+			var psiSourceFile = file.PhysicalPsiSourceFile;
 			if (psiSourceFile == null) return;
 			var lastWriteTimeUtc = psiSourceFile.LastWriteTimeUtc;
 			if (lastWriteTimeUtc == PreviousExecutedFileWriteTime) return;
 			PreviousExecutedFileWriteTime = lastWriteTimeUtc;
 			var solution = file.GetSolution();
-			string message = new T4CSharpPreprocessedCodeGenerator(file, solution).Generate().RawText;
+			var contextFreeTree = psiSourceFile.BuildT4Tree();
+			string message = new T4CSharpPreprocessedCodeGenerator(contextFreeTree, solution).Generate().RawText;
 			solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "T4 template preprocessing", () =>
 			{
 				using (WriteLockCookie.Create())

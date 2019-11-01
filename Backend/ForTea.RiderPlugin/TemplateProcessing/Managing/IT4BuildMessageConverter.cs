@@ -4,7 +4,6 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Rider.Model;
-using JetBrains.Util.dataStructures;
 using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing

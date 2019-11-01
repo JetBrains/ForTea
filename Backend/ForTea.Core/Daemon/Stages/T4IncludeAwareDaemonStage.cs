@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
 	[DaemonStage(StagesBefore = new[] {typeof(CollectUsagesStage)})]
-	public class T4WarningStage : T4DaemonStageBase
+	public sealed class T4IncludeAwareDaemonStage : T4DaemonStageBase
 	{
 		protected override IDaemonStageProcess CreateProcess(
 			IDaemonProcess process,

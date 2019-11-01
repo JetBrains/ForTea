@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using JetBrains.Application.DataContext;
@@ -30,13 +31,15 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 			model.PreprocessingStarted();
 
 			var file = FindT4File(context, solution).NotNull();
-			var projectFile = file.GetSourceFile().ToProjectFile().NotNull();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
+			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var location = new T4FileLocation(solution.GetComponent<ProjectModelViewHost>().GetIdByItem(projectFile));
 
 			statistics.TrackAction("T4.Template.Preprocess");
 			try
 			{
-				string message = new T4CSharpPreprocessedCodeGenerator(file, solution).Generate().RawText;
+				var contextFreeTree = sourceFile.BuildT4Tree();
+				string message = new T4CSharpPreprocessedCodeGenerator(contextFreeTree, solution).Generate().RawText;
 				using (WriteLockCookie.Create())
 				{
 					targetFileManager.SavePreprocessResults(file, message);

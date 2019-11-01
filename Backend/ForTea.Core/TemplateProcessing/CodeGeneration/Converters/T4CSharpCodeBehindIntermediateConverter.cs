@@ -4,21 +4,21 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public sealed class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
 		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
-		public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
-		public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
+		[NotNull] public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
+		[NotNull] public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
+		[NotNull] public const string ExpressionCommentStartText = "/*_T4\x200CExpressionStart*/";
+		[NotNull] public const string ExpressionCommentEndText = "/*_T4\x200CExpressionEnd*/";
 
 		[NotNull, ItemNotNull]
 		private IEnumerable<string> DisabledPropertyInspections { get; } = new[]
@@ -57,22 +57,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 
 			Result.Append("        private global::");
-			if (description.HasSameSourceFile(File.GetSourceFile()))
-			{
-				var type = description.TypeToken;
-				if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
-				Result.AppendMapped(type);
-			}
-			else Result.Append(description.TypeString);
+			var type = description.TypeToken;
+			if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
+			Result.AppendMapped(type);
 
 			Result.Append(" ");
-			if (description.HasSameSourceFile(File.GetSourceFile()))
-			{
-				var name = description.NameToken;
-				if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
-				Result.AppendMapped(name);
-			}
-			else Result.Append(description.NameString);
+			var name = description.NameToken;
+			if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
+			Result.AppendMapped(name);
 
 			Result.Append(" => ");
 			Result.Append(description.FieldNameString);
@@ -111,9 +103,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			return fileName;
 		}
 
-		protected override string GeneratedClassName => TryGetGeneratedClassNameFromFile() ?? GeneratedClassNameString;
-
-		protected override string GeneratedBaseClassName
+		protected override string GeneratedClassName
 		{
 			get
 			{
@@ -133,6 +123,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => CodeCommentStartText;
 		public override string CodeCommentEnd => CodeCommentEndText;
+		public override string ExpressionCommentStart => ExpressionCommentStartText;
+		public override string ExpressionCommentEnd => ExpressionCommentEndText;
 		public override string Indent => "";
 		public override bool ShouldBreakExpressionWithLineDirective => false;
 

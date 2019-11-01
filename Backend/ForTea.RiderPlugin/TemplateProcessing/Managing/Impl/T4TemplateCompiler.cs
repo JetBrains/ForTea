@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
@@ -9,11 +9,13 @@ using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generators;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
@@ -56,36 +58,55 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		[NotNull]
-		public T4BuildResult Compile(Lifetime lifetime, IT4File file)
+		public T4BuildResult Compile(Lifetime lifetime, IPsiSourceFile sourceFile)
 		{
-			Logger.Verbose("Compiling {0}", file.GetSourceFile()?.Name);
+			Logger.Verbose("Compiling a file");
 			Locks.AssertReadAccessAllowed();
+			// Since we need no context when compiling a file, we need to build the tree manually
+			var file = sourceFile.BuildT4Tree();
 			var error = file.ThisAndDescendants<IErrorElement>().Collect();
 			if (!error.IsEmpty()) return Converter.SyntaxErrors(error);
-			List<Diagnostic> messages = null;
+
 			return lifetime.UsingNested(nested =>
 			{
 				try
 				{
+					// Prepare the code
 					var references = ReferenceExtractionManager.ExtractPortableReferencesTransitive(lifetime, file);
 					string code = GenerateCode(file);
+
+					// Prepare the paths
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);
 					var compilation = CreateCompilation(code, references, executablePath);
-					var diagnostics = compilation.GetDiagnostics(nested);
-					messages = diagnostics.AsList();
-					var errors = diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
-					if (!errors.IsEmpty()) return null;
-
 					executablePath.Parent.CreateDirectory();
 					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
-					compilation.Emit(executablePath.FullPath, pdbPath.FullPath, cancellationToken: nested);
-					return null;
+
+					// Delegate to Roslyn
+					var emitOptions = new EmitOptions(
+						debugInformationFormat: DebugInformationFormat.PortablePdb,
+						pdbFilePath: pdbPath.FullPath
+					);
+					EmitResult emitResult;
+					using (var executableStream = executablePath.OpenFileForWriting())
+					{
+						using (var pdbStream = pdbPath.OpenFileForWriting())
+						{
+							emitResult = compilation.Emit(
+								peStream: executableStream,
+								pdbStream: pdbStream,
+								options: emitOptions,
+								cancellationToken: nested
+							);
+						}
+					}
+
+					return Converter.ToT4BuildResult(emitResult.Diagnostics.AsList(), file);
 				}
 				catch (T4OutputGenerationException e)
 				{
 					return Converter.ToT4BuildResult(e);
 				}
-			}) ?? Converter.ToT4BuildResult(messages, file);
+			});
 		}
 
 		[NotNull]

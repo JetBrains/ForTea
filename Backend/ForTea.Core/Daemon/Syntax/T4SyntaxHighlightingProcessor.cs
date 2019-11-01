@@ -2,7 +2,6 @@ using System;
 using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
-using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;

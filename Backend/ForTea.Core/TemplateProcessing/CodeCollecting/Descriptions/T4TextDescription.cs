@@ -1,11 +1,10 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4TextDescription : T4ElementDescriptionBase, IT4AppendableElementDescription
+	public sealed class T4TextDescription : IT4AppendableElementDescription
 	{
 		[NotNull]
 		private string Text { get; }
@@ -14,8 +13,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		public void AppendContent(
 			T4CSharpCodeGenerationResult destination,
-			IT4ElementAppendFormatProvider provider,
-			IPsiSourceFile context
+			IT4ElementAppendFormatProvider provider
 		)
 		{
 			destination.Append(provider.Indent);

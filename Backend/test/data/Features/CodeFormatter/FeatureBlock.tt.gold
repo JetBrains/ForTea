@@ -1,4 +1,6 @@
 ﻿<#+
-    public static int Whatever(int arg) => arg;
+  public static int Whatever(int arg)
+  {
+  }
 #>
 {caret}

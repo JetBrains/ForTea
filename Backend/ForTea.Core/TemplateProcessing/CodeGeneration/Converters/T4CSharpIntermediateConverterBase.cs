@@ -104,7 +104,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			foreach (var description in IntermediateResult.ImportDescriptions)
 			{
-				description.AppendContent(Result, this, File.GetSourceFile());
+				description.AppendContent(Result, this);
 			}
 		}
 
@@ -122,7 +122,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformMethod();
 			foreach (var description in IntermediateResult.FeatureDescriptions)
 			{
-				description.AppendContent(Result, this, File.GetSourceFile());
+				description.AppendContent(Result, this);
 			}
 
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
@@ -185,7 +185,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine();
 			foreach (var description in IntermediateResult.TransformationDescriptions)
 			{
-				description.AppendContent(Result, this, File.GetSourceFile());
+				description.AppendContent(Result, this);
 			}
 
 			AppendIndent();
@@ -254,6 +254,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		public abstract string CodeCommentStart { get; }
 		public abstract string CodeCommentEnd { get; }
+		public abstract string ExpressionCommentStart { get; }
+		public abstract string ExpressionCommentEnd { get; }
 		public abstract string Indent { get; }
 		public abstract bool ShouldBreakExpressionWithLineDirective { get; }
 		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
