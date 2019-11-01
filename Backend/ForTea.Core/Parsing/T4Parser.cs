@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Parser;
+using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -40,6 +41,7 @@ namespace GammaJul.ForTea.Core.Parsing
 		public override TreeElement ParseFile()
 		{
 			var result = ParseFileWithoutCleanup();
+			result.SetSourceFile(SourceFile);
 			T4ParsingContextHelper.Reset();
 			return result;
 		}
