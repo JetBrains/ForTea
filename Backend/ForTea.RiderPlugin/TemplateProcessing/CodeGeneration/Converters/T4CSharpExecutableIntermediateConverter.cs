@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ProjectModel;
@@ -39,7 +40,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
 			[NotNull] IT4File file,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
-		) : base(intermediateResult, file) => ReferenceExtractionManager = referenceExtractionManager;
+		) : base(intermediateResult, file)
+		{
+			file.AssertContainsNoIncludeContext();
+			ReferenceExtractionManager = referenceExtractionManager;
+		}
 
 		protected override void AppendNamespacePrefix()
 		{
@@ -146,8 +151,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>
 			destination.Append(code.GetText());
 
-		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
 		{
+			var offset = node
+				.GetSourceFile()
+				.NotNull()
+				.Document
+				.GetCoordsByOffset(node.GetDocumentStartOffset().Offset)
+				.Column;
 			for (var i = Int32<DocColumn>.O; i < offset; i++)
 			{
 				destination.Append(" ");

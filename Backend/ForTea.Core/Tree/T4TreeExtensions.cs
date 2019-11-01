@@ -4,11 +4,9 @@ using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
-using GammaJul.ForTea.Core.Psi.Utils;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
@@ -20,7 +18,7 @@ namespace GammaJul.ForTea.Core.Tree
 	public static class T4TreeExtensions
 	{
 		[CanBeNull]
-		public static ITreeNode GetAttributeValueToken(
+		public static IT4TreeNode GetAttributeValueToken(
 			[CanBeNull] this IT4Directive directive,
 			[CanBeNull] string attributeName
 		)
@@ -39,20 +37,20 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] string attributeName
 		) => directive.GetAttributeValueToken(attributeName)?.GetText();
 
-		public static Pair<ITreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
+		public static Pair<IT4TreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
 			[NotNull] this IT4Directive directive,
 			[NotNull] string attributeName
 		)
 		{
 			var valueToken = directive.GetAttributeValueToken(attributeName);
 			if (valueToken == null)
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
 			string value = valueToken.GetText();
 			if (value.IsNullOrWhitespace())
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
-			return new Pair<ITreeNode, string>(valueToken, value);
+			return new Pair<IT4TreeNode, string>(valueToken, value);
 		}
 
 		[NotNull]
@@ -75,34 +73,6 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] DirectiveAttributeInfo info
 		) => directive.Attributes.FirstOrDefault(it =>
 			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
-
-		[NotNull, ItemNotNull]
-		public static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive([NotNull] this IT4File file)
-		{
-			var guard = new T4IncludeGuard<IPsiSourceFile>();
-			return file.GetThisAndIncludedFilesRecursive(guard);
-		}
-
-		[NotNull, ItemNotNull]
-		private static IEnumerable<IT4File> GetThisAndIncludedFilesRecursive(
-			[NotNull] this IT4File file,
-			[NotNull] T4IncludeGuard<IPsiSourceFile> guard
-		)
-		{
-			yield return file;
-			var sourceFile = file.GetSourceFile();
-			if (sourceFile == null || !guard.CanProcess(sourceFile)) yield break;
-			guard.StartProcessing(sourceFile);
-			var includedFiles = file.Blocks.OfType<IT4IncludeDirective>()
-				.Select(include => include.Path.ResolveT4File(guard))
-				.Where(resolution => resolution != null);
-			foreach (var recursiveInclude in includedFiles
-				.SelectMany(includedFile => includedFile.GetThisAndIncludedFilesRecursive(guard))
-			)
-			{
-				yield return recursiveInclude;
-			}
-		}
 
 		/// <summary>Gets a T4 block containing a specified C# node.</summary>
 		/// <typeparam name="T">The type of expected T4 container node.</typeparam>
@@ -263,5 +233,21 @@ namespace GammaJul.ForTea.Core.Tree
 
 			return null;
 		}
+
+		[NotNull, ItemNotNull]
+		public static IEnumerable<IT4FileLikeNode> GetThisAndIncludedFilesRecursive([NotNull] this IT4FileLikeNode node)
+		{
+			yield return node;
+			foreach (var transitiveInclude in node.Includes.SelectMany(GetThisAndIncludedFilesRecursive))
+			{
+				yield return transitiveInclude;
+			}
+		}
+
+		private static bool ContainsIncludeContext([NotNull] this IT4File file) =>
+			file.LogicalPsiSourceFile == file.PhysicalPsiSourceFile;
+
+		public static void AssertContainsNoIncludeContext([NotNull] this IT4File file) =>
+			Assertion.Assert(file.ContainsIncludeContext(), "PSI file should not contain any include context");
 	}
 }

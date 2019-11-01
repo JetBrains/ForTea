@@ -41,7 +41,7 @@ namespace GammaJul.ForTea.Core.Psi
 			}
 			else
 			{
-				using (T4MacroResolveContextCookie.Create(projectFile))
+				using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
 				{
 					includePaths = IncludedFiles.AsList();
 				}

@@ -1,5 +1,4 @@
 using JetBrains.DocumentManagers;
-using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Occurrences;
 using JetBrains.ReSharper.Psi.Search;

@@ -3,9 +3,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DocumentModel;
 using JetBrains.Util;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -106,7 +104,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			foreach (var description in IntermediateResult.ImportDescriptions)
 			{
-				description.AppendContent(Result, this, File.GetSourceFile());
+				description.AppendContent(Result, this);
 			}
 		}
 
@@ -124,7 +122,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformMethod();
 			foreach (var description in IntermediateResult.FeatureDescriptions)
 			{
-				description.AppendContent(Result, this, File.GetSourceFile());
+				description.AppendContent(Result, this);
 			}
 
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
@@ -187,7 +185,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine();
 			foreach (var description in IntermediateResult.TransformationDescriptions)
 			{
-				description.AppendContent(Result, this, File.GetSourceFile());
+				description.AppendContent(Result, this);
 			}
 
 			AppendIndent();
@@ -260,7 +258,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		public abstract string ExpressionCommentEnd { get; }
 		public abstract string Indent { get; }
 		public abstract bool ShouldBreakExpressionWithLineDirective { get; }
-		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset);
+		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
+		public abstract void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
 		public abstract void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code);
 		#endregion IT4ElementAppendFormatProvider
 	}

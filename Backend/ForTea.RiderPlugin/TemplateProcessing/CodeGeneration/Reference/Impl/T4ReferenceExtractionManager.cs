@@ -45,13 +45,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file)
 		{
-			var sourceFile = file.GetSourceFile().NotNull();
+			file.AssertContainsNoIncludeContext();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var directives = file.GetThisAndIncludedFilesRecursive()
-				.SelectMany(it => it.BlocksEnumerable)
+				.SelectMany(it => it.Blocks)
 				.OfType<IT4AssemblyDirective>();
 			var errors = new FrugalLocalList<T4FailureRawData>();
-			using (T4MacroResolveContextCookie.Create(projectFile))
+			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
 			{
 				var directDependencies = directives.SelectNotNull(directive =>
 				{
@@ -100,10 +101,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
+			// todo: file.AssertContainsNoIncludeContext();
 			var directReferences = ExtractRawAssemblyReferences(file).Select(assemblyFile =>
 				new T4AssemblyReferenceInfo(assemblyFile.AssemblyName?.FullName ?? "", assemblyFile.Location)
 			);
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.LogicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var resolveContext = projectFile.SelectResolveContext();
 			return AssemblyReferenceResolver
@@ -114,7 +116,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		[NotNull, ItemNotNull]
 		private static IEnumerable<IAssemblyFile> ExtractRawAssemblyReferences([NotNull] IT4File file)
 		{
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.LogicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			if (!(sourceFile.PsiModule is IT4FilePsiModule psiModule)) return EmptyList<IAssemblyFile>.Enumerable;
 			var resolveContext = projectFile.SelectResolveContext();
@@ -126,7 +128,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<IProject> GetProjectDependencies(IT4File file)
 		{
-			var sourceFile = file.GetSourceFile().NotNull();
+			file.AssertContainsNoIncludeContext();
+			var sourceFile = file.LogicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var psiModule = sourceFile.PsiModule;
 			var resolveContext = projectFile.SelectResolveContext();

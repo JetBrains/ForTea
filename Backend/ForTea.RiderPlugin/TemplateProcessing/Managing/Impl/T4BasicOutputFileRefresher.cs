@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;

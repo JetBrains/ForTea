@@ -61,8 +61,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		public IList<IPsiSourceFile> GetPsiSourceFilesFor([CanBeNull] IProjectFile projectFile) {
 			_shellLocks.AssertReadAccessAllowed();
 
-			return projectFile != null
-				&& projectFile.IsValid()
+			return projectFile?.IsValid() == true
 				&& _modules.TryGetValue(projectFile, out ModuleWrapper wrapper)
 				&& wrapper.Module.IsValid()
 			? new[] { wrapper.Module.SourceFile }

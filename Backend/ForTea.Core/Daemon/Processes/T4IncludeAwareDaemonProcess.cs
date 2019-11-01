@@ -29,16 +29,20 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public void Execute(Action<DaemonStageResult> committer)
 		{
-			var psiSourceFile = File.GetSourceFile();
-			var projectFile = psiSourceFile?.ToProjectFile();
+			var psiSourceFile = File.LogicalPsiSourceFile;
+			var solution = psiSourceFile.GetSolution();
+			var projectFile = psiSourceFile.ToProjectFile();
 			if (projectFile == null) return;
 			var visitor = new T4IncludeAwareDaemonProcessVisitor(psiSourceFile);
-			using (T4MacroResolveContextCookie.Create(projectFile))
+			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
 			{
 				File.ProcessDescendants(visitor);
 			}
 
-			committer(new DaemonStageResult(visitor.Highlightings.ToArray()));
+			var relevantHighlightings = visitor
+				.Highlightings
+				.Where(info => info.Range.Document.GetPsiSourceFile(solution) == File.PhysicalPsiSourceFile);
+			committer(new DaemonStageResult(relevantHighlightings.ToArray()));
 		}
 	}
 }

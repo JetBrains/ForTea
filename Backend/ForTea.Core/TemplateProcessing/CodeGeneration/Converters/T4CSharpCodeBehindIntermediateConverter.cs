@@ -4,13 +4,11 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -59,22 +57,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 
 			Result.Append("        private global::");
-			if (description.HasSameSourceFile(File.GetSourceFile()))
-			{
-				var type = description.TypeToken;
-				if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
-				Result.AppendMapped(type);
-			}
-			else Result.Append(description.TypeString);
+			var type = description.TypeToken;
+			if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
+			Result.AppendMapped(type);
 
 			Result.Append(" ");
-			if (description.HasSameSourceFile(File.GetSourceFile()))
-			{
-				var name = description.NameToken;
-				if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
-				Result.AppendMapped(name);
-			}
-			else Result.Append(description.NameString);
+			var name = description.NameToken;
+			if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
+			Result.AppendMapped(name);
 
 			Result.Append(" => ");
 			Result.Append(description.FieldNameString);
@@ -138,8 +128,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		public override string Indent => "";
 		public override bool ShouldBreakExpressionWithLineDirective => false;
 
-		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset)
+		public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
 		{
+		}
+
+		public override void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
+		{
+			// Line directives in code-behind affect nothing anyway.
+			// The mapping between the code and the document
+			// is handled by document range translators.
 		}
 
 		public override void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code) =>

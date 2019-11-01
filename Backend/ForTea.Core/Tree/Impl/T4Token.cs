@@ -9,7 +9,7 @@ using JetBrains.Text;
 namespace GammaJul.ForTea.Core.Tree.Impl
 {
 	/// <summary>Implementation of <see cref="IT4Token"/>.</summary>
-	public class T4Token : BindedToBufferLeafElement, IT4Token
+	public class T4Token : BoundToBufferLeafElement, IT4Token
 	{
 		public void Accept(TreeNodeVisitor visitor) => visitor.VisitNode(this);
 

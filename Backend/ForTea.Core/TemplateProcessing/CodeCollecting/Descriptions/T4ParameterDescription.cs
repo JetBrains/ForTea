@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4ParameterDescription : T4ElementDescriptionBase
+	public sealed class T4ParameterDescription
 	{
 		[NotNull]
 		public ITreeNode TypeToken { get; }
@@ -27,7 +27,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			[NotNull] ITreeNode nameToken,
 			[NotNull] string typeString,
 			[NotNull] string nameString
-		) : base(typeToken.GetSourceFile())
+		)
 		{
 			TypeToken = typeToken;
 			NameToken = nameToken;

@@ -1,12 +1,8 @@
-using GammaJul.ForTea.Core.Psi.Invalidation;
-using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -22,39 +18,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		[NotNull]
 		private ISolution Solution { get; }
 
-		[NotNull]
-		private T4FileDependencyManager DependencyManager { get; }
-
 		public T4CSharpCodeBehindGenerator(
-			[NotNull] IT4File actualFile,
+			[NotNull] IT4File file,
 			[NotNull] ISolution solution
-		) : base(actualFile)
-		{
-			Solution = solution;
-			DependencyManager = solution.GetComponent<T4FileDependencyManager>();
-		}
+		) : base(file) => Solution = solution;
 
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector =>
-			new T4CSharpCodeBehindGenerationInfoCollector(Root, Solution);
+			new T4CSharpCodeBehindGenerationInfoCollector(File, Solution);
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		) => new T4CSharpCodeBehindIntermediateConverter(intermediateResult, ActualFile);
-
-		/// <summary>
-		/// In generated code-behind, we use root file to provide intelligent support for 
-		/// </summary>
-		[NotNull]
-		private IT4File Root
-		{
-			get
-			{
-				var projectFile = ActualFile.GetSourceFile().ToProjectFile().NotNull();
-				var rootPsiSourceFile = DependencyManager.Graph.FindBestRoot(projectFile).ToSourceFile();
-				if (ActualFile.GetSourceFile() == rootPsiSourceFile) return ActualFile;
-				var root = rootPsiSourceFile?.BuildT4Tree();
-				return root.NotNull();
-			}
-		}
+		) => new T4CSharpCodeBehindIntermediateConverter(intermediateResult, File);
 	}
 }

@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.ProjectModel;
+using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
@@ -77,8 +80,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		}
 
 		[CanBeNull]
-		private List<int> CalculateProjectDependencies([NotNull] IT4File file) => ReferenceExtractionManager
-			.GetProjectDependencies(file)
+		private List<int> CalculateProjectDependencies([NotNull] IPsiSourceFile file) => ReferenceExtractionManager
+			.GetProjectDependencies(file.BuildT4Tree())
 			.Select(it => Host.GetIdByProjectModelElement(it))
 			.AsList();
 
@@ -88,10 +91,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
 		);
 
-		private T4BuildResult Compile([NotNull] IT4File t4File)
+		private T4BuildResult Compile([NotNull] IPsiSourceFile sourceFile)
 		{
 			T4BuildResult result = null;
-			Solution.GetLifetime().UsingNested(nested => result = Compiler.Compile(nested, t4File));
+			Solution.GetLifetime().UsingNested(nested => result = Compiler.Compile(nested, sourceFile));
 			return result;
 		}
 

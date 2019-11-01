@@ -25,12 +25,12 @@ namespace GammaJul.ForTea.Core.Psi.Resolve
 		private T4MacroResolveContextCookie([CanBeNull] IProjectFile previous) => Previous = previous;
 		public void Dispose() => ProjectFile = Previous;
 
-		public static T4MacroResolveContextCookie Create(IProjectFile context)
+		public static T4MacroResolveContextCookie GetOrCreate([CanBeNull] IProjectFile context)
 		{
 			lock (Locker)
 			{
 				var result = new T4MacroResolveContextCookie(ProjectFile);
-				ProjectFile = context;
+				ProjectFile = context ?? ProjectFile;
 				return result;
 			}
 		}

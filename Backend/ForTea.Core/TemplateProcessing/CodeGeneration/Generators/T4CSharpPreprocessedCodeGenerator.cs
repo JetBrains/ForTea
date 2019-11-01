@@ -10,17 +10,17 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 	/// This class preprocesses T4 file
 	/// to produce C# file that can be compiled and run correctly.
 	/// </summary>
-	public class T4CSharpCodeGenerator : T4CSharpCodeGeneratorBase
+	public class T4CSharpPreprocessedCodeGenerator : T4CSharpCodeGeneratorBase
 	{
-		public T4CSharpCodeGenerator(
-			[NotNull] IT4File actualFile,
+		public T4CSharpPreprocessedCodeGenerator(
+			[NotNull] IT4File file,
 			[NotNull] ISolution solution
-		) : base(actualFile) => Collector = new T4CSharpCodeGenerationInfoCollector(actualFile, solution);
+		) : base(file) => Collector = new T4CSharpCodeGenerationInfoCollector(file, solution);
 
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		) => new T4CSharpIntermediateConverter(intermediateResult, ActualFile);
+		) => new T4CSharpIntermediateConverter(intermediateResult, File);
 	}
 }

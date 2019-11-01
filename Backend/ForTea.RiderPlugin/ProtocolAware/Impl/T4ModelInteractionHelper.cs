@@ -15,7 +15,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
 	[SolutionComponent]
-	public class T4ModelInteractionHelper : IT4ModelInteractionHelper
+	public sealed class T4ModelInteractionHelper : IT4ModelInteractionHelper
 	{
 		[NotNull]
 		private ProjectModelViewHost Host { get; }
@@ -29,20 +29,22 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			Logger = logger;
 		}
 
-		[NotNull]
-		public Func<T4FileLocation, T> Wrap<T>(Func<IT4File, T> wrappee, T defaultValue) where T : class =>
+		public Func<T4FileLocation, T> Wrap<T>(Func<IT4File, T> wrappee, T defaultValue)
+			where T : class =>
+			Wrap(sourceFile => wrappee(sourceFile
+				.GetPsiFiles(T4Language.Instance)
+				.OfType<IT4File>()
+				.SingleItem()), defaultValue);
+
+		public Func<T4FileLocation, T> Wrap<T>(Func<IPsiSourceFile, T> wrappee, T defaultValue)
+			where T : class =>
 			location =>
 			{
 				var result = Logger.Catch(() =>
 				{
 					using (ReadLockCookie.Create())
 					{
-						var file = Host
-							.GetItemById<IProjectFile>(location.Id)
-							?.ToSourceFile()
-							?.GetPsiFiles(T4Language.Instance)
-							.OfType<IT4File>()
-							.SingleItem();
+						var file = Host.GetItemById<IProjectFile>(location.Id)?.ToSourceFile();
 						return file == null ? null : wrappee(file);
 					}
 				});

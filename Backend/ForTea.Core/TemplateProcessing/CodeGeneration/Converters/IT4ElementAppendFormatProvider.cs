@@ -1,7 +1,5 @@
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DocumentModel;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -20,9 +18,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		void AppendCompilationOffset(
 			[NotNull] T4CSharpCodeGenerationResult destination,
-			Int32<DocColumn> offset
+			[NotNull] IT4TreeNode node
 		);
 
+		void AppendLineDirective(
+			[NotNull] T4CSharpCodeGenerationResult destination,
+			[NotNull] IT4TreeNode node
+		);
+
+		// TODO: wtf
 		void AppendMappedIfNeeded(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4Code code

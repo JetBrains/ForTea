@@ -35,13 +35,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private int GetProjectId([NotNull] IT4File file) => Host?.GetIdByItem(file.GetProject().NotNull()) ?? 0;
 
 		public T4BuildResult ToT4BuildResult(T4OutputGenerationException exception) =>
-			ToT4BuildResult(exception.FailureDatum);
+			ToT4BuildResult(exception.FailureDatum.AsEnumerable());
 
 		[NotNull]
-		private T4BuildResult ToT4BuildResult(FrugalLocalList<T4FailureRawData> data) =>
+		private T4BuildResult ToT4BuildResult([NotNull] IEnumerable<T4FailureRawData> data) =>
 			new T4BuildResult(T4BuildResultKind.HasErrors, ToT4BuildMessages(data));
 
-		public List<T4BuildMessage> ToT4BuildMessages(FrugalLocalList<T4FailureRawData> rawData)
+		public List<T4BuildMessage> ToT4BuildMessages(IEnumerable<T4FailureRawData> rawData)
 		{
 			var messages = new List<T4BuildMessage>();
 			foreach (var data in rawData)
@@ -66,8 +66,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
 		}
 
-		public T4BuildResult SyntaxError(ITreeNode node) =>
-			ToT4BuildResult(FrugalLocalList<T4FailureRawData>.Of(T4FailureRawData.FromElement(node, "Syntax error")));
+		public T4BuildResult SyntaxErrors(IEnumerable<ITreeNode> nodes) =>
+			ToT4BuildResult(nodes.Select(node => T4FailureRawData.FromElement(node, "Syntax error")));
 
 		private static T4BuildResultKind ToT4BuildResultKind([NotNull, ItemNotNull] ICollection<Diagnostic> diagnostics)
 		{

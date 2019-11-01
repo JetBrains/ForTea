@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
@@ -8,6 +9,8 @@ using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generators;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
@@ -35,9 +38,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IT4BuildMessageConverter Converter { get; }
 
 		[NotNull]
-		private IT4SyntaxErrorSearcher ErrorSearcher { get; }
-
-		[NotNull]
 		private ILogger Logger { get; }
 
 		public T4TemplateCompiler(
@@ -45,7 +45,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			[NotNull] IT4TargetFileManager targetManager,
 			[NotNull] IT4BuildMessageConverter converter,
 			[NotNull] ISolution solution,
-			[NotNull] IT4SyntaxErrorSearcher errorSearcher,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager,
 			[NotNull] ILogger logger
 		)
@@ -54,19 +53,19 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			TargetManager = targetManager;
 			Converter = converter;
 			Solution = solution;
-			ErrorSearcher = errorSearcher;
 			ReferenceExtractionManager = referenceExtractionManager;
 			Logger = logger;
 		}
 
 		[NotNull]
-		public T4BuildResult Compile(Lifetime lifetime, IT4File file)
+		public T4BuildResult Compile(Lifetime lifetime, IPsiSourceFile sourceFile)
 		{
 			Logger.Verbose("Compiling a file");
 			Locks.AssertReadAccessAllowed();
-
-			var error = ErrorSearcher.FindErrorElement(file);
-			if (error != null) return Converter.SyntaxError(error);
+			// Since we need no context when compiling a file, we need to build the tree manually
+			var file = sourceFile.BuildT4Tree();
+			var error = file.ThisAndDescendants<IErrorElement>().Collect();
+			if (!error.IsEmpty()) return Converter.SyntaxErrors(error);
 
 			return lifetime.UsingNested(nested =>
 			{

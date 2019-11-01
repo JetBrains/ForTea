@@ -34,9 +34,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 
 		protected override bool IsSupported(ITextControl textControl) {
 			IPsiSourceFile psiSourceFile = textControl.Document.GetPsiSourceFile(Solution);
-			return psiSourceFile != null
-				&& psiSourceFile.LanguageType.Is<T4ProjectFileType>()
-				&& psiSourceFile.IsValid();
+			return psiSourceFile?.LanguageType.Is<T4ProjectFileType>() == true && psiSourceFile.IsValid();
 		}
 
 		public bool QuickCheckAvailability(ITextControl textControl, IPsiSourceFile projectFile)
