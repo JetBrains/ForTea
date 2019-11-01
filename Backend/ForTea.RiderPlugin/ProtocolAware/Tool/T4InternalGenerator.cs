@@ -87,7 +87,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		private void Preprocess([NotNull] IT4File file, [NotNull] ISolution solution)
 		{
 			Statistics.TrackAction(T4StatisticIdBundle.PreprocessSilently);
-			solution.GetComponent<IT4TemplatePreprocessingManager>().Preprocess(file);
+			solution.GetComponent<IT4TemplatePreprocessingManager>().TryPreprocess(file);
 		}
 	}
 }
