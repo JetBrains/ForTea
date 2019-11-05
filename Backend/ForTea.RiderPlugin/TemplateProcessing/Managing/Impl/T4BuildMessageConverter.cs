@@ -67,7 +67,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		public T4BuildResult SyntaxError(ITreeNode node) =>
-			ToT4BuildResult(FrugalLocalList<T4FailureRawData>.Of(T4FailureRawData.FromElement(node, "Syntax error")));
+			ToT4BuildResult(FrugalLocalList<T4FailureRawData>.Init(T4FailureRawData.FromElement(node, "Syntax error")));
 
 		private static T4BuildResultKind ToT4BuildResultKind([NotNull, ItemNotNull] ICollection<Diagnostic> diagnostics)
 		{

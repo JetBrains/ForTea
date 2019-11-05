@@ -45,8 +45,7 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 			[NotNull] DocumentManager documentManager,
 			[NotNull] ISolution solution,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IFileSystemTracker fileSystemTracker,
-			[NotNull] PsiSourceFileWithLocationTracker psiSourceFileWithLocationTracker
+			[NotNull] IFileSystemTracker fileSystemTracker
 		)
 		{
 			ProjectFileExtensions = projectFileExtensions;
@@ -61,7 +60,6 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 				t4Environment.TargetFrameworkId,
 				fileSystemTracker,
 				lifetime,
-				psiSourceFileWithLocationTracker,
 				false);
 		}
 

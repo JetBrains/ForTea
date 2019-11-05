@@ -8,7 +8,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt
 		public FrugalLocalList<T4FailureRawData> FailureDatum { get; }
 
 		public T4OutputGenerationException(T4FailureRawData failureData) =>
-			FailureDatum = FrugalLocalList<T4FailureRawData>.Of(failureData);
+			FailureDatum = FrugalLocalList<T4FailureRawData>.Init(failureData);
 
 		public T4OutputGenerationException(FrugalLocalList<T4FailureRawData> failureDatum) =>
 			FailureDatum = failureDatum;

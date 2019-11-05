@@ -26,30 +26,36 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("SmallLoop")]
 		[TestCase("StatementAfterTargetLanguage")]
 		[TestCase("StatementsAroundTargetLanguage")]
-		[TestCase("StatementAndFeatureBlocks")]
+		[TestCase("StatementAndFeatureBlocks", Ignore = "Not implemented")]
 		[TestCase("FeatureBlock")]
 		[TestCase("RemovingIndent")]
 		[TestCase("MisplacedBlockEnd")]
-		[TestCase("ExpressionBlock")]
+		[TestCase("ExpressionBlock", Ignore = "Not implemented")]
 		[TestCase("ComplexFeatureBlock")]
 		[TestCase("BrokenFeatureBlock")]
 		[TestCase("InnerClasses")]
-		[TestCase("SemiBrokenBlock")]
-		[TestCase("OneLineStatement")]
-		[TestCase("StatementBlockAfterExpressionBlock")]
-		[TestCase("ImportDirective")]
 		public void TestFormatter([NotNull] string name) => DoOneTest(name);
 
 		protected override void DoTest(Lifetime lifetime, IProject testProject)
 		{
 			var textControl = OpenTextControl(lifetime);
 			var document = textControl.Document;
-			string newDocumentText = GetTextAfterFormatting(document, textControl);
-			document.ReplaceText(document.DocumentRange, newDocumentText);
+			int caretOffset = textControl.Caret.Offset();
+			string newDocumentText = GetTextAfterFormatting(document, textControl, ref caretOffset);
+			document.ReplaceText(TextRange.FromLength(document.GetTextLength()), newDocumentText);
+			if (caretOffset >= 0)
+			{
+				textControl.Caret.MoveTo(caretOffset, CaretVisualPlacement.Generic);
+			}
+
 			CheckTextControl(textControl);
 		}
 
-		private string GetTextAfterFormatting([NotNull] IDocument document, [NotNull] ITextControl textControl)
+		private string GetTextAfterFormatting(
+			[NotNull] IDocument document,
+			[NotNull] ITextControl textControl,
+			ref int caretOffset
+		)
 		{
 			using (Solution.GetComponent<DocumentTransactionManager>()
 				.CreateTransactionCookie(DefaultAction.Rollback, "Temporary change"))
@@ -61,7 +67,7 @@ namespace JetBrains.ForTea.Tests.Features
 				var selectionRange = textControl.Selection.OneDocRangeWithCaret();
 				codeCleanup.Run(file, selectionRange.Length > 0
 					? new DocumentRange(textControl.Document, selectionRange)
-					: DocumentRange.InvalidRange, profile, NullProgressIndicator.Create());
+					: DocumentRange.InvalidRange, ref caretOffset, profile, NullProgressIndicator.Create());
 				return document.GetText();
 			}
 		}

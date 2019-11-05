@@ -47,12 +47,12 @@ java {
 }
 
 
-val baseVersion = "2019.3"
+val baseVersion = "2019.2.3"
 version = baseVersion
 
 intellij {
   type = "RD"
-  version = "$baseVersion-SNAPSHOT"
+  version = "$baseVersion"
   instrumentCode = false
   downloadSources = false
   updateSinceUntilBuild = false
