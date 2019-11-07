@@ -44,10 +44,19 @@ version = baseVersion
 
 intellij {
   type = "RD"
-  version = "$baseVersion-SNAPSHOT"
+  val dir = file("build/rider")
+  if (dir.exists()) {
+    logger.lifecycle("*** Using Rider SDK from local path " + dir.absolutePath)
+    localPath = dir.absolutePath
+  } else {
+    logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
+    version = "$baseVersion-SNAPSHOT"
+  }
+
   instrumentCode = false
   downloadSources = false
   updateSinceUntilBuild = false
+
   // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
   setPlugins("rider-plugins-appender")
 }
