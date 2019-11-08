@@ -18,7 +18,7 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("MissingToken", Ignore = "Error recovery not implemented")]
 		[TestCase("StatementAfterFeature")]
 		[TestCase("EmptyExpressionBlock")]
-		[TestCase("RecursiveInclude")]
+		[TestCase("RecursiveInclude", Ignore = "Not implemented")]
 		[TestCase("UnknownEncoding")]
 		[TestCase("PossibleLanguages")]
 		[TestCase("IllegalCharacter")]
