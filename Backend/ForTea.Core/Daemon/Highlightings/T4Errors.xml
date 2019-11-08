@@ -61,7 +61,7 @@
     <Error name="MissingRequiredAttribute" staticGroup="T4Errors">
         <Parameter type="ITokenNode" name="node"/>
         <Parameter type="string" name="missingAttributeName"/>
-        <Message value="Missing required attribute \&quot;{0}\&quot;">
+        <Message value="\&quot;{0}\&quot;">
             <Argument>MissingAttributeName</Argument>
         </Message>
         <Range>Node.GetHighlightingRange()</Range>

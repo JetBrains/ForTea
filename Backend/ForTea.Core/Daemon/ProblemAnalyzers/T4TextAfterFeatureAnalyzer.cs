@@ -1,5 +1,6 @@
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -17,6 +18,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 			IHighlightingConsumer consumer
 		)
 		{
+			if (element.GetTokenType() != T4TokenNodeTypes.RAW_TEXT) return;
 			if (!HasFeatureBlocks(element)) return;
 			if (HasFeatureBlocksAhead(element)) return;
 			if (IsInFeatureBlock(element)) return;
@@ -24,7 +26,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		}
 
 		private static bool HasFeatureBlocks([NotNull] IT4Token element) =>
-			element.GetParentOfType<IT4FileLikeNode>().NotNull().Blocks.IsEmpty;
+			element.GetParentOfType<IT4FileLikeNode>().NotNull().Blocks.OfType<IT4FeatureBlock>().Any();
 
 		private static bool IsInFeatureBlock([NotNull] IT4Token element) =>
 			element.GetParentOfType<IT4FeatureBlock>() != null;
