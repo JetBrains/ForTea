@@ -56,7 +56,10 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			var result = new Dictionary<string, string>();
 			foreach (string heavyMacro in heavyMacros)
 			{
-				string value = msBuildSession.GetProjectProperty(mark, heavyMacro)?.EvaluatedValue;
+				string value = msBuildSession
+					.GetProjectProperty(mark, heavyMacro)
+					.Select(it => it.EvaluatedValue)
+					.SingleOrDefault();
 				if (value == null) continue;
 				result.Add(heavyMacro, value);
 			}
