@@ -7,8 +7,10 @@ using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Psi.Impl.Shared;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
@@ -160,6 +162,7 @@ namespace GammaJul.ForTea.Core.Tree
 		{
 			if (directive == null) return;
 			using (WriteLockCookie.Create(file.IsPhysical()))
+			using (file.GetPsiServices().Transactions.CreateCustomCookie<DisableChecks>())
 			{
 				// remove the optional end line after the directive
 				var sibling = directive.NextSibling;
