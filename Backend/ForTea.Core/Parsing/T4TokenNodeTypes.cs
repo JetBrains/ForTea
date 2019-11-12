@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using static GammaJul.ForTea.Core.Parsing.T4TokenNodeFlag;
 
 namespace GammaJul.ForTea.Core.Parsing
@@ -31,5 +32,6 @@ namespace GammaJul.ForTea.Core.Parsing
 		[NotNull] public static readonly T4TokenNodeType DOLLAR = new T4TokenNodeType("DOLLAR", DOLLAR_NODE_TYPE_INDEX, "$", None);
 		[NotNull] public static readonly T4TokenNodeType RIGHT_PARENTHESIS = new T4TokenNodeType("RIGHT_PARENTHESIS", RIGHT_PARENTHESIS_NODE_TYPE_INDEX, ")", None);
 		[NotNull] public static readonly T4TokenNodeType PERCENT = new T4TokenNodeType("PERCENT", PERCENT_NODE_TYPE_INDEX, "%", None);
+		[NotNull] public static readonly NodeTypeSet CodeBlockStarts = new NodeTypeSet(STATEMENT_BLOCK_START, EXPRESSION_BLOCK_START, FEATURE_BLOCK_START);
 	}
 }
