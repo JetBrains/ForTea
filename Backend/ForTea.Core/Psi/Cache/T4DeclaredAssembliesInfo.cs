@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
-using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
