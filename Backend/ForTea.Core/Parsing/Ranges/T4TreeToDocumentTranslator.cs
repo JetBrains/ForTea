@@ -12,47 +12,39 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 	public sealed class T4TreeToDocumentTranslator : T4RangeTranslatorBase
 	{
 		[NotNull]
-		private IReadOnlyCollection<T4FileSector> Sectors { get; }
+		private IEnumerable<T4FileSector> Sectors
+		{
+			get {
+				var previousIncludeEnd = TreeOffset.Zero;
+				int currentIncludeLength = 0;
+				foreach (var include in Includes)
+				{
+					var includeRange = include.GetTreeTextRange();
+					// This range is bound to be valid because includes cannot directly be followed by one another,
+					// There has to be a gap for the 'include directive' between them
+					var range = new TreeTextRange(previousIncludeEnd, includeRange.StartOffset);
+					// The part of file that goes in between includes
+					yield return new T4FileSector(range, null, currentIncludeLength);
+					// The include itself
+					yield return new T4FileSector(includeRange, include, currentIncludeLength);
+					previousIncludeEnd = include.GetTreeEndOffset();
+					currentIncludeLength += includeRange.Length;
+				}
+
+				// The remaining part of the file
+				var fileEnd = FileLikeNode.GetTreeEndOffset();
+				// The include directive might be the last directive in the file.
+				// In that case, there would be no original file space left
+				if (previousIncludeEnd == fileEnd) yield break;
+				// Otherwise, this would be a valid range
+				var lastRange = new TreeTextRange(previousIncludeEnd, fileEnd);
+				yield return new T4FileSector(lastRange, null, currentIncludeLength);
+			}
+		}
 
 		public T4TreeToDocumentTranslator([NotNull] IT4FileLikeNode fileLikeNode) : base(fileLikeNode)
 		{
-			var sectors = ProduceSectors().AsList();
-			ValidateSectors(sectors);
-			Sectors = sectors;
-		}
-
-		[NotNull]
-		private IEnumerable<T4FileSector> ProduceSectors()
-		{
-			var previousIncludeEnd = TreeOffset.Zero;
-			int currentIncludeLength = 0;
-			foreach (var include in Includes)
-			{
-				var includeRange = include.GetTreeTextRange();
-				// This range is bound to be valid because includes cannot directly be followed by one another,
-				// There has to be a gap for the 'include directive' between them
-				var range = new TreeTextRange(previousIncludeEnd, includeRange.StartOffset);
-				// The part of file that goes in between includes
-				yield return new T4FileSector(range, null, currentIncludeLength);
-				// The include itself
-				yield return new T4FileSector(includeRange, include, currentIncludeLength);
-				previousIncludeEnd = include.GetTreeEndOffset();
-				currentIncludeLength += includeRange.Length;
-			}
-
-			// The remaining part of the file
-			var fileEnd = FileLikeNode.GetTreeEndOffset();
-			// The include directive might be the last directive in the file.
-			// In that case, there would be no original file space left
-			if (previousIncludeEnd == fileEnd) yield break;
-			// Otherwise, this would be a valid range
-			var lastRange = new TreeTextRange(previousIncludeEnd, fileEnd);
-			yield return new T4FileSector(lastRange, null, currentIncludeLength);
-		}
-
-		private static void ValidateSectors([NotNull] IEnumerable<T4FileSector> sectors)
-		{
-			foreach (var sector in sectors)
+			foreach (var sector in Sectors)
 			{
 				sector.AssertValid();
 			}
