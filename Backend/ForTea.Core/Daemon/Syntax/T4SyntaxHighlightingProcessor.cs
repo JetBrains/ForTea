@@ -21,8 +21,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer context)
 		{
 			if (!(element is IT4TreeNode t4Element)) return;
-			var visitor = new T4SyntaxHighlightingVisitor();
-			t4Element.Accept(visitor, context);
+			var visitor = new T4SyntaxHighlightingVisitor(context);
+			t4Element.Accept(visitor);
 		}
 
 		// These methods should never be called

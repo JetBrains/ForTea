@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
@@ -32,11 +33,11 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			Settings = settings;
 		}
 
-		protected override void DoExecute(Action<DaemonStageResult> committer)
+		protected override void DoExecute(Action<IEnumerable<HighlightingInfo>> committer)
 		{
 			var consumer = new FilteringHighlightingConsumer(DaemonProcess.SourceFile, File, Settings);
 			File.ProcessThisAndDescendants(new Processor(this, consumer));
-			committer.Invoke(new DaemonStageResult(consumer.Highlightings));
+			committer.Invoke(consumer.Highlightings);
 		}
 
 		private void Process([NotNull] ITreeNode element, [NotNull] IHighlightingConsumer context)

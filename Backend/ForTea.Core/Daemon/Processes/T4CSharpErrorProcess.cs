@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Daemon.CSharp.Stages;
@@ -13,7 +14,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.Processes {
 	
-	public class T4CSharpErrorProcess : CSharpIncrementalDaemonStageProcessBase {
+	public sealed class T4CSharpErrorProcess : CSharpIncrementalDaemonStageProcessBase {
 
 		public override void VisitClassDeclaration(IClassDeclaration classDeclarationParam, IHighlightingConsumer context) {
 			base.VisitClassDeclaration(classDeclarationParam, context);
@@ -24,7 +25,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 				return;
 
 			ITypeUsage baseClassNode = classDeclarationParam.SuperTypeUsageNodes.FirstOrDefault();
-			if (baseClassNode == null) return;
+			if (baseClassNode?.IsVisibleInDocument() != true) return;
 
 			if (T4CSharpIntermediateConverterBase.GeneratedBaseClassNameString.Equals(
 				baseClassNode.GetText(),

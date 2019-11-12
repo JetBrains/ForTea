@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -21,7 +21,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			[NotNull] IDaemonProcess daemonProcess
 		) : base(daemonProcess) => File = file;
 
-		protected override void DoExecute(Action<DaemonStageResult> committer)
+		protected override void DoExecute(Action<IEnumerable<HighlightingInfo>> committer)
 		{
 			var psiSourceFile = File.LogicalPsiSourceFile;
 			var projectFile = psiSourceFile.ToProjectFile();
@@ -32,12 +32,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 				File.ProcessDescendants(visitor);
 			}
 
-			var relevantHighlightings = visitor
-				.Highlightings
-				// TODO: remove this line once @alexander.kirsanov adds similar filtering before adding highlightings
-				// to the RangeableContainer
-				.Where(info => info.Range.Document == File.PhysicalPsiSourceFile?.Document);
-			committer(new DaemonStageResult(relevantHighlightings.ToArray()));
+			committer(visitor.Highlightings);
 		}
 	}
 }

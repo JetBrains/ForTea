@@ -252,5 +252,17 @@ namespace GammaJul.ForTea.Core.Tree
 
 		public static void AssertContainsNoIncludeContext([NotNull] this IT4File file) =>
 			Assertion.Assert(file.ContainsIncludeContext(), "PSI file should not contain any include context");
+
+		/// <summary>
+		/// Some nodes in T4 tree constitute include context.
+		/// Here I'll call them invisible
+		/// </summary>
+		public static bool IsVisibleInDocument([NotNull] this ITreeNode node)
+		{
+			var file = node.GetContainingFile().NotNull();
+			var nodeDocument = node.GetDocumentRange().Document;
+			var visibleDocument = file.GetSourceFile()?.Document;
+			return nodeDocument == visibleDocument;
+		}
 	}
 }
