@@ -1,14 +1,10 @@
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
-using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Invalidation
+namespace GammaJul.ForTea.Core.Psi.Cache
 {
 	public interface IT4FileDependencyGraph
 	{
-		void UpdateIncludes([NotNull] FileSystemPath includer, [NotNull] ICollection<FileSystemPath> includees);
-
 		/// <summary>
 		/// This is used for building correct PSI for .ttinclude files.
 		/// T4 includes are similar to C++ ones, and symbols used in them
@@ -19,8 +15,5 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation
 		/// TODO: cache root?
 		[NotNull]
 		IProjectFile FindBestRoot([NotNull] IProjectFile file);
-
-		[NotNull, ItemNotNull]
-		IEnumerable<FileSystemPath> FindIndirectIncludesTransitiveClosure([NotNull] FileSystemPath path);
 	}
 }
