@@ -55,9 +55,9 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void VisitAttributeNameNode(IT4AttributeName attributeNameParam) =>
 			AddHighlighting(T4HighlightingAttributeIds.DIRECTIVE_ATTRIBUTE, attributeNameParam);
 
-		private void AddHighlighting([NotNull] string id, [NotNull] ITreeNode node)
+		private void AddHighlighting([NotNull] string id, [CanBeNull] ITreeNode node)
 		{
-			if (!node.IsVisibleInDocument()) return;
+			if (node?.IsVisibleInDocument() != true) return;
 			var highlighting = new ReSharperSyntaxHighlighting(id, null, node.GetDocumentRange());
 			Context.AddHighlighting(highlighting);
 		}
