@@ -31,38 +31,34 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 				return rangeFromIncludes ?? TreeTextRange.InvalidRange;
 			}
 
-			int includedLength = 0;
-			foreach (var include in Includes)
-			{
-				int includeEndOffset = include.GetTreeTextRange().EndOffset.Offset;
-				if (includeEndOffset - includedLength > documentRange.TextRange.EndOffset)
-					return BuildRange(documentRange, includedLength);
+			// The range is in the same document as the source file we are responsible for,
+			// so we have no choice but to handle the request ourselves
+			(int documentStartOffset, int documentEndOffset) = documentRange.TextRange;
+			var rootStartOffset = FileLikeNode.GetTreeStartOffset();
 
-				if (includeEndOffset - includedLength == documentRange.TextRange.EndOffset)
-				{
-					if (documentRange.TextRange.StartOffset == documentRange.TextRange.EndOffset)
-						// end of include
-						return include.GetTreeTextRange();
+			// No includes, tree and document are matching
+			if (!Includes.Any())
+				return new TreeTextRange(rootStartOffset + documentStartOffset, rootStartOffset + documentEndOffset);
 
-					// range that start before the end of include statement
-					return BuildRange(documentRange, includedLength);
-				}
-
-				if (includeEndOffset - includedLength > documentRange.TextRange.StartOffset)
-					// document range crosses include boundary
-					return TreeTextRange.InvalidRange;
-
-				includedLength += include.GetTreeStartOffset().Offset - includeEndOffset;
-			}
-
-			return BuildRange(documentRange, includedLength);
+			var treeStartOffset = Translate(documentStartOffset);
+			if (!treeStartOffset.IsValid()) return TreeTextRange.InvalidRange;
+			return TreeTextRange.FromLength(treeStartOffset, documentRange.Length);
 		}
 
-		private static TreeTextRange BuildRange(DocumentRange documentRange, int includedLength)
+		private TreeOffset Translate(int documentOffset)
 		{
-			var start = new TreeOffset(documentRange.TextRange.StartOffset + includedLength);
-			var end = new TreeOffset(documentRange.TextRange.EndOffset + includedLength);
-			return new TreeTextRange(start, end);
+			int offset = 0;
+			foreach (var include in Includes)
+			{
+				var includeRange = include.GetTreeTextRange();
+				var finalOffset = new TreeOffset(documentOffset + offset);
+				// The matching file offset starts before the current include, we got it
+				if (finalOffset < includeRange.StartOffset) return finalOffset;
+				offset += includeRange.Length;
+			}
+
+			// The offset is in the file, after the last include
+			return new TreeOffset(documentOffset + offset);
 		}
 	}
 }
