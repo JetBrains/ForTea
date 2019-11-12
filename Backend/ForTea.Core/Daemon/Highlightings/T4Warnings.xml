@@ -9,16 +9,12 @@
                 <Title>Keyword will be escaped during code generation</Title>
                 <Description/>
             </Tag>
-            <Tag name="IgnoredAssemblyDirective" default="WARNING">
+            <Tag name="IgnoredDirective" default="WARNING">
                 <Title>The directive will be ignored and can be safely removed</Title>
                 <Description/>
             </Tag>
             <Tag name="NoSupportForVB" default="WARNING">
                 <Title>Visual Basic is not supported</Title>
-                <Description/>
-            </Tag>
-            <Tag name="DuplicateDirective" default="WARNING">
-                <Title>The directive will be ignored and can be safely removed</Title>
                 <Description/>
             </Tag>
             <Tag name="RedundantInclude" default="WARNING">
@@ -48,18 +44,12 @@
         <Message value="Keyword will be escaped"/>
         <Range>Value.GetHighlightingRange()</Range>
     </Warning>
-    <Warning name="IgnoredAssemblyDirective" configurableSeverity="IgnoredAssemblyDirective">
-        <Parameter type="IT4AssemblyDirective" name="directive"/>
-        <Message value="Ignored assembly reference"/>
-        <Range>Directive.GetHighlightingRange()</Range>
-        <Behavour attributeID="DEADCODE" overlapResolvePolicy="ERROR"/>
-    </Warning>
     <Warning name="NoSupportForVB" configurableSeverity="NoSupportForVB">
         <Parameter type="IT4AttributeValue" name="value"/>
         <Message value="Visual Basic is not supported"/>
         <Range>Value.GetHighlightingRange()</Range>
     </Warning>
-    <Warning name="DuplicateDirective" configurableSeverity="DuplicateDirective">
+    <Warning name="IgnoredDirective" configurableSeverity="IgnoredDirective">
         <Parameter type="IT4Directive" name="directive"/>
         <Message value="The directive will be ignored and can be safely removed"/>
         <Range>Directive.GetHighlightingRange()</Range>

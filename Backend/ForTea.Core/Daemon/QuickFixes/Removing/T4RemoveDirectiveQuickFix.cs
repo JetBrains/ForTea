@@ -6,12 +6,12 @@ using JetBrains.ReSharper.Feature.Services.QuickFixes;
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes.Removing
 {
 	[QuickFix]
-	public class T4RemoveDirectiveQuickFix : T4RemoveBlockQuickFixBase<IT4Directive, IgnoredAssemblyDirectiveWarning>
+	public sealed class T4RemoveDirectiveQuickFix : T4RemoveBlockQuickFixBase<IT4Directive, IgnoredDirectiveWarning>
 	{
 		public override string Text => "Remove directive";
 		protected override IT4Directive Node => Highlighting.Directive;
 
-		public T4RemoveDirectiveQuickFix([NotNull] IgnoredAssemblyDirectiveWarning highlighting) : base(highlighting)
+		public T4RemoveDirectiveQuickFix([NotNull] IgnoredDirectiveWarning highlighting) : base(highlighting)
 		{
 		}
 	}
