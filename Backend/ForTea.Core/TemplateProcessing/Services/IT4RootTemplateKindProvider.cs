@@ -3,8 +3,8 @@ using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.Services
 {
-	public interface IT4TemplateKindProvider
+	public interface IT4RootTemplateKindProvider
 	{
-		T4TemplateKind GetTemplateKind([NotNull] IProjectFile file);
+		T4TemplateKind GetRootTemplateKind([NotNull] IProjectFile file);
 	}
 }
