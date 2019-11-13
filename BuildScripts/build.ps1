@@ -4,8 +4,11 @@
     [switch]$Verbose
 )
 
-$backendPath = "${PSScriptRoot}\..\Backend"
-$frontendPath = "${PSScriptRoot}\..\Frontend"
+$donetSdkDir = Get-ChildItem Env:DOTNET_SDK_DIRECTORY
+$baseDir = "${PSScriptRoot}\..\"
+echo "BaseDir=${baseDir}, DotNetSdkDir=${donetSdkDir}"
+$backendPath = "${baseDir}\Backend"
+$frontendPath = "${baseDir}\Frontend"
 
 $gradleArgs = @()
 If ($Verbose -eq $true) { Write-Host "Will build rider plugin" }
@@ -34,11 +37,11 @@ Write-Host "Preparing to build T4 plugin"
 Push-Location -Path $frontendPath
 Try {
     If ($Verbose -eq $true) {
-        .\gradlew :prepare --console=plain
+        "${baseDir}Frontend\gradlew.bat" :prepare --console=plain
         $code = $LastExitCode
     }
     Else {
-        .\gradlew :prepare > $null --quiet --console=plain
+        "${baseDir}Frontend\gradlew.bat" :prepare > $null --quiet --console=plain
         $code = $LastExitCode
     }
     If ($code -ne 0) { throw "Could not prepare. Gradlew exit code: $code." }
@@ -51,11 +54,11 @@ Write-Host "Building T4 backend"
 Push-Location -Path $backendPath
 Try {
     If ($Verbose -eq $true) {
-        dotnet msbuild -m ForTea.Backend.sln
+        "${dotNetSdkDir}dotnet" msbuild -m ForTea.Backend.sln
         $code = $LastExitCode
     }
     Else {
-        dotnet msbuild -m ForTea.Backend.sln > $null
+        "${dotNetSdkDir}dotnet" msbuild -m ForTea.Backend.sln > $null
         $code = $LastExitCode
     }
     If ($code -ne 0) { throw "Could not compile backend. MsBuild exit code: $code." }    
@@ -68,11 +71,11 @@ Write-Host $mainWorkName
 Push-Location -Path $frontendPath
 Try {
     If ($Verbose -eq $true) {
-        .\gradlew $gradleArgs
+        "${baseDir}Frontend\gradlew.bat" $gradleArgs
         $code = $LastExitCode
     }
     Else {
-        .\gradlew $gradleArgs 2>&1> $null
+        "${baseDir}Frontend\gradlew.bat" $gradleArgs 2>&1> $null
         $code = $LastExitCode
     }
     If ($code -ne 0) { throw "Main gradle work failed. Gradlew exit code: $code." }
