@@ -37,5 +37,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 			if (sourceFile == null) return T4EmptyPathWithMacros.Instance;
 			return new T4PathWithMacros(includeFileName, sourceFile);
 		}
+
+		public IT4IncludedFile IncludedFile => lastChild as IT4IncludedFile;
 	}
 }
