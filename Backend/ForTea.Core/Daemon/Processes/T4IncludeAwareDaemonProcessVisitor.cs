@@ -95,7 +95,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ReportDuplicateDirective([NotNull] IT4Directive directive)
 		{
-			var warning = new DuplicateDirectiveWarning(directive);
+			var warning = new IgnoredDirectiveWarning(directive);
 			var highlightingInfo = new HighlightingInfo(directive.GetHighlightingRange(), warning);
 			MyHighlightings.Add(highlightingInfo);
 		}
