@@ -2,28 +2,28 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
+namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
 	public sealed class T4IndirectIncludeTransitiveClosureSearcher
 	{
 		[NotNull]
-		private OneToSetMap<FileSystemPath, FileSystemPath> DirectIncludeGraph { get; }
+		private IDictionary<FileSystemPath, T4FileDependencyData> IncluderToIncludes { get; }
 
 		[NotNull]
-		private OneToSetMap<FileSystemPath, FileSystemPath> ReversedIncludeGraph { get; }
+		private IDictionary<FileSystemPath, T4FileDependencyData> IncludeToIncluders { get; }
 
 		public T4IndirectIncludeTransitiveClosureSearcher(
-			[NotNull] OneToSetMap<FileSystemPath, FileSystemPath> directIncludeGraph,
-			[NotNull] OneToSetMap<FileSystemPath, FileSystemPath> reversedIncludeGraph
+			[NotNull] IDictionary<FileSystemPath, T4FileDependencyData> includerToIncludes,
+			[NotNull] IDictionary<FileSystemPath, T4FileDependencyData> includeToIncluders
 		)
 		{
-			DirectIncludeGraph = directIncludeGraph;
-			ReversedIncludeGraph = reversedIncludeGraph;
+			IncluderToIncludes = includerToIncludes;
+			IncludeToIncluders = includeToIncluders;
 		}
 
 		[NotNull, ItemNotNull]
 		public IEnumerable<FileSystemPath> FindClosure([NotNull] FileSystemPath path) =>
-			FindAllIncludees(FindAllIncluders(path));
+			FindAllIncludes(FindAllIncluders(path));
 
 		/// <summary>
 		/// Performs DFS to collect all the files that include the current one,
@@ -33,17 +33,19 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 		private IEnumerable<FileSystemPath> FindAllIncluders([NotNull] FileSystemPath path)
 		{
 			var result = new JetHashSet<FileSystemPath>();
-			FindAllChildren(path, ReversedIncludeGraph, result);
+			FindAllChildren(path, IncludeToIncluders, result);
 			return result;
 		}
 
 		[NotNull, ItemNotNull]
-		private IEnumerable<FileSystemPath> FindAllIncludees([NotNull, ItemNotNull] IEnumerable<FileSystemPath> includers)
+		private IEnumerable<FileSystemPath> FindAllIncludes(
+			[NotNull, ItemNotNull] IEnumerable<FileSystemPath> includers
+		)
 		{
 			var result = new JetHashSet<FileSystemPath>();
 			foreach (var includer in includers)
 			{
-				FindAllChildren(includer, DirectIncludeGraph, result);
+				FindAllChildren(includer, IncluderToIncludes, result);
 			}
 
 			return result;
@@ -51,13 +53,15 @@ namespace GammaJul.ForTea.Core.Psi.Invalidation.Impl
 
 		private static void FindAllChildren(
 			[NotNull] FileSystemPath path,
-			[NotNull] OneToSetMap<FileSystemPath, FileSystemPath> graph,
+			[NotNull] IDictionary<FileSystemPath, T4FileDependencyData> graph,
 			[NotNull, ItemNotNull] ISet<FileSystemPath> destination
 		)
 		{
 			if (destination.Contains(path)) return;
 			destination.Add(path);
-			foreach (var child in graph[path])
+			var data = graph.TryGetValue(path);
+			if (data == null) return;
+			foreach (var child in data.Paths)
 			{
 				FindAllChildren(child, graph, destination);
 			}

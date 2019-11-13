@@ -11,7 +11,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.Services
 		) => manager.GetTemplateKind(file) == T4TemplateKind.Preprocessed;
 
 		public static bool IsRootPreprocessedTemplate(
-			[NotNull] this IT4TemplateKindProvider manager,
+			[NotNull] this IT4RootTemplateKindProvider manager,
 			[NotNull] IProjectFile file
 		) => manager.GetRootTemplateKind(file) == T4TemplateKind.Preprocessed;
 	}

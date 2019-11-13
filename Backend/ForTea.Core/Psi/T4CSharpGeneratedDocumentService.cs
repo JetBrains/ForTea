@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.Psi.Invalidation;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.DocumentModel;
@@ -34,20 +32,16 @@ namespace GammaJul.ForTea.Core.Psi
 
 			var solution = modificationInfo.SourceFile.GetSolution();
 			var generator = new T4CSharpCodeBehindGenerator(t4File, solution);
-			T4CSharpCodeGenerationResult result = generator.GenerateSafe();
+			var result = generator.GenerateSafe();
 
-			LanguageService csharpLanguageService = CSharpLanguage.Instance.LanguageService();
+			var csharpLanguageService = CSharpLanguage.Instance.LanguageService();
 			if (csharpLanguageService == null) return null;
-			var t4FileDependencyManager = solution.GetComponent<T4FileDependencyManager>();
 
-			return new T4SecondaryDocumentGenerationResult(
-				modificationInfo.SourceFile,
+			return new SecondaryDocumentGenerationResult(
 				result.RawText,
 				csharpLanguageService.LanguageType,
 				new RangeTranslatorWithGeneratedRangeMap(result.GeneratedRangeMap),
-				csharpLanguageService.GetPrimaryLexerFactory(),
-				t4FileDependencyManager,
-				t4File.Blocks.OfType<IT4IncludeDirective>()
+				csharpLanguageService.GetPrimaryLexerFactory()
 			);
 		}
 
