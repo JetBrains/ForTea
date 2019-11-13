@@ -7,12 +7,10 @@ using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Parsing
 {
@@ -126,14 +124,14 @@ namespace GammaJul.ForTea.Core.Parsing
 		{
 			var sourceFile = LogicalSourceFile;
 			if (sourceFile == null) return null;
-			var path = directive.GetPathForParsing(sourceFile).ResolvePath();
+			var pathWithMacros = directive.GetPathForParsing(sourceFile);
+			var path = pathWithMacros.ResolvePath();
 			var project = sourceFile.GetProject();
 			if (project == null) return null;
 			var includeFile =
-				T4ParsingContextHelper.ExecuteGuarded(path, directive.Once, () => GetProjectFile(project, path));
-			var includedSourceFile = includeFile?.ToSourceFile();
-			if (includedSourceFile == null) return null;
-			return BuildIncludedT4Tree(includedSourceFile);
+				T4ParsingContextHelper.ExecuteGuarded(path, directive.Once, () => pathWithMacros.Resolve());
+			if (includeFile == null) return null;
+			return BuildIncludedT4Tree(includeFile);
 		}
 
 		[NotNull]
@@ -146,11 +144,6 @@ namespace GammaJul.ForTea.Core.Parsing
 			return IncludedFile.FromOtherNode(new T4Parser(lexer, target, PhysicalSourceFile)
 				.ParseFileWithoutCleanup());
 		}
-
-		[CanBeNull]
-		private static IProjectFile GetProjectFile([NotNull] IProject project, [NotNull] FileSystemPath path) =>
-			// If there are many, let's pick random because why not. They are going to have equal contents anyway
-			project.GetSolution().FindProjectItemsByLocation(path).OfType<IProjectFile>().FirstOrDefault();
 
 		[Obsolete("This method should never be called", true)]
 		public override TreeElement ParseIncludedFile() => throw new InvalidOperationException();

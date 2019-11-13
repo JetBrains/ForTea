@@ -38,6 +38,6 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 			return new T4PathWithMacros(includeFileName, sourceFile);
 		}
 
-		public IT4IncludedFile IncludedFile => lastChild as IT4IncludedFile;
+		public IT4IncludedFile IncludedFile => NextSibling as IT4IncludedFile;
 	}
 }
