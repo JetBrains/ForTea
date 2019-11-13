@@ -4,8 +4,8 @@
     [switch]$Verbose
 )
 
-$backendPath = "..\Backend"
-$frontendPath = "..\Frontend"
+$backendPath = "${PSScriptRoot}\..\Backend"
+$frontendPath = "${PSScriptRoot}\..\Frontend"
 
 $gradleArgs = @()
 If ($Verbose -eq $true) { Write-Host "Will build rider plugin" }
