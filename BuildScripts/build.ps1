@@ -3,15 +3,11 @@
     [switch]$run,
     [switch]$Verbose
 )
-
 if (Test-Path Env:DOTNET_SDK_DIRECTORY) 
 {
-    $doNetPath = (Get-ChildItem Env:DOTNET_SDK_DIRECTORY) + "\dotnet.exe"
+    Set-Item -Path Env:PATH -Value "$($Env:DOTNET_SDK_DIRECTORY);$($Env:PATH)"
 }
-else 
-{
-    $dotNetPath = "dotnet"
-}
+Write-Host "PATH=$Env:PATH"
 $baseDir = "${PSScriptRoot}\..\"
 $backendPath = "${baseDir}\Backend"
 $frontendPath = "${baseDir}\Frontend"
@@ -60,11 +56,11 @@ Write-Host "Building T4 backend"
 Push-Location -Path $backendPath
 Try {
     If ($Verbose -eq $true) {
-        & "${doNetPath}dotnet" msbuild -m ForTea.Backend.sln
+        dotnet" msbuild -m ForTea.Backend.sln
         $code = $LastExitCode
     }
     Else {
-        & "${doNetPath}dotnet" msbuild -m ForTea.Backend.sln > $null
+        dotnet" msbuild -m ForTea.Backend.sln > $null
         $code = $LastExitCode
     }
     If ($code -ne 0) { throw "Could not compile backend. MsBuild exit code: $code." }    
