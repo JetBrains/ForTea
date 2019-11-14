@@ -7,7 +7,6 @@ if (Test-Path Env:DOTNET_SDK_DIRECTORY)
 {
     Set-Item -Path Env:PATH -Value "$($Env:DOTNET_SDK_DIRECTORY);$($Env:PATH)"
 }
-Write-Host "PATH=$Env:PATH"
 $baseDir = "${PSScriptRoot}\..\"
 $backendPath = "${baseDir}\Backend"
 $frontendPath = "${baseDir}\Frontend"
