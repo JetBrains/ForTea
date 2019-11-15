@@ -33,7 +33,7 @@ Features
 
 License
 ----
-Licensed under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+Licensed under [Apache License 2.0](LICENSE)
 This plugin is a successor of [the original plugin by MrJul](https://github.com/MrJul/ForTea), whom we are very thankful.
 
 Building plugin
