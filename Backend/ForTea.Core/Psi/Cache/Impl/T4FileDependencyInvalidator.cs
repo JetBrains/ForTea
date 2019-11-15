@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 
@@ -43,10 +44,14 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				CommitStage = T4CommitStage.DependencyInvalidation;
 				try
 				{
-					foreach (var file in IndirectDependencies)
+					using (WriteLockCookie.Create())
 					{
-						services.Files.MarkAsDirty(file);
-						services.Caches.MarkAsDirty(file);
+						// Filter just in case a miracle happens and the file gets deleted before being marked as dirty
+						foreach (var file in IndirectDependencies.Where(file => file.IsValid()))
+						{
+							services.Files.MarkAsDirty(file);
+							services.Caches.MarkAsDirty(file);
+						}
 					}
 
 					IndirectDependencies.Clear();
