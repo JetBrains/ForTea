@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.Psi.Invalidation;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
@@ -154,7 +153,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			FileSystemPath location = projectFile.Location;
 			if (fileManager.HasSourceFile(location)) {
 				fileManager.DeleteSourceFile(location);
-				InvalidateFilesHavingInclude(location, solution.GetPsiServices());
 			}
 		}
 
@@ -162,34 +160,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_modules.Remove(projectFile);
 			changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Removed);
 			changeBuilder.AddModuleChange(moduleWrapper.Module, PsiModuleChange.ChangeType.Removed);
-			InvalidateFilesHavingInclude(projectFile.Location, moduleWrapper.Module.GetPsiServices());
 			moduleWrapper.LifetimeDefinition.Terminate();
 		}
 
 		private static void ModifyFile([NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)
 			=> changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Modified);
 
-		private void InvalidateFilesHavingInclude(
-			[NotNull] FileSystemPath includeLocation,
-			[NotNull] IPsiServices psiServices
-		)
-		{
-			psiServices
-				.GetComponent<T4FileDependencyManager>()
-				.UpdateIncludes(includeLocation, EmptyList<FileSystemPath>.InstanceList);
-			/* TODO: mark as dirty
-			foreach (var sourceFile in _modules.Values.Select(moduleWrapper => moduleWrapper.Module.SourceFile))
-			{
-				if (!(sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File)) continue;
-				bool hasUpdatedDependency = t4File.Blocks
-					.OfType<IT4IncludeDirective>()
-					.Select(include => include.Path.ResolvePath())
-					.Where(path => !path.IsEmpty)
-					.Any(path => path == includeLocation);
-				if (hasUpdatedDependency) psiServices.MarkAsDirty(sourceFile);
-			}*/
-		}
-		
 		public void Dispose() {
 			using (WriteLockCookie.Create()) {
 				foreach (var wrapper in _modules.Values)
