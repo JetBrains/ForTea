@@ -38,7 +38,7 @@ This plugin is a successor of [the original plugin by MrJul](https://github.com/
 
 Building plugin
 ----
-Build instruction can be found at BUILD.md
+Build instruction can be found [here](BUILD.md).  
 
 Things to know about ReSharper plugin
 ----
