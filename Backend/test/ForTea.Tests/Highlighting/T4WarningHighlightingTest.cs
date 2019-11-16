@@ -1,4 +1,3 @@
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.TestFramework;
@@ -19,6 +18,7 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("UnresolvedInclude")]
 		[TestCase("UnresolvedAssembly")]
 		[TestCase("EmptyDirective")]
+		[TestCase("UnsupportedLanguage")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.WARNING;

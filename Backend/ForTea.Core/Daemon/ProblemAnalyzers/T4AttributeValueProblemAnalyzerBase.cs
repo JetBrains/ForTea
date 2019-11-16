@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;

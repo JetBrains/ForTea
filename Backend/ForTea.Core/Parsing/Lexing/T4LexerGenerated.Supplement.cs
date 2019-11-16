@@ -38,7 +38,7 @@ namespace GammaJul.ForTea.Core.Parsing.Lexing
 		private T4TokenNodeType FindDirectiveByCurrentToken() =>
 			Directives.GetValueSafe(ReusableBufferRange, yy_buffer, yy_buffer_start, yy_buffer_end);
 
-		private static NodeTypeSet DirectiveTypes { get; } = new NodeTypeSet(
+		public static NodeTypeSet DirectiveTypes { get; } = new NodeTypeSet(
 			T4TokenNodeTypes.TEMPLATE,
 			T4TokenNodeTypes.PARAMETER,
 			T4TokenNodeTypes.OUTPUT,

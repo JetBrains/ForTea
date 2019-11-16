@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.Application;
@@ -15,12 +14,14 @@ namespace JetBrains.ForTea.ReSharperPlugin
 	[ShellComponent]
 	public sealed class T4MacroResolver : T4MacroResolverBase
 	{
-		public T4MacroResolver(IT4AssemblyNamePreprocessor preprocessor) : base(preprocessor)
-		{
-		}
+		[NotNull]
+		private static Dictionary<string, string> ourEmptyDictionary { get; } = new Dictionary<string, string>();
 
-		public override IReadOnlyDictionary<string, string> Resolve(
-			IEnumerable<string> macros,
+		protected override Dictionary<string, string> ResolveAllLightMacrosInternal(IProjectFile file) =>
+			ourEmptyDictionary;
+
+		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(
+			IList<string> macros,
 			IProjectFile file
 		)
 		{

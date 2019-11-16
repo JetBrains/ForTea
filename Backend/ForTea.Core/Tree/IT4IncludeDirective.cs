@@ -9,5 +9,8 @@ namespace GammaJul.ForTea.Core.Tree
 
 		[NotNull]
 		IT4PathWithMacros Path { get; }
+
+		[CanBeNull]
+		IT4IncludedFile IncludedFile { get; }
 	}
 }

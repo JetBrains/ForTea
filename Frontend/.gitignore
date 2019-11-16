@@ -3,3 +3,9 @@ classes
 .idea
 .gradle
 *.iml
+src/main/java/com/jetbrains/fortea/*
+!src/main/java/com/jetbrains/fortea/parser
+!src/main/java/com/jetbrains/fortea/psi
+#**/java/*
+#!**/java/
+#!**/java/com/jetbrains/fortea/parser

@@ -23,7 +23,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 	[QuickFix]
 	public class CreateTransformTextMethodQuickFix : QuickFixBase {
 
-		[NotNull] private readonly MissingTransformTextMethodHighlighting _highlighting;
+		[NotNull] private readonly MissingTransformTextMethodError _highlighting;
 
 		public override bool IsAvailable(IUserDataHolder cache)
 			=> GetTargetTypeDeclaration(_highlighting.BaseClass) != null;
@@ -84,7 +84,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 			return target;
 		}
 
-		public CreateTransformTextMethodQuickFix([NotNull] MissingTransformTextMethodHighlighting highlighting) {
+		public CreateTransformTextMethodQuickFix([NotNull] MissingTransformTextMethodError highlighting) {
 			_highlighting = highlighting;
 		}
 

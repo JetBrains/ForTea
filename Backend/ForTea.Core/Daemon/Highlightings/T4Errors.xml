@@ -1,0 +1,83 @@
+<Errors language="C#" implementationLanguage="T4">
+    <Usings>
+        JetBrains.ReSharper.Psi;
+        JetBrains.ReSharper.Psi.CSharp.Tree;
+        GammaJul.ForTea.Core.Daemon.Highlightings;
+        GammaJul.ForTea.Core.Tree;
+    </Usings>
+    <StaticSeverityGroups>
+        <Group name="T4 Compiler Errors" key="T4Errors"/>
+    </StaticSeverityGroups>
+    <Error name="TextAfterFeature" staticGroup="T4Errors">
+        <Parameter type="ITreeNode" name="text"/>
+        <Message value="Text cannot be placed after last feature block"/>
+        <Range>Text.GetHighlightingRange()</Range>
+        <Behavour overlapResolvePolicy="ERROR"/>
+    </Error>
+    <Error name="EmptyExpressionBlock" staticGroup="T4Errors">
+        <Parameter type="IT4ExpressionBlock" name="block"/>
+        <Message value="Expression block cannot be empty"/>
+        <Range>Block.GetHighlightingRange()</Range>
+        <Behavour overlapResolvePolicy="UNRESOLVED_ERROR"/>
+        <!-- higher priority is used to hide undesired message from R# -->
+    </Error>
+    <Error name="RecursiveInclude" staticGroup="T4Errors">
+        <Parameter type="IT4AttributeValue" name="value"/>
+        <Message value="Cycle in includes"/>
+        <Range>Value.GetNavigationRange()</Range>
+        <Behavour overlapResolvePolicy="ERROR"/>
+    </Error>
+    <Error name="StatementAfterFeature" staticGroup="T4Errors">
+        <Parameter type="IT4StatementBlock" name="block"/>
+        <Message value="Statement block cannot be placed after feature block"/>
+        <Range>Block.GetNavigationRange()</Range>
+        <Behavour overlapResolvePolicy="ERROR"/>
+    </Error>
+    <Error name="UnresolvedMacro" staticGroup="T4Errors">
+        <Parameter type="IT4Macro" name="macro"/>
+        <Message value="Unresolved macro"/>
+        <Range>Macro.RawAttributeValue?.GetHighlightingRange() ?? DocumentRange.InvalidRange</Range>
+        <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="UNRESOLVED_ERROR"/>
+    </Error>
+    <Error name="UnresolvedEnvironmentVariable" staticGroup="T4Errors">
+        <Parameter type="IT4EnvironmentVariable" name="Variable"/>
+        <Message value="Unresolved environment variable"/>
+        <Range>Variable.RawAttributeValue?.GetHighlightingRange() ?? DocumentRange.InvalidRange</Range>
+        <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="UNRESOLVED_ERROR"/>
+    </Error>
+    <Error name="IllegalCharacter" staticGroup="T4Errors">
+        <Parameter type="IT4AttributeValue" name="value"/>
+        <Parameter type="DocumentRange" name="range"/>
+        <Message value="Illegal character"/>
+        <Range>Range</Range>
+        <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="UNRESOLVED_ERROR"/>
+    </Error>
+    <Error name="InvalidAttributeValue" staticGroup="T4Errors">
+        <Parameter type="IT4AttributeValue" name="value"/>
+        <Message value="Unexpected value"/>
+        <Range>Value.GetHighlightingRange()</Range>
+        <Behavour overlapResolvePolicy="ERROR"/>
+    </Error>
+    <Error name="MissingRequiredAttribute" staticGroup="T4Errors">
+        <Parameter type="ITokenNode" name="node"/>
+        <Parameter type="string" name="missingAttributeName"/>
+        <Message value="\&quot;{0}\&quot;">
+            <Argument>MissingAttributeName</Argument>
+        </Message>
+        <Range>Node.GetHighlightingRange()</Range>
+        <Behavour overlapResolvePolicy="ERROR"/>
+    </Error>
+    <Error name="MissingTransformTextMethod" staticGroup="T4Errors">
+        <Parameter type="ITypeUsage" name="baseClassNode"/>
+        <Parameter type="ITypeElement" name="baseClass"/>
+        <Message value="Base class doesn't have a suitable TransformText method"/>
+        <Range>BaseClassNode.GetNavigationRange()</Range>
+        <Behavour overlapResolvePolicy="ERROR"/>
+    </Error>
+    <Error name="UnsupportedMacro" staticGroup="T4Errors">
+        <Parameter type="IT4Macro" name="macro"/>
+        <Message value="This macro is not supported yet"/>
+        <Range>Macro.GetHighlightingRange()</Range>
+        <Behavour overlapResolvePolicy="ERROR"/>
+    </Error>
+</Errors>

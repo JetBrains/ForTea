@@ -1,33 +1,27 @@
-using FluentAssertions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public class T4CodeDescription : T4AppendableElementDescriptionBase
+	public sealed class T4CodeDescription : IT4AppendableElementDescription
 	{
 		[NotNull]
 		private IT4Code Source { get; }
 
-		public T4CodeDescription([NotNull] IT4Code source) : base(source.GetContainingFile().As<IT4File>().NotNull()) =>
-			Source = source;
+		public T4CodeDescription([NotNull] IT4Code source) => Source = source;
 
-		public override void AppendContent(
+		public void AppendContent(
 			T4CSharpCodeGenerationResult destination,
-			IT4ElementAppendFormatProvider provider,
-			IT4File context
+			IT4ElementAppendFormatProvider provider
 		)
 		{
 			destination.Append(provider.Indent);
-			destination.AppendLine(GetLineDirectiveText(Source));
-			provider.AppendCompilationOffset(destination, GetOffset(Source));
+			provider.AppendLineDirective(destination, Source);
+			provider.AppendCompilationOffset(destination, Source);
 			destination.Append(provider.CodeCommentStart);
-			if (HasSameSource(context)) destination.AppendMapped(Source);
-			else destination.Append(Source.GetText());
+			destination.AppendMapped(Source);
 			destination.AppendLine(provider.CodeCommentEnd);
 			destination.AppendLine(provider.Indent);
 			destination.Append(provider.Indent);

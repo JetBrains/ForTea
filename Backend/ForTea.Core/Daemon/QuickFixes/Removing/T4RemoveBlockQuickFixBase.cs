@@ -1,10 +1,10 @@
 using System;
-using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -16,18 +16,20 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes.Removing
 {
 	public abstract class T4RemoveBlockQuickFixBase<TNode, THighlighting> : QuickFixBase
 		where TNode : IT4Block
-		where THighlighting : T4HighlightingBase<TNode>
+		where THighlighting : IHighlighting
 	{
 		public override string Text => "Remove";
 
 		[NotNull]
 		protected THighlighting Highlighting { get; }
 
-		protected virtual TNode Node => Highlighting.AssociatedNode;
+		[NotNull]
+		protected abstract TNode Node { get; }
 
 		protected T4RemoveBlockQuickFixBase([NotNull] THighlighting highlighting) => Highlighting = highlighting;
 
-		protected sealed override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+		protected sealed override Action<ITextControl> ExecutePsiTransaction(ISolution solution,
+			IProgressIndicator progress)
 		{
 			using (WriteLockCookie.Create(Node.IsPhysical()))
 			{

@@ -6,13 +6,14 @@ IT4File
     TEMPLATE: template
     WHITE_SPACE:  
     IT4DirectiveAttribute
-      TOKEN: language
+      IT4AttributeName
+        TOKEN: language
       EQUAL: =
       QUOTE: "
       IT4AttributeValue
         RAW_ATTRIBUTE_VALUE: C#
       QUOTE: "
-    ErrorElement:Unexpected token
+    ErrorElement:#> expected
   WHITE_SPACE: \n
   IT4ExpressionBlock
     EXPRESSION_BLOCK_START: <#=

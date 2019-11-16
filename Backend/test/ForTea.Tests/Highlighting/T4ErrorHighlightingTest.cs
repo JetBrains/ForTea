@@ -1,4 +1,3 @@
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.TestFramework;
@@ -19,9 +18,12 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("MissingToken", Ignore = "Error recovery not implemented")]
 		[TestCase("StatementAfterFeature")]
 		[TestCase("EmptyExpressionBlock")]
-		[TestCase("RecursiveInclude")]
+		[TestCase("RecursiveInclude", Ignore = "Not implemented")]
 		[TestCase("UnknownEncoding")]
-		[TestCase("UnsupportedLanguage")]
+		[TestCase("PossibleLanguages")]
+		[TestCase("IllegalCharacter")]
+		[TestCase("UnresolvedMacro")]
+		[TestCase("UnresolvedEnvironmentVariable")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.ERROR;

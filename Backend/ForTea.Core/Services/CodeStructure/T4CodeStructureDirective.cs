@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.UI.Controls.TreeView;
@@ -19,7 +20,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 		[NotNull]
 		private string GetDirectiveText() {
 			IT4Directive directive = GetTreeNode();
-			string name = directive?.Name.GetText();
+			string name = directive?.Name?.GetText();
 			if (name == null)
 				return "???";
 
@@ -29,9 +30,9 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 			// display the directive with the attributes that are marked with DisplayInCodeStructure
 			var builder = new StringBuilder(name);
-			foreach (IT4DirectiveAttribute attribute in directive?.Attributes) {
+			foreach (IT4DirectiveAttribute attribute in directive.AttributesEnumerable) {
 				DirectiveAttributeInfo attributeInfo = directiveInfo.GetAttributeByName(attribute.Name.GetText());
-				if (attributeInfo == null || !attributeInfo.IsDisplayedInCodeStructure)
+				if (attributeInfo?.IsDisplayedInCodeStructure != true)
 					continue;
 
 				builder.Append(' ');

@@ -1,0 +1,6 @@
+<#@ tEmPlAtE lAnGuAgE="C#" hOsTsPeCiFiC="tRuE" #>
+<#@ iMpOrT nAmEsPaCe="System.Text" #>
+<#
+    ITextTemplatingEngineHost host = Host;
+#>
+CONTENT

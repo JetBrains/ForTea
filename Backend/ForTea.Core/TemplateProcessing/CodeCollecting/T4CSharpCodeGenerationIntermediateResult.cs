@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.PsiGen.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
@@ -14,15 +13,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 	{
 		[NotNull]
 		public T4CSharpCodeGenerationResult CollectedBaseClass { get; }
-		
+
 		[CanBeNull]
 		public string Encoding { get; set; }
 
 		[NotNull, ItemNotNull]
-		private List<T4AppendableElementDescriptionBase> MyTransformationDescriptions { get; }
+		private List<IT4AppendableElementDescription> MyTransformationDescriptions { get; }
 
 		[NotNull, ItemNotNull]
-		private List<T4AppendableElementDescriptionBase> MyFeatureDescriptions { get; }
+		private List<IT4AppendableElementDescription> MyFeatureDescriptions { get; }
 
 		[NotNull, ItemNotNull]
 		private List<T4ParameterDescription> MyParameterDescriptions { get; }
@@ -37,10 +36,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public IReadOnlyList<T4ImportDescription> ImportDescriptions => MyImportDescriptions;
 
 		[NotNull, ItemNotNull]
-		public IReadOnlyList<T4AppendableElementDescriptionBase> FeatureDescriptions => MyFeatureDescriptions;
+		public IReadOnlyList<IT4AppendableElementDescription> FeatureDescriptions => MyFeatureDescriptions;
 
 		[NotNull, ItemNotNull]
-		public IReadOnlyList<T4AppendableElementDescriptionBase> TransformationDescriptions =>
+		public IReadOnlyList<IT4AppendableElementDescription> TransformationDescriptions =>
 			MyTransformationDescriptions;
 
 		public IT4InfoCollectorState State { get; private set; }
@@ -56,8 +55,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		)
 		{
 			CollectedBaseClass = new T4CSharpCodeGenerationResult(file);
-			MyTransformationDescriptions = new List<T4AppendableElementDescriptionBase>();
-			MyFeatureDescriptions = new List<T4AppendableElementDescriptionBase>();
+			MyTransformationDescriptions = new List<IT4AppendableElementDescription>();
+			MyFeatureDescriptions = new List<IT4AppendableElementDescription>();
 			MyParameterDescriptions = new List<T4ParameterDescription>();
 			MyImportDescriptions = new List<T4ImportDescription>();
 			State = new T4InfoCollectorStateInitial(interrupter);
@@ -67,13 +66,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public void Append([NotNull] T4ParameterDescription description) => MyParameterDescriptions.Add(description);
 		public void Append([NotNull] T4ImportDescription description) => MyImportDescriptions.Add(description);
 
-		public void AppendFeature([NotNull] T4AppendableElementDescriptionBase description) =>
+		public void AppendFeature([NotNull] IT4AppendableElementDescription description) =>
 			MyFeatureDescriptions.Add(description);
 
 		public void AppendFeature([NotNull] string message) =>
 			MyFeatureDescriptions.Add(new T4TextDescription(message));
 
-		public void AppendTransformation([NotNull] T4AppendableElementDescriptionBase description) =>
+		public void AppendTransformation([NotNull] IT4AppendableElementDescription description) =>
 			MyTransformationDescriptions.Add(description);
 
 		public void AppendTransformation([NotNull] string message) =>
@@ -81,12 +80,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public void Append([NotNull] T4CSharpCodeGenerationIntermediateResult other)
 		{
-			MyImportDescriptions.addAll(other.ImportDescriptions);
+			MyImportDescriptions.AddRange(other.ImportDescriptions);
 			Encoding = Encoding ?? other.Encoding;
 			if (CollectedBaseClass.IsEmpty) CollectedBaseClass.Append(other.CollectedBaseClass);
-			MyTransformationDescriptions.addAll(other.TransformationDescriptions);
-			MyFeatureDescriptions.addAll(other.FeatureDescriptions);
-			MyParameterDescriptions.addAll(other.ParameterDescriptions);
+			MyTransformationDescriptions.AddRange(other.TransformationDescriptions);
+			MyFeatureDescriptions.AddRange(other.FeatureDescriptions);
+			MyParameterDescriptions.AddRange(other.ParameterDescriptions);
 			// 'feature started' is intentionally ignored
 			HasHost = HasHost || other.HasHost;
 		}

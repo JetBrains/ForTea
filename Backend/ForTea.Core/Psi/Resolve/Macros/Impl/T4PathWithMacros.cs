@@ -2,15 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GammaJul.ForTea.Core.Parsing;
-using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.Psi.Modules;
-using GammaJul.ForTea.Core.Tree;
+using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
@@ -21,6 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private static Regex MacroRegex { get; } =
 			new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
+		[NotNull]
 		private string RawPath { get; }
 
 		[NotNull]
@@ -35,38 +31,35 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		[NotNull]
 		private ISolution Solution { get; }
 
-		[CanBeNull]
-		private IT4FilePsiModule Module => SourceFile.PsiModule as IT4FilePsiModule;
+		[NotNull]
+		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4PathWithMacros>();
 
-		public T4PathWithMacros([NotNull] string rawPath, [NotNull] IPsiSourceFile file)
+		[NotNull]
+		private T4OutsideSolutionSourceFileManager OutsideSolutionManager { get; }
+
+		public T4PathWithMacros([CanBeNull] string rawPath, [NotNull] IPsiSourceFile file)
 		{
-			RawPath = rawPath;
+			RawPath = rawPath ?? "";
 			SourceFile = file;
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
+			OutsideSolutionManager = Solution.GetComponent<T4OutsideSolutionSourceFileManager>();
 		}
 
-		public IT4File ResolveT4File(T4IncludeGuard guard)
+		public IPsiSourceFile Resolve()
 		{
-			if (!ResolvePath().ExistsFile) return null;
-			var target = Resolve();
-			if (target == null) return null;
-			if (!guard.CanProcess(target)) return null;
-			if (target.LanguageType.Is<T4ProjectFileType>())
-				return (IT4File) target.GetPrimaryPsiFile();
-			return BuildT4Tree(target);
+			var path = ResolvePath();
+			if (path.IsEmpty) return null;
+			var solutionSourceFile = Solution
+				.FindProjectItemsByLocation(path)
+				.OfType<IProjectFile>()
+				.SingleItem()?.ToSourceFile();
+			var file = solutionSourceFile;
+			if (file != null) return file;
+			if (path.ExistsFile) return OutsideSolutionManager.GetOrCreateSourceFile(path);
+			return null;
 		}
-
-		private IT4File BuildT4Tree(IPsiSourceFile target)
-		{
-			var languageService = T4Language.Instance.LanguageService();
-			Assertion.AssertNotNull(languageService, "languageService != null");
-			var lexer = (T4Lexer) languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
-			return new T4Parser(lexer).Parse();
-		}
-
-		public IPsiSourceFile Resolve() => ResolvePath().FindSourceFileInSolution(Solution);
 
 		public FileSystemPath ResolvePath()
 		{
@@ -90,11 +83,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		public string ResolveString()
 		{
-			var module = Module;
-			if (string.IsNullOrEmpty(RawPath) || module == null || !ContainsMacros) return RawPath;
-
-			var macroValues = Resolver.Resolve(RawMacros, SourceFile.ToProjectFile().NotNull());
-
+			if (string.IsNullOrEmpty(RawPath) || !ContainsMacros) return RawPath;
+			var projectFile = SourceFile.ToProjectFile() ?? T4MacroResolveContextCookie.ProjectFile;
+			if (projectFile == null)
+			{
+				Logger.Warn("Could not find any project file for macro resolution");
+				return RawPath;
+			}
+			var macroValues = Resolver.ResolveHeavyMacros(RawMacros, projectFile);
 			string result = System.Environment.ExpandEnvironmentVariables(RawPath);
 			return MacroRegex.Replace(result, match =>
 			{
@@ -133,10 +129,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		{
 			unchecked
 			{
-				return ((RawPath != null ? RawPath.GetHashCode() : 0) * 397) ^ SourceFile.GetHashCode();
+				return (RawPath.GetHashCode() * 397) ^ SourceFile.GetHashCode();
 			}
 		}
-
-		public bool IsEmpty => RawPath.IsEmpty();
 	}
 }

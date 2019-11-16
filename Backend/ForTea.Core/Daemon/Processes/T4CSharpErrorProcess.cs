@@ -2,32 +2,32 @@ using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Daemon.CSharp.Stages;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.Processes {
 	
-	public class T4CSharpErrorProcess : CSharpIncrementalDaemonStageProcessBase {
+	public sealed class T4CSharpErrorProcess : CSharpIncrementalDaemonStageProcessBase {
 
 		public override void VisitClassDeclaration(IClassDeclaration classDeclarationParam, IHighlightingConsumer context) {
 			base.VisitClassDeclaration(classDeclarationParam, context);
 
 			if (!classDeclarationParam.IsSynthetic()) return;
-			if (!T4CSharpCodeBehindIntermediateConverter.GeneratedClassNameString.Equals(
+			if (!T4CSharpIntermediateConverterBase.GeneratedClassNameString.Equals(
 				classDeclarationParam.DeclaredName, StringComparison.Ordinal))
 				return;
 
 			ITypeUsage baseClassNode = classDeclarationParam.SuperTypeUsageNodes.FirstOrDefault();
-			if (baseClassNode == null) return;
+			if (baseClassNode?.IsVisibleInDocument() != true) return;
 
-			if (T4CSharpCodeBehindIntermediateConverter.GeneratedBaseClassNameString.Equals(
+			if (T4CSharpIntermediateConverterBase.GeneratedBaseClassNameString.Equals(
 				baseClassNode.GetText(),
 				StringComparison.Ordinal)) return;
 
@@ -35,7 +35,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 			if (baseClass == null) return;
 
 			if (HasTransformTextMethod(baseClass)) return;
-			context.AddHighlighting(new MissingTransformTextMethodHighlighting(baseClassNode, baseClass));
+			context.AddHighlighting(new MissingTransformTextMethodError(baseClassNode, baseClass));
 		}
 
 		private static bool HasTransformTextMethod([NotNull] ITypeElement typeElement)

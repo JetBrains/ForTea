@@ -1,23 +1,20 @@
-using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public abstract class T4CSharpIntermediateConverterBase : IT4ElementAppendFormatProvider
 	{
-		[NotNull] public const string GeneratedClassNameString = "TextTransformation";
-		[NotNull] public const string GeneratedBaseClassNameString = GeneratedClassNameString + "Base";
+		[NotNull] public const string GeneratedClassNameString = "GeneratedTextTransformation";
+		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
+
+		[NotNull] private const string ToStringInstanceHelperResource =
+			"GammaJul.ForTea.Core.Resources.ToStringInstanceHelper.cs";
 
 		[NotNull]
 		protected T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
@@ -43,7 +40,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendGeneratedMessage();
 			string ns = GetNamespace();
-			bool hasNamespace = !String.IsNullOrEmpty(ns);
+			AppendNamespacePrefix();
+			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
 			{
 				Result.AppendLine($"namespace {ns}");
@@ -61,13 +59,17 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			return Result;
 		}
 
+		protected virtual void AppendNamespacePrefix()
+		{
+		}
+
 		private void AppendNamespaceContents()
 		{
 			AppendImports();
-			AppendClasses(IntermediateResult.HasHost);
+			AppendClasses();
 		}
 
-		protected virtual void AppendClasses(bool hostspecific)
+		protected virtual void AppendClasses()
 		{
 			AppendClass();
 			AppendIndent();
@@ -76,35 +78,34 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		[CanBeNull]
-		private string GetNamespace()
-		{
-			var sourceFile = File.GetSourceFile();
-			var projectFile = sourceFile?.ToProjectFile();
+		protected string GetNamespace() => File.GetSourceFile()?.Properties.GetDefaultNamespace();
 
-			string ns = projectFile.GetCustomToolNamespace();
-			string ns2 = sourceFile?.Properties.GetDefaultNamespace();
-			if (ns == null) return ns2;
-			if (ns2 == null) return ns;
-			return ns.IsEmpty() ? ns2 : ns;
-		}
-
-		protected virtual void AppendImports()
+		private void AppendImports()
 		{
-			foreach (var description in IntermediateResult.ImportDescriptions)
+			if (ShouldAppendPragmaDirectives)
 			{
 				AppendIndent();
-				Result.Append("using ");
-				if (description.HasSameSource(File))
-					Result.AppendMapped(description.Presentation, description.Source.GetTreeTextRange());
-				else Result.Append(description.Presentation);
-				Result.AppendLine(";");
+				Result.AppendLine("#pragma warning disable 8019");
 			}
 
 			AppendIndent();
 			Result.AppendLine("using System;");
-			if (!IntermediateResult.HasHost) return;
-			AppendIndent();
-			Result.AppendLine("using System.CodeDom.Compiler;");
+			if (IntermediateResult.HasHost)
+			{
+				AppendIndent();
+				Result.AppendLine("using System.CodeDom.Compiler;");
+			}
+
+			if (ShouldAppendPragmaDirectives)
+			{
+				AppendIndent();
+				Result.AppendLine("#pragma warning restore 8019");
+			}
+
+			foreach (var description in IntermediateResult.ImportDescriptions)
+			{
+				description.AppendContent(Result, this);
+			}
 		}
 
 		protected virtual void AppendClass()
@@ -121,7 +122,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendTransformMethod();
 			foreach (var description in IntermediateResult.FeatureDescriptions)
 			{
-				description.AppendContent(Result, this, File);
+				description.AppendContent(Result, this);
 			}
 
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
@@ -182,10 +183,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			PushIndent();
 			AppendIndent();
 			Result.AppendLine();
-			AppendTransformationPrefix();
 			foreach (var description in IntermediateResult.TransformationDescriptions)
 			{
-				description.AppendContent(Result, this, File);
+				description.AppendContent(Result, this);
 			}
 
 			AppendIndent();
@@ -203,8 +203,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected void AppendBaseClass()
 		{
-			if (IntermediateResult.HasBaseClass) return;
-			var provider = new T4TemplateResourceProvider(ResourceName, this);
+			string resource = !IntermediateResult.HasBaseClass ? BaseClassResourceName : ToStringInstanceHelperResource;
+			var provider = new T4TemplateResourceProvider(resource);
 			Result.Append(provider.ProcessResource(GeneratedBaseClassName));
 		}
 
@@ -212,7 +212,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
 
 		[NotNull]
-		protected abstract string ResourceName { get; }
+		protected abstract string BaseClassResourceName { get; }
 
 		[NotNull]
 		protected virtual string GeneratedClassName => GeneratedClassNameString;
@@ -225,13 +225,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
 
-		protected virtual void AppendTransformationPrefix()
-		{
-		}
-
 		protected virtual void AppendGeneratedMessage()
 		{
 		}
+
+		protected virtual bool ShouldAppendPragmaDirectives => false;
 
 		#region Indentation
 		protected int CurrentIndent { get; private set; }
@@ -242,15 +240,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		#endregion Indentation
 
 		#region IT4ElementAppendFormatProvider
-		public abstract string ToStringConversionPrefix { get; }
-		public abstract string ToStringConversionSuffix { get; }
-		public abstract string ExpressionWritingPrefix { get; }
-		public abstract string ExpressionWritingSuffix { get; }
+		[NotNull]
+		public virtual string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
+
+		[NotNull]
+		public string ToStringConversionSuffix => ")";
+
+		[NotNull]
+		public string ExpressionWritingPrefix => "this.Write(";
+
+		[NotNull]
+		public string ExpressionWritingSuffix => ");";
+
 		public abstract string CodeCommentStart { get; }
 		public abstract string CodeCommentEnd { get; }
+		public abstract string ExpressionCommentStart { get; }
+		public abstract string ExpressionCommentEnd { get; }
 		public abstract string Indent { get; }
 		public abstract bool ShouldBreakExpressionWithLineDirective { get; }
-		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, Int32<DocColumn> offset);
+		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
+		public abstract void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
 		public abstract void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code);
 		#endregion IT4ElementAppendFormatProvider
 	}

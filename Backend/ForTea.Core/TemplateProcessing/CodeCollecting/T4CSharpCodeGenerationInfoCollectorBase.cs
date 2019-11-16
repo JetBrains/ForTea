@@ -1,25 +1,23 @@
 using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Resolve;
+using GammaJul.ForTea.Core.Psi.Utils;
+using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
-	// TODO: use generated visitor
-	public abstract class T4CSharpCodeGenerationInfoCollectorBase : IRecursiveElementProcessor
+	public abstract class T4CSharpCodeGenerationInfoCollectorBase : TreeNodeVisitor, IRecursiveElementProcessor
 	{
 		#region Properties
-
 		[NotNull]
 		private IT4File File { get; }
 
@@ -27,7 +25,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4EncodingsManager EncodingsManager { get; }
 
 		[NotNull]
-		private T4IncludeGuard Guard { get; }
+		private IT4IncludeGuard<IPsiSourceFile> Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
@@ -36,7 +34,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		[NotNull]
 		protected T4CSharpCodeGenerationIntermediateResult Result => Results.Peek();
-
 		#endregion Properties
 
 		protected T4CSharpCodeGenerationInfoCollectorBase(
@@ -46,28 +43,33 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Guard = new T4IncludeGuard();
+			Guard = new T4ContextTrackingIncludeGuard();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
 		[NotNull]
 		public T4CSharpCodeGenerationIntermediateResult Collect()
 		{
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			Guard.StartProcessing(File.GetSourceFile().NotNull());
-			File.ProcessDescendants(this);
-			string suffix = Result.State.ProduceBeforeEof();
-			if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
-			Guard.EndProcessing();
-			return Results.Pop();
+			var projectFile = File.GetSourceFile()?.ToProjectFile();
+			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(File, Interrupter);
+			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
+			{
+				Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+				Guard.StartProcessing(File.LogicalPsiSourceFile);
+				File.ProcessDescendants(this);
+				string suffix = Result.State.ProduceBeforeEof();
+				if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
+				Guard.EndProcessing();
+				return Results.Pop();
+			}
 		}
 
-		#region Interface Members
-
+		#region IRecirsiveElementProcessor
 		public bool InteriorShouldBeProcessed(ITreeNode element) => false;
 
 		public void ProcessBeforeInterior(ITreeNode element)
 		{
+			AppendRemainingMessage(element);
 			if (!(element is IT4IncludeDirective include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
 			var sourceFile = include.Path.Resolve();
@@ -76,7 +78,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(null);
+				Guard.StartProcessing(File.LogicalPsiSourceFile);
 				return;
 			}
 
@@ -90,38 +92,17 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				return;
 			}
 
-			var resolved = include.Path.ResolveT4File(Guard).NotNull();
+			var resolved = include.IncludedFile;
 			Guard.StartProcessing(sourceFile);
-			resolved.ProcessDescendants(this);
+			resolved?.ProcessDescendants(this);
 		}
 
 		public void ProcessAfterInterior(ITreeNode element)
 		{
-			switch (element)
-			{
-				case IT4IncludeDirective include:
-					string suffix = Result.State.ProduceBeforeEof();
-					if (!suffix.IsNullOrEmpty()) AppendTransformation(suffix);
-					Guard.TryEndProcessing(include.Path.Resolve());
-					var intermediateResults = Results.Pop();
-					Result.Append(intermediateResults);
-					AppendRemainingMessage(element);
-					HandleDirective(include);
-					break;
-				case IT4Directive directive:
-					AppendRemainingMessage(element);
-					HandleDirective(directive);
-					break;
-				case IT4CodeBlock codeBlock:
-					AppendRemainingMessage(element);
-					HandleCodeBlock(codeBlock);
-					break;
-				case IT4Token token:
-					Result.State.ConsumeToken(token);
-					break;
-			}
-
-			Result.AdvanceState(element);
+			if (!(element is IT4TreeNode t4Element)) return;
+			t4Element.Accept(this);
+			if (t4Element is IT4Token token) Result.State.ConsumeToken(token);
+			Result.AdvanceState(t4Element);
 		}
 
 		public bool ProcessingIsFinished
@@ -132,105 +113,85 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				return false;
 			}
 		}
+		#endregion IRecirsiveElementProcessor
 
-		#endregion Interface Members
-
-		#region Utils
-
-		/// <summary>Handles a directive in the tree.</summary>
-		/// <param name="directive">The directive.</param>
-		private void HandleDirective([NotNull] IT4Directive directive)
+		#region TreeNodeVisitor
+		public override void VisitIncludeDirectiveNode(IT4IncludeDirective includeDirectiveParam)
 		{
-			switch (directive)
-			{
-				case IT4ImportDirective _:
-					HandleImportDirective(directive);
-					break;
-				case IT4TemplateDirective _:
-					HandleTemplateDirective(directive);
-					break;
-				case IT4ParameterDirective _:
-					HandleParameterDirective(directive);
-					break;
-				case IT4OutputDirective output:
-					HandleOutputDirective(output);
-					break;
-			}
+			string suffix = Result.State.ProduceBeforeEof();
+			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
+			Guard.TryEndProcessing(includeDirectiveParam.Path.Resolve());
+			var intermediateResults = Results.Pop();
+			Result.Append(intermediateResults);
 		}
 
-		/// <summary>
-		/// Handles a code block: depending of whether it's a feature or transform text result,
-		/// it is not added to the same part of the C# file.
-		/// </summary>
-		/// <param name="codeBlock">The code block.</param>
-		private void HandleCodeBlock([NotNull] IT4CodeBlock codeBlock)
+		public override void VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam)
 		{
-			var code = codeBlock.Code;
-			if (code == null) return;
-			switch (codeBlock)
-			{
-				case IT4ExpressionBlock _:
-					if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
-					else Result.AppendTransformation(new T4ExpressionDescription(code));
-					break;
-				case IT4FeatureBlock _:
-					Result.AppendFeature(new T4CodeDescription(code));
-					break;
-				default:
-					Result.AppendTransformation(new T4CodeDescription(code));
-					break;
-			}
-		}
-
-		private void HandleOutputDirective([NotNull] IT4OutputDirective directive) =>
-			Result.Encoding = EncodingsManager.FindEncoding(directive, Interrupter);
-
-		/// <summary>Handles an import directive, equivalent of an using directive in C#.</summary>
-		/// <param name="directive">The import directive.</param>
-		private void HandleImportDirective([NotNull] IT4Directive directive)
-		{
-			var description = T4ImportDescription.FromDirective(directive);
+			var description = T4ImportDescription.FromDirective(importDirectiveParam);
 			if (description == null) return;
 			Result.Append(description);
 		}
 
-		/// <summary>
-		/// Handles a template directive,
-		/// determining if we should output a Host property
-		/// and use a base class.
-		/// </summary>
-		/// <param name="directive">The template directive.</param>
-		private void HandleTemplateDirective([NotNull] IT4Directive directive)
+		public override void VisitOutputDirectiveNode(IT4OutputDirective outputDirectiveParam) =>
+			Result.Encoding = EncodingsManager.FindEncoding(outputDirectiveParam, Interrupter);
+
+		public override void VisitParameterDirectiveNode(IT4ParameterDirective parameterDirectiveParam)
+		{
+			var description = T4ParameterDescription.FromDirective(parameterDirectiveParam);
+			if (description == null) return;
+			Result.Append(description);
+		}
+
+		public override void VisitTemplateDirectiveNode(IT4TemplateDirective templateDirectiveParam)
 		{
 			if (HasSeenTemplateDirective) return;
 			HasSeenTemplateDirective = true;
-			string hostSpecific = directive.GetAttributeValueByName(T4DirectiveInfoManager.Template.HostSpecificAttribute.Name);
+			string hostSpecific = templateDirectiveParam
+				.GetAttributeValueByName(T4DirectiveInfoManager.Template.HostSpecificAttribute.Name);
 			if (bool.TrueString.Equals(hostSpecific, StringComparison.OrdinalIgnoreCase)) Result.RequireHost();
 
-			(ITreeNode classNameToken, string className) =
-				directive.GetAttributeValueIgnoreOnlyWhitespace(T4DirectiveInfoManager.Template.InheritsAttribute.Name);
+			(ITreeNode classNameToken, string className) = templateDirectiveParam
+				.GetAttributeValueIgnoreOnlyWhitespace(T4DirectiveInfoManager.Template.InheritsAttribute.Name);
 			if (classNameToken != null && className != null)
 				Result.CollectedBaseClass.AppendMapped(className, classNameToken.GetTreeTextRange());
 		}
 
-		/// <summary>Handles a parameter directive, outputting an extra property.</summary>
-		/// <param name="directive">The parameter directive.</param>
-		private void HandleParameterDirective([NotNull] IT4Directive directive)
+		public override void VisitUnknownDirectiveNode(IT4UnknownDirective unknownDirectiveParam)
 		{
-			var description = T4ParameterDescription.FromDirective(directive);
-			if (description == null) return;
-			Result.Append(description);
+			var data = T4FailureRawData.FromElement(unknownDirectiveParam, "Custom directives are not supported");
+			Interrupter.InterruptAfterProblem(data);
 		}
+
+		public override void VisitExpressionBlockNode(IT4ExpressionBlock expressionBlockParam)
+		{
+			var code = expressionBlockParam.Code;
+			if (code == null) return;
+			if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
+			else Result.AppendTransformation(new T4ExpressionDescription(code));
+		}
+
+		public override void VisitFeatureBlockNode(IT4FeatureBlock featureBlockParam)
+		{
+			var code = featureBlockParam.Code;
+			if (code == null) return;
+			Result.AppendFeature(new T4CodeDescription(code));
+		}
+
+		public override void VisitStatementBlockNode(IT4StatementBlock statementBlockParam)
+		{
+			var code = statementBlockParam.Code;
+			if (code == null) return;
+			Result.AppendTransformation(new T4CodeDescription(code));
+		}
+		#endregion TreeNodeVisitor
 
 		private void AppendRemainingMessage([NotNull] ITreeNode lookahead)
 		{
 			if (lookahead is IT4Token) return;
 			string produced = Result.State.Produce(lookahead);
-			if (produced.IsNullOrEmpty()) return;
+			if (string.IsNullOrEmpty(produced)) return;
 			AppendTransformation(produced);
 		}
-
-		#endregion Utils
 
 		protected abstract void AppendTransformation([NotNull] string message);
 		protected abstract IT4CodeGenerationInterrupter Interrupter { get; }

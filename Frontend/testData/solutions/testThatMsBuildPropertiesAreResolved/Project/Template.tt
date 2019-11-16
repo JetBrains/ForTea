@@ -1,0 +1,3 @@
+﻿<#@ template language="C#" #>
+<#@ include file="$(T4UtilsLocation)Included.ttinclude" #>
+CONTENT 2

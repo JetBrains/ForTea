@@ -2,4 +2,4 @@
 |<# #>|(0)
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: A statement block cannot appear after a class feature block
+(0): ReSharper Underlined Error Highlighting: Statement block cannot be placed after feature block

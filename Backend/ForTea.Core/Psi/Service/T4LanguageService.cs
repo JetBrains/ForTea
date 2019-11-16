@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl;
@@ -14,6 +17,9 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 	/// <summary>Base, file independent language service for T4.</summary>
 	[Language(typeof(T4Language))]
 	public sealed class T4LanguageService : LanguageService {
+		[NotNull]
+		private ILogger Logger { get; }
+
 		/// <summary>Creates a lexer that filters tokens that have no meaning.</summary>
 		/// <param name="lexer">The base lexer.</param>
 		/// <returns>An implementation of a filtering lexer.</returns>
@@ -30,8 +36,26 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 		/// <param name="module">The module owning the source file.</param>
 		/// <param name="sourceFile">The source file.</param>
 		/// <returns>A T4 parser that operates onto <paramref name="lexer"/>.</returns>
-		public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile) =>
-			new T4Parser(lexer);
+		/// <note>
+		/// For the sake of providing the most complete intelligent support,
+		/// we make the widest possible context part of the primary PSI.
+		/// </note>
+		[NotNull]
+		public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile)
+		{
+			if (sourceFile == null)
+			{
+				Logger.Warn("Creating parser for null sourceFile");
+				return new T4Parser(lexer, null, null);
+			}
+
+			var projectFile = sourceFile.ToProjectFile();
+			var solution = sourceFile.GetSolution();
+			var graph = solution.GetComponent<IT4FileDependencyGraph>();
+			var rootSourceFile = graph.FindBestRoot(projectFile).ToSourceFile().NotNull();
+			var rootLexer = GetPrimaryLexerFactory().CreateLexer(rootSourceFile.Document.Buffer);
+			return new T4Parser(rootLexer, rootSourceFile, sourceFile);
+		}
 
 		/// <summary>
 		/// Gets a cache provider for T4 files.
@@ -53,16 +77,11 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 		public override IEnumerable<ITypeDeclaration> FindTypeDeclarations(IFile file)
 			=> EmptyList<ITypeDeclaration>.InstanceList;
 
-		/// <summary>Initializes a new instance of the <see cref="T4LanguageService"/> class.</summary>
-		/// <param name="t4Language">The T4 language.</param>
-		/// <param name="constantValueService">The constant value service.</param>
 		public T4LanguageService(
 			[NotNull] T4Language t4Language,
-			[NotNull] IConstantValueService constantValueService
-		) : base(t4Language, constantValueService)
-		{
-		}
-
+			[NotNull] IConstantValueService constantValueService,
+			[NotNull] ILogger logger
+		) : base(t4Language, constantValueService) => Logger = logger;
 	}
 
 }

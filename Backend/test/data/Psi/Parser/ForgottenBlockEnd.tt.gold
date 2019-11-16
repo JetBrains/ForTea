@@ -6,7 +6,8 @@ IT4File
     TEMPLATE: template
     WHITE_SPACE:  
     IT4DirectiveAttribute
-      TOKEN: language
+      IT4AttributeName
+        TOKEN: language
       EQUAL: =
       QUOTE: "
       IT4AttributeValue
@@ -14,8 +15,9 @@ IT4File
       QUOTE: "
     WHITE_SPACE: \n
     IT4DirectiveAttribute
-      TOKEN: Hello
-    ErrorElement:Unexpected token
+      IT4AttributeName
+        TOKEN: Hello
+    ErrorElement:= expected
       BAD_TOKEN: ,
       WHITE_SPACE:  
       TOKEN: world

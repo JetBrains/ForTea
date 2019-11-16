@@ -1,0 +1,6 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#+
+    // features to be included to other t4 files
+#>

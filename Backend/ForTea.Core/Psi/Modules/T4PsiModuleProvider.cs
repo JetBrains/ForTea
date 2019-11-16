@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.Psi.Invalidation;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
-using GammaJul.ForTea.Core.Tree;
+using GammaJul.ForTea.Core.Psi.OutsideSolution;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Threading;
@@ -28,8 +27,10 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly IShellLocks _shellLocks;
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IT4Environment _t4Environment;
-		[NotNull] private readonly IT4MacroResolver _resolver;
 		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
+
+		[NotNull]
+		private IT4TemplateKindProvider TemplateDataManager { get; }
 
 		private readonly struct ModuleWrapper {
 
@@ -59,73 +60,73 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		public IList<IPsiSourceFile> GetPsiSourceFilesFor([CanBeNull] IProjectFile projectFile) {
 			_shellLocks.AssertReadAccessAllowed();
 
-			return projectFile != null
-				&& projectFile.IsValid()
+			return projectFile?.IsValid() == true
 				&& _modules.TryGetValue(projectFile, out ModuleWrapper wrapper)
 				&& wrapper.Module.IsValid()
 			? new[] { wrapper.Module.SourceFile }
 			: EmptyList<IPsiSourceFile>.InstanceList;
 		}
 
-		/// <summary>Processes changes for specific project file and returns a list of corresponding source file changes.</summary>
+		/// <summary>
+		/// Processes changes for specific project file and sets up a list of corresponding source file changes.
+		/// </summary>
 		/// <param name="projectFile">The project file.</param>
 		/// <param name="changeType">Type of the change.</param>
 		/// <param name="changeBuilder">The change builder used to populate changes.</param>
-		/// <returns>Whether the provider has handled the file change.</returns>
-		public bool OnProjectFileChanged(
+		/// <returns><see cref="PsiModuleChange.ChangeType"/> if further changing is required, null otherwise</returns>
+		public PsiModuleChange.ChangeType? OnProjectFileChanged(
 			[NotNull] IProjectFile projectFile,
-			ref PsiModuleChange.ChangeType changeType,
+			PsiModuleChange.ChangeType changeType,
 			[NotNull] PsiModuleChangeBuilder changeBuilder
 		) {
-			if (!_t4Environment.IsSupported)
-				return false;
-
+			if (!_t4Environment.IsSupported) return changeType;
 			_shellLocks.AssertWriteAccessAllowed();
 			ModuleWrapper moduleWrapper;
-			
-			switch (changeType) {
-
+			switch (changeType)
+			{
 				case PsiModuleChange.ChangeType.Added:
 					// Preprocessed .tt files should be handled by R# itself as if it's a normal project file,
 					// so that it has access to the current project types.
-					if (projectFile.LanguageType.Is<T4ProjectFileType>() && !projectFile.IsPreprocessedT4Template()) {
+					if (projectFile.LanguageType.Is<T4ProjectFileType>()
+					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
+					{
 						AddFile(projectFile, changeBuilder);
-						return true;
+						return null;
 					}
 					break;
 
 				case PsiModuleChange.ChangeType.Removed:
 					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
 						RemoveFile(projectFile, changeBuilder, moduleWrapper);
-						return true;
+						return null;
 					}
 					break;
 
 				case PsiModuleChange.ChangeType.Modified:
 					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
-						if (!projectFile.IsPreprocessedT4Template()) {
+						if (!TemplateDataManager.IsPreprocessedTemplate(projectFile)) {
 							ModifyFile(changeBuilder, moduleWrapper);
-							return true;
+							return null;
 						}
 
 						// The T4 file went from Transformed to Preprocessed, it doesn't need a T4PsiModule anymore.
 						RemoveFile(projectFile, changeBuilder, moduleWrapper);
-						changeType = PsiModuleChange.ChangeType.Added;
-						return false;
+						return PsiModuleChange.ChangeType.Added;
 					}
 
 					// The T4 file went from Preprocessed to Transformed, it now needs a T4PsiModule.
-					if (projectFile.LanguageType.Is<T4ProjectFileType>() && !projectFile.IsPreprocessedT4Template()) {
+					if (projectFile.LanguageType.Is<T4ProjectFileType>()
+					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
+					{
 						AddFile(projectFile, changeBuilder);
-						changeType = PsiModuleChange.ChangeType.Removed;
-						return false;
+						return PsiModuleChange.ChangeType.Removed;
 					}
 
 					break;
 
 			}
 
-			return false;
+			return changeType;
 		}
 
 		private void AddFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder) {
@@ -139,7 +140,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_changeManager,
 				_shellLocks,
 				_t4Environment,
-				_resolver,
 				_coordinator
 			);
 			_modules[projectFile] = new ModuleWrapper(psiModule, lifetimeDefinition);
@@ -153,7 +153,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			FileSystemPath location = projectFile.Location;
 			if (fileManager.HasSourceFile(location)) {
 				fileManager.DeleteSourceFile(location);
-				InvalidateFilesHavingInclude(location, solution.GetPsiServices());
 			}
 		}
 
@@ -161,33 +160,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_modules.Remove(projectFile);
 			changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Removed);
 			changeBuilder.AddModuleChange(moduleWrapper.Module, PsiModuleChange.ChangeType.Removed);
-			InvalidateFilesHavingInclude(projectFile.Location, moduleWrapper.Module.GetPsiServices());
 			moduleWrapper.LifetimeDefinition.Terminate();
 		}
 
 		private static void ModifyFile([NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)
 			=> changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Modified);
 
-		private void InvalidateFilesHavingInclude(
-			[NotNull] FileSystemPath includeLocation,
-			[NotNull] IPsiServices psiServices
-		)
-		{
-			psiServices
-				.GetComponent<T4FileDependencyManager>()
-				.UpdateIncludes(includeLocation, EmptyList<FileSystemPath>.InstanceList);
-			foreach (var sourceFile in _modules.Values.Select(moduleWrapper => moduleWrapper.Module.SourceFile))
-			{
-				if (!(sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File)) continue;
-				bool hasUpdatedDependency = t4File.Blocks
-					.OfType<IT4IncludeDirective>()
-					.Select(include => include.Path.ResolvePath())
-					.Where(path => !path.IsEmpty)
-					.Any(path => path == includeLocation);
-				if (hasUpdatedDependency) psiServices.MarkAsDirty(sourceFile);
-			}
-		}
-		
 		public void Dispose() {
 			using (WriteLockCookie.Create()) {
 				foreach (var wrapper in _modules.Values)
@@ -201,16 +179,16 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IT4MacroResolver resolver,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator
+			[NotNull] PsiProjectFileTypeCoordinator coordinator,
+			[NotNull] IT4TemplateKindProvider templateDataManager
 		)
 		{
 			_lifetime = lifetime;
 			_shellLocks = shellLocks;
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
-			_resolver = resolver;
 			_coordinator = coordinator;
+			TemplateDataManager = templateDataManager;
 		}
 
 	}

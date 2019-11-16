@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Psi.Impl.Shared;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Tree
@@ -19,13 +20,17 @@ namespace GammaJul.ForTea.Core.Tree
 	public static class T4TreeExtensions
 	{
 		[CanBeNull]
-		public static ITreeNode GetAttributeValueToken(
+		public static IT4TreeNode GetAttributeValueToken(
 			[CanBeNull] this IT4Directive directive,
 			[CanBeNull] string attributeName
 		)
 		{
 			if (string.IsNullOrEmpty(attributeName)) return null;
-			return directive?.Attributes.Where(it => it.Name.GetText() == attributeName)?.FirstOrDefault()?.Value;
+			return directive
+				?.Attributes
+				.Where(it => string.Equals(it.Name.GetText(), attributeName, StringComparison.OrdinalIgnoreCase))
+				?.FirstOrDefault()
+				?.Value;
 		}
 
 		[CanBeNull]
@@ -34,41 +39,28 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] string attributeName
 		) => directive.GetAttributeValueToken(attributeName)?.GetText();
 
-		public static Pair<ITreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
+		public static Pair<IT4TreeNode, string> GetAttributeValueIgnoreOnlyWhitespace(
 			[NotNull] this IT4Directive directive,
 			[NotNull] string attributeName
 		)
 		{
 			var valueToken = directive.GetAttributeValueToken(attributeName);
 			if (valueToken == null)
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
 			string value = valueToken.GetText();
 			if (value.IsNullOrWhitespace())
-				return new Pair<ITreeNode, string>();
+				return new Pair<IT4TreeNode, string>();
 
-			return new Pair<ITreeNode, string>(valueToken, value);
+			return new Pair<IT4TreeNode, string>(valueToken, value);
 		}
-
-		[ContractAnnotation("directive:null => false"), Obsolete("Use tree types", true)]
-		public static bool IsSpecificDirective(
-			[CanBeNull] this IT4Directive directive,
-			[CanBeNull] DirectiveInfo directiveInfo
-		) => directive != null &&
-		     directiveInfo?.Name.Equals(directive.Name.GetText(), StringComparison.OrdinalIgnoreCase) == true;
 
 		[NotNull]
 		public static IEnumerable<IT4Directive> GetDirectives(
 			[NotNull] this IT4File file,
 			[NotNull] DirectiveInfo directiveInfo
 		) => file.Blocks.OfType<IT4Directive>().Where(d =>
-			directiveInfo.Name.Equals(d.Name.GetText(), StringComparison.OrdinalIgnoreCase));
-
-		[NotNull, Obsolete("Use overload with attribute info", true)]
-		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
-			[NotNull] this IT4Directive directive,
-			[NotNull] string name
-		) => directive.Attributes.Where(it => it.Name.GetText() == name);
+			directiveInfo.Name.Equals(d.Name?.GetText(), StringComparison.OrdinalIgnoreCase));
 
 		[NotNull]
 		public static IEnumerable<IT4DirectiveAttribute> GetAttributes(
@@ -76,35 +68,13 @@ namespace GammaJul.ForTea.Core.Tree
 			[NotNull] DirectiveAttributeInfo info
 		) => directive.Attributes.Where(it =>
 			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
-		
+
 		[CanBeNull]
 		public static IT4DirectiveAttribute GetFirstAttribute(
 			[NotNull] this IT4Directive directive,
 			[NotNull] DirectiveAttributeInfo info
 		) => directive.Attributes.FirstOrDefault(it =>
 			string.Equals(it.Name.GetText(), info.Name, StringComparison.OrdinalIgnoreCase));
-
-		
-
-		[NotNull, ItemNotNull]
-		public static IEnumerable<IT4File> GetIncludedFilesRecursive([NotNull] this IT4File file,
-			[NotNull] T4IncludeGuard guard)
-		{
-			var sourceFile = file.GetSourceFile();
-			if (sourceFile == null || guard.CanProcess(sourceFile)) yield break;
-			guard.StartProcessing(sourceFile);
-			var includedFiles = file.Blocks.OfType<IT4IncludeDirective>()
-				.Select(include => include.Path.ResolveT4File(guard))
-				.Where(resolution => resolution != null);
-			foreach (var includedFile in includedFiles)
-			{
-				yield return includedFile;
-				foreach (var recursiveInclude in includedFile.GetIncludedFilesRecursive(guard))
-				{
-					yield return recursiveInclude;
-				}
-			}
-		}
 
 		/// <summary>Gets a T4 block containing a specified C# node.</summary>
 		/// <typeparam name="T">The type of expected T4 container node.</typeparam>
@@ -130,6 +100,7 @@ namespace GammaJul.ForTea.Core.Tree
 			return t4Node.GetContainingNode<T>(true);
 		}
 
+		[NotNull]
 		public static IT4Directive AddDirective([NotNull] this IT4File file, [NotNull] IT4Directive directive)
 		{
 			IT4Directive anchor = file.Blocks.OfType<IT4Directive>().LastOrDefault();
@@ -146,7 +117,12 @@ namespace GammaJul.ForTea.Core.Tree
 			}
 		}
 
-		public static IT4Directive AddDirectiveBefore(this IT4File file, IT4Directive directive, IT4Directive anchor)
+		[NotNull]
+		public static IT4Directive AddDirectiveBefore(
+			[NotNull] this IT4File file,
+			IT4Directive directive,
+			[NotNull] IT4Directive anchor
+		)
 		{
 			using (WriteLockCookie.Create(file.IsPhysical()))
 			{
@@ -161,8 +137,12 @@ namespace GammaJul.ForTea.Core.Tree
 			}
 		}
 
-		public static IT4Directive AddDirectiveAfter([NotNull] this IT4File file, IT4Directive directive,
-			IT4Directive anchor)
+		[NotNull]
+		public static IT4Directive AddDirectiveAfter(
+			[NotNull] this IT4File file,
+			[NotNull] IT4Directive directive,
+			[NotNull] IT4Directive anchor
+		)
 		{
 			using (WriteLockCookie.Create(file.IsPhysical()))
 			{
@@ -182,6 +162,7 @@ namespace GammaJul.ForTea.Core.Tree
 		{
 			if (directive == null) return;
 			using (WriteLockCookie.Create(file.IsPhysical()))
+			using (file.GetPsiServices().Transactions.CreateCustomCookie<DisableChecks>())
 			{
 				// remove the optional end line after the directive
 				var sibling = directive.NextSibling;
@@ -191,7 +172,8 @@ namespace GammaJul.ForTea.Core.Tree
 		}
 
 		[NotNull]
-		public static IT4FeatureBlock AddFeatureBlock([NotNull] this IT4File file,
+		public static IT4FeatureBlock AddFeatureBlock(
+			[NotNull] this IT4File file,
 			[NotNull] IT4FeatureBlock featureBlock)
 		{
 			var anchor = file.Blocks.OfType<IT4FeatureBlock>().LastOrDefault();
@@ -231,16 +213,56 @@ namespace GammaJul.ForTea.Core.Tree
 			}
 		}
 
+		[NotNull]
 		public static IEnumerable<TParent> GetParentsOfType<TParent>([NotNull] this ITreeNode node)
 			where TParent : class, ITreeNode
 		{
-			var parent = node.GetParentOfType<TParent>();
-			while (parent != null)
+			for (; node != null; node = node.Parent)
 			{
-				yield return parent;
-				var tmpParent = parent.Parent;
-				parent = tmpParent?.GetParentOfType<TParent>();
+				if (!(node is TParent obj)) continue;
+				yield return obj;
 			}
+		}
+
+		[CanBeNull]
+		public static TParent GetParentOfType<TParent>([NotNull] this ITreeNode node)
+			where TParent : class, ITreeNode
+		{
+			for (; node != null; node = node.Parent)
+			{
+				if (!(node is TParent obj)) continue;
+				return obj;
+			}
+
+			return null;
+		}
+
+		[NotNull, ItemNotNull]
+		public static IEnumerable<IT4FileLikeNode> GetThisAndIncludedFilesRecursive([NotNull] this IT4FileLikeNode node)
+		{
+			yield return node;
+			foreach (var transitiveInclude in node.Includes.SelectMany(GetThisAndIncludedFilesRecursive))
+			{
+				yield return transitiveInclude;
+			}
+		}
+
+		private static bool ContainsIncludeContext([NotNull] this IT4File file) =>
+			file.LogicalPsiSourceFile == file.PhysicalPsiSourceFile;
+
+		public static void AssertContainsNoIncludeContext([NotNull] this IT4File file) =>
+			Assertion.Assert(file.ContainsIncludeContext(), "PSI file should not contain any include context");
+
+		/// <summary>
+		/// Some nodes in T4 tree constitute include context.
+		/// Here I'll call them invisible
+		/// </summary>
+		public static bool IsVisibleInDocument([NotNull] this ITreeNode node)
+		{
+			var file = node.GetContainingFile().NotNull();
+			var nodeDocument = node.GetDocumentRange().Document;
+			var visibleDocument = file.GetSourceFile()?.Document;
+			return nodeDocument == visibleDocument;
 		}
 	}
 }

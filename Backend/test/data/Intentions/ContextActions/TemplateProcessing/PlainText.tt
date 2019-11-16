@@ -1,2 +1,0 @@
-<#@ output extension=".txt" #>
-Hello{caret}

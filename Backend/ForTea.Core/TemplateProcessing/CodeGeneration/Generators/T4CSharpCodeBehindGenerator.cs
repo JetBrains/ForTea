@@ -15,12 +15,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 	/// </summary>
 	internal sealed class T4CSharpCodeBehindGenerator : T4CSharpCodeGeneratorBase
 	{
+		[NotNull]
+		private ISolution Solution { get; }
+
 		public T4CSharpCodeBehindGenerator(
 			[NotNull] IT4File file,
 			[NotNull] ISolution solution
-		) : base(file) => Collector = new T4CSharpCodeBehindGenerationInfoCollector(file, solution);
+		) : base(file) => Solution = solution;
 
-		protected override T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
+		protected override T4CSharpCodeGenerationInfoCollectorBase Collector =>
+			new T4CSharpCodeBehindGenerationInfoCollector(File, Solution);
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult

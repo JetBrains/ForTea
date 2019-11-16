@@ -1,3 +1,1 @@
-<#+
-public static int Whatever(int arg)=>arg;{caret}
-#>
+<#+public static void Whatever(int arg){}{caret}#>

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -16,17 +15,14 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 	public class T4MacroResolver : T4MacroResolverBase
 	{
 		[NotNull]
-		private ISolution Solution { get; }
+		protected ISolution Solution { get; }
 
-		public T4MacroResolver(
-			[NotNull] ISolution solution,
-			[NotNull] IT4AssemblyNamePreprocessor preprocessor
-		) : base(preprocessor) => Solution = solution;
+		public T4MacroResolver([NotNull] ISolution solution) => Solution = solution;
 
-		public sealed override IReadOnlyDictionary<string, string> Resolve(IEnumerable<string> _, IProjectFile file) =>
-			ResolveInternal(file);
+		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(IList<string> macros,
+			IProjectFile file) => EmptyDictionary<string, string>.Instance;
 
-		protected virtual Dictionary<string, string> ResolveInternal([NotNull] IProjectFile file)
+		protected override Dictionary<string, string> ResolveAllLightMacrosInternal(IProjectFile file)
 		{
 			var result = new Dictionary<string, string>(CaseInsensitiveComparison.Comparer);
 			AddBasicMacros(result);
@@ -35,12 +31,15 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			return result;
 		}
 
-		private void AddProjectMacros(IProjectFile file, Dictionary<string, string> result)
+		private void AddProjectMacros([NotNull] IProjectFile file, Dictionary<string, string> result)
 		{
 			var project = file.GetProject();
 			if (project == null) return;
-			result.Add("Configuration", project.ProjectProperties.ActiveConfigurations.Configurations.Single().Name);
-			result.Add("TargetDir", project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent.FullPathWithTrailingPathSeparator());
+			var configuration = project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem();
+			if (configuration != null) result.Add("Configuration", configuration.Name);
+			result.Add("TargetDir",
+				project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).Parent
+					.FullPathWithTrailingPathSeparator());
 			result.Add("ProjectDir", project.Location.FullPathWithTrailingPathSeparator());
 			result.Add("ProjectFileName", project.ProjectFileLocation.Name);
 			result.Add("ProjectName", project.Name);
@@ -50,7 +49,10 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			AddMsBuildProjectProperties(result, project);
 		}
 
-		private static void AddMsBuildProjectProperties(Dictionary<string, string> result, IProject project)
+		private static void AddMsBuildProjectProperties(
+			[NotNull] Dictionary<string, string> result,
+			[NotNull] IProject project
+		)
 		{
 			result.Add("TargetExt", T4MSBuildProjectUtil.GetTargetExtension(project));
 			string rootNamespace = project
@@ -68,7 +70,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			result.Add("SolutionFileName", solutionFile.Name);
 		}
 
-		private void AddBasicMacros(Dictionary<string, string> result)
+		private void AddBasicMacros([NotNull] Dictionary<string, string> result)
 		{
 			result.Add("SolutionDir", Solution.SolutionDirectory.FullPathWithTrailingPathSeparator());
 			result.Add("SolutionName", Solution.Name);

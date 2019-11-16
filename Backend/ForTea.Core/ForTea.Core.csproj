@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
@@ -9,9 +9,11 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>GammaJul.ForTea.Core</RootNamespace>
   </PropertyGroup>
-
+  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +24,7 @@
     <Compile Remove="Resources\HostStub.cs" />
     <Compile Remove="Resources\Host.cs" />
     <Compile Remove="Resources\AssemblyRegistering.cs" />
+    <Compile Remove="Resources\ToStringInstanceHelper.cs" />
 
     <EmbeddedResource Include="Resources\TemplateBaseFull.cs" />
     <EmbeddedResource Include="Resources\TemplateBaseFullExecutableSuffix.cs" />
@@ -30,6 +33,7 @@
     <EmbeddedResource Include="Resources\HostStub.cs" />
     <EmbeddedResource Include="Resources\Host.cs" />
     <EmbeddedResource Include="Resources\AssemblyRegistering.cs" />
+    <EmbeddedResource Include="Resources\ToStringInstanceHelper.cs" />
 
     <None Remove="Parsing\T4.lex" />
 
@@ -72,5 +76,20 @@
   <ItemGroup>
     <Clean Remove="obj\Debug\\TempCA\ForTea.Core.pdb" />
     <Clean Remove="obj\Debug\\TempCA\ForTea.Core.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ErrorsGen Include="Daemon\Highlightings\T4Errors.xml">
+      <Mode>ERRORS</Mode>
+      <Namespace>GammaJul.ForTea.Core.Daemon.Highlightings</Namespace>
+      <OutputFile>Daemon\Highlightings\T4Errors.Generated.cs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+    <ErrorsGen Include="Daemon\Highlightings\T4Warnings.xml">
+      <Mode>ERRORS</Mode>
+      <Namespace>GammaJul.ForTea.Core.Daemon.Highlightings</Namespace>
+      <OutputFile>Daemon\Highlightings\T4Warnings.Generated.cs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
   </ItemGroup>
 </Project>

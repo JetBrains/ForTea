@@ -120,7 +120,7 @@ errorhandling interface directive:
     | importDirective
     | includeDirective
     | cleanupBehaviorDirective
-    | unknownDirective 
+    | unknownDirective
 ;
 
 errorhandling templateDirective:
@@ -180,7 +180,7 @@ errorhandling unknownDirective:
 ;
 
 directiveAttribute:
-    TOKEN<TOKEN, Name>
+    attributeName<AttributeName, Name>
     EQUAL<EQUAL, Equal>
     QUOTE<QUOTE, OpeningQuote>
     attributeValue<DIRECTIVE_ATTRIBUTE_VALUE, Value>
@@ -189,6 +189,16 @@ directiveAttribute:
 
 attributeName:
     TOKEN<TOKEN, Token>
+;
+
+// ---- ---- ---- ---- included file ---- ---- ---- ----
+
+includedFile:
+    ( block<BLOCK, Blocks>
+    | RAW_TEXT<RAW_TEXT, RawTexts>
+    | NEW_LINE<NEW_LINE, NewLines>
+    | includedFile<INCLUDED_FILE, IncludedFiles>
+    )*
 ;
 
 // ---- ---- ---- ---- raw values ---- ---- ---- ----

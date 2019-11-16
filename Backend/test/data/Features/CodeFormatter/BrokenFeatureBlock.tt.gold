@@ -1,16 +1,17 @@
-﻿{caret}<#@ include file="foo/bar.txt" once="i don't know" #>
+﻿<#@ include file="foo/bar.txt" once="i don't know" #>
 <#+
-
-    public static void Foo(int number, string line)
+  public static void Foo(int number, string line)
+  {
+    for (int i = 0; i < number; i += 1)
     {
-        for (int i = 0; i < number; i += 1)
-        {
-            Write(line); #>omg<#+ int x = number + i;
-            if (x > 0)
-            {
-                return;
-            }
-        }
+      Write(line);
+#>omg<#+
+      int x = number + i;
+      if (x > 0)
+      {
+        return;
+      }
     }
-
+  }
 #>
+{caret}

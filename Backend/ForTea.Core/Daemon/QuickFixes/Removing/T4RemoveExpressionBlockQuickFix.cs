@@ -8,12 +8,12 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes.Removing
 {
 	[QuickFix]
 	public class T4RemoveExpressionBlockQuickFix :
-		T4RemoveBlockQuickFixBase<IT4ExpressionBlock, T4EmptyExpressionBlockHighlighting>
+		T4RemoveBlockQuickFixBase<IT4ExpressionBlock, EmptyExpressionBlockError>
 	{
 		public override string Text => "Remove empty expression block";
+		protected override IT4ExpressionBlock Node => Highlighting.Block;
 
-		public T4RemoveExpressionBlockQuickFix([NotNull] T4EmptyExpressionBlockHighlighting highlighting) :
-			base(highlighting)
+		public T4RemoveExpressionBlockQuickFix([NotNull] EmptyExpressionBlockError highlighting) : base(highlighting)
 		{
 		}
 

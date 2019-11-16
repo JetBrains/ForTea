@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
 	[ElementProblemAnalyzer(typeof(IT4UnknownDirective), HighlightingTypes =
-		new[] {typeof(T4UnexpectedDirectiveHighlighting)})]
+		new[] {typeof(UnexpectedDirectiveWarning)})]
 	public class T4UnexpectedDirectiveAnalyzer : ElementProblemAnalyzer<IT4UnknownDirective>
 	{
 		protected override void Run(
@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		{
 			var name = element.Name;
 			if (name == null) return;
-			consumer.AddHighlighting(new T4UnexpectedDirectiveHighlighting(name));
+			consumer.AddHighlighting(new UnexpectedDirectiveWarning(name));
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DataStructures;
@@ -58,9 +59,10 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 			switch (name)
 			{
 				case null:
-				case TemplateDirectiveInfo.CSharpLanguageAttributeValue:
+				case LanguageAttributeInfo.CSharpLanguageAttributeValue:
+				case LanguageAttributeInfo.NewCSharpLanguageAttributeValue:
 					return CSharpLanguage.Instance;
-				case TemplateDirectiveInfo.VBLanguageAttributeValue:
+				case LanguageAttributeInfo.VBLanguageAttributeValue:
 					return VBLanguage.Instance;
 				default:
 					return UnknownLanguage.Instance;

@@ -1,95 +1,97 @@
-using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Daemon.CodeFolding;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 {
-	public class T4CodeFoldingProcessor : ICodeFoldingProcessor
+	public sealed class T4CodeFoldingProcessor : TreeNodeVisitor<FoldingHighlightingConsumer>, ICodeFoldingProcessor
 	{
-		private bool FileProcessed { get; set; }
-		public bool InteriorShouldBeProcessed(ITreeNode element, FoldingHighlightingConsumer context) => false;
+		private DocumentOffset? DirectiveFoldingStart { get; set; }
+		private DocumentOffset? DirectiveFoldingEnd { get; set; }
+
+		/// The directives we are interested in
+		/// might reside very deep in the include tree,
+		/// so we have to traverse more than just the top layer
+		public bool InteriorShouldBeProcessed(ITreeNode element, FoldingHighlightingConsumer context) =>
+			element is IT4IncludedFile;
+
 		public bool IsProcessingFinished(FoldingHighlightingConsumer context) => false;
 
 		public void ProcessBeforeInterior(ITreeNode element, FoldingHighlightingConsumer context)
 		{
-			if (!FileProcessed && element.GetContainingFile() is IT4File file) CollectFileFoldings(context, file);
-			FileProcessed = true;
-
-			if (element is IT4CodeBlock && !(element is IT4FeatureBlock))
-				context.AddDefaultPriorityFolding(
-					T4CodeFoldingAttributes.Directive,
-					element.GetDocumentRange(),
-					"<# ... #>");
+			if (!(element is IT4TreeNode t4Element)) return;
+			if (!t4Element.IsVisibleInDocument()) return;
+			t4Element.Accept(this, context);
 		}
 
-		private void CollectFileFoldings(FoldingHighlightingConsumer context, IT4File file)
+		public override void VisitDirectiveNode(IT4Directive directiveParam, FoldingHighlightingConsumer context)
 		{
-			foreach (var range in FindDirectiveFoldings(file))
-			{
-				context.AddDefaultPriorityFolding(T4CodeFoldingAttributes.Directive, range, "<#@ ... #>");
-			}
-
-			var featureFolding = FindFeatureFoldings(file);
-			if (featureFolding.HasValue)
-			{
-				context.AddDefaultPriorityFolding(
-					T4CodeFoldingAttributes.Directive,
-					featureFolding.Value,
-					"<#+ ... #>");
-			}
+			// It is necessary to determine offset like this
+			// because using a <see cref="TreeNodeExtensions.GetDocumentStartOffset(ITreeNode)"/>
+			// would yield incorrect results in some edge cases
+			DirectiveFoldingStart ??= directiveParam.GetDocumentRange().StartOffset;
+			DirectiveFoldingEnd = directiveParam.GetDocumentRange().EndOffset;
 		}
 
-		[NotNull]
-		private IEnumerable<DocumentRange> FindDirectiveFoldings([NotNull] IT4File file)
+		public override void VisitNode(ITreeNode node, FoldingHighlightingConsumer context)
 		{
-			int? directiveStart = null;
-			int? directiveEnd = null;
-
-			foreach (var node in file.Children())
-			{
-				if (node is IT4Directive)
-				{
-					directiveStart = directiveStart ?? node.GetTreeStartOffset().Offset;
-					directiveEnd = node.GetTreeEndOffset().Offset;
-					continue;
-				}
-
-				if (node.NodeType == T4TokenNodeTypes.NEW_LINE) continue;
-				if (directiveStart == null) continue;
-
-				yield return new DocumentRange(
-					file.GetSourceFile().NotNull().Document,
-					new TextRange(directiveStart.Value, directiveEnd.Value));
-				directiveStart = null;
-				directiveEnd = null;
-			}
-
-			if (directiveStart == null) yield break;
-			yield return new DocumentRange(
-				file.GetSourceFile().NotNull().Document,
-				new TextRange(directiveStart.Value, directiveEnd.Value));
+			if (!(node is IT4TreeNode)) return;
+			// Since this is a function that does not specify
+			// what exactly we visited,
+			// we must be visiting a token,
+			// i.e. either newline or raw text
+			if (node.NodeType == T4TokenNodeTypes.NEW_LINE) return;
+			ProduceDirectiveFolding(context);
 		}
 
-		private DocumentRange? FindFeatureFoldings([NotNull] IT4File file)
+		private void ProduceDirectiveFolding([NotNull] FoldingHighlightingConsumer context)
 		{
-			int? start = file.Children().OfType<IT4FeatureBlock>().FirstOrDefault()?.GetTreeStartOffset().Offset;
-			int? end = file.Children().OfType<IT4FeatureBlock>().LastOrDefault()?.GetTreeEndOffset().Offset;
-			if (!start.HasValue || !end.HasValue) return null;
-			return new DocumentRange(
-				file.GetSourceFile().NotNull().Document,
-				new TextRange(start.Value, end.Value));
+			if (DirectiveFoldingStart == null || DirectiveFoldingEnd == null) return;
+			var range = new DocumentRange(DirectiveFoldingStart.Value, DirectiveFoldingEnd.Value);
+			context.AddDefaultPriorityFolding(T4CodeFoldingAttributes.Directive, range, "<#@ ... #>");
+			DirectiveFoldingStart = null;
+			DirectiveFoldingEnd = null;
 		}
 
 		public void ProcessAfterInterior(ITreeNode element, FoldingHighlightingConsumer context)
 		{
+			if (element.NextSibling != null) return;
+			if (!(element is IT4TreeNode t4Element)) return;
+			if (!t4Element.IsVisibleInDocument()) return;
+			if (DirectiveFoldingStart == null || DirectiveFoldingEnd == null) return;
+			var range = new DocumentRange(DirectiveFoldingStart.Value, DirectiveFoldingEnd.Value);
+			context.AddDefaultPriorityFolding(T4CodeFoldingAttributes.Directive, range, "<#@ ... #>");
+			DirectiveFoldingStart = null;
+			DirectiveFoldingEnd = null;
+		}
+
+		public override void VisitExpressionBlockNode(
+			IT4ExpressionBlock expressionBlockParam,
+			[NotNull] FoldingHighlightingConsumer context
+		) => AddFolding(context, T4CodeFoldingAttributes.ExpressionBlock, expressionBlockParam, "<#= ... #>");
+
+		public override void VisitFeatureBlockNode(
+			IT4FeatureBlock featureBlockParam,
+			[NotNull] FoldingHighlightingConsumer context
+		) => AddFolding(context, T4CodeFoldingAttributes.FeatureBlock, featureBlockParam, "<#+ ... #>");
+
+		public override void VisitStatementBlockNode(
+			IT4StatementBlock statementBlockParam,
+			[NotNull] FoldingHighlightingConsumer context
+		) => AddFolding(context, T4CodeFoldingAttributes.StatementBlock, statementBlockParam, "<# ... #>");
+
+		private static void AddFolding(
+			[NotNull] FoldingHighlightingConsumer context,
+			[NotNull] string id,
+			[NotNull] IT4TreeNode node,
+			[NotNull] string replacement
+		)
+		{
+			if (!node.IsVisibleInDocument()) return;
+			context.AddDefaultPriorityFolding(id, node.GetDocumentRange(), replacement);
 		}
 	}
 }

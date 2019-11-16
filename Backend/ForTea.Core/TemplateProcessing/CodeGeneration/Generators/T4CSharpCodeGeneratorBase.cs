@@ -14,15 +14,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		[NotNull]
 		protected IT4File File { get; }
 
-		/// <summary>Initializes a new instance of the <see cref="T4CSharpCodeGeneratorBase"/> class.</summary>
-		/// <param name="file">The associated T4 file whose C# code behind will be generated.</param>
-		protected T4CSharpCodeGeneratorBase([NotNull] IT4File file) =>
-			File = file ?? throw new ArgumentNullException(nameof(file));
+		protected T4CSharpCodeGeneratorBase([NotNull] IT4File file) => File = file;
 
 		[NotNull]
 		public T4CSharpCodeGenerationResult Generate() =>
 			CreateConverter(Collector.Collect()).Convert();
 
+		[NotNull]
 		public T4CSharpCodeGenerationResult GenerateSafe()
 		{
 			try

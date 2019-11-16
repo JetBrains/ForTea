@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.Application.CommandProcessing;
@@ -11,36 +12,41 @@ using JetBrains.ReSharper.Feature.Services.Web.TypingAssist;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CachingLexers;
 using JetBrains.ReSharper.Psi.CSharp;
+using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.TextControl;
 
-namespace GammaJul.ForTea.Core.Services.TypingAssist {
-
+namespace GammaJul.ForTea.Core.Services.TypingAssist
+{
 	/// <summary>Typing assistant for C# embedded in T4 files.</summary>
 	[SolutionComponent]
-	public class T4CSharpTypingAssist : CSharpTypingAssistBase {
-
-		/// <summary>Gets whether a given text control is supported by the assistant.</summary>
-		/// <param name="textControl">The text control to check.</param>
-		/// <returns><c>true</c> if <paramref name="textControl"/> is a T4 file with C# code behind, <c>false</c> otherwise.</returns>
+	public sealed class T4CSharpTypingAssist : CSharpTypingAssistBase
+	{
 		protected override bool IsSupported(ITextControl textControl)
-			=> WebTypingAssistUtil.IsProjectFileSupported<T4ProjectFileType, CSharpLanguage>(textControl, Solution);
+		{
+			if (!WebTypingAssistUtil.IsProjectFileSupported<T4ProjectFileType, CSharpLanguage>(textControl, Solution))
+				return false;
+			if (WebTypingAssistUtil.IsSupported<ICSharpTokenNodeType>(GetCachingLexer(textControl), textControl))
+				return true;
+			return IsInEmptyCodeBlock(textControl);
+		}
 
-		/// <summary>Returns the offset difference between a text control and a lexer.</summary>
-		/// <param name="textControl">The text control.</param>
-		/// <param name="offset">The original offset.</param>
-		/// <returns>Always <paramref name="offset"/>.</returns>
-		public override int TextControlToLexer(ITextControl textControl, int offset)
-			=> offset;
+		private bool IsInEmptyCodeBlock([NotNull] ITextControl textControl)
+		{
+			var lexer = GetCachingLexer(textControl);
+			if (lexer == null) return false;
+			int caretOffset = textControl.Caret.Offset();
+			if (!WebTypingAssistUtil.FindTokenAt(lexer, caretOffset)) return false;
+			if (!(lexer.TokenType is T4TokenNodeType tokenType)) return false;
+			if (tokenType != T4TokenNodeTypes.BLOCK_END) return false;
+			if (caretOffset != lexer.TokenStart) return false;
+			lexer.Advance(-1);
+			var prevToken = lexer.TokenType;
+			if (prevToken != null && T4TokenNodeTypes.CodeBlockStarts[prevToken]) return true;
+			return false;
+		}
 
-		/// <summary>Returns the offset difference between a lexer and a text control.</summary>
-		/// <param name="textControl">The text control.</param>
-		/// <param name="offset">The original offset.</param>
-		/// <returns>Always <paramref name="offset"/>.</returns>
-		public override int LexerToTextControl(ITextControl textControl, int offset)
-			=> offset;
-
-		public override bool QuickCheckAvailability(ITextControl textControl, IPsiSourceFile projectFile)
-			=> projectFile.LanguageType.Is<T4ProjectFileType>();
+		public override bool QuickCheckAvailability(ITextControl textControl, IPsiSourceFile projectFile) =>
+			projectFile.LanguageType.Is<T4ProjectFileType>();
 
 		public T4CSharpTypingAssist(
 			Lifetime lifetime,
@@ -52,20 +58,18 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			[NotNull] ITypingAssistManager typingAssistManager,
 			[NotNull] IPsiServices psiServices,
 			[NotNull] IExternalIntellisenseHost externalIntellisenseHost
+		) : base(
+			lifetime,
+			solution,
+			commandProcessor,
+			skippingTypingAssist,
+			cachingLexerService,
+			settingsStore,
+			typingAssistManager,
+			psiServices,
+			externalIntellisenseHost
 		)
-			: base(
-				lifetime,
-				solution,
-				commandProcessor,
-				skippingTypingAssist,
-				cachingLexerService,
-				settingsStore,
-				typingAssistManager,
-				psiServices,
-				externalIntellisenseHost
-			) {
+		{
 		}
-
 	}
-
 }

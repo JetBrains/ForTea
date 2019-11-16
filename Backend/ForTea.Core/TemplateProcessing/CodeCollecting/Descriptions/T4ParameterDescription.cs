@@ -1,14 +1,11 @@
-using FluentAssertions;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public class T4ParameterDescription : T4ElementDescriptionBase
+	public sealed class T4ParameterDescription
 	{
 		[NotNull]
 		public ITreeNode TypeToken { get; }
@@ -30,7 +27,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			[NotNull] ITreeNode nameToken,
 			[NotNull] string typeString,
 			[NotNull] string nameString
-		) : base(typeToken.GetContainingFile().As<IT4File>().NotNull())
+		)
 		{
 			TypeToken = typeToken;
 			NameToken = nameToken;
@@ -46,8 +43,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			string typeText = typeToken?.GetText();
 			var nameToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.NameAttribute.Name);
 			string nameText = nameToken?.GetText();
-			if (typeText?.IsNullOrEmpty() != false) return null;
-			if (nameText?.IsNullOrEmpty() != false) return null;
+			if (string.IsNullOrEmpty(typeText)) return null;
+			if (string.IsNullOrEmpty(nameText)) return null;
 			return new T4ParameterDescription(typeToken, nameToken, typeText, nameText);
 		}
 	}

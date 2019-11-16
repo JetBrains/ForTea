@@ -9,11 +9,23 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
   <ItemGroup>
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="JetBrains.Roslyn.References.Repack" Version="42.42.20190604.144922" />
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Features\Folding\T4CodeFoldingAttributes.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>T4CodeFoldingAttributes.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Features\Folding\T4CodeFoldingAttributes.cs">
+      <DependentUpon>T4CodeFoldingAttributes.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

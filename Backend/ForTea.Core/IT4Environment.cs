@@ -7,17 +7,6 @@ namespace GammaJul.ForTea.Core
 {
 	public interface IT4Environment
 	{
-		/// <summary>
-		/// Indicates whether plugin should support 'once' attribute in 'include' directive.
-		/// </summary>
-		// <#@ include file="foo" once="true" #>
-		bool ShouldSupportOnceAttribute { get; }
-
-		/// <summary>
-		/// Indicates whether plugin should support 'linePragmas' and 'visibility' attributes
-		/// </summary>
-		bool ShouldSupportAdvancedAttributes { get; }
-
 		/// <summary>Gets the target framework ID.</summary>
 		TargetFrameworkId TargetFrameworkId { get; }
 

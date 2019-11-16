@@ -7,14 +7,16 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Rider.Model;
+using JetBrains.Util.dataStructures;
 using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
 	[SolutionComponent]
-	public class T4BuildMessageConverter : IT4BuildMessageConverter
+	public sealed class T4BuildMessageConverter : IT4BuildMessageConverter
 	{
 		[CanBeNull]
 		private ProjectModelViewHost Host { get; }
@@ -22,7 +24,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public T4BuildMessageConverter([NotNull] ISolution solution) =>
 			Host = solution.TryGetComponent<ProjectModelViewHost>();
 
-		public T4BuildResult ToT4BuildResult(ICollection<Diagnostic> diagnostics, IT4File file)
+		public T4BuildResult ToT4BuildResult(ICollection<Diagnostic> diagnostics, [NotNull] IT4File file)
 		{
 			int id = GetProjectId(file);
 			var kind = ToT4BuildResultKind(diagnostics);
@@ -33,38 +35,41 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private int GetProjectId([NotNull] IT4File file) => Host?.GetIdByItem(file.GetProject().NotNull()) ?? 0;
 
 		public T4BuildResult ToT4BuildResult(T4OutputGenerationException exception) =>
-			ToT4BuildResult(exception.FailureData);
+			ToT4BuildResult(exception.FailureDatum.AsEnumerable());
 
-		public T4PreprocessingResult ToT4PreprocessingResult(T4OutputGenerationException exception) =>
-			new T4PreprocessingResult(false, ToT4BuildMessage(exception.FailureData));
+		[NotNull]
+		private T4BuildResult ToT4BuildResult([NotNull] IEnumerable<T4FailureRawData> data) =>
+			new T4BuildResult(T4BuildResultKind.HasErrors, ToT4BuildMessages(data));
 
-		private T4BuildResult ToT4BuildResult(T4FailureRawData data)
+		public List<T4BuildMessage> ToT4BuildMessages(IEnumerable<T4FailureRawData> rawData)
 		{
-			var message = ToT4BuildMessage(data);
-			var messages = new List<T4BuildMessage> {message};
-			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
-		}
+			var messages = new List<T4BuildMessage>();
+			foreach (var data in rawData)
+			{
+				var location = new T4Location(data.Line, data.Column);
+				int projectId = GetProjectId(data.File);
+				string fullPath = data.File.GetSourceFile().GetLocation().FullPath;
+				string message = data.Message;
+				const T4BuildMessageKind kind = T4BuildMessageKind.Error;
+				messages.Add(new T4BuildMessage(kind, "Error", location, message, projectId, fullPath));
+			}
 
-		private T4BuildMessage ToT4BuildMessage(T4FailureRawData data)
-		{
-			var location = new T4Location(data.Line, data.Column);
-			int projectId = GetProjectId(data.File);
-			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, data.Message, projectId);
-			return message;
+			return messages;
 		}
 
 		public T4BuildResult FatalError()
 		{
 			var location = new T4Location(-1, -1);
-			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, "Fatal internal error", -1);
+			const string content = "Fatal internal error";
+			var message = new T4BuildMessage(T4BuildMessageKind.Error, "Error", location, content, -1, null);
 			var messages = new List<T4BuildMessage> {message};
 			return new T4BuildResult(T4BuildResultKind.HasErrors, messages);
 		}
 
-		public T4BuildResult SyntaxError(ITreeNode node) =>
-			ToT4BuildResult(T4FailureRawData.FromElement(node, "Syntax error"));
+		public T4BuildResult SyntaxErrors(IEnumerable<ITreeNode> nodes) =>
+			ToT4BuildResult(nodes.Select(node => T4FailureRawData.FromElement(node, "Syntax error")));
 
-		private T4BuildResultKind ToT4BuildResultKind([NotNull, ItemNotNull] ICollection<Diagnostic> diagnostics)
+		private static T4BuildResultKind ToT4BuildResultKind([NotNull, ItemNotNull] ICollection<Diagnostic> diagnostics)
 		{
 			if (diagnostics.Any(it => it.Severity == DiagnosticSeverity.Error)) return T4BuildResultKind.HasErrors;
 			if (diagnostics.Any(it => it.Severity == DiagnosticSeverity.Warning)) return T4BuildResultKind.HasWarnings;
@@ -75,9 +80,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private T4BuildMessage ToT4BuildMessage([NotNull] Diagnostic diagnostic, int projectId)
 		{
 			var kind = ToT4BuildMessageKind(diagnostic.Severity);
-			var start = diagnostic.Location.GetMappedLineSpan().StartLinePosition;
+			var mappedSpan = diagnostic.Location.GetMappedLineSpan();
+			var start = mappedSpan.StartLinePosition;
 			var location = new T4Location(start.Line, start.Character);
-			return new T4BuildMessage(kind, diagnostic.Id, location, diagnostic.GetMessage(), projectId);
+			string path = mappedSpan.Path;
+			string message = diagnostic.GetMessage();
+			string id = diagnostic.Id;
+			return new T4BuildMessage(kind, id, location, message, projectId, path);
 		}
 
 		private T4BuildMessageKind ToT4BuildMessageKind(DiagnosticSeverity severity)

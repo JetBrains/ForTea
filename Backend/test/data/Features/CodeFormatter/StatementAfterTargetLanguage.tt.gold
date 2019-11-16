@@ -1,12 +1,13 @@
-<#@ output extension="txt" #>
+﻿<#@ output extension="txt" #>
 <#
-    for (int i = 0; i < 10; i += 1)
+  for (int i = 0; i < 10; i += 1)
+  {
+    if (i % 2 == 0)
     {
-        if {caret}(i % 2 == 0)
-        {
 #>Hello
 <#
-            int j = i;
-        }
+      int j = i;
     }
+  }
 #>
+{caret}

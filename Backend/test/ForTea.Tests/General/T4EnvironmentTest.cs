@@ -15,8 +15,6 @@ namespace JetBrains.ForTea.Tests.General
 			var environment = ShellInstance.TryGetComponent<IT4Environment>();
 			Assert.NotNull(environment);
 			Assert.That(environment.IsSupported);
-			Assert.That(environment.ShouldSupportAdvancedAttributes);
-			Assert.That(environment.ShouldSupportOnceAttribute);
 		}
 
 		[Test]

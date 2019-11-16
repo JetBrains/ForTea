@@ -1,0 +1,7 @@
+﻿<#@ template language="C#" #>
+<#@ template language="C#v3.5" #>
+<#@ template language="VB" #>
+<#@ template language="|F#|(0)" #>
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Unexpected value

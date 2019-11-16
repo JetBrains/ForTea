@@ -6,6 +6,12 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
+	/// <summary>
+	/// If a feature block is followed by newlines, they get ignored,
+	/// see <see cref="T4InfoCollectorStateSeenFeatureAndNewLine"/>.
+	/// This state represents that newlines should not be ignored anymore
+	/// because there is text after a feature block
+	/// </summary>
 	public class T4InfoCollectorStateSeenFeatureAndText : T4InfoCollectorStateBase
 	{
 		[NotNull]
@@ -25,16 +31,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			FirstElement = firstElement;
 		}
 
-		protected override IT4InfoCollectorState GetNextStateSafe(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(ITreeNode element)
 		{
 			switch (element)
 			{
 				case IT4FeatureBlock _:
-					Die();
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
 				case IT4ExpressionBlock _:
-					Die();
-					return new T4InfoCollectorStateSeenFeature(Interrupter);
+					return new T4InfoCollectorStateSeenFeatureAndExpressionBlock(Interrupter);
 				case IT4Token _: return this;
 				default:
 					var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
@@ -43,11 +47,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			}
 		}
 
-		protected override bool FeatureStartedSafe => true;
-		protected override void ConsumeTokenSafe(IT4Token token) => Builder.Append(Convert(token));
-		protected override string ProduceSafe(ITreeNode lookahead) => Builder.ToString();
+		public override bool FeatureStarted => true;
+		public override void ConsumeToken(IT4Token token) => Builder.Append(Convert(token));
+		public override string Produce(ITreeNode lookahead) => Builder.ToString();
 
-		protected override string ProduceBeforeEofSafe()
+		public override string ProduceBeforeEof()
 		{
 			var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
 			Interrupter.InterruptAfterProblem(data);

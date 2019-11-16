@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <T4UtilsLocation>$(SolutionDir)T4Utils\</T4UtilsLocation>
+  </PropertyGroup>
+</Project>

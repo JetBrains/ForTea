@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Parsing.Lexing;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 
@@ -9,6 +10,7 @@ namespace GammaJul.ForTea.Core.Parsing
 	{
 		private T4LexerGenerated Generated { get; }
 		public T4Lexer(IBuffer buffer) => Generated = new T4LexerGenerated(buffer);
+		public static NodeTypeSet DirectiveTypes { get; } = T4LexerGenerated.DirectiveTypes;
 
 		public object CurrentPosition
 		{

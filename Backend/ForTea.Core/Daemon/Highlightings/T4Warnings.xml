@@ -1,0 +1,84 @@
+<Errors language="C#" implementationLanguage="T4">
+    <Usings>
+        GammaJul.ForTea.Core.Daemon.Attributes;
+        GammaJul.ForTea.Core.Tree;
+    </Usings>
+    <SeverityConfiguration>
+        <Group name="T4HighlightingAttributeGroup.ID">
+            <Tag name="EscapedKeyword" default="WARNING">
+                <Title>Keyword will be escaped during code generation</Title>
+                <Description/>
+            </Tag>
+            <Tag name="IgnoredDirective" default="WARNING">
+                <Title>The directive will be ignored and can be safely removed</Title>
+                <Description/>
+            </Tag>
+            <Tag name="NoSupportForVB" default="WARNING">
+                <Title>Visual Basic is not supported</Title>
+                <Description/>
+            </Tag>
+            <Tag name="RedundantInclude" default="WARNING">
+                <Title>Redundant include</Title>
+                <Description/>
+            </Tag>
+            <Tag name="UnresolvedInclude" default="WARNING">
+                <Title>Unresolved include</Title>
+                <Description/>
+            </Tag>
+            <Tag name="UnresolvedAssembly" default="WARNING">
+                <Title>Unresolved assembly</Title>
+                <Description/>
+            </Tag>
+            <Tag name="UnexpectedDirective" default="WARNING">
+                <Title>The directive is unknown and will be ignored</Title>
+                <Description/>
+            </Tag>
+            <Tag name="UnexpectedAttribute" default="WARNING">
+                <Title>The attribute is unknown and will be ignored</Title>
+                <Description/>
+            </Tag>
+        </Group>
+    </SeverityConfiguration>
+    <Warning name="EscapedKeyword" configurableSeverity="EscapedKeyword">
+        <Parameter type="IT4AttributeValue" name="value"/>
+        <Message value="Keyword will be escaped"/>
+        <Range>Value.GetHighlightingRange()</Range>
+    </Warning>
+    <Warning name="NoSupportForVB" configurableSeverity="NoSupportForVB">
+        <Parameter type="IT4AttributeValue" name="value"/>
+        <Message value="Visual Basic is not supported"/>
+        <Range>Value.GetHighlightingRange()</Range>
+    </Warning>
+    <Warning name="IgnoredDirective" configurableSeverity="IgnoredDirective">
+        <Parameter type="IT4Directive" name="directive"/>
+        <Message value="The directive will be ignored and can be safely removed"/>
+        <Range>Directive.GetHighlightingRange()</Range>
+        <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    </Warning>
+    <Warning name="RedundantInclude" configurableSeverity="RedundantInclude">
+        <Parameter type="IT4IncludeDirective" name="include"/>
+        <Message value="File already included"/>
+        <Range>Include.GetHighlightingRange()</Range>
+        <Behavour attributeID="HINT" overlapResolvePolicy="DEADCODE"/>
+    </Warning>
+    <Warning name="UnresolvedInclude" configurableSeverity="UnresolvedInclude">
+        <Parameter type="ITokenNode" name="node"/>
+        <Message value="Unresolved include path"/>
+        <Range>Node.GetHighlightingRange()</Range>
+    </Warning>
+    <Warning name="UnresolvedAssembly" configurableSeverity="UnresolvedAssembly">
+        <Parameter type="ITokenNode" name="node"/>
+        <Message value="Unresolved assembly"/>
+        <Range>Node.GetNavigationRange()</Range>
+    </Warning>
+    <Warning name="UnexpectedDirective" configurableSeverity="UnexpectedDirective">
+        <Parameter type="ITokenNode" name="name"/>
+        <Message value="Unexpected directive"/>
+        <Range>Name.GetHighlightingRange()</Range>
+    </Warning>
+    <Warning name="UnexpectedAttribute" configurableSeverity="UnexpectedAttribute">
+        <Parameter type="IT4AttributeName" name="name"/>
+        <Message value="Unexpected attribute"/>
+        <Range>Name.GetHighlightingRange()</Range>
+    </Warning>
+</Errors>

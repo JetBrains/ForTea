@@ -24,6 +24,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     field("location", T4Location)
     field("content", string)
     field("projectId", int)
+    field("file", string.nullable)
   }
 
   val T4BuildResultKind = enum {
@@ -37,26 +38,46 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     field("messages", immutableList(T4BuildMessage))
   }
 
-  val T4PreprocessingResult = structdef {
-    field("succeeded", bool)
-    field("message", T4BuildMessage.nullable)
-  }
-
   val T4ConfigurationModel = structdef {
     field("executablePath", string)
     field("outputPath", string)
   }
 
   val T4FileLocation = structdef {
-    field("location", string)
-    field("projectId", int)
+    field("id", int)
+  }
+
+  val T4PreprocessingResult = structdef {
+    field("location", T4FileLocation)
+    field("succeeded", bool)
+    field("message", immutableList(T4BuildMessage))
+  }
+
+  val T4ExecutionRequest = structdef {
+    field("location", T4FileLocation)
+    field("isVisible", bool)
   }
 
   init {
-    property("userSessionActive", bool).async
+    // Backend calls these to create and run new configurations
+    val requestExecution = call("requestExecution", T4ExecutionRequest, void).async
+    requestExecution.flow = FlowKind.Sink
+    val requestDebug = call("requestDebug", T4ExecutionRequest, void).async
+    requestDebug.flow = FlowKind.Sink
+
+    val preprocessingStarted = signal("preprocessingStarted", void).async
+    preprocessingStarted.flow = FlowKind.Sink
+    val preprocessingFinished = signal("preprocessingFinished", T4PreprocessingResult).async
+    preprocessingFinished.flow = FlowKind.Sink
+
     call("getConfiguration", T4FileLocation, T4ConfigurationModel).async
+
+    // Frontend calls this before executing file
     call("requestCompilation", T4FileLocation, T4BuildResult).async
     call("executionSucceeded", T4FileLocation, void).async
-    call("requestPreprocessing", T4FileLocation, T4PreprocessingResult).async
+    call("executionFailed", T4FileLocation, void).async
+    call("executionAborted", T4FileLocation, void).async
+
+    call("getProjectDependencies", T4FileLocation, immutableList(int)).async
   }
 }

@@ -1,0 +1,4 @@
+﻿<#@ include file="$(|ProjecDir|(0))" #>
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Unresolved macro

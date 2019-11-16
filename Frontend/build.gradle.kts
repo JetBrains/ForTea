@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
+import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -13,15 +14,14 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath("com.jetbrains.rd:rd-gen:0.192.36")
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.31")
-    classpath("org.jetbrains.kotlin:kotlin-reflect:1.3")
+    classpath("com.jetbrains.rd:rd-gen:0.193.100")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
   }
 }
 
 plugins {
-  id("org.jetbrains.intellij") version "0.4.9"
-  id("org.jetbrains.grammarkit") version "2018.1.7"
+  id("org.jetbrains.intellij") version "0.4.10"
+  id("org.jetbrains.grammarkit") version "2019.3"
 }
 
 apply {
@@ -35,26 +35,28 @@ repositories {
   maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
 }
 
-dependencies {
-  implementation(kotlin("stdlib"))
-  implementation(kotlin("reflect"))
+grammarKit {
+  grammarKitRelease = "2019.3"
 }
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-
-val baseVersion = "2019.2"
-version = "0.01"
+val baseVersion = "2019.3"
+version = baseVersion
 
 intellij {
   type = "RD"
-  version = baseVersion
+  val dir = file("build/rider")
+  if (dir.exists()) {
+    logger.lifecycle("*** Using Rider SDK from local path " + dir.absolutePath)
+    localPath = dir.absolutePath
+  } else {
+    logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
+    version = "$baseVersion-SNAPSHOT"
+  }
+
   instrumentCode = false
   downloadSources = false
   updateSinceUntilBuild = false
+
   // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
   setPlugins("rider-plugins-appender")
 }
@@ -102,7 +104,7 @@ val riderSdkPackageVersion by lazy {
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val riderSdkVersionPropsPath = File(backendPluginPath, "RiderSdkPackageVersion.props")
 
-val riderForTeaTargetsGroup = "ForTea.Rider"
+val riderForTeaTargetsGroup = "T4"
 
 fun File.writeTextIfChanged(content: String) {
   val bytes = content.toByteArray()
@@ -124,7 +126,6 @@ configure<RdgenParams> {
     logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
     val sdkPath = intellij.ideaDependency.classes
     val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-
     "$rdLibDirectory/rider-model.jar"
   })
   sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
@@ -148,6 +149,12 @@ configure<RdgenParams> {
 }
 
 tasks {
+  withType<RunIdeTask> {
+    // IDEs from SDK are launched with 512m by default, which is not enough for Rider.
+    // Rider uses this value when launched not from SDK
+    maxHeapSize = "1500m"
+  }
+
   withType<PrepareSandboxTask> {
     val files = pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
     val paths = files.map { File(backendPluginPath, it) }
@@ -178,7 +185,7 @@ tasks {
     purgeOldFiles = true
   }
 
-  val generateT4Parser = task<GenerateParser>("generateT4Parser") {
+  task<GenerateParser>("generateT4Parser") {
     source = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
     this.targetRoot = "src/main/java"
     purgeOldFiles = true
@@ -188,11 +195,11 @@ tasks {
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
-    dependsOn(generateT4Parser, generateT4Lexer)
+    dependsOn(generateT4Lexer)
   }
 
   withType<Test> {
-    dependsOn(generateT4Lexer, generateT4Parser)
+    dependsOn(generateT4Lexer)
     useTestNG()
     testLogging {
       showStandardStreams = true
@@ -260,6 +267,15 @@ tasks {
       }
     }
   }
+
+  getByName("buildSearchableOptions") {
+    // A kind of hack.
+    // The task is broken outside of Rider
+    // and cannot be performed when building standalone plugin
+    // Assumption: plugin is built in Release mode if and only if
+    // it is built on the server as Ridier bundled plugin
+    enabled = buildConfiguration == "Release"
+  }
 }
 
 defaultTasks("prepare")
@@ -267,13 +283,4 @@ defaultTasks("prepare")
 // workaround for https://youtrack.jetbrains.com/issue/RIDER-18697
 dependencies {
   testCompile("xalan", "xalan", "2.7.2")
-  implementation(kotlin("stdlib-jdk8"))
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-  jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-  jvmTarget = "1.8"
 }

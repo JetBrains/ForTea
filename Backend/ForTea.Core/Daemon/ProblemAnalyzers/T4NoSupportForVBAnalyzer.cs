@@ -1,11 +1,12 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4TemplateDirective), HighlightingTypes = new[] {typeof(EscapedKeywordHighlighting)})]
+	[ElementProblemAnalyzer(typeof(IT4TemplateDirective), HighlightingTypes = new[] {typeof(NoSupportForVBWarning)})]
 	public sealed class T4NoSupportForVBAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4TemplateDirective>
 	{
 		protected override DirectiveAttributeInfo GetTargetAttribute() =>
@@ -14,7 +15,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		protected override void DoRun(IT4AttributeValue element, IHighlightingConsumer consumer)
 		{
 			if (element.GetText() != "VB") return;
-			consumer.AddHighlighting(new NoSupportForVBHighlighting(element));
+			consumer.AddHighlighting(new NoSupportForVBWarning(element));
 		}
 	}
 }

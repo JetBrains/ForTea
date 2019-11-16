@@ -6,9 +6,10 @@ IT4File
     TEMPLATE: template
     WHITE_SPACE:  
     IT4DirectiveAttribute
-      TOKEN: language
+      IT4AttributeName
+        TOKEN: language
       EQUAL: =
-    ErrorElement:Unexpected token
+    ErrorElement:" expected
       TOKEN: C
       BAD_TOKEN: #
       QUOTE: "

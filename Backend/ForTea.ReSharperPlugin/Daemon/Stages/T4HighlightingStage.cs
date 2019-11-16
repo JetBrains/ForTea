@@ -12,7 +12,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Stages
 	/// <summary>Daemon stage that creates processes for highlighting tokens.</summary>
 	[DaemonStage(
 		StagesBefore = new[] {typeof(GlobalFileStructureCollectorStage)},
-		StagesAfter = new[] {typeof(T4ErrorStage), typeof(CollectUsagesStage), typeof(IdentifierHighlightingStage)}
+		StagesAfter = new[] {typeof(CollectUsagesStage), typeof(IdentifierHighlightingStage)}
 	)]
 	public class T4HighlightingStage : T4DaemonStageBase
 	{

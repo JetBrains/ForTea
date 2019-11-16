@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.Psi.Invalidation;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.DocumentModel;
@@ -22,7 +19,7 @@ namespace GammaJul.ForTea.Core.Psi
 {
 	/// <summary>This class will generate a C# code-behind from a T4 file.</summary>
 	[GeneratedDocumentService(typeof(T4ProjectFileType))]
-	public class T4CSharpGeneratedDocumentService : GeneratedDocumentServiceBase
+	public sealed class T4CSharpGeneratedDocumentService : GeneratedDocumentServiceBase
 	{
 		private static IEnumerable<PsiLanguageType> PsiLanguageTypes => new PsiLanguageType[] {CSharpLanguage.Instance};
 
@@ -35,32 +32,16 @@ namespace GammaJul.ForTea.Core.Psi
 
 			var solution = modificationInfo.SourceFile.GetSolution();
 			var generator = new T4CSharpCodeBehindGenerator(t4File, solution);
-			T4CSharpCodeGenerationResult result = generator.GenerateSafe();
+			var result = generator.GenerateSafe();
 
-			LanguageService csharpLanguageService = CSharpLanguage.Instance.LanguageService();
-			if (csharpLanguageService == null)
-				return null;
+			var csharpLanguageService = CSharpLanguage.Instance.LanguageService();
+			if (csharpLanguageService == null) return null;
 
-			var includedFiles = new OneToSetMap<FileSystemPath, FileSystemPath>();
-			includedFiles.AddRange(modificationInfo.SourceFile.GetLocation(), t4File
-				.Blocks
-				.OfType<IT4IncludeDirective>()
-				.Select(include => include.Path.ResolvePath())
-				.Where(path => !path.IsEmpty));
-
-			var t4FileDependencyManager = solution.GetComponent<T4FileDependencyManager>();
-
-			return new T4SecondaryDocumentGenerationResult(
-				modificationInfo.SourceFile,
+			return new SecondaryDocumentGenerationResult(
 				result.RawText,
 				csharpLanguageService.LanguageType,
 				new RangeTranslatorWithGeneratedRangeMap(result.GeneratedRangeMap),
-				csharpLanguageService.GetPrimaryLexerFactory(),
-				t4FileDependencyManager,
-				t4File.Blocks
-					.OfType<IT4IncludeDirective>()
-					.Select(include => include.Path.ResolvePath())
-					.Where(path => !path.IsEmpty)
+				csharpLanguageService.GetPrimaryLexerFactory()
 			);
 		}
 
