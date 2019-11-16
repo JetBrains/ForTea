@@ -102,8 +102,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			var t4File = sourceFile.GetTheOnlyPsiFile<T4Language>() as IT4File;
 			var includes = t4File
 				.NotNull()
-				.BlocksEnumerable
-				.OfType<IT4IncludeDirective>()
+				.GetThisAndChildrenOfType<IT4IncludeDirective>()
 				.Where(directive => directive.IsVisibleInDocument())
 				.Select(directive => directive.Path.ResolvePath())
 				.Distinct();

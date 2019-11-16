@@ -264,5 +264,15 @@ namespace GammaJul.ForTea.Core.Tree
 			var visibleDocument = file.GetSourceFile()?.Document;
 			return nodeDocument == visibleDocument;
 		}
+
+		[Pure, NotNull, ItemNotNull]
+		public static IEnumerable<TNode> GetThisAndChildrenOfType<TNode>([NotNull] this ITreeNode node)
+		{
+			if (node is TNode tNode) yield return tNode;
+			foreach (var that in node.Children().SelectMany(GetThisAndChildrenOfType<TNode>))
+			{
+				yield return that;
+			}
+		}
 	}
 }
