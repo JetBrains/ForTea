@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	/// this cache marks all the former dependencies and all the new dependencies as dirty.
 	/// </summary>
 	[PsiComponent]
-	public sealed class IT4FileDependencyCache : SimpleICache<T4FileDependencyData>,
+	public sealed class T4FileDependencyCache : SimpleICache<T4FileDependencyData>,
 		IT4FileDependencyGraph, IT4FileGraphNotifier
 	{
 		[NotNull]
@@ -50,7 +50,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			}
 		}
 
-		public IT4FileDependencyCache(
+		public T4FileDependencyCache(
 			Lifetime lifetime,
 			[NotNull] IPersistentIndexManager persistentIndexManager,
 			[NotNull] ILogger logger
@@ -58,6 +58,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		public IProjectFile FindBestRoot(IProjectFile file)
 		{
+			
 			var rootPath = FindBestRoot(file.Location);
 			var root = file
 				.GetSolution()
