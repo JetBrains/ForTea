@@ -58,7 +58,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		public IProjectFile FindBestRoot(IProjectFile file)
 		{
-			
 			var rootPath = FindBestRoot(file.Location);
 			var root = file
 				.GetSolution()

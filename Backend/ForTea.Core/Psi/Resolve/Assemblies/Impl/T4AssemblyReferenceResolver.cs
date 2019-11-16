@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
@@ -61,21 +60,25 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 
 		public FileSystemPath Resolve(IT4AssemblyDirective directive)
 		{
-			var targetAttribute = T4DirectiveInfoManager.Assembly.NameAttribute;
-			string assemblyNameOrFile = directive.GetFirstAttribute(targetAttribute)?.Value.GetText();
-			if (assemblyNameOrFile == null) return null;
-			var sourceFile = directive.GetSourceFile();
-			if (sourceFile == null) return null;
-			return Resolve(assemblyNameOrFile, sourceFile);
+			if (directive.ResolutionContext == null) return null;
+			using (Preprocessor.Prepare(directive.ResolutionContext))
+			{
+				string resolved = directive.Path.ResolveString();
+				string path = Preprocessor.Preprocess(directive.ResolutionContext, resolved);
+				var resolveContext = directive.ResolutionContext.SelectResolveContext();
+				var target = FindAssemblyReferenceTarget(path);
+				if (target == null) return null;
+				return Resolve(target, directive.ResolutionContext.GetProject().NotNull(), resolveContext);
+			}
 		}
 
 		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{
-			var projectFile = sourceFile.ToProjectFile() ?? T4MacroResolveContextCookie.ProjectFile;
+			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return null;
 			using (Preprocessor.Prepare(projectFile))
 			{
-				string resolved = new T4PathWithMacros(assemblyNameOrFile, sourceFile).ResolveString();
+				string resolved = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile).ResolveString();
 				string path = Preprocessor.Preprocess(projectFile, resolved);
 				var resolveContext = projectFile.SelectResolveContext();
 				var target = FindAssemblyReferenceTarget(path);

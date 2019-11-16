@@ -1,7 +1,6 @@
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.Modules.References;
-using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
@@ -25,7 +24,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		)
 		{
 			bool result = false;
-			using (T4MacroResolveContextCookie.GetOrCreate(file))
 			using (AssemblyNamePreprocessor.Prepare(file))
 			{
 				// removes the assembly references from the old assembly directives

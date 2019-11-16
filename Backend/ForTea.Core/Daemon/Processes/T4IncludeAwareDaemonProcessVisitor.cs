@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Utils;
-using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -15,7 +14,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 	public sealed class T4IncludeAwareDaemonProcessVisitor : IRecursiveElementProcessor
 	{
 		[NotNull]
-		private IT4IncludeGuard<IPsiSourceFile> Guard { get; }
+		private T4IncludeGuard Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private List<HighlightingInfo> MyHighlightings { get; } = new List<HighlightingInfo>();
@@ -29,8 +28,8 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		public T4IncludeAwareDaemonProcessVisitor([NotNull] IPsiSourceFile initialFile)
 		{
-			Guard = new T4ContextTrackingIncludeGuard();
-			Guard.StartProcessing(initialFile);
+			Guard = new T4IncludeGuard();
+			Guard.StartProcessing(initialFile.GetLocation());
 		}
 
 		public bool InteriorShouldBeProcessed(ITreeNode element) => true;
@@ -50,7 +49,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 					ProcessInclude(include);
 					break;
 				case IT4IncludedFile include:
-					Guard.StartProcessing(include.LogicalPsiSourceFile);
+					Guard.StartProcessing(include.LogicalPsiSourceFile.GetLocation());
 					break;
 				case IT4Directive directive:
 					ProcessDirective(directive);
@@ -86,8 +85,8 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 				return;
 			}
 
-			if (!Guard.CanProcess(sourceFile)) return;
-			if (include.Once && Guard.HasSeenFile(sourceFile))
+			if (!Guard.CanProcess(sourceFile.GetLocation())) return;
+			if (include.Once && Guard.HasSeenFile(sourceFile.GetLocation()))
 			{
 				ReportRedundantInclude(include);
 			}

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -23,7 +22,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			string attributeName = T4DirectiveInfoManager.Assembly.NameAttribute.Name;
 			string assemblyNameOrFile = directive.GetAttributeValueByName(attributeName);
 			if (assemblyNameOrFile.IsNullOrWhitespace()) return;
-			ReferencedAssemblies.Add(new T4PathWithMacros(assemblyNameOrFile, directive.GetSourceFile().NotNull()));
+			ReferencedAssemblies.Add(directive.Path);
 		}
 
 		/// <summary>Computes a difference between this data and another one.</summary>

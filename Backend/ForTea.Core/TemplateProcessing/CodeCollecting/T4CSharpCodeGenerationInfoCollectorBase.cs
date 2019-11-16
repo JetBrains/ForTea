@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
-using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Utils;
-using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
@@ -25,7 +23,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4EncodingsManager EncodingsManager { get; }
 
 		[NotNull]
-		private IT4IncludeGuard<IPsiSourceFile> Guard { get; }
+		private T4IncludeGuard Guard { get; }
 
 		[NotNull, ItemNotNull]
 		private Stack<T4CSharpCodeGenerationIntermediateResult> Results { get; }
@@ -43,25 +41,22 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
-			Guard = new T4ContextTrackingIncludeGuard();
+			Guard = new T4IncludeGuard();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
 		}
 
 		[NotNull]
 		public T4CSharpCodeGenerationIntermediateResult Collect()
 		{
-			var projectFile = File.GetSourceFile()?.ToProjectFile();
+			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile();
 			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(File, Interrupter);
-			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
-			{
-				Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-				Guard.StartProcessing(File.LogicalPsiSourceFile);
-				File.ProcessDescendants(this);
-				string suffix = Result.State.ProduceBeforeEof();
-				if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
-				Guard.EndProcessing();
-				return Results.Pop();
-			}
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+			Guard.StartProcessing(File.LogicalPsiSourceFile.GetLocation());
+			File.ProcessDescendants(this);
+			string suffix = Result.State.ProduceBeforeEof();
+			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
+			Guard.EndProcessing();
+			return Results.Pop();
 		}
 
 		#region IRecirsiveElementProcessor
@@ -78,22 +73,22 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(File.LogicalPsiSourceFile);
+				Guard.StartProcessing(File.LogicalPsiSourceFile.GetLocation());
 				return;
 			}
 
-			if (include.Once && Guard.HasSeenFile(sourceFile)) return;
-			if (!Guard.CanProcess(sourceFile))
+			if (include.Once && Guard.HasSeenFile(sourceFile.GetLocation())) return;
+			if (!Guard.CanProcess(sourceFile.GetLocation()))
 			{
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, "Recursion in includes");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(sourceFile);
+				Guard.StartProcessing(sourceFile.GetLocation());
 				return;
 			}
 
 			var resolved = include.IncludedFile;
-			Guard.StartProcessing(sourceFile);
+			Guard.StartProcessing(sourceFile.GetLocation());
 			resolved?.ProcessDescendants(this);
 		}
 
@@ -120,7 +115,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			string suffix = Result.State.ProduceBeforeEof();
 			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
-			Guard.TryEndProcessing(includeDirectiveParam.Path.Resolve());
+			Guard.TryEndProcessing(includeDirectiveParam.Path.Resolve().GetLocation());
 			var intermediateResults = Results.Pop();
 			Result.Append(intermediateResults);
 		}

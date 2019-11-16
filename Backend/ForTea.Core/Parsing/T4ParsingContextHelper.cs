@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using GammaJul.ForTea.Core.Psi.Utils;
-using GammaJul.ForTea.Core.Psi.Utils.Impl;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
@@ -10,8 +9,8 @@ namespace GammaJul.ForTea.Core.Parsing
 	public static class T4ParsingContextHelper
 	{
 		[NotNull]
-		private static ThreadLocal<IT4IncludeGuard<FileSystemPath>> Guard { get; } =
-			new ThreadLocal<IT4IncludeGuard<FileSystemPath>>(() => new T4BasicIncludeGuard());
+		private static ThreadLocal<T4IncludeGuard> Guard { get; } =
+			new ThreadLocal<T4IncludeGuard>(() => new T4IncludeGuard());
 
 		public static T ExecuteGuarded<T>([NotNull] FileSystemPath path, bool once, Func<T> action)
 		{
@@ -28,6 +27,6 @@ namespace GammaJul.ForTea.Core.Parsing
 			}
 		}
 
-		public static void Reset() => Guard.Value = new T4BasicIncludeGuard();
+		public static void Reset() => Guard.Value = new T4IncludeGuard();
 	}
 }

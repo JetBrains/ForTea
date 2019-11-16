@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Psi;
+using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
@@ -25,6 +26,9 @@ namespace GammaJul.ForTea.Core.Parsing
 		[CanBeNull]
 		private IPsiSourceFile PhysicalSourceFile { get; }
 
+		[NotNull]
+		private T4MacroResolveContext Context { get; }
+
 		/// <note>
 		/// Since the other ParseFile method is used in some external places,
 		/// this method should not contain any additional logic
@@ -35,12 +39,14 @@ namespace GammaJul.ForTea.Core.Parsing
 		public T4Parser(
 			[NotNull] ILexer lexer,
 			[CanBeNull] IPsiSourceFile logicalSourceFile,
-			[CanBeNull] IPsiSourceFile physicalSourceFile
+			[CanBeNull] IPsiSourceFile physicalSourceFile,
+			[CanBeNull] T4MacroResolveContext context = null
 		)
 		{
 			OriginalLexer = lexer;
 			LogicalSourceFile = logicalSourceFile;
 			PhysicalSourceFile = physicalSourceFile;
+			Context = context ?? new T4MacroResolveContext();
 			SetLexer(new T4FilteringLexer(lexer));
 		}
 
@@ -48,6 +54,7 @@ namespace GammaJul.ForTea.Core.Parsing
 		public override TreeElement ParseFile()
 		{
 			var result = ParseFileWithoutCleanup();
+			SetUpResolveContexts(result);
 			ResolveIncludes(result);
 			SetUpRangeTranslators(result);
 			result.SetSourceFile(PhysicalSourceFile);
@@ -76,19 +83,23 @@ namespace GammaJul.ForTea.Core.Parsing
 		[NotNull]
 		private File ParseFileWithoutCleanup()
 		{
-			var result = T4ParsingContextHelper.ExecuteGuarded(
-				LogicalSourceFile.GetLocation(),
-				false,
-				() =>
-				{
-					var file = (File) ParseFileInternal();
-					T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
-					if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
-					return file;
-				}
-			);
-			if (result == null) throw new InvalidOperationException("Attempted to parse same file recursively twice");
-			return result;
+			using (Context.RegisterNextLayer(LogicalSourceFile.ToProjectFile()))
+			{
+				var result = T4ParsingContextHelper.ExecuteGuarded(
+					LogicalSourceFile.GetLocation(),
+					false,
+					() =>
+					{
+						var file = (File) ParseFileInternal();
+						T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
+						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
+						return file;
+					}
+				);
+				if (result == null)
+					throw new InvalidOperationException("Attempted to parse same file recursively twice");
+				return result;
+			}
 		}
 
 		public override TreeElement ParseDirective()
@@ -107,6 +118,14 @@ namespace GammaJul.ForTea.Core.Parsing
 			var tempParsingResult = Match(T4TokenNodeTypes.DIRECTIVE_START);
 			result.AppendNewChild(tempParsingResult);
 			return HandleErrorInDirective(result, new UnexpectedToken("Missing directive name"));
+		}
+
+		private void SetUpResolveContexts([NotNull] IT4File file)
+		{
+			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
+			{
+				directive.ResolutionContext = Context.MostSuitableProjectFile;
+			}
 		}
 
 		private void ResolveIncludes([NotNull] IT4File file)
@@ -141,7 +160,7 @@ namespace GammaJul.ForTea.Core.Parsing
 			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
 			// We need to parse File here, not IncludedFile,
 			// because File makes some important error recovery and token reinsertion
-			return IncludedFile.FromOtherNode(new T4Parser(lexer, target, PhysicalSourceFile)
+			return IncludedFile.FromOtherNode(new T4Parser(lexer, target, PhysicalSourceFile, Context)
 				.ParseFileWithoutCleanup());
 		}
 
