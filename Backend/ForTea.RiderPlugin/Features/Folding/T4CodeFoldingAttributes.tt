@@ -20,6 +20,7 @@
 using JetBrains.ForTea.RiderPlugin.Features.Folding;
 using JetBrains.TextControl.DocumentMarkup;
 
+#region Registering
 <#
     foreach (string name in names)
     {
@@ -28,6 +29,7 @@ using JetBrains.TextControl.DocumentMarkup;
 <#
     }
 #>
+#endregion
 
 namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 {

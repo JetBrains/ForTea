@@ -9,10 +9,12 @@
 using JetBrains.ForTea.RiderPlugin.Features.Folding;
 using JetBrains.TextControl.DocumentMarkup;
 
+#region Registering
 [assembly: RegisterHighlighter(T4CodeFoldingAttributes.Directive, EffectType = EffectType.FOLDING)]
 [assembly: RegisterHighlighter(T4CodeFoldingAttributes.ExpressionBlock, EffectType = EffectType.FOLDING)]
 [assembly: RegisterHighlighter(T4CodeFoldingAttributes.FeatureBlock, EffectType = EffectType.FOLDING)]
 [assembly: RegisterHighlighter(T4CodeFoldingAttributes.StatementBlock, EffectType = EffectType.FOLDING)]
+#endregion
 
 namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 {
