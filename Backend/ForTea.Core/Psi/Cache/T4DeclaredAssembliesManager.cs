@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -8,10 +6,15 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
 {
+	/// <summary>
+	/// Cache holding <see cref="T4DeclaredAssembliesInfo"/> for each T4 file.
+	/// It cannot be implemented like ordinary cache because it needs PSI to build.
+	/// </summary>
 	[PsiComponent]
 	public sealed class T4DeclaredAssembliesManager
 	{
@@ -21,33 +24,48 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		[NotNull]
 		public Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>> FileDataChanged { get; }
 
-		public T4DeclaredAssembliesManager(Lifetime lifetime, [NotNull] IT4FileDependencyGraph graph)
+		public T4DeclaredAssembliesManager(
+			Lifetime lifetime,
+			[NotNull] IT4FileDependencyGraph graph,
+			[NotNull] IPsiFiles psiFiles
+		)
 		{
 			Graph = graph;
 			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>>(
 				lifetime,
-				"T4DeclaredAssembliesManager.FileDataChanged"
+				"T4DeclaredAssembliesCache.FileDataChanged"
+			);
+			lifetime.Bracket(
+				() => psiFiles.PsiFileCreated += OnPsiFileChanged,
+				() => psiFiles.PsiFileCreated -= OnPsiFileChanged
+			);
+			lifetime.Bracket(
+				() => psiFiles.AfterPsiChanged += OnPsiChanged,
+				() => psiFiles.AfterPsiChanged -= OnPsiChanged
 			);
 		}
 
-		public void UpdateReferences([NotNull, ItemNotNull] IEnumerable<IProjectFile> targets)
+		/// <summary>Called when a PSI file is created.</summary>
+		/// <param name="file">The file that was created.</param>
+		private void OnPsiFileChanged([CanBeNull] IFile file)
 		{
-			// This method should only be called on UI thread
-			// after all the documents have been committed,
-			// so it must be safe to access the PSI
-			var files = targets
-				.Select(PsiSourceFileExtensions.ToSourceFile)
-				.Select(sourceFile => sourceFile.GetPrimaryPsiFile())
-				.OfType<IT4File>();
-			foreach (var file in files)
-			{
-				CreateOrUpdateData(file);
-			}
+			if (!(file is IT4File t4File)) return;
+			CreateOrUpdateData(t4File);
+		}
+
+		/// <summary>Called when a PSI element changes.</summary>
+		/// <param name="treeNode">The tree node that changed.</param>
+		/// <param name="psiChangedElementType">The type of the PSI change.</param>
+		private void OnPsiChanged([CanBeNull] ITreeNode treeNode, PsiChangedElementType psiChangedElementType)
+		{
+			if (treeNode == null) return;
+			if (psiChangedElementType != PsiChangedElementType.SourceContentsChanged) return;
+			OnPsiFileChanged(treeNode.GetContainingFile());
 		}
 
 		private void CreateOrUpdateData([NotNull] IT4File t4File)
 		{
-			var sourceFile = t4File.GetSourceFile();
+			var sourceFile = t4File.PhysicalPsiSourceFile;
 			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
 			var newData = new T4DeclaredAssembliesInfo(t4File, Graph);
 			var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
