@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TextTemplating
 	/// <summary>
 	///     Utility class to produce culture-oriented representation of an object as a string.
 	/// </summary>
-	public static class ToStringInstanceHelper
+	public static class ToStringHelper
 	{
 		private static IFormatProvider formatProviderField =
 			CultureInfo.InvariantCulture;

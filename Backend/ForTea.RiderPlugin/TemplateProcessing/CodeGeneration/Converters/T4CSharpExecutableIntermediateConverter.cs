@@ -29,7 +29,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			"GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs";
 
 		protected override string GeneratedClassName => GeneratedClassNameString;
-		protected override string GeneratedBaseClassName => GeneratedBaseClassNameString;
+		protected override string GeneratedBaseClassName => T4TextTemplatingFQNs.TextTransformation;
 
 		[NotNull]
 		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
@@ -146,14 +146,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 				.Append("\"}"));
 
 		#region IT4ElementAppendFormatProvider
-		public override string ToStringConversionPrefix
-		{
-			get
-			{
-				if (IntermediateResult.HasBaseClass) return "ToStringInstanceHelper.ToStringWithCulture(";
-				return base.ToStringConversionPrefix;
-			}
-		}
+		public override string ToStringConversionPrefix =>
+			T4TextTemplatingFQNs.ToStringHelper + ".ToStringWithCulture(";
 
 		public override bool ShouldBreakExpressionWithLineDirective => true;
 
