@@ -82,7 +82,7 @@ namespace GammaJul.ForTea.Core.Parsing
 		{
 			using (Context.RegisterNextLayer(LogicalSourceFile.ToProjectFile()))
 			{
-				var result = T4ParsingContextHelper.ExecuteGuarded(
+				return T4ParsingContextHelper.ExecuteGuarded(
 					LogicalSourceFile.GetLocation(),
 					false,
 					() =>
@@ -90,15 +90,12 @@ namespace GammaJul.ForTea.Core.Parsing
 						var file = (File) ParseFileInternal();
 						T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
 						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
+						SetUpResolveContexts(file);
+						ResolveIncludes(file);
+						SetUpRangeTranslators(file);
 						return file;
 					}
-				);
-				if (result == null)
-					throw new InvalidOperationException("Attempted to parse same file recursively twice");
-				SetUpResolveContexts(result);
-				ResolveIncludes(result);
-				SetUpRangeTranslators(result);
-				return result;
+				).NotNull("Attempted to parse same file recursively twice");
 			}
 		}
 
