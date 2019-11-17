@@ -1,6 +1,6 @@
 namespace Microsoft.VisualStudio.TextTemplating
 {
-    public class ITextTemplatingEngineHost
+    public class TextTemplatingEngineHost : global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost
     {
         private const string RelativeUnsupportedMessage =
             "Relative include include path resolution is not supported yet.\n" +

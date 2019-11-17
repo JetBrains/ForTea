@@ -9,12 +9,13 @@
         private static int PostRegisterMain(string[] args)
         {
             var transformation = new $(PARAMETER_0) ();
-            transformation.Host.transformation = transformation;
+            var host = (TextTemplatingEngineHost) transformation.Host;
+            host.transformation = transformation;
             transformation.Host.SetOutputEncoding(global::System.Text.Encoding.GetEncoding($(PARAMETER_1)), true);
             string destination = args[0];
             string text = transformation.TransformText();
-            var encoding = transformation.Host.Encoding;
-            string extension = transformation.Host.FileExtension;
+            var encoding = host.Encoding;
+            string extension = host.FileExtension;
             if (extension != null) destination = destination.WithExtension__Generated(extension);
             foreach (CompilerError error in transformation.Errors)
             {

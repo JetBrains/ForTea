@@ -11,6 +11,7 @@ using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using Microsoft.CodeAnalysis;
@@ -68,14 +69,41 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			).AsList();
 
 			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
-			directDependencies.AddRange(Environment
-				.DefaultAssemblyNames
-				.Select(assemblyName => AssemblyReferenceResolver.Resolve(assemblyName, file.LogicalPsiSourceFile))
-			);
+			AddBaseReferences(directDependencies, file);
 			return LowLevelReferenceExtractionManager.ResolveTransitiveDependencies(
 				directDependencies,
 				projectFile.SelectResolveContext()
 			);
+		}
+
+		private void AddBaseReferences(
+			[NotNull, ItemNotNull] List<FileSystemPath> directDependencies,
+			[NotNull] IT4File file
+		)
+		{
+			directDependencies.AddRange(
+				Environment.DefaultAssemblyNames.Select(assemblyName => ResolveReference(file, assemblyName))
+			);
+		}
+
+		[NotNull]
+		private FileSystemPath ResolveReference(
+			[NotNull] IT4File file,
+			[NotNull] string assemblyName
+		)
+		{
+			var resolved = AssemblyReferenceResolver.Resolve(assemblyName, file.LogicalPsiSourceFile);
+			if (resolved != null) return resolved;
+			var node = FindSuitableNodeForErrorReporting(file);
+			string message = $"Could not resolve assembly: {assemblyName}";
+			throw new T4OutputGenerationException(T4FailureRawData.FromElement(node, message));
+		}
+
+		[NotNull]
+		private ITreeNode FindSuitableNodeForErrorReporting([NotNull] IT4File file)
+		{
+			ITreeNode templateDirective = file.BlocksEnumerable.OfType<IT4TemplateDirective>().FirstOrDefault();
+			return templateDirective ?? file;
 		}
 	}
 }

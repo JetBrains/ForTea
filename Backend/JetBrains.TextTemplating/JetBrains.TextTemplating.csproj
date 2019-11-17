@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DefineConstants>$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Microsoft.VisualStudio.TextTemplating</RootNamespace>
+  </PropertyGroup>
+</Project>

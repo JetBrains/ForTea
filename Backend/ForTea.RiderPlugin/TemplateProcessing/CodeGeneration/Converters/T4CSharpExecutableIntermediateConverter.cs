@@ -67,7 +67,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			Result.AppendLine(
 				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; } =");
 			AppendIndent();
-			Result.AppendLine("    new Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost();");
+			Result.AppendLine("    new Microsoft.VisualStudio.TextTemplating.TextTemplatingEngineHost();");
 		}
 
 		protected override bool ShouldAppendPragmaDirectives => true;
