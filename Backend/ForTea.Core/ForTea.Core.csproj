@@ -30,9 +30,7 @@
     <EmbeddedResource Include="Resources\TemplateBaseFullExecutableSuffix.cs" />
     <EmbeddedResource Include="Resources\HostspecificTemplateBaseFullExecutableSuffix.cs" />
     <EmbeddedResource Include="Resources\TemplateBaseStub.cs" />
-    <EmbeddedResource Include="Resources\Host.cs" />
     <EmbeddedResource Include="Resources\AssemblyRegistering.cs" />
-    <EmbeddedResource Include="Resources\ToStringInstanceHelper.cs" />
 
     <None Remove="Parsing\T4.lex" />
 

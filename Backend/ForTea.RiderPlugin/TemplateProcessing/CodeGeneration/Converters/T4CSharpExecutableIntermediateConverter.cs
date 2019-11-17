@@ -25,8 +25,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		[NotNull] private const string HostspecificSuffixResource =
 			"GammaJul.ForTea.Core.Resources.HostspecificTemplateBaseFullExecutableSuffix.cs";
 
-		[NotNull] private const string HostResource = "GammaJul.ForTea.Core.Resources.Host.cs";
-
 		[NotNull] private const string AssemblyRegisteringResource =
 			"GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs";
 
@@ -46,17 +44,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			ReferenceExtractionManager = referenceExtractionManager;
 		}
 
-		protected override void AppendNamespacePrefix()
-		{
-			if (!IntermediateResult.HasHost) return;
-			AppendHostDefinition();
-		}
-
-		// When creating executable, it is better to put base class first,
-		// to make error messages more informative
+		// When creating executable, we reference JetBrains.TextTemplating,
+		// which already contains the definition for TextTransformation
 		protected override void AppendClasses()
 		{
-			AppendBaseClass();
 			AppendMainContainer();
 			AppendClass();
 		}
@@ -65,34 +56,52 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		{
 			AppendIndent();
 			Result.AppendLine(
-				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; } =");
-			AppendIndent();
-			Result.AppendLine("    new Microsoft.VisualStudio.TextTemplating.TextTemplatingEngineHost();");
+				$"public virtual {T4TextTemplatingFQNs.HostInterface} Host {{ get; }}");
 		}
 
 		protected override bool ShouldAppendPragmaDirectives => true;
 
-		private void AppendHostDefinition()
+		protected override void AppendConstructor()
 		{
-			var provider = new T4TemplateResourceProvider(HostResource);
-			string filePath = File.GetSourceFile().GetLocation().FullPath;
-			string macros = GenerateExpandableMacros();
-			string host = provider.ProcessResource(filePath, GetGeneratedBaseClassFqn(), macros);
-			Result.Append(host);
+			AppendIndent();
+			Result.AppendLine("public GeneratedTextTransformation()");
+			AppendIndent();
+			Result.AppendLine("{");
+			PushIndent();
+			if (IntermediateResult.HasHost) AppendHostInitialization();
+			PopIndent();
+			PopIndent();
+			Result.AppendLine("}");
 		}
 
-		[NotNull]
-		private string GetGeneratedBaseClassFqn()
+		private void AppendHostInitialization()
 		{
-			string ns = GetNamespace();
-			if (ns.IsNullOrWhitespace()) return GeneratedBaseClassName;
-			return $"{ns}.{GeneratedBaseClassName}";
+			AppendIndent();
+			Result.AppendLine($"Host = new {T4TextTemplatingFQNs.HostImpl}(");
+			PushIndent();
+			{
+				AppendIndent();
+				Result.AppendLine($"new {T4TextTemplatingFQNs.Macros}");
+				AppendIndent();
+				Result.AppendLine("{");
+				Result.AppendLine(GenerateExpandableMacros());
+				AppendIndent();
+				Result.AppendLine("},");
+				AppendIndent();
+				Result.Append("\"");
+				string path = File.PhysicalPsiSourceFile.GetLocation().FullPath;
+				Result.Append(StringLiteralConverter.EscapeToRegular(path));
+				Result.AppendLine("\",");
+				AppendIndent();
+				Result.AppendLine("this);");
+			}
+			PopIndent();
 		}
 
 		[NotNull]
 		private string GenerateExpandableMacros()
 		{
-			var projectFile = File.GetSourceFile().ToProjectFile();
+			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile();
 			if (projectFile == null) return "";
 			var resolver = File.GetSolution().GetComponent<IT4MacroResolver>();
 			var macros = resolver.ResolveAllLightMacros(projectFile);

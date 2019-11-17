@@ -9,8 +9,7 @@
         private static int PostRegisterMain(string[] args)
         {
             var transformation = new $(PARAMETER_0) ();
-            var host = (TextTemplatingEngineHost) transformation.Host;
-            host.transformation = transformation;
+            var host = (global::Microsoft.VisualStudio.TextTemplating.JetBrains.TextTemplatingEngineHost) transformation.Host;
             transformation.Host.SetOutputEncoding(global::System.Text.Encoding.GetEncoding($(PARAMETER_1)), true);
             string destination = args[0];
             string text = transformation.TransformText();
