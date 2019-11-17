@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ProjectModel;
@@ -156,8 +155,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		{
 			int documentOffset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node).Offset;
 			var lineOffset = node
-				.GetSourceFile()
-				.NotNull()
+				.FindLogicalPsiSourceFile()
 				.Document
 				.GetCoordsByOffset(documentOffset)
 				.Column;

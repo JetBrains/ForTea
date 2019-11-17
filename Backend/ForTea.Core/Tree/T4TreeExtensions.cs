@@ -274,5 +274,9 @@ namespace GammaJul.ForTea.Core.Tree
 				yield return that;
 			}
 		}
+
+		[NotNull]
+		public static IPsiSourceFile FindLogicalPsiSourceFile([NotNull] this IT4TreeNode node) =>
+			node.GetParentOfType<IT4FileLikeNode>().NotNull().LogicalPsiSourceFile;
 	}
 }
