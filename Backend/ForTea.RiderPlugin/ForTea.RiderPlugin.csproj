@@ -14,7 +14,7 @@
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="JetBrains.Roslyn.References.Repack" Version="42.42.20190604.144922" />
+    <PackageReference Include="JetBrains.Roslyn.References.Repack" Version="42.42.20191115.153431" />
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
