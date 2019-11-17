@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 {
-	public class TextTemplatingEngineHost : ITextTemplatingEngineHost
+	public class TextTemplatingEngineHost : ITextTemplatingEngineHost, IServiceProvider
 	{
 		private const string RelativeUnsupportedMessage =
 			"Relative include include path resolution is not supported yet.\n" +
@@ -119,6 +119,16 @@ namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 				default:
 					return null;
 			}
+		}
+
+		public object GetService(Type serviceType)
+		{
+			if (typeof(EnvDTE.DTE) == serviceType)
+			{
+				return null;
+			}
+
+			return null;
 		}
 	}
 }
