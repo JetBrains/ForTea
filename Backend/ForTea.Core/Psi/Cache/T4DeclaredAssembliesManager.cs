@@ -19,18 +19,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	public sealed class T4DeclaredAssembliesManager
 	{
 		[NotNull]
-		private IT4FileDependencyGraph Graph { get; }
-
-		[NotNull]
 		public Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>> FileDataChanged { get; }
 
 		public T4DeclaredAssembliesManager(
 			Lifetime lifetime,
-			[NotNull] IT4FileDependencyGraph graph,
 			[NotNull] IPsiFiles psiFiles
 		)
 		{
-			Graph = graph;
 			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>>(
 				lifetime,
 				"T4DeclaredAssembliesCache.FileDataChanged"
@@ -67,7 +62,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		{
 			var sourceFile = t4File.PhysicalPsiSourceFile;
 			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
-			var newData = new T4DeclaredAssembliesInfo(t4File, Graph);
+			var newData = new T4DeclaredAssembliesInfo(t4File);
 			var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
 			sourceFile.SetDeclaredAssembliesInfo(newData);
 			var diff = newData.DiffWith(existingDeclaredAssembliesInfo);

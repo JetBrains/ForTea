@@ -1,12 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -19,10 +16,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		private void HandleAssemblyDirective([NotNull] IT4AssemblyDirective directive)
 		{
-			string attributeName = T4DirectiveInfoManager.Assembly.NameAttribute.Name;
-			string assemblyNameOrFile = directive.GetAttributeValueByName(attributeName);
-			if (assemblyNameOrFile.IsNullOrWhitespace()) return;
-			ReferencedAssemblies.Add(directive.Path);
+			// i.e. non-empty
+			if (!(directive.Path is T4PathWithMacros path)) return;
+			ReferencedAssemblies.Add(path);
 		}
 
 		/// <summary>Computes a difference between this data and another one.</summary>
@@ -50,18 +46,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			return new T4DeclaredAssembliesDiff(addedAssemblies, removedAssemblies);
 		}
 
-		public T4DeclaredAssembliesInfo([NotNull] IT4File baseFile, [NotNull] IT4FileDependencyGraph graph)
+		public T4DeclaredAssembliesInfo([NotNull] IT4File baseFile)
 		{
-			var projectFile = baseFile.GetSourceFile().NotNull().ToProjectFile().NotNull();
-			var directives = graph
-				.FindBestRoot(projectFile)
-				.ToSourceFile()
-				.NotNull()
-				.GetPrimaryPsiFile()
-				.NotNull()
-				.Children()
-				.OfType<IT4AssemblyDirective>();
-			foreach (var directive in directives)
+			foreach (var directive in baseFile.Children().OfType<IT4AssemblyDirective>())
 			{
 				HandleAssemblyDirective(directive);
 			}
