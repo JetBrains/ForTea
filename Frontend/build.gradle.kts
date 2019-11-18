@@ -20,7 +20,7 @@ buildscript {
 }
 
 plugins {
-  id("org.jetbrains.intellij") version "0.4.10"
+  id("org.jetbrains.intellij") version "0.4.13"
   id("org.jetbrains.grammarkit") version "2019.3"
 }
 
