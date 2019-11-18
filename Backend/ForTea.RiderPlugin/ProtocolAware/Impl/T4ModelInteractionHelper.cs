@@ -51,19 +51,17 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				return result ?? defaultValue;
 			};
 
-		[NotNull]
 		public Func<T4FileLocation, Unit> Wrap(Action<IT4File> wrappee) => location =>
 		{
 			Logger.Catch(() =>
 			{
 				using (ReadLockCookie.Create())
 				{
-					var file = Host
-						.GetItemById<IProjectFile>(location.Id)
-						?.ToSourceFile()
-						?.GetPsiFiles(T4Language.Instance)
-						.OfType<IT4File>()
-						.SingleItem();
+					var projectFile = Host.GetItemById<IProjectFile>(location.Id);
+					var sourceFile = projectFile?.ToSourceFile();
+					if (sourceFile == null) return;
+					sourceFile.GetPsiServices().Files.CommitAllDocuments();
+					var file = sourceFile.GetPsiFiles(T4Language.Instance).OfType<IT4File>().SingleItem();
 					if (file != null) wrappee(file);
 				}
 			});
