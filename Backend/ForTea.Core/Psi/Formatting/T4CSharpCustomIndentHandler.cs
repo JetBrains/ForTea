@@ -133,19 +133,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			.Select(rangeTranslator.GeneratedToOriginal)
 			.Where(originalRange => originalRange.IsValid())
 			.SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
-			.Any(IsInStatement);
-
-		private static bool IsInStatement([NotNull] ITreeNode node)
-		{
-			switch (node.GetParentOfType<IT4CodeBlock>())
-			{
-				case null:
-				case IT4ExpressionBlock _:
-					return false;
-				default:
-					return true;
-			}
-		}
+			.Any(it => it is IT4StatementBlock);
 
 		[Pure]
 		private static bool HasLineBreak([NotNull] IT4CodeBlock codeBlock, int nodeStart, TreeOffset blockStart) =>
