@@ -3,6 +3,11 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using EnvDTE;
+using EnvDTE80;
+using JetBrains.EnvDTE.Client;
+using JetBrains.EnvDTE.Client.Impl;
+using JetBrains.Lifetimes;
 
 namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 {
@@ -122,9 +127,13 @@ namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 
 		public object GetService(Type serviceType)
 		{
-			if (typeof(EnvDTE.DTE) == serviceType)
+			if (serviceType == typeof(DTE) || serviceType == typeof(DTE2))
 			{
-				return null;
+				string rawPort = Environment.GetEnvironmentVariable("T4_ENVDTE_CLIENT_PORT");
+				if (rawPort == null) return null;
+				if (!int.TryParse(rawPort, out int port)) return null;
+				var manager = new ConnectionManager(Lifetime.Eternal, port);
+				return new DTEImplementation(manager.Model);
 			}
 
 			return null;
