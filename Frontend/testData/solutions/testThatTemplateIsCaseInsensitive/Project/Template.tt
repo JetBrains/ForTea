@@ -1,5 +1,5 @@
 <#@ tEmPlAtE lAnGuAgE="C#" hOsTsPeCiFiC="tRuE" #>
-<#@ iMpOrT nAmEsPaCe="System.Text" #>
+<#@ iMpOrT nAmEsPaCe="Microsoft.VisualStudio.TextTemplating" #>
 <#
     ITextTemplatingEngineHost host = Host;
 #>
