@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Modules;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
@@ -18,7 +19,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
 	[SolutionComponent]
-	public sealed class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
+	public class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
 	{
 		[NotNull]
 		private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
@@ -40,7 +41,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			AssemblyInfoDatabase = assemblyInfoDatabase;
 		}
 
-		public AssemblyReferenceTarget FindAssemblyReferenceTarget(string assemblyNameOrFile)
+		[CanBeNull]
+		private static AssemblyReferenceTarget FindAssemblyReferenceTarget(string assemblyNameOrFile)
 		{
 			// assembly path
 			var path = FileSystemPath.TryParse(assemblyNameOrFile);
@@ -52,7 +54,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			return nameInfo.ToAssemblyReferenceTarget();
 		}
 
-		public FileSystemPath Resolve(
+		[CanBeNull]
+		private FileSystemPath Resolve(
 			AssemblyReferenceTarget target,
 			IProject project,
 			IModuleReferenceResolveContext resolveContext
@@ -60,15 +63,11 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 
 		public FileSystemPath Resolve(IT4AssemblyDirective directive)
 		{
-			if (directive.ResolutionContext == null) return null;
-			using (Preprocessor.Prepare(directive.ResolutionContext))
+			var projectFile = directive.ResolutionContext;
+			using (Preprocessor.Prepare(projectFile))
 			{
-				string resolved = directive.Path.ResolveString();
-				string path = Preprocessor.Preprocess(directive.ResolutionContext, resolved);
-				var resolveContext = directive.ResolutionContext.SelectResolveContext();
-				var target = FindAssemblyReferenceTarget(path);
-				if (target == null) return null;
-				return Resolve(target, directive.ResolutionContext.GetProject().NotNull(), resolveContext);
+				var pathWithMacros = directive.Path;
+				return Resolve(pathWithMacros);
 			}
 		}
 
@@ -78,13 +77,19 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			if (projectFile == null) return null;
 			using (Preprocessor.Prepare(projectFile))
 			{
-				string resolved = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile).ResolveString();
-				string path = Preprocessor.Preprocess(projectFile, resolved);
-				var resolveContext = projectFile.SelectResolveContext();
-				var target = FindAssemblyReferenceTarget(path);
-				if (target == null) return null;
-				return Resolve(target, projectFile.GetProject().NotNull(), resolveContext);
+				var pathWithMacros = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile);
+				return Resolve(pathWithMacros);
 			}
+		}
+
+		public virtual FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros)
+		{
+			string resolved = pathWithMacros.ResolveString();
+			string path = Preprocessor.Preprocess(pathWithMacros.ProjectFile, resolved);
+			var resolveContext = pathWithMacros.ProjectFile.SelectResolveContext();
+			var target = FindAssemblyReferenceTarget(path);
+			if (target == null) return null;
+			return Resolve(target, pathWithMacros.ProjectFile.GetProject().NotNull(), resolveContext);
 		}
 
 		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(

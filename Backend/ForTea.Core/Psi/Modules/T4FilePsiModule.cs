@@ -4,6 +4,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Modules.References;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
@@ -209,11 +210,16 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 
 		private void AddBaseReferences()
 		{
-			AssemblyReferenceManager.TryAddReference("mscorlib");
-			AssemblyReferenceManager.TryAddReference("System");
-			foreach (var assemblyName in T4Environment.TextTemplatingAssemblyNames)
-				AssemblyReferenceManager.TryAddReference(assemblyName);
+			TryAddReference("mscorlib");
+			TryAddReference("System");
+			foreach (string assemblyName in T4Environment.TextTemplatingAssemblyNames)
+			{
+				TryAddReference(assemblyName);
+			}
 		}
+
+		private void TryAddReference([NotNull] string name) =>
+			AssemblyReferenceManager.TryAddReference(new T4PathWithMacros(name, SourceFile, ProjectFile, GetSolution()));
 
 		public IPsiServices GetPsiServices() => PsiServices;
 		public ISolution GetSolution() => Solution;

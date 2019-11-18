@@ -42,8 +42,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				// adds assembly references from the new assembly directives
 				foreach (var _ in dataDiff
 					.AddedAssemblies
-					.Select(it => AssemblyNamePreprocessor.Preprocess(file, it.ResolveString()))
-					.Where(addedAssembly => !referenceManager.References.ContainsKey(addedAssembly))
 					.Select(referenceManager.TryAddReference)
 					.WhereNotNull()
 				)

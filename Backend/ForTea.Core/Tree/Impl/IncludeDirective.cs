@@ -29,15 +29,16 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 		public IT4PathWithMacros GetPathForParsing([NotNull] IPsiSourceFile file)
 		{
 			string rawPath = RawPath;
-			if (rawPath == null) return T4EmptyPathWithMacros.Instance;
+			if (rawPath == null) return new T4EmptyPathWithMacros(ResolutionContext);
 			return new T4PathWithMacros(rawPath, file, ResolutionContext);
 		}
 
+		[NotNull]
 		private IT4PathWithMacros CreateIncludePath([CanBeNull] string includeFileName)
 		{
-			if (includeFileName == null) return T4EmptyPathWithMacros.Instance;
+			if (includeFileName == null) return new T4EmptyPathWithMacros(ResolutionContext);
 			var sourceFile = GetSourceFile();
-			if (sourceFile == null) return T4EmptyPathWithMacros.Instance;
+			if (sourceFile == null) return new T4EmptyPathWithMacros(ResolutionContext);
 			return new T4PathWithMacros(includeFileName, sourceFile, ResolutionContext);
 		}
 

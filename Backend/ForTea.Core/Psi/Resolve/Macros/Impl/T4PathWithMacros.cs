@@ -16,16 +16,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private static Regex MacroRegex { get; } =
 			new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
-		[NotNull]
-		private string RawPath { get; }
+		public string RawPath { get; }
 
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
 
 		// Source file might have no corresponding project file;
 		// This is the most suitable project file in that case
-		[CanBeNull]
-		private IProjectFile ProjectFile { get; }
+		public IProjectFile ProjectFile { get; }
 
 		[NotNull]
 		private IT4MacroResolver Resolver { get; }
@@ -45,13 +43,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		public T4PathWithMacros(
 			[CanBeNull] string rawPath,
 			[NotNull] IPsiSourceFile file,
-			[CanBeNull] IProjectFile projectFile
+			[CanBeNull] IProjectFile projectFile,
+			[CanBeNull] ISolution solution = null
 		)
 		{
 			RawPath = rawPath ?? "";
 			SourceFile = file;
 			ProjectFile = projectFile;
-			Solution = SourceFile.GetSolution();
+			Solution = solution ?? SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
 			OutsideSolutionManager = Solution.GetComponent<T4OutsideSolutionSourceFileManager>();
