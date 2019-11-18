@@ -45,14 +45,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IProject project,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator,
 			[NotNull] IT4TemplateKindProvider manager
 		) : base(handler) => _t4PsiModuleProvider = new T4PsiModuleProvider(
 			lifetime,
 			project.Locks,
 			changeManager,
 			t4Environment,
-			coordinator,
 			manager
 		);
 

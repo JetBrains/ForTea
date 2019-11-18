@@ -27,7 +27,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[NotNull] private readonly IShellLocks _shellLocks;
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IT4Environment _t4Environment;
-		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
 
 		[NotNull]
 		private IT4TemplateKindProvider TemplateDataManager { get; }
@@ -139,8 +138,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				projectFile,
 				_changeManager,
 				_shellLocks,
-				_t4Environment,
-				_coordinator
+				_t4Environment
 			);
 			_modules[projectFile] = new ModuleWrapper(psiModule, lifetimeDefinition);
 			changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added);
@@ -179,7 +177,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator,
 			[NotNull] IT4TemplateKindProvider templateDataManager
 		)
 		{
@@ -187,7 +184,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_shellLocks = shellLocks;
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
-			_coordinator = coordinator;
 			TemplateDataManager = templateDataManager;
 		}
 
