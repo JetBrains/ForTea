@@ -72,7 +72,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			RunningFiles = new Dictionary<FileSystemPath, LifetimeDefinition>();
 		}
 
-		private void RememberExecution([NotNull] IT4File file, bool withProgress) =>
+		public void RememberExecution(IT4File file, bool withProgress) =>
 			RememberExecution(file.PhysicalPsiSourceFile.NotNull().GetLocation(), withProgress);
 
 		private void RememberExecution([NotNull] FileSystemPath path, bool withProgress)

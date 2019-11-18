@@ -77,6 +77,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			model.ExecutionSucceeded.Set(helper.Wrap(ExecutionSucceeded));
 			model.ExecutionFailed.Set(helper.Wrap(ExecutionFailed));
 			model.ExecutionAborted.Set(helper.Wrap(ExecutionFailed));
+			model.PrepareExecution.Set(helper.Wrap(PrepareExecution));
 		}
 
 		[CanBeNull]
@@ -120,6 +121,11 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		{
 			Logger.Verbose("Execution of a file failed");
 			ExecutionManager.OnExecutionFinished(file);
+		}
+
+		private void PrepareExecution([NotNull] IT4File file)
+		{
+			ExecutionManager.RememberExecution(file, false);
 		}
 	}
 }

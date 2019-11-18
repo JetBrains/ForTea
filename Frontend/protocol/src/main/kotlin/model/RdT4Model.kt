@@ -79,5 +79,9 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     call("executionAborted", T4FileLocation, void).async
 
     call("getProjectDependencies", T4FileLocation, immutableList(int)).async
+    // Normally, it's the backend that initiates template execution,
+    // so it can perform the necessary associated data structure preparations.
+    // In tests, however, this call needs to be done first
+    call("prepareExecution", T4FileLocation, void)
   }
 }
