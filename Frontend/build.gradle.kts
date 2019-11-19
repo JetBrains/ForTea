@@ -66,12 +66,13 @@ val pluginFiles = listOf(
 
 val libraryFiles = listOf(
   // A temporary fix. Remove this once EnvDTE nugets are part of the platform
-  "output/JetBrains.TextTemplating/$buildConfiguration/EnvDTE",
-  "output/JetBrains.TextTemplating/$buildConfiguration/EnvDTE80",
-  "output/JetBrains.TextTemplating/$buildConfiguration/EnvDTE90",
-  "output/JetBrains.TextTemplating/$buildConfiguration/EnvDTE90a",
-  "output/JetBrains.TextTemplating/$buildConfiguration/EnvDTE100"
-)
+  "EnvDTE",
+  "EnvDTE80",
+  "EnvDTE90",
+  "EnvDTE90a",
+  "EnvDTE100",
+  "JetBrains.EnvDTE.Client"
+).map { "output/JetBrains.TextTemplating/$buildConfiguration/$it" }
 
 val dotNetSdkPath by lazy {
   val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
