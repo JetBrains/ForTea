@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application.Infra;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Utils;
@@ -22,9 +18,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 	public class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
 	{
 		[NotNull]
-		private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
-
-		[NotNull]
 		private IT4AssemblyNamePreprocessor Preprocessor { get; }
 
 		[NotNull]
@@ -32,13 +25,11 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 
 		public T4AssemblyReferenceResolver(
 			[NotNull] IModuleReferenceResolveManager resolveManager,
-			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
-			[NotNull] AssemblyInfoDatabase assemblyInfoDatabase
+			[NotNull] IT4AssemblyNamePreprocessor preprocessor
 		)
 		{
 			ResolveManager = resolveManager;
 			Preprocessor = preprocessor;
-			AssemblyInfoDatabase = assemblyInfoDatabase;
 		}
 
 		[CanBeNull]
@@ -90,55 +81,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			var target = FindAssemblyReferenceTarget(path);
 			if (target == null) return null;
 			return Resolve(target, pathWithMacros.ProjectFile.GetProject().NotNull(), resolveContext);
-		}
-
-		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
-			IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			IModuleReferenceResolveContext resolveContext
-		)
-		{
-			var result = new List<T4AssemblyReferenceInfo>();
-			ResolveTransitiveDependencies(directDependencies, resolveContext, result);
-			return result;
-		}
-
-		public IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
-			IList<FileSystemPath> directDependencies,
-			IModuleReferenceResolveContext resolveContext
-		)
-		{
-			return ResolveTransitiveDependencies(directDependencies.SelectMany(directDependency => AssemblyInfoDatabase
-				.GetReferencedAssemblyNames(directDependency)
-				.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(assemblyNameInfo =>
-				{
-					var resolver = new AssemblyResolverOnFolders(directDependency.Parent);
-					resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-					if (path == null) return null;
-					return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
-				})), resolveContext).Select(it => it.Location).Concat(directDependencies);
-		}
-
-		private void ResolveTransitiveDependencies(
-			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			[NotNull] IModuleReferenceResolveContext resolveContext,
-			[NotNull] IList<T4AssemblyReferenceInfo> destination
-		)
-		{
-			foreach (var directDependency in directDependencies)
-			{
-				if (destination.Any(it => it.FullName == directDependency.FullName)) continue;
-				destination.Add(directDependency);
-				var indirectDependencies = AssemblyInfoDatabase
-					.GetReferencedAssemblyNames(directDependency.Location)
-					.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(assemblyNameInfo =>
-					{
-						var resolver = new AssemblyResolverOnFolders(directDependency.Location.Parent);
-						resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-						if (path == null) return null;
-						return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
-					});
-				ResolveTransitiveDependencies(indirectDependencies, resolveContext, destination);
-			}
 		}
 	}
 }

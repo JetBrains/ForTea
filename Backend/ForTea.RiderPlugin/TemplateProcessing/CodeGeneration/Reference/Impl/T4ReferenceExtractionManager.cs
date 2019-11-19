@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Debugger.Common.MetadataAndPdb;
+using GammaJul.ForTea.Core;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -13,6 +14,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using Microsoft.CodeAnalysis;
@@ -26,19 +28,20 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		private RoslynMetadataReferenceCache Cache { get; }
 
 		[NotNull]
-		private IPsiModules PsiModules { get; }
-
-		[NotNull]
 		private IT4AssemblyReferenceResolver AssemblyReferenceResolver { get; }
 
+		[NotNull]
+		private IT4LowLevelReferenceExtractionManager LowLevelReferenceExtractionManager { get; }
+		
 		public T4ReferenceExtractionManager(
 			Lifetime lifetime,
 			[NotNull] IPsiModules psiModules,
-			[NotNull] IT4AssemblyReferenceResolver assemblyReferenceResolver
+			[NotNull] IT4AssemblyReferenceResolver assemblyReferenceResolver,
+			[NotNull] IT4LowLevelReferenceExtractionManager lowLevelReferenceExtractionManager
 		)
 		{
-			PsiModules = psiModules;
 			AssemblyReferenceResolver = assemblyReferenceResolver;
+			LowLevelReferenceExtractionManager = lowLevelReferenceExtractionManager;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
@@ -51,19 +54,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 				.SelectMany(it => it.Blocks)
 				.OfType<IT4AssemblyDirective>();
 			var errors = new FrugalLocalList<T4FailureRawData>();
-			var directDependencies = directives.SelectNotNull(directive =>
-			{
-				var resolved = AssemblyReferenceResolver.Resolve(directive);
-				if (resolved == null)
+			var directDependencies = directives.SelectNotNull(
+				directive =>
 				{
-					errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
-				}
+					var resolved = AssemblyReferenceResolver.Resolve(directive);
+					if (resolved == null)
+					{
+						errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
+					}
 
-				return resolved;
-			}).AsList();
+					return resolved;
+				}
+			).AsList();
 
 			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
-			var result = AssemblyReferenceResolver.ResolveTransitiveDependencies(
+			var result = LowLevelReferenceExtractionManager.ResolveTransitiveDependencies(
 				directDependencies,
 				projectFile.SelectResolveContext()
 			).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
@@ -98,13 +103,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
 			// todo: file.AssertContainsNoIncludeContext();
-			var directReferences = ExtractRawAssemblyReferences(file).Select(assemblyFile =>
-				new T4AssemblyReferenceInfo(assemblyFile.AssemblyName?.FullName ?? "", assemblyFile.Location)
+			var directReferences = ExtractRawAssemblyReferences(file).Select(
+				assemblyFile =>
+					new T4AssemblyReferenceInfo(assemblyFile.AssemblyName?.FullName ?? "", assemblyFile.Location)
 			);
 			var sourceFile = file.LogicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var resolveContext = projectFile.SelectResolveContext();
-			return AssemblyReferenceResolver
+			return LowLevelReferenceExtractionManager
 				.ResolveTransitiveDependencies(directReferences, resolveContext)
 				.AsList();
 		}
@@ -119,24 +125,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			using (CompilationContextCookie.GetOrCreate(resolveContext))
 			{
 				return psiModule.RawReferences.SelectMany(it => it.GetFiles()).AsList();
-			}
-		}
-
-		public IEnumerable<IProject> GetProjectDependencies(IT4File file)
-		{
-			file.AssertContainsNoIncludeContext();
-			var sourceFile = file.LogicalPsiSourceFile.NotNull();
-			var projectFile = sourceFile.ToProjectFile().NotNull();
-			var psiModule = sourceFile.PsiModule;
-			var resolveContext = projectFile.SelectResolveContext();
-			using (CompilationContextCookie.GetOrCreate(resolveContext))
-			{
-				return PsiModules
-					.GetModuleReferences(psiModule)
-					.Select(it => it.Module)
-					.OfType<IProjectPsiModule>()
-					.Select(it => it.Project)
-					.AsList();
 			}
 		}
 	}
