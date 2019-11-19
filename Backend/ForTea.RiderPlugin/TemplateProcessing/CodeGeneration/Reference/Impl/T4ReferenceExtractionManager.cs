@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Debugger.Common.MetadataAndPdb;
+using GammaJul.ForTea.Core;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -29,14 +30,19 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		[NotNull]
 		private IT4LowLevelReferenceExtractionManager LowLevelReferenceExtractionManager { get; }
 
+		[NotNull]
+		private IT4Environment Environment { get; }
+
 		public T4ReferenceExtractionManager(
 			Lifetime lifetime,
 			[NotNull] IT4AssemblyReferenceResolver assemblyReferenceResolver,
-			[NotNull] IT4LowLevelReferenceExtractionManager lowLevelReferenceExtractionManager
+			[NotNull] IT4LowLevelReferenceExtractionManager lowLevelReferenceExtractionManager,
+			[NotNull] IT4Environment environment
 		)
 		{
 			AssemblyReferenceResolver = assemblyReferenceResolver;
 			LowLevelReferenceExtractionManager = lowLevelReferenceExtractionManager;
+			Environment = environment;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
@@ -63,37 +69,31 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			).AsList();
 
 			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
+			AddBaseReferences(directDependencies, file);
 			var result = LowLevelReferenceExtractionManager.ResolveTransitiveDependencies(
 				directDependencies,
 				projectFile.SelectResolveContext()
 			).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
-			AddBaseReferences(lifetime, result, sourceFile);
 			return result;
 		}
 
 		private void AddBaseReferences(
-			Lifetime lifetime,
-			[NotNull, ItemNotNull] List<MetadataReference> result,
-			[NotNull] IPsiSourceFile sourceFile
+			[NotNull, ItemNotNull] List<FileSystemPath> directDependencies,
+			[NotNull] IT4File file
 		)
 		{
-			TryAddReference(lifetime, result, sourceFile, "mscorlib");
-			TryAddReference(lifetime, result, sourceFile, "System");
+			directDependencies.Add(AddReference(file, "mscorlib"));
+			directDependencies.Add(AddReference(file, "System"));
+			directDependencies.AddRange(
+				Environment.TextTemplatingAssemblyNames.Select(assemblyName => AddReference(file, assemblyName))
+			);
 		}
 
-		private void TryAddReference(
-			Lifetime lifetime,
-			[NotNull, ItemNotNull] List<MetadataReference> result,
-			[NotNull] IPsiSourceFile sourceFile,
+		[CanBeNull]
+		private FileSystemPath AddReference(
+			[NotNull] IT4File file,
 			[NotNull] string assemblyName
-		)
-		{
-			var resolved = AssemblyReferenceResolver.Resolve(assemblyName, sourceFile);
-			if (resolved == null) return;
-			var metadataReference = Cache.GetMetadataReference(lifetime, resolved);
-			if (metadataReference == null) return;
-			result.Add(metadataReference);
-		}
+		) => AssemblyReferenceResolver.Resolve(assemblyName, file.LogicalPsiSourceFile);
 
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
