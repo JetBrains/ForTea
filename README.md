@@ -5,27 +5,27 @@
 
 About
 ----
-ForTea is a a plugin for [Rider](https://www.jetbrains.com/rider/) and [ReSharper](https://www.jetbrains.com/resharper/) that adds intelligent support for editing T4 files (`*.tt`, `*.ttinclude`, `*.t4`).
-The Rider plugin also allows to automatically execute and preprocess T4 files.
+ForTea is a plugin for [Rider](https://www.jetbrains.com/rider/) and [ReSharper](https://www.jetbrains.com/resharper/) that adds intelligent support for editing T4 files (`*.tt`, `*.ttinclude`, `*.t4`).
+The Rider plugin also has the option to automatically execute and preprocess T4 files.
 
 Installation
 ----
 #### Rider:
-Starting with `Rider 2019.3`, the plugin will be installed out-of-the-box.  
+Starting with `Rider 2019.3`, this plugin will be installed out of the box.  
 If you build the plugin manually, it can be installed using  
 _Settings > Plugins > (Gear icon) > Install plugin from disk_
 
 #### ReSharper:
 Visual Studio 2010, 2012, 2013, 2015, 2017 and 2019 are supported.  
 To use the latest version of the plugin, the latest stable ReSharper must be installed (older releases are still available for some older versions of ReSharper).  
-Right now, this plugin is not published. If you want to use it, you'll need to build it first. See BUILD.md for details.  
+This plugin is not published. If you want to use it, you'll first need to build it. See BUILD.md for details.  
 After you've built the plugin, use Extension Manager from the ReSharper menu.
 
 Features
 ----
  - Execution of classical T4 templates
  - Generation of C# code (aka template preprocessing)
- - Full inetllignet support in T4 directives
+ - Full intelligent support in T4 directives
  - Full intelligent support in C# in in-line blocks: find usages, refactorings, context actions, etc.
  - Extensive intelligent support for includes
  - Support for adding assembly and import directives through quick fixes
@@ -34,11 +34,11 @@ Features
 License
 ----
 Licensed under [Apache License 2.0](LICENSE)
-This plugin is a successor of [the original plugin by MrJul](https://github.com/MrJul/ForTea), whom we are very thankful.
+This plugin is a successor to [the original plugin by MrJul](https://github.com/MrJul/ForTea), whom we are very thankful to.
 
 Building plugin
 ----
-Build instruction can be found [here](BUILD.md).  
+Build instructions can be found [here](BUILD.md).  
 
 Things to know about ReSharper plugin
 ----
