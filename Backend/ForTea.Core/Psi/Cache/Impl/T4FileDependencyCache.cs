@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
+using GammaJul.ForTea.Core.Utils;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
@@ -29,7 +30,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		[NotNull]
 		private IDictionary<FileSystemPath, T4FileDependencyData> IncluderToIncludes =>
-			Map.ToDictionary(it => it.Key.GetLocation(), it => it.Value);
+			Map.Distinct(it => it.Key.GetLocation()).ToDictionary(it => it.Key.GetLocation(), it => it.Value);
 
 		[NotNull]
 		private IDictionary<FileSystemPath, T4FileDependencyData> IncludeToIncluders
@@ -56,23 +57,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			[NotNull] ILogger logger
 		) : base(lifetime, persistentIndexManager, T4FileDependencyDataMarshaller.Instance) => Logger = logger;
 
-		public IProjectFile FindBestRoot(IProjectFile file)
-		{
-			
-			var rootPath = FindBestRoot(file.Location);
-			var root = file
-				.GetSolution()
-				.FindProjectItemsByLocation(rootPath)
-				.OfType<IProjectFile>()
-				.SingleOrDefault();
-			if (root == null)
-			{
-				Logger.Warn("Could not determine best root for a file");
-				return file;
-			}
-
-			return root;
-		}
+		public IProjectFile FindBestRoot(IProjectFile file) =>
+			FindBestRoot(file.Location).FindMostSuitableFile(file);
 
 		[NotNull]
 		private FileSystemPath FindBestRoot([NotNull] FileSystemPath include) =>
@@ -103,8 +89,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			var t4File = sourceFile.GetTheOnlyPsiFile<T4Language>() as IT4File;
 			var includes = t4File
 				.NotNull()
-				.BlocksEnumerable
-				.OfType<IT4IncludeDirective>()
+				.GetThisAndChildrenOfType<IT4IncludeDirective>()
 				.Where(directive => directive.IsVisibleInDocument())
 				.Select(directive => directive.Path.ResolvePath())
 				.Distinct();

@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
+using JetBrains.RiderTutorials.Utils;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing
 {
@@ -60,14 +61,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 		{
 			if (file == null) throw new ArgumentNullException(nameof(file));
 
-			var output = T4DirectiveInfoManager.Output;
-			var attributes = file
-				.GetDirectives(output)
-				.SelectMany(outputDirective => outputDirective.AttributesEnumerable)
-				.Where(attribute => string.Equals(attribute.Name.GetText(), output.ExtensionAttribute.Name));
-			var query = attributes.Select(attribute => attribute.Value.GetText());
-
-			string targetExtension = query.FirstOrDefault();
+			var extension = T4DirectiveInfoManager.Output.ExtensionAttribute;
+			string targetExtension = file
+				.GetChildrenInSubtrees()
+				.OfType<IT4OutputDirective>()
+				.FirstOrDefault()
+				?.GetFirstAttribute(extension)
+				?.Value
+				.GetText();
 
 			if (targetExtension == null) return DefaultTargetExtension;
 

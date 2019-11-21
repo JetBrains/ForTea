@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Utils.Impl;
+using GammaJul.ForTea.Core.Psi.Utils;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
@@ -26,7 +26,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		public FileSystemPath FindClosestSink([NotNull] FileSystemPath source)
 		{
-			var guard = new T4BasicIncludeGuard();
+			var guard = new T4IncludeGuard();
 			guard.StartProcessing(source);
 			ISet<FileSystemPath> currentLayer = new JetHashSet<FileSystemPath>(new[] {source});
 			while (!currentLayer.IsEmpty())

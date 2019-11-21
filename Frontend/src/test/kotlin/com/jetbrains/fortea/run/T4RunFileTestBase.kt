@@ -8,7 +8,9 @@ import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
 import com.jetbrains.rider.model.T4ExecutionRequest
 import com.jetbrains.rider.model.T4FileLocation
+import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
+import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
@@ -73,7 +75,9 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
     val host = project.getComponent<ProjectModelViewHost>()
     val virtualFile = t4File.path.toVirtualFile(true).shouldNotBeNull()
     val id = host.getItemsByVirtualFile(virtualFile).single().id
-    val request = T4ExecutionRequest(T4FileLocation(id), false)
+    val location = T4FileLocation(id)
+    project.solution.t4ProtocolModel.prepareExecution.sync(location)
+    val request = T4ExecutionRequest(location, false)
     T4SynchronousRunConfigurationExecutor(project, host) {
       !T4SynchronousRunConfigurationExecutor.isExecutionRunning
     }.execute(request)

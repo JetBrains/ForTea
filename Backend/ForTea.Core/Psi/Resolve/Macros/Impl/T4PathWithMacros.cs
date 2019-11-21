@@ -22,6 +22,11 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
 
+		// Source file might have no corresponding project file;
+		// This is the most suitable project file in that case
+		[CanBeNull]
+		private IProjectFile ProjectFile { get; }
+
 		[NotNull]
 		private IT4MacroResolver Resolver { get; }
 
@@ -37,10 +42,15 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		[NotNull]
 		private T4OutsideSolutionSourceFileManager OutsideSolutionManager { get; }
 
-		public T4PathWithMacros([CanBeNull] string rawPath, [NotNull] IPsiSourceFile file)
+		public T4PathWithMacros(
+			[CanBeNull] string rawPath,
+			[NotNull] IPsiSourceFile file,
+			[CanBeNull] IProjectFile projectFile
+		)
 		{
 			RawPath = rawPath ?? "";
 			SourceFile = file;
+			ProjectFile = projectFile;
 			Solution = SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
@@ -84,13 +94,13 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		public string ResolveString()
 		{
 			if (string.IsNullOrEmpty(RawPath) || !ContainsMacros) return RawPath;
-			var projectFile = SourceFile.ToProjectFile() ?? T4MacroResolveContextCookie.ProjectFile;
-			if (projectFile == null)
+			if (ProjectFile == null)
 			{
 				Logger.Warn("Could not find any project file for macro resolution");
 				return RawPath;
 			}
-			var macroValues = Resolver.ResolveHeavyMacros(RawMacros, projectFile);
+
+			var macroValues = Resolver.ResolveHeavyMacros(RawMacros, ProjectFile);
 			string result = System.Environment.ExpandEnvironmentVariables(RawPath);
 			return MacroRegex.Replace(result, match =>
 			{
@@ -112,13 +122,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			}
 		}
 
+		[NotNull, ItemNotNull]
 		private IEnumerable<string> RawMacros => MacroRegex
 			.Matches(RawPath)
 			.Cast<Match>()
 			.Where(match => match.Success)
 			.Select(match => match.Groups[1].Value);
 
-		private bool Equals(T4PathWithMacros other) =>
+		private bool Equals([NotNull] T4PathWithMacros other) =>
 			string.Equals(RawPath, other.RawPath, StringComparison.OrdinalIgnoreCase)
 			&& SourceFile.Equals(other.SourceFile);
 

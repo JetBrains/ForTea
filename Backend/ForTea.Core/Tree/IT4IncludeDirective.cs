@@ -1,14 +1,10 @@
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.Tree
 {
-	public partial interface IT4IncludeDirective
+	public partial interface IT4IncludeDirective : IT4DirectiveWithPath
 	{
 		bool Once { get; }
-
-		[NotNull]
-		IT4PathWithMacros Path { get; }
 
 		[CanBeNull]
 		IT4IncludedFile IncludedFile { get; }

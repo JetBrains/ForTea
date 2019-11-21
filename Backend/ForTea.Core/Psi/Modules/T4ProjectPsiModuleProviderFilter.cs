@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 
 namespace GammaJul.ForTea.Core.Psi.Modules {
@@ -14,8 +13,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 	sealed class T4ProjectPsiModuleProviderFilter : IProjectPsiModuleProviderFilter {
 		[NotNull] private readonly ChangeManager _changeManager;
 		[NotNull] private readonly IT4Environment _t4Environment;
-		[NotNull] private readonly PsiProjectFileTypeCoordinator _coordinator;
-		
+
 		[NotNull]
 		private IT4TemplateKindProvider TemplateDataManager { get; }
 
@@ -31,7 +29,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				_changeManager,
 				_t4Environment,
 				project,
-				_coordinator,
 				TemplateDataManager
 			);
 			return new Tuple<IProjectPsiModuleHandler, IPsiModuleDecorator>(t4ModuleHandler, null);
@@ -40,13 +37,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		public T4ProjectPsiModuleProviderFilter(
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] PsiProjectFileTypeCoordinator coordinator,
 			[NotNull] IT4TemplateKindProvider templateDataManager
 		)
 		{
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
-			_coordinator = coordinator;
 			TemplateDataManager = templateDataManager;
 		}
 

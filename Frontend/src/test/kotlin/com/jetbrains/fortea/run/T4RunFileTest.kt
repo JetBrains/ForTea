@@ -22,7 +22,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
 //  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
   @Test fun testThatTemplateCanProduceBigXml() = doTest()
-//  @Test fun testThatTemplateIsCaseInsensitive() = doTest()
+  @Test fun testThatTemplateIsCaseInsensitive() = doTest()
 //  @Test fun testThatFileExtensionCanBeUpdatedCorrectly() {
 //    executeT4File()
 //    t4File.writeText(t4File.readText().replace(".fs", ".cs"))

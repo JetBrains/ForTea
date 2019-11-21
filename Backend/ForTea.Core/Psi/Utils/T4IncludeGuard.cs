@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Utils.Impl
+namespace GammaJul.ForTea.Core.Psi.Utils
 {
-	public sealed class T4BasicIncludeGuard : IT4IncludeGuard<FileSystemPath>
+	public sealed class T4IncludeGuard
 	{
 		[NotNull, ItemCanBeNull]
 		private ISet<FileSystemPath> SeenFiles { get; }
@@ -12,25 +12,24 @@ namespace GammaJul.ForTea.Core.Psi.Utils.Impl
 		[NotNull, ItemCanBeNull]
 		private Stack<FileSystemPath> FilesBeingProcessed { get; }
 
-		public T4BasicIncludeGuard()
+		public T4IncludeGuard()
 		{
 			FilesBeingProcessed = new Stack<FileSystemPath>();
 			SeenFiles = new HashSet<FileSystemPath>();
 		}
 
-		public bool CanProcess(FileSystemPath file) => !FilesBeingProcessed.Contains(file);
+		public bool CanProcess([NotNull] FileSystemPath file) => !FilesBeingProcessed.Contains(file);
 
-		public void StartProcessing(FileSystemPath file)
+		public void StartProcessing([NotNull] FileSystemPath file)
 		{
 			FilesBeingProcessed.Push(file);
 			SeenFiles.Add(file);
 		}
 
-		public bool HasSeenFile(FileSystemPath file) => SeenFiles.Contains(file);
+		public bool HasSeenFile([NotNull] FileSystemPath file) => SeenFiles.Contains(file);
 		public void EndProcessing() => FilesBeingProcessed.Pop();
-		public bool IsOnTopLevel => FilesBeingProcessed.Count == 1;
 
-		public void TryEndProcessing(FileSystemPath file)
+		public void TryEndProcessing([CanBeNull] FileSystemPath file)
 		{
 			if (file == null) return;
 			if (EqualityComparer<FileSystemPath>.Default.Equals(FilesBeingProcessed.Peek(), file)) FilesBeingProcessed.Pop();

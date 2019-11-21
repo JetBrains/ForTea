@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -27,11 +26,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 			var projectFile = psiSourceFile.ToProjectFile();
 			if (projectFile == null) return;
 			var visitor = new T4IncludeAwareDaemonProcessVisitor(psiSourceFile);
-			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
-			{
-				File.ProcessDescendants(visitor);
-			}
-
+			File.ProcessDescendants(visitor);
 			committer(visitor.Highlightings);
 		}
 	}

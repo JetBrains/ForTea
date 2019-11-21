@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.Psi.Modules;
-using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
@@ -52,27 +51,24 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 				.SelectMany(it => it.Blocks)
 				.OfType<IT4AssemblyDirective>();
 			var errors = new FrugalLocalList<T4FailureRawData>();
-			using (T4MacroResolveContextCookie.GetOrCreate(projectFile))
+			var directDependencies = directives.SelectNotNull(directive =>
 			{
-				var directDependencies = directives.SelectNotNull(directive =>
+				var resolved = AssemblyReferenceResolver.Resolve(directive);
+				if (resolved == null)
 				{
-					var resolved = AssemblyReferenceResolver.Resolve(directive);
-					if (resolved == null)
-					{
-						errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
-					}
+					errors.Add(T4FailureRawData.FromElement(directive, "Unresolved assembly reference"));
+				}
 
-					return resolved;
-				}).AsList();
+				return resolved;
+			}).AsList();
 
-				if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
-				var result = AssemblyReferenceResolver.ResolveTransitiveDependencies(
-					directDependencies,
-					projectFile.SelectResolveContext()
-				).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
-				AddBaseReferences(lifetime, result, sourceFile);
-				return result;
-			}
+			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
+			var result = AssemblyReferenceResolver.ResolveTransitiveDependencies(
+				directDependencies,
+				projectFile.SelectResolveContext()
+			).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
+			AddBaseReferences(lifetime, result, sourceFile);
+			return result;
 		}
 
 		private void AddBaseReferences(

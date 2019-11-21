@@ -75,10 +75,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			[NotNull] IT4ElementAppendFormatProvider provider
 		)
 		{
-			destination.Append(provider.CodeCommentStart);
+			destination.Append(provider.ExpressionCommentStart);
 			provider.AppendCompilationOffset(destination, Source);
 			provider.AppendMappedIfNeeded(destination, Source);
-			destination.Append(provider.CodeCommentEnd);
+			destination.Append(provider.ExpressionCommentEnd);
 		}
 
 		private void AppendOpeningLineDirective(

@@ -46,7 +46,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			shellLocks,
 			changeManager,
 			t4Environment,
-			coordinator,
 			templateDataManager
 		);
 	}

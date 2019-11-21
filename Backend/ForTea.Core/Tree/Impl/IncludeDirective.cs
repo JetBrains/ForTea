@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Tree.Impl
@@ -16,6 +17,8 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 				.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase)
 			?? false;
 
+		public IProjectFile ResolutionContext { get; set; }
+
 		[CanBeNull]
 		private string RawPath =>
 			this.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value?.GetText();
@@ -27,7 +30,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 		{
 			string rawPath = RawPath;
 			if (rawPath == null) return T4EmptyPathWithMacros.Instance;
-			return new T4PathWithMacros(rawPath, file);
+			return new T4PathWithMacros(rawPath, file, ResolutionContext);
 		}
 
 		private IT4PathWithMacros CreateIncludePath([CanBeNull] string includeFileName)
@@ -35,7 +38,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 			if (includeFileName == null) return T4EmptyPathWithMacros.Instance;
 			var sourceFile = GetSourceFile();
 			if (sourceFile == null) return T4EmptyPathWithMacros.Instance;
-			return new T4PathWithMacros(includeFileName, sourceFile);
+			return new T4PathWithMacros(includeFileName, sourceFile, ResolutionContext);
 		}
 
 		public IT4IncludedFile IncludedFile => NextSibling as IT4IncludedFile;
