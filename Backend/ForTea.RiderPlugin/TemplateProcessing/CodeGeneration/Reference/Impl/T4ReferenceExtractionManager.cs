@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Debugger.Common.MetadataAndPdb;
-using GammaJul.ForTea.Core;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -11,10 +10,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using Microsoft.CodeAnalysis;
@@ -32,10 +28,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		[NotNull]
 		private IT4LowLevelReferenceExtractionManager LowLevelReferenceExtractionManager { get; }
-		
+
 		public T4ReferenceExtractionManager(
 			Lifetime lifetime,
-			[NotNull] IPsiModules psiModules,
 			[NotNull] IT4AssemblyReferenceResolver assemblyReferenceResolver,
 			[NotNull] IT4LowLevelReferenceExtractionManager lowLevelReferenceExtractionManager
 		)
@@ -103,10 +98,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
 			// todo: file.AssertContainsNoIncludeContext();
-			var directReferences = ExtractRawAssemblyReferences(file).Select(
-				assemblyFile =>
-					new T4AssemblyReferenceInfo(assemblyFile.AssemblyName?.FullName ?? "", assemblyFile.Location)
-			);
+			var directReferences = ExtractRawAssemblyReferences(file);
 			var sourceFile = file.LogicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var resolveContext = projectFile.SelectResolveContext();
@@ -115,16 +107,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 				.AsList();
 		}
 
-		[NotNull, ItemNotNull]
-		private static IEnumerable<IAssemblyFile> ExtractRawAssemblyReferences([NotNull] IT4File file)
+		[NotNull]
+		private IEnumerable<T4AssemblyReferenceInfo> ExtractRawAssemblyReferences([NotNull] IT4File file)
 		{
 			var sourceFile = file.LogicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
-			if (!(sourceFile.PsiModule is IT4FilePsiModule psiModule)) return EmptyList<IAssemblyFile>.Enumerable;
+			if (!(sourceFile.PsiModule is IT4FilePsiModule psiModule))
+				return EmptyList<T4AssemblyReferenceInfo>.Enumerable;
+
 			var resolveContext = projectFile.SelectResolveContext();
 			using (CompilationContextCookie.GetOrCreate(resolveContext))
 			{
-				return psiModule.RawReferences.SelectMany(it => it.GetFiles()).AsList();
+				return LowLevelReferenceExtractionManager.ResolveAssemblies(psiModule.RawReferences, resolveContext);
 			}
 		}
 	}

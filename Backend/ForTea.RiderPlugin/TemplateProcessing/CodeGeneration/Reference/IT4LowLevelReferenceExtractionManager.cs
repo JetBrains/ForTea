@@ -11,11 +11,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		[NotNull]
 		IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
 			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			[NotNull] IModuleReferenceResolveContext resolveContext);
+			[NotNull] IModuleReferenceResolveContext resolveContext
+		);
 
 		[NotNull]
 		IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
 			[NotNull, ItemNotNull] IList<FileSystemPath> directDependencies,
+			[NotNull] IModuleReferenceResolveContext resolveContext
+		);
+
+		[NotNull]
+		IEnumerable<T4AssemblyReferenceInfo> ResolveAssemblies(
+			[NotNull] [ItemNotNull] IEnumerable<FileSystemPath> directDependencies,
 			[NotNull] IModuleReferenceResolveContext resolveContext
 		);
 	}

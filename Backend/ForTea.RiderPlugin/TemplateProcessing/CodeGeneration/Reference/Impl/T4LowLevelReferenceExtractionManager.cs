@@ -41,25 +41,26 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		public IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
 			IList<FileSystemPath> directDependencies,
 			IModuleReferenceResolveContext resolveContext
-		)
-		{
-			return ResolveTransitiveDependencies(
-				directDependencies.SelectMany(
-					directDependency => AssemblyInfoDatabase
-						.GetReferencedAssemblyNames(directDependency)
-						.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(
-							assemblyNameInfo =>
-							{
-								var resolver = new AssemblyResolverOnFolders(directDependency.Parent);
-								resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-								if (path == null) return null;
-								return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
-							}
-						)
-				),
-				resolveContext
-			).Select(it => it.Location).Concat(directDependencies);
-		}
+		) => ResolveTransitiveDependencies(ResolveAssemblies(directDependencies, resolveContext), resolveContext)
+			.Select(it => it.Location)
+			.Concat(directDependencies);
+
+		public IEnumerable<T4AssemblyReferenceInfo> ResolveAssemblies(
+			IEnumerable<FileSystemPath> directDependencies,
+			IModuleReferenceResolveContext resolveContext
+		) => directDependencies.SelectMany(
+			directDependency => AssemblyInfoDatabase
+				.GetReferencedAssemblyNames(directDependency)
+				.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(
+					assemblyNameInfo =>
+					{
+						var resolver = new AssemblyResolverOnFolders(directDependency.Parent);
+						resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
+						if (path == null) return null;
+						return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
+					}
+				)
+		);
 
 		private void ResolveTransitiveDependencies(
 			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,

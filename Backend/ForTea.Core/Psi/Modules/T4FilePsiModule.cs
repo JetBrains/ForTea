@@ -4,6 +4,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Modules.References;
+using GammaJul.ForTea.Core.Psi.Modules.References.Impl;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -15,7 +16,6 @@ using JetBrains.Lifetimes;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
-using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Modules;
@@ -34,7 +34,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private Lifetime Lifetime { get; }
 
 		[NotNull]
-		private T4AssemblyReferenceManager AssemblyReferenceManager { get; }
+		private IT4AssemblyReferenceManager AssemblyReferenceManager { get; }
 
 		[NotNull]
 		private T4ProjectReferenceManager ProjectReferenceManager { get; }
@@ -73,7 +73,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			get { yield return SourceFile; }
 		}
 
-		public IEnumerable<IAssembly> RawReferences => AssemblyReferenceManager.RawReferences;
+		public IEnumerable<FileSystemPath> RawReferences => AssemblyReferenceManager.RawReferences;
 
 		public T4FilePsiModule(
 			Lifetime lifetime,
@@ -136,10 +136,18 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private void OnFileDataChanged([NotNull] T4DeclaredAssembliesDiff dataDiff)
 		{
 			ShellLocks.AssertWriteAccessAllowed();
-			bool hasChanges = T4AssemblyReferenceInvalidator.InvalidateAssemblies(
-				dataDiff,
-				AssemblyReferenceManager
-			);
+			bool hasChanges = false;
+			// removes the assembly references from the old assembly directives
+			foreach (var _ in dataDiff.RemovedAssemblies.Where(AssemblyReferenceManager.TryRemoveReference))
+			{
+				hasChanges = true;
+			}
+
+			// adds assembly references from the new assembly directives
+			foreach (var _ in dataDiff.AddedAssemblies.Where(AssemblyReferenceManager.TryAddReference))
+			{
+				hasChanges = true;
+			}
 
 			if (!hasChanges) return;
 
@@ -163,7 +171,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		public IEnumerable<IPsiModuleReference> GetReferences(IModuleReferenceResolveContext _)
 		{
 			var references = new PsiModuleReferenceAccumulator(TargetFrameworkId);
-			var moduleReferences = RawReferences
+			var moduleReferences = AssemblyReferenceManager
+				.AssemblyReferences
+				.Concat(AssemblyReferenceManager.ProjectReferences)
 				.SelectNotNull(assembly => PsiModules.GetPrimaryPsiModule(assembly, TargetFrameworkId))
 				.Select(it => new PsiModuleReference(it));
 			references.AddRange(moduleReferences);
@@ -196,8 +206,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			}
 		}
 
-		private void TryAddReference([NotNull] string name) =>
-			AssemblyReferenceManager.TryAddReference(new T4PathWithMacros(name, SourceFile, ProjectFile, GetSolution()));
+		private void TryAddReference([NotNull] string name)
+		{
+			var path = new T4PathWithMacros(name, SourceFile, ProjectFile, GetSolution());
+			AssemblyReferenceManager.TryAddReference(path);
+		}
 
 		public IPsiServices GetPsiServices() => PsiServices;
 		public ISolution GetSolution() => Solution;
