@@ -1,0 +1,5 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="$(SolutionDir)Project\bin\Debug\Project.exe" #>
+<#
+    Project.Program.Main(new string[0]);
+#>
