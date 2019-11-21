@@ -87,7 +87,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 				.Select(includePath => includePath.Combine(expanded))
 				.FirstOrDefault(resultPath => resultPath.ExistsFile);
 
-			return asGlobalInclude ?? asRelativePath;
+			return asGlobalInclude ?? FileSystemPath.Empty;
 		}
 
 		public string ResolveString()
