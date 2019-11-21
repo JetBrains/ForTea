@@ -66,10 +66,20 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 		{
 			var path = Resolver.Resolve(pathWithMacros);
 			if (path == null) return false;
-			if (!MyAssemblyReferences.TryGetValue(path, out var cookie)) return false;
-			MyAssemblyReferences.Remove(path);
-			cookie.Dispose();
-			return true;
+			if (MyAssemblyReferences.TryGetValue(path, out var cookie))
+			{
+				MyAssemblyReferences.Remove(path);
+				cookie.Dispose();
+				return true;
+			}
+
+			if (MyProjectReferences.ContainsKey(path))
+			{
+				MyProjectReferences.Remove(path);
+				return true;
+			}
+
+			return false;
 		}
 
 		public bool TryAddReference(IT4PathWithMacros pathWithMacros)
