@@ -1,20 +1,19 @@
 using System;
 using System.IO;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
-using JetBrains.Application;
-using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
+using JetBrains.Util;
 
-namespace JetBrains.ForTea.RiderPlugin
+namespace JetBrains.ForTea.RiderPlugin.Psi.Assemblies.Impl
 {
-	[ShellComponent]
-	public sealed class AssemblyNamePreprocessor : IT4AssemblyNamePreprocessor
+	[SolutionComponent]
+	public sealed class T4LightWeightAssemblyReferenceResolver : IT4LightWeightAssemblyReferenceResolver
 	{
-		public string Preprocess(IProjectFile file, string assemblyName)
+		public FileSystemPath TryResolve(IProjectFile file, string assemblyName)
 		{
 			// If the argument is the fully qualified path of an existing file, then we are done.
-			if (File.Exists(assemblyName)) return assemblyName;
+			if (File.Exists(assemblyName)) return FileSystemPath.Parse(assemblyName);
 
 			string folderPath = (file.ParentFolder?.Location?.FullPath).NotNull();
 
@@ -22,7 +21,7 @@ namespace JetBrains.ForTea.RiderPlugin
 			{
 				// Maybe the assembly is in the same folder as the text template that called the directive?
 				string candidate = Path.Combine(folderPath, assemblyName);
-				if (File.Exists(candidate)) return candidate;
+				if (File.Exists(candidate)) return FileSystemPath.Parse(candidate);
 			}
 			catch (ArgumentException)
 			{
@@ -32,19 +31,13 @@ namespace JetBrains.ForTea.RiderPlugin
 			{
 				// Maybe the assembly name is missing extension?
 				string candidate = Path.Combine(folderPath, assemblyName + ".dll");
-				if (File.Exists(candidate)) return candidate;
+				if (File.Exists(candidate)) return FileSystemPath.Parse(candidate);
 			}
 			catch (ArgumentException)
 			{
 			}
 
-			// There's no need to perform other kinds of search,
-			// as those will be performed by T4AssemblyReferenceManager
-
-			// If we cannot do better, return the original file name.
-			return assemblyName;
+			return null;
 		}
-
-		public IDisposable Prepare(IProjectFile file) => Disposable.Empty;
 	}
 }

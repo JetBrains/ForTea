@@ -6,7 +6,6 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 {
-	// TODO: inline IT4AssemblyNamePreprocessor
 	public interface IT4AssemblyReferenceResolver
 	{
 		[CanBeNull]

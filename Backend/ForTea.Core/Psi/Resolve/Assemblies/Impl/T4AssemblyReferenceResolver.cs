@@ -15,21 +15,21 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
 	[SolutionComponent]
-	public class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
+	public sealed class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
 	{
 		[NotNull]
-		private IT4AssemblyNamePreprocessor Preprocessor { get; }
+		private IT4LightWeightAssemblyReferenceResolver LightWeightResolver { get; }
 
 		[NotNull]
 		private IModuleReferenceResolveManager ResolveManager { get; }
 
 		public T4AssemblyReferenceResolver(
 			[NotNull] IModuleReferenceResolveManager resolveManager,
-			[NotNull] IT4AssemblyNamePreprocessor preprocessor
+			[NotNull] IT4LightWeightAssemblyReferenceResolver lightWeightResolver
 		)
 		{
 			ResolveManager = resolveManager;
-			Preprocessor = preprocessor;
+			LightWeightResolver = lightWeightResolver;
 		}
 
 		[CanBeNull]
@@ -52,33 +52,27 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			IModuleReferenceResolveContext resolveContext
 		) => ResolveManager.Resolve(target, project, resolveContext);
 
-		public FileSystemPath Resolve(IT4AssemblyDirective directive)
-		{
-			var projectFile = directive.ResolutionContext;
-			using (Preprocessor.Prepare(projectFile))
-			{
-				var pathWithMacros = directive.Path;
-				return Resolve(pathWithMacros);
-			}
-		}
+		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.Path);
 
 		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{
 			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return null;
-			using (Preprocessor.Prepare(projectFile))
-			{
-				var pathWithMacros = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile);
-				return Resolve(pathWithMacros);
-			}
+			var pathWithMacros = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile);
+			return Resolve(pathWithMacros);
 		}
 
-		public virtual FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros)
+		public FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros)
 		{
+			var path = pathWithMacros.ResolvePath();
+			if (path.IsAbsolute) return path;
+
 			string resolved = pathWithMacros.ResolveString();
-			string path = Preprocessor.Preprocess(pathWithMacros.ProjectFile, resolved);
+			var lightResolved = LightWeightResolver.TryResolve(pathWithMacros.ProjectFile, resolved);
+			if (lightResolved != null) return lightResolved;
+
 			var resolveContext = pathWithMacros.ProjectFile.SelectResolveContext();
-			var target = FindAssemblyReferenceTarget(path);
+			var target = FindAssemblyReferenceTarget(resolved);
 			if (target == null) return null;
 			return Resolve(target, pathWithMacros.ProjectFile.GetProject().NotNull(), resolveContext);
 		}

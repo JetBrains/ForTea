@@ -1,7 +1,6 @@
 using System;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using JetBrains.Annotations;
-using JetBrains.Application;
 using JetBrains.Application.Components;
 using JetBrains.DataFlow;
 using JetBrains.ProjectModel;
@@ -10,25 +9,30 @@ using JetBrains.VsIntegration.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 
-namespace JetBrains.ForTea.ReSharperPlugin
+namespace JetBrains.ForTea.ReSharperPlugin.Psi.Assemblies.Impl
 {
-	[ShellComponent]
-	public sealed class AssemblyNamePreprocessor : IT4AssemblyNamePreprocessor
+	[SolutionComponent]
+	public sealed class T4LightWeightAssemblyReferenceResolver : IT4LightWeightAssemblyReferenceResolver
 	{
 		[NotNull] private readonly Lazy<Optional<ITextTemplatingComponents>> _components;
 
 		[NotNull]
 		private Optional<ITextTemplatingComponents> Components => _components.Value;
 
-		public AssemblyNamePreprocessor([NotNull] RawVsServiceProvider provider) =>
+		public T4LightWeightAssemblyReferenceResolver([NotNull] RawVsServiceProvider provider) =>
 			_components = Lazy.Of(() =>
 					new Optional<ITextTemplatingComponents>(provider.Value.GetService<STextTemplating, ITextTemplatingComponents>()),
 				true);
 
-		public string Preprocess(IProjectFile file, string assemblyName) =>
-			Components.CanBeNull?.Host?.ResolveAssemblyReference(assemblyName) ?? assemblyName;
+		public FileSystemPath TryResolve(IProjectFile file, string assemblyName)
+		{
+			using var _ = Prepare(file);
+			string resolved = Components.CanBeNull?.Host?.ResolveAssemblyReference(assemblyName);
+			if (resolved == null) return null;
+			return FileSystemPath.Parse(resolved);
+		}
 
-		public IDisposable Prepare(IProjectFile file)
+		private IDisposable Prepare(IProjectFile file)
 		{
 			IVsHierarchy hierarchy = Utils.TryGetVsHierarchy(file);
 			ITextTemplatingComponents components = Components.CanBeNull;
