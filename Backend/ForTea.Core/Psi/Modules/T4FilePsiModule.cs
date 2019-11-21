@@ -26,7 +26,7 @@ using JetBrains.Util.Dotnet.TargetFrameworkIds;
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
 	/// <summary>PSI module managing a single T4 file.</summary>
-	public sealed class T4FilePsiModule : ConcurrentUserDataHolder, IT4FilePsiModule
+	public sealed class T4FilePsiModule : ConcurrentUserDataHolder, IT4FilePsiModule, IDisposable
 	{
 		[NotNull]
 		private const string Prefix = "[T4]";
@@ -55,9 +55,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private IPsiServices PsiServices { get; }
 
 		[NotNull]
-		private T4AssemblyReferenceInvalidator AssemblyReferenceInvalidator { get; }
-
-		[NotNull]
 		private IProjectFile ProjectFile { get; }
 
 		private IChangeProvider ChangeProvider { get; }
@@ -76,8 +73,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			get { yield return SourceFile; }
 		}
 
-		public IEnumerable<IAssembly> RawReferences =>
-			AssemblyReferenceManager.References.Values.SelectNotNull(cookie => cookie.Assembly);
+		public IEnumerable<IAssembly> RawReferences => AssemblyReferenceManager.RawReferences;
 
 		public T4FilePsiModule(
 			Lifetime lifetime,
@@ -88,12 +84,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		)
 		{
 			Lifetime = lifetime;
-			lifetime.OnTermination(Dispose);
+			lifetime.AddDispose(this);
 			ProjectFile = projectFile;
 			Solution = ProjectFile.GetSolution();
 			PsiModules = Solution.GetComponent<IPsiModules>();
 			PsiServices = Solution.GetComponent<IPsiServices>();
-			AssemblyReferenceInvalidator = Solution.GetComponent<T4AssemblyReferenceInvalidator>();
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
 			T4Environment = t4Environment;
@@ -106,7 +101,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			AssemblyReferenceManager = new T4AssemblyReferenceManager(
 				Solution.GetComponent<IAssemblyFactory>(),
 				ProjectFile,
-				resolveContext
+				resolveContext,
+				shellLocks
 			);
 			ProjectReferenceManager = new T4ProjectReferenceManager(ProjectFile, Solution);
 
@@ -140,9 +136,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private void OnFileDataChanged([NotNull] T4DeclaredAssembliesDiff dataDiff)
 		{
 			ShellLocks.AssertWriteAccessAllowed();
-			bool hasChanges = AssemblyReferenceInvalidator.InvalidateAssemblies(
+			bool hasChanges = T4AssemblyReferenceInvalidator.InvalidateAssemblies(
 				dataDiff,
-				ProjectFile,
 				AssemblyReferenceManager
 			);
 
@@ -189,24 +184,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			AssemblyReferenceManager.ResolveContext
 		);
 
-		/// <summary>Disposes this instance.</summary>
-		/// <remarks>Does not implement <see cref="IDisposable"/>, is called when the lifetime is terminated.</remarks>
-		private void Dispose()
-		{
-			// Removes the references.
-			var assemblyCookies = AssemblyReferenceManager.References.Values.ToArray();
-			if (assemblyCookies.Length <= 0) return;
-			ShellLocks.ExecuteWithWriteLock(
-				() =>
-				{
-					foreach (var assemblyCookie in assemblyCookies)
-					{
-						assemblyCookie.Dispose();
-					}
-				}
-			);
-			AssemblyReferenceManager.References.Clear();
-		}
+		public void Dispose() => AssemblyReferenceManager.Dispose();
 
 		private void AddBaseReferences()
 		{
