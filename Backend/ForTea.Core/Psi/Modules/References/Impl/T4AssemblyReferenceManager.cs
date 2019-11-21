@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Build;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.Util;
@@ -16,13 +15,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 	public sealed class T4AssemblyReferenceManager : IT4AssemblyReferenceManager
 	{
 		[NotNull]
-		private IT4AssemblyReferenceResolver Resolver { get; }
+		private IT4AssemblyReferenceResolver AssemblyReferenceResolver { get; }
+		
+		[NotNull]
+		private IT4ProjectReferenceResolver ProjectReferenceResolver { get; }
 
 		[NotNull]
 		private IShellLocks ShellLocks { get; }
-
-		[NotNull]
-		private OutputAssemblies OutputAssemblies { get; }
 
 		[NotNull]
 		private IDictionary<FileSystemPath, IAssemblyCookie> MyAssemblyReferences { get; }
@@ -58,13 +57,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			ResolveContext = resolveContext;
 			ShellLocks = shellLocks;
 			var solution = File.GetSolution();
-			OutputAssemblies = solution.GetComponent<OutputAssemblies>();
-			Resolver = solution.GetComponent<IT4AssemblyReferenceResolver>();
+			AssemblyReferenceResolver = solution.GetComponent<IT4AssemblyReferenceResolver>();
+			ProjectReferenceResolver = solution.GetComponent<IT4ProjectReferenceResolver>();
 		}
 
 		public bool TryRemoveReference(IT4PathWithMacros pathWithMacros)
 		{
-			var path = Resolver.Resolve(pathWithMacros);
+			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
 			if (path == null) return false;
 			if (MyAssemblyReferences.TryGetValue(path, out var cookie))
 			{
@@ -84,17 +83,15 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 
 		public bool TryAddReference(IT4PathWithMacros pathWithMacros)
 		{
-			var path = Resolver.Resolve(pathWithMacros);
+			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
 			if (path == null) return false;
 			return TryAddProjectReference(path) || TryAddAssemblyReference(path);
 		}
 
 		private bool TryAddProjectReference([NotNull] FileSystemPath path)
 		{
-			if (!OutputAssemblies.TryGetProjectAndTargetFrameworkIdByOutputAssemblyLocation(path, out var pair))
-				return false;
-
-			var (project, _) = pair;
+			var project = ProjectReferenceResolver.TryResolveProject(path);
+			if (project == null) return false;
 			MyProjectReferences.Add(path, project);
 			return true;
 		}

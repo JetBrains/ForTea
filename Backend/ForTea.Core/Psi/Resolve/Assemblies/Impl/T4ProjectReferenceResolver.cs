@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Build;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
@@ -17,7 +18,14 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		[NotNull]
 		private IPsiModules PsiModules { get; }
 
-		public T4ProjectReferenceResolver([NotNull] IPsiModules psiModules) => PsiModules = psiModules;
+		[NotNull]
+		private OutputAssemblies OutputAssemblies { get; }
+
+		public T4ProjectReferenceResolver([NotNull] IPsiModules psiModules, [NotNull] OutputAssemblies outputAssemblies)
+		{
+			PsiModules = psiModules;
+			OutputAssemblies = outputAssemblies;
+		}
 
 		public IEnumerable<IProject> GetProjectDependencies(IT4File file)
 		{
@@ -36,5 +44,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 					.AsList();
 			}
 		}
+		
+		public IProject TryResolveProject(FileSystemPath path) =>
+			!OutputAssemblies.TryGetProjectAndTargetFrameworkIdByOutputAssemblyLocation(path, out var pair)
+				? null
+				: pair.First;
 	}
 }
