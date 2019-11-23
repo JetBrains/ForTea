@@ -267,6 +267,7 @@ namespace GammaJul.ForTea.Core.Tree
 
 		[Pure, NotNull, ItemNotNull]
 		public static IEnumerable<TNode> GetThisAndChildrenOfType<TNode>([NotNull] this ITreeNode node)
+			where TNode : ITreeNode
 		{
 			if (node is TNode tNode) yield return tNode;
 			foreach (var that in node.Children().SelectMany(GetThisAndChildrenOfType<TNode>))
