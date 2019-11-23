@@ -97,7 +97,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
-			// todo: file.AssertContainsNoIncludeContext();
+			file.AssertContainsNoIncludeContext();
 			var directReferences = ExtractRawAssemblyReferences(file);
 			var sourceFile = file.LogicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
@@ -111,15 +111,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		private IEnumerable<T4AssemblyReferenceInfo> ExtractRawAssemblyReferences([NotNull] IT4File file)
 		{
 			var sourceFile = file.LogicalPsiSourceFile.NotNull();
-			var projectFile = sourceFile.ToProjectFile().NotNull();
 			if (!(sourceFile.PsiModule is IT4FilePsiModule psiModule))
 				return EmptyList<T4AssemblyReferenceInfo>.Enumerable;
 
-			var resolveContext = projectFile.SelectResolveContext();
-			using (CompilationContextCookie.GetOrCreate(resolveContext))
-			{
-				return LowLevelReferenceExtractionManager.ResolveAssemblies(psiModule.RawReferences, resolveContext);
-			}
+			return psiModule
+				.RawReferences
+				.SelectNotNull(it => LowLevelReferenceExtractionManager.Resolve(it));
 		}
 	}
 }

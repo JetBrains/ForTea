@@ -14,7 +14,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference.Impl
 {
 	[SolutionComponent]
-	public class T4LowLevelReferenceExtractionManager : IT4LowLevelReferenceExtractionManager
+	public sealed class T4LowLevelReferenceExtractionManager : IT4LowLevelReferenceExtractionManager
 	{
 		[NotNull]
 		private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
@@ -22,6 +22,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		public T4LowLevelReferenceExtractionManager([NotNull] AssemblyInfoDatabase assemblyInfoDatabase) =>
 			AssemblyInfoDatabase = assemblyInfoDatabase;
 
+		// TODO: is this necessary?
 		[NotNull]
 		private static IAssemblyResolver ProtocolAssemblyResolver { get; } = new AssemblyResolverOnFolders(
 			FileSystemPath.Parse(typeof(Lifetime).Assembly.Location).Parent, // JetBrains.Lifetimes
@@ -41,26 +42,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		public IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
 			IList<FileSystemPath> directDependencies,
 			IModuleReferenceResolveContext resolveContext
-		) => ResolveTransitiveDependencies(ResolveAssemblies(directDependencies, resolveContext), resolveContext)
-			.Select(it => it.Location)
-			.Concat(directDependencies);
+		) => ResolveTransitiveDependencies(directDependencies.SelectNotNull(Resolve), resolveContext)
+			.Select(it => it.Location);
 
-		public IEnumerable<T4AssemblyReferenceInfo> ResolveAssemblies(
-			IEnumerable<FileSystemPath> directDependencies,
-			IModuleReferenceResolveContext resolveContext
-		) => directDependencies.SelectMany(
-			directDependency => AssemblyInfoDatabase
-				.GetReferencedAssemblyNames(directDependency)
-				.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(
-					assemblyNameInfo =>
-					{
-						var resolver = new AssemblyResolverOnFolders(directDependency.Parent);
-						resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-						if (path == null) return null;
-						return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
-					}
-				)
-		);
+		public T4AssemblyReferenceInfo? Resolve(FileSystemPath path)
+		{
+			var info = AssemblyInfoDatabase.GetAssemblyName(path);
+			if (info == null) return null;
+			return new T4AssemblyReferenceInfo(info.FullName, path);
+		}
 
 		private void ResolveTransitiveDependencies(
 			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
@@ -87,6 +77,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			}
 		}
 
+		[NotNull]
 		private static IAssemblyResolver BuildResolver(T4AssemblyReferenceInfo directDependency) =>
 			new CombiningAssemblyResolver(
 				new AssemblyResolverOnFolders(directDependency.Location.Parent),

@@ -20,10 +20,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			[NotNull] IModuleReferenceResolveContext resolveContext
 		);
 
-		[NotNull]
-		IEnumerable<T4AssemblyReferenceInfo> ResolveAssemblies(
-			[NotNull] [ItemNotNull] IEnumerable<FileSystemPath> directDependencies,
-			[NotNull] IModuleReferenceResolveContext resolveContext
-		);
+		T4AssemblyReferenceInfo? Resolve([NotNull] FileSystemPath path);
 	}
 }
