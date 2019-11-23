@@ -5,8 +5,8 @@
 
 About
 ----
-ForTea is a plugin for [Rider](https://www.jetbrains.com/rider/) and [ReSharper](https://www.jetbrains.com/resharper/) that adds intelligent support for editing T4 files (`*.tt`, `*.ttinclude`, `*.t4`).
-The Rider plugin also has the option to automatically execute and preprocess T4 files.
+ForTea is a plugin for [Rider](https://www.jetbrains.com/rider/) and [ReSharper](https://www.jetbrains.com/resharper/) which adds intelligent support for editing T4 files (`*.tt`, `*.ttinclude`, `*.t4`).
+The Rider plugin also can automatically execute and preprocess T4 files.
 
 Installation
 ----
@@ -34,17 +34,17 @@ Features
 License
 ----
 Licensed under [Apache License 2.0](LICENSE)
-This plugin is a successor to [the original plugin by MrJul](https://github.com/MrJul/ForTea), whom we are very thankful to.
+This plugin is a successor to [the original plugin by MrJul](https://github.com/MrJul/ForTea), to whom we are very thankful.
 
 Building plugin
 ----
 Build instructions can be found [here](BUILD.md).  
 
-Things to know about ReSharper plugin
+Things to know about this ReSharper plugin
 ----
 As a ReSharper plugin, ForTea doesn't provide any Visual Studio service,
 meaning there are some limitations.
-Amongst those, syntax highlighting is fully handled by ReSharper rather than Visual Studio:
+Among those, syntax highlighting is fully handled by ReSharper rather than Visual Studio:
 to get coloring for identifiers, you must enable _Color identifiers_ in _ReSharper Options > Code Inspection > Settings_.
 Plus, there is no code outlining support yet.
 
