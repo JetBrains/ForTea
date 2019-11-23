@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
@@ -12,6 +12,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		IPsiSourceFile SourceFile { get; }
 
 		[NotNull, ItemNotNull]
-		IEnumerable<IAssembly> RawReferences { get; }
+		IEnumerable<FileSystemPath> RawReferences { get; }
 	}
 }

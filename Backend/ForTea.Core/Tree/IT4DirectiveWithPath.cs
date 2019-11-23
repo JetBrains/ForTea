@@ -6,7 +6,7 @@ namespace GammaJul.ForTea.Core.Tree
 {
 	public interface IT4DirectiveWithPath
 	{
-		[CanBeNull]
+		[NotNull]
 		IProjectFile ResolutionContext { get; set; }
 
 		[NotNull]

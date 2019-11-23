@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
@@ -5,13 +7,11 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 {
 	public sealed class T4EmptyPathWithMacros : IT4PathWithMacros
 	{
-		private T4EmptyPathWithMacros()
-		{
-		}
-
-		public static IT4PathWithMacros Instance { get; } = new T4EmptyPathWithMacros();
+		public T4EmptyPathWithMacros([NotNull] IProjectFile projectFile) => ProjectFile = projectFile;
 		public IPsiSourceFile Resolve() => null;
 		public FileSystemPath ResolvePath() => FileSystemPath.Empty;
 		public string ResolveString() => "";
+		public IProjectFile ProjectFile { get; }
+		public string RawPath => "";
 	}
 }

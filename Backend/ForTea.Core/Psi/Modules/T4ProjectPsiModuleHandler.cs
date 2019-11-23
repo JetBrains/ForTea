@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
+using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -15,6 +17,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 	internal sealed class T4ProjectPsiModuleHandler : DelegatingProjectPsiModuleHandler
 	{
 		[NotNull] private readonly T4PsiModuleProvider _t4PsiModuleProvider;
+
+		[NotNull]
+		private IT4TemplateKindProvider TemplateKindProvider { get; }
 
 		public override IList<IPsiModule> GetAllModules()
 		{
@@ -45,20 +50,28 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] IProject project,
-			[NotNull] IT4TemplateKindProvider manager
-		) : base(handler) => _t4PsiModuleProvider = new T4PsiModuleProvider(
-			lifetime,
-			project.Locks,
-			changeManager,
-			t4Environment,
-			manager
-		);
+			[NotNull] IT4TemplateKindProvider templateKindProvider
+		) : base(handler)
+		{
+			TemplateKindProvider = templateKindProvider;
+			_t4PsiModuleProvider = new T4PsiModuleProvider(
+				lifetime,
+				project.Locks,
+				changeManager,
+				t4Environment,
+				templateKindProvider
+			);
+		}
 
 		public override bool InternalsVisibleTo(IPsiModule moduleTo, IPsiModule moduleFrom)
 		{
-			if (!(moduleTo is T4FilePsiModule)) return base.InternalsVisibleTo(moduleTo, moduleFrom);
+			if (!(moduleTo is T4FilePsiModule t4Module)) return base.InternalsVisibleTo(moduleTo, moduleFrom);
 			if (moduleFrom is IAssemblyPsiModule) return false;
-			return true;
+			if (!(moduleFrom is IProjectPsiModule projectModule)) return false;
+			var projectFile = t4Module.SourceFile.ToProjectFile().NotNull();
+			var root = projectFile.GetSolution().GetComponent<IT4FileDependencyGraph>().FindBestRoot(projectFile);
+			if (!TemplateKindProvider.IsPreprocessedTemplate(root)) return false;
+			return Equals(root.GetProject(), projectModule.Project);
 		}
 	}
 }

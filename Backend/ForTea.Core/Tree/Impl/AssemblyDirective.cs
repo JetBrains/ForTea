@@ -17,7 +17,12 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 			{
 				string attributeName = T4DirectiveInfoManager.Assembly.NameAttribute.Name;
 				string assemblyNameOrFile = this.GetAttributeValueByName(attributeName);
-				if (assemblyNameOrFile.IsNullOrWhitespace()) return T4EmptyPathWithMacros.Instance;
+				if (assemblyNameOrFile.IsNullOrWhitespace())
+				{
+					var projectFile = ResolutionContext.NotNull();
+					return new T4EmptyPathWithMacros(projectFile);
+				}
+
 				return new T4PathWithMacros(assemblyNameOrFile, GetSourceFile().NotNull(), ResolutionContext);
 			}
 		}
