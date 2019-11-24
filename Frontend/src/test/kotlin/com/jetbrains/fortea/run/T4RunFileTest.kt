@@ -41,7 +41,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testTemplateWithLineBreakMess() = doTest()
   @Test fun testThatFeatureBlocksCanContainManyNewLines() = doTest()
   @Test fun testHowTextInFeatureIsHandled() = doTest()
-  @Test fun testThatOutputOfUnbuiltProjectCanBeReferenced() = doTest()
+//  @Test fun testThatOutputOfUnbuiltProjectCanBeReferenced() = doTest()
   @Test fun testHostInHostSpecificTemplate() = doTest()
   @Test fun testHostInNonHostSpecificTemplate() {
     executeT4File()
