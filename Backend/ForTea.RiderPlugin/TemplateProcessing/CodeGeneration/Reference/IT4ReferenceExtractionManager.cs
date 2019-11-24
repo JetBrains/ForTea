@@ -16,7 +16,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			Lifetime lifetime,
 			[NotNull] IT4File file);
 
-		/// Ignores unresolved assembly references
+		/// Fails if there are unresolved assembly references by throwing <see cref="T4OutputGenerationException"/>
 		[NotNull]
 		IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive([NotNull] IT4File file);
 	}

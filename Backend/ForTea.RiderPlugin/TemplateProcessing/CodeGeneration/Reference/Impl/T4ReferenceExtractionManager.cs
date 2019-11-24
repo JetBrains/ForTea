@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
@@ -22,9 +21,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 	public sealed class T4ReferenceExtractionManager : IT4ReferenceExtractionManager
 	{
 		[NotNull]
-		private RoslynMetadataReferenceCache Cache { get; }
-
-		[NotNull]
 		private IT4AssemblyReferenceResolver AssemblyReferenceResolver { get; }
 
 		[NotNull]
@@ -34,7 +30,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		private IT4Environment Environment { get; }
 
 		public T4ReferenceExtractionManager(
-			Lifetime lifetime,
 			[NotNull] IT4AssemblyReferenceResolver assemblyReferenceResolver,
 			[NotNull] IT4LowLevelReferenceExtractionManager lowLevelReferenceExtractionManager,
 			[NotNull] IT4Environment environment
@@ -43,10 +38,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			AssemblyReferenceResolver = assemblyReferenceResolver;
 			LowLevelReferenceExtractionManager = lowLevelReferenceExtractionManager;
 			Environment = environment;
-			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
-		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file)
+		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file) =>
+			ExtractTransitiveReferencePaths(file)
+				.Select(path => LowLevelReferenceExtractionManager.ResolveMetadata(lifetime, path))
+				.AsList();
+
+		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file) =>
+			ExtractTransitiveReferencePaths(file).SelectNotNull(LowLevelReferenceExtractionManager.Resolve);
+
+		[NotNull, ItemNotNull]
+		private IEnumerable<FileSystemPath> ExtractTransitiveReferencePaths([NotNull] IT4File file)
 		{
 			file.AssertContainsNoIncludeContext();
 			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
@@ -70,11 +73,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
 			AddBaseReferences(directDependencies, file);
-			var result = LowLevelReferenceExtractionManager.ResolveTransitiveDependencies(
+			return LowLevelReferenceExtractionManager.ResolveTransitiveDependencies(
 				directDependencies,
 				projectFile.SelectResolveContext()
-			).Select(path => Cache.GetMetadataReference(lifetime, path)).AsList<MetadataReference>();
-			return result;
+			);
 		}
 
 		private void AddBaseReferences(
@@ -94,29 +96,5 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			[NotNull] IT4File file,
 			[NotNull] string assemblyName
 		) => AssemblyReferenceResolver.Resolve(assemblyName, file.LogicalPsiSourceFile);
-
-		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
-		{
-			file.AssertContainsNoIncludeContext();
-			var directReferences = ExtractRawAssemblyReferences(file);
-			var sourceFile = file.LogicalPsiSourceFile.NotNull();
-			var projectFile = sourceFile.ToProjectFile().NotNull();
-			var resolveContext = projectFile.SelectResolveContext();
-			return LowLevelReferenceExtractionManager
-				.ResolveTransitiveDependencies(directReferences, resolveContext)
-				.AsList();
-		}
-
-		[NotNull]
-		private IEnumerable<T4AssemblyReferenceInfo> ExtractRawAssemblyReferences([NotNull] IT4File file)
-		{
-			var sourceFile = file.LogicalPsiSourceFile.NotNull();
-			if (!(sourceFile.PsiModule is IT4FilePsiModule psiModule))
-				return EmptyList<T4AssemblyReferenceInfo>.Enumerable;
-
-			return psiModule
-				.RawReferences
-				.SelectNotNull(it => LowLevelReferenceExtractionManager.Resolve(it));
-		}
 	}
 }
