@@ -49,4 +49,9 @@ class T4RunFileTest : T4RunFileTestBase() {
     assertNoOutputWithExtension(".txt")
     dumpCsproj()
   }
+
+  @Test fun testInProjectTransitiveIncludeResolution() = doTest()
+  @Test fun testOutOfProjectTransitiveIncludeResolution() = doTest()
+  @Test fun testInProjectNonTrivialIncludeResolution() = doTest()
+  @Test fun testDefaultLinq2DbTemplate() = doTest()
 }

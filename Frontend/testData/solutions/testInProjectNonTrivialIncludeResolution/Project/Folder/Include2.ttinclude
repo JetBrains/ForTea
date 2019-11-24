@@ -1,0 +1,3 @@
+﻿<#+
+    private static int Answer => 42;
+#>
