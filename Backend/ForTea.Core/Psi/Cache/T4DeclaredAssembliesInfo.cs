@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
@@ -48,7 +46,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		public T4DeclaredAssembliesInfo([NotNull] IT4File baseFile)
 		{
-			foreach (var directive in baseFile.Children().OfType<IT4AssemblyDirective>())
+			foreach (var directive in baseFile.GetThisAndChildrenOfType<IT4AssemblyDirective>())
 			{
 				HandleAssemblyDirective(directive);
 			}
