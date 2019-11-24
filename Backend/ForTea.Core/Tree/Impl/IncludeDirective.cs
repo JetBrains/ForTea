@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 
@@ -37,8 +38,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 		private IT4PathWithMacros CreateIncludePath([CanBeNull] string includeFileName)
 		{
 			if (includeFileName == null) return new T4EmptyPathWithMacros(ResolutionContext);
-			var sourceFile = GetSourceFile();
-			if (sourceFile == null) return new T4EmptyPathWithMacros(ResolutionContext);
+			var sourceFile = this.GetParentOfType<IT4FileLikeNode>().NotNull().LogicalPsiSourceFile;
 			return new T4PathWithMacros(includeFileName, sourceFile, ResolutionContext);
 		}
 
