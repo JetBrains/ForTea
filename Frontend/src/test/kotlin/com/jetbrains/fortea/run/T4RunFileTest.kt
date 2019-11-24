@@ -26,6 +26,7 @@ class T4RunFileTest : T4RunFileTestBase() {
 //  @Test fun testThatFileExtensionCanBeUpdatedCorrectly() {
 //    executeT4File()
 //    t4File.writeText(t4File.readText().replace(".fs", ".cs"))
+//    todo: saveSolution()? or see @korifey dialog for details on how to force update from disk
 //    executeT4File()
 //    saveSolution()
 //    dumpExecutionResult(".cs")
@@ -41,4 +42,11 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatFeatureBlocksCanContainManyNewLines() = doTest()
   @Test fun testHowTextInFeatureIsHandled() = doTest()
   @Test fun testThatOutputOfUnbuiltProjectCanBeReferenced() = doTest()
+  @Test fun testHostInHostSpecificTemplate() = doTest()
+  @Test fun testHostInNonHostSpecificTemplate() {
+    executeT4File()
+    saveSolution()
+    assertNoOutputWithExtension(".txt")
+    dumpCsproj()
+  }
 }
