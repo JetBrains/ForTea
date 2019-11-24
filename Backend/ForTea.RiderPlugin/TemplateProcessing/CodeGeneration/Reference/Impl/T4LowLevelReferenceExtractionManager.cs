@@ -40,17 +40,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			FileSystemPath.Parse(typeof(IProtocol).Assembly.Location).Parent // JetBrains.RdFramework
 		);
 
-		public IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
+		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
 			IList<FileSystemPath> directDependencies,
 			IModuleReferenceResolveContext resolveContext
 		)
 		{
 			var result = new List<T4AssemblyReferenceInfo>();
 			ResolveTransitiveDependencies(directDependencies.SelectNotNull(Resolve), resolveContext, result);
-			return result.Select(it => it.Location);
+			return result;
 		}
 
-		public T4AssemblyReferenceInfo? Resolve(FileSystemPath path)
+		private T4AssemblyReferenceInfo? Resolve([NotNull] FileSystemPath path)
 		{
 			var info = AssemblyInfoDatabase.GetAssemblyName(path);
 			if (info == null) return null;

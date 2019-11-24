@@ -11,12 +11,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 	public interface IT4LowLevelReferenceExtractionManager
 	{
 		[NotNull]
-		IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
+		IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
 			[NotNull, ItemNotNull] IList<FileSystemPath> directDependencies,
 			[NotNull] IModuleReferenceResolveContext resolveContext
 		);
-
-		T4AssemblyReferenceInfo? Resolve([NotNull] FileSystemPath path);
 
 		[CanBeNull]
 		MetadataReference ResolveMetadata(Lifetime lifetime, [NotNull] FileSystemPath path);

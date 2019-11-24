@@ -41,15 +41,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		}
 
 		public IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(Lifetime lifetime, IT4File file) =>
-			ExtractTransitiveReferencePaths(file)
-				.Select(path => LowLevelReferenceExtractionManager.ResolveMetadata(lifetime, path))
+			ExtractReferenceLocationsTransitive(file)
+				.Select(info => LowLevelReferenceExtractionManager.ResolveMetadata(lifetime, info.Location))
 				.AsList();
 
-		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file) =>
-			ExtractTransitiveReferencePaths(file).SelectNotNull(LowLevelReferenceExtractionManager.Resolve);
-
-		[NotNull, ItemNotNull]
-		private IEnumerable<FileSystemPath> ExtractTransitiveReferencePaths([NotNull] IT4File file)
+		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
 			file.AssertContainsNoIncludeContext();
 			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
