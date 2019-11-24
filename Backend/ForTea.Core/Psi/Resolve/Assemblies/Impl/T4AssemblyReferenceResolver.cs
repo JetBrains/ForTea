@@ -49,7 +49,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			return Resolve(path);
 		}
 
-		public FileSystemPath Resolve(T4ResolvedPath path) =>
+		public virtual FileSystemPath Resolve(T4ResolvedPath path) =>
 			ResolveAsLightReference(path)
 			?? ResolveAsAssemblyName(path)
 			?? ResolveAsAssemblyFile(path);
