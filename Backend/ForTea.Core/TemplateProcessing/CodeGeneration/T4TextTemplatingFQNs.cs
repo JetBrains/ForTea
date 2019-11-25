@@ -19,5 +19,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 
 		[NotNull] public const string ToStringHelper =
 			"global::Microsoft.VisualStudio.TextTemplating.ToStringHelper";
+
+		public const string Lifetime = "global::JetBrains.Lifetimes.Lifetime";
 	}
 }
