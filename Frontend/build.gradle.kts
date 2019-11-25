@@ -72,7 +72,8 @@ val libraryFiles = listOf(
   "EnvDTE90a",
   "EnvDTE100",
   "JetBrains.EnvDTE.Client"
-).map { "output/JetBrains.TextTemplating/$buildConfiguration/$it" }
+).map { "output/JetBrains.TextTemplating/$buildConfiguration/$it" } +
+  "output/ForTea.RiderPlugin/$buildConfiguration/JetBrains.EnvDTE.Host"
 
 val dotNetSdkPath by lazy {
   val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")

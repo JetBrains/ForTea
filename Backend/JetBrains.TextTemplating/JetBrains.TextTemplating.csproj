@@ -8,8 +8,8 @@
     <OutputPath>..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Microsoft.VisualStudio.TextTemplating</RootNamespace>
-    <EnvDTEVersion>0.1.0.2</EnvDTEVersion>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)targets\EnvDTETargets.targets"/>
   <ItemGroup>
     <PackageReference Include="JetBrains.EnvDTE" Version="$(EnvDTEVersion)"/>
     <PackageReference Include="JetBrains.EnvDTE80" Version="$(EnvDTEVersion)"/>
