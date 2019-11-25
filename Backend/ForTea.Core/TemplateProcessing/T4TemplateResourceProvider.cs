@@ -15,11 +15,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 		private static string ReadTemplate([NotNull] string resourceName)
 		{
 			var assembly = Assembly.GetExecutingAssembly();
-			using (var stream = assembly.GetManifestResourceStream(resourceName))
-			using (var reader = new StreamReader(stream.NotNull()))
-			{
-				return reader.ReadToEnd();
-			}
+			using var stream = assembly.GetManifestResourceStream(resourceName);
+			using var reader = new StreamReader(stream.NotNull());
+			return reader.ReadToEnd();
 		}
 
 		[NotNull]

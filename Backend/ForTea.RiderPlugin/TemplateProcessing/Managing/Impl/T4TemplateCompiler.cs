@@ -86,19 +86,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 						debugInformationFormat: DebugInformationFormat.PortablePdb,
 						pdbFilePath: pdbPath.FullPath
 					);
-					EmitResult emitResult;
-					using (var executableStream = executablePath.OpenFileForWriting())
-					{
-						using (var pdbStream = pdbPath.OpenFileForWriting())
-						{
-							emitResult = compilation.Emit(
-								peStream: executableStream,
-								pdbStream: pdbStream,
-								options: emitOptions,
-								cancellationToken: nested
-							);
-						}
-					}
+					using var executableStream = executablePath.OpenFileForWriting();
+					using var pdbStream = pdbPath.OpenFileForWriting();
+					var emitResult = compilation.Emit(
+						peStream: executableStream,
+						pdbStream: pdbStream,
+						options: emitOptions,
+						cancellationToken: nested
+					);
 
 					return Converter.ToT4BuildResult(emitResult.Diagnostics.AsList(), file);
 				}
