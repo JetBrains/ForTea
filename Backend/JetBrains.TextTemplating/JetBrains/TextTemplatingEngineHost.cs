@@ -23,17 +23,23 @@ namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 		public string FileExtension { get; private set; }
 
 		public TextTemplatingEngineHost(
+			Lifetime lifetime,
 			IDictionary<string, string> knownMacros,
 			string templateFile,
 			TextTransformation transformation
 		)
 		{
+			Lifetime = lifetime;
 			Helper = new MacroResolveHelper(knownMacros);
 			Transformation = transformation;
 			TemplateFile = templateFile;
 		}
 
 		private MacroResolveHelper Helper { get; }
+
+		private Lifetime Lifetime { get; }
+
+		private DteImplementation CachedDteImplementation { get; set; }
 
 		public bool LoadIncludeText(string requestFileName, out string content, out string location)
 		{
@@ -130,11 +136,14 @@ namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 		{
 			if (serviceType == typeof(DTE) || serviceType == typeof(DTE2))
 			{
+				if (CachedDteImplementation != null) return CachedDteImplementation;
 				string rawPort = Environment.GetEnvironmentVariable("T4_ENVDTE_CLIENT_PORT");
 				if (rawPort == null) return null;
 				if (!int.TryParse(rawPort, out int port)) return null;
-				var manager = new ConnectionManager(Lifetime.Eternal, port);
-				return new DTEImplementation(manager.Model);
+				var manager = new ConnectionManager(Lifetime, port);
+				var implementation = new DteImplementation(manager.Model);
+				CachedDteImplementation = implementation;
+				return implementation;
 			}
 
 			return null;

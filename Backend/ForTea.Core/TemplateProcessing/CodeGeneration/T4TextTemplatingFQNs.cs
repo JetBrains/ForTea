@@ -34,5 +34,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 
 		[NotNull]
 		public const string GetConverter = "global::System.ComponentModel.TypeDescriptor.GetConverter";
+
+		public const string Lifetime = "global::JetBrains.Lifetimes.Lifetime";
 	}
 }
