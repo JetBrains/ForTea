@@ -4,6 +4,8 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Modules.References;
+using GammaJul.ForTea.Core.Psi.Modules.References.Impl;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
@@ -14,7 +16,6 @@ using JetBrains.Lifetimes;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
-using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Modules;
@@ -25,7 +26,7 @@ using JetBrains.Util.Dotnet.TargetFrameworkIds;
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
 	/// <summary>PSI module managing a single T4 file.</summary>
-	public sealed class T4FilePsiModule : ConcurrentUserDataHolder, IT4FilePsiModule
+	public sealed class T4FilePsiModule : ConcurrentUserDataHolder, IT4FilePsiModule, IDisposable
 	{
 		[NotNull]
 		private const string Prefix = "[T4]";
@@ -33,7 +34,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private Lifetime Lifetime { get; }
 
 		[NotNull]
-		private T4AssemblyReferenceManager AssemblyReferenceManager { get; }
+		private IT4AssemblyReferenceManager AssemblyReferenceManager { get; }
 
 		[NotNull]
 		private T4ProjectReferenceManager ProjectReferenceManager { get; }
@@ -54,9 +55,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private IPsiServices PsiServices { get; }
 
 		[NotNull]
-		private T4AssemblyReferenceInvalidator AssemblyReferenceInvalidator { get; }
-
-		[NotNull]
 		private IProjectFile ProjectFile { get; }
 
 		private IChangeProvider ChangeProvider { get; }
@@ -75,8 +73,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			get { yield return SourceFile; }
 		}
 
-		public IEnumerable<IAssembly> RawReferences =>
-			AssemblyReferenceManager.References.Values.SelectNotNull(cookie => cookie.Assembly);
+		public IEnumerable<FileSystemPath> RawReferences => AssemblyReferenceManager.RawReferences;
 
 		public T4FilePsiModule(
 			Lifetime lifetime,
@@ -87,12 +84,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		)
 		{
 			Lifetime = lifetime;
-			lifetime.OnTermination(Dispose);
+			lifetime.AddDispose(this);
 			ProjectFile = projectFile;
 			Solution = ProjectFile.GetSolution();
 			PsiModules = Solution.GetComponent<IPsiModules>();
 			PsiServices = Solution.GetComponent<IPsiServices>();
-			AssemblyReferenceInvalidator = Solution.GetComponent<T4AssemblyReferenceInvalidator>();
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
 			T4Environment = t4Environment;
@@ -105,7 +101,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			AssemblyReferenceManager = new T4AssemblyReferenceManager(
 				Solution.GetComponent<IAssemblyFactory>(),
 				ProjectFile,
-				resolveContext
+				resolveContext,
+				shellLocks
 			);
 			ProjectReferenceManager = new T4ProjectReferenceManager(ProjectFile, Solution);
 
@@ -139,11 +136,18 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private void OnFileDataChanged([NotNull] T4DeclaredAssembliesDiff dataDiff)
 		{
 			ShellLocks.AssertWriteAccessAllowed();
-			bool hasChanges = AssemblyReferenceInvalidator.InvalidateAssemblies(
-				dataDiff,
-				ProjectFile,
-				AssemblyReferenceManager
-			);
+			bool hasChanges = false;
+			// removes the assembly references from the old assembly directives
+			foreach (var _ in dataDiff.RemovedAssemblies.Where(AssemblyReferenceManager.TryRemoveReference))
+			{
+				hasChanges = true;
+			}
+
+			// adds assembly references from the new assembly directives
+			foreach (var _ in dataDiff.AddedAssemblies.Where(AssemblyReferenceManager.TryAddReference))
+			{
+				hasChanges = true;
+			}
 
 			if (!hasChanges) return;
 
@@ -167,7 +171,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		public IEnumerable<IPsiModuleReference> GetReferences(IModuleReferenceResolveContext _)
 		{
 			var references = new PsiModuleReferenceAccumulator(TargetFrameworkId);
-			var moduleReferences = RawReferences
+			var moduleReferences = AssemblyReferenceManager
+				.AssemblyReferences
+				.Concat(AssemblyReferenceManager.ProjectReferences)
 				.SelectNotNull(assembly => PsiModules.GetPrimaryPsiModule(assembly, TargetFrameworkId))
 				.Select(it => new PsiModuleReference(it));
 			references.AddRange(moduleReferences);
@@ -188,31 +194,22 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			AssemblyReferenceManager.ResolveContext
 		);
 
-		/// <summary>Disposes this instance.</summary>
-		/// <remarks>Does not implement <see cref="IDisposable"/>, is called when the lifetime is terminated.</remarks>
-		private void Dispose()
-		{
-			// Removes the references.
-			var assemblyCookies = AssemblyReferenceManager.References.Values.ToArray();
-			if (assemblyCookies.Length <= 0) return;
-			ShellLocks.ExecuteWithWriteLock(
-				() =>
-				{
-					foreach (var assemblyCookie in assemblyCookies)
-					{
-						assemblyCookie.Dispose();
-					}
-				}
-			);
-			AssemblyReferenceManager.References.Clear();
-		}
+		public void Dispose() => AssemblyReferenceManager.Dispose();
 
 		private void AddBaseReferences()
 		{
-			AssemblyReferenceManager.TryAddReference("mscorlib");
-			AssemblyReferenceManager.TryAddReference("System");
-			foreach (var assemblyName in T4Environment.TextTemplatingAssemblyNames)
-				AssemblyReferenceManager.TryAddReference(assemblyName);
+			TryAddReference("mscorlib");
+			TryAddReference("System");
+			foreach (string assemblyName in T4Environment.TextTemplatingAssemblyNames)
+			{
+				TryAddReference(assemblyName);
+			}
+		}
+
+		private void TryAddReference([NotNull] string name)
+		{
+			var path = new T4PathWithMacros(name, SourceFile, ProjectFile, GetSolution());
+			AssemblyReferenceManager.TryAddReference(path);
 		}
 
 		public IPsiServices GetPsiServices() => PsiServices;

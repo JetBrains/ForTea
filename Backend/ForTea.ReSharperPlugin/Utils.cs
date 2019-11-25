@@ -12,8 +12,7 @@ namespace JetBrains.ForTea.ReSharperPlugin
 		public static IVsHierarchy TryGetVsHierarchy([NotNull] IProjectFile file) => file
 			.GetSolution()
 			.TryGetComponent<ProjectModelSynchronizer>()
-			?.TryGetHierarchyItemByProjectItem(file.GetProject().NotNull(), false)
+			?.TryGetHierarchyItemByProjectItem(file.GetProject().NotNull().ToProjectSearchDescriptor(), false)
 			?.Hierarchy;
-
 	}
 }

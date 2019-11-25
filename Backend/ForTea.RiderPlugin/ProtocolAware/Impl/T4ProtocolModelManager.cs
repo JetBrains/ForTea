@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.ProjectModel;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Host.Features;
@@ -37,7 +36,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private IT4TemplateExecutionManager ExecutionManager { get; }
 
 		[NotNull]
-		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
+		private IT4ProjectReferenceResolver ProjectReferenceResolver { get; }
 
 		[NotNull]
 		private ProjectModelViewHost Host { get; }
@@ -49,12 +48,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			[NotNull] ISolution solution,
 			[NotNull] IT4TargetFileManager targetFileManager,
 			[NotNull] IT4TemplateCompiler compiler,
-			[NotNull] T4BuildMessageConverter converter,
+			[NotNull] IT4BuildMessageConverter converter,
 			[NotNull] IT4ModelInteractionHelper helper,
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger,
-			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager,
-			[NotNull] ProjectModelViewHost host
+			[NotNull] ProjectModelViewHost host,
+			IT4ProjectReferenceResolver projectReferenceResolver
 		)
 		{
 			Solution = solution;
@@ -63,7 +62,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			Converter = converter;
 			ExecutionManager = executionManager;
 			Logger = logger;
-			ReferenceExtractionManager = referenceExtractionManager;
+			ProjectReferenceResolver = projectReferenceResolver;
 			Host = host;
 			var model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RegisterCallbacks(model, helper);
@@ -81,7 +80,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		}
 
 		[CanBeNull]
-		private List<int> CalculateProjectDependencies([NotNull] IPsiSourceFile file) => ReferenceExtractionManager
+		private List<int> CalculateProjectDependencies([NotNull] IPsiSourceFile file) => ProjectReferenceResolver
 			.GetProjectDependencies(file.BuildT4Tree())
 			.Select(it => Host.GetIdByProjectModelElement(it))
 			.AsList();

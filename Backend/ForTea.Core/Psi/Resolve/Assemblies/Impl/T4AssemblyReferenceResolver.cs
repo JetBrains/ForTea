@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Psi.Modules;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Application.Infra;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Utils;
@@ -21,26 +18,22 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 	public sealed class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
 	{
 		[NotNull]
-		private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
-
-		[NotNull]
-		private IT4AssemblyNamePreprocessor Preprocessor { get; }
+		private IT4LightWeightAssemblyReferenceResolver LightWeightResolver { get; }
 
 		[NotNull]
 		private IModuleReferenceResolveManager ResolveManager { get; }
 
 		public T4AssemblyReferenceResolver(
 			[NotNull] IModuleReferenceResolveManager resolveManager,
-			[NotNull] IT4AssemblyNamePreprocessor preprocessor,
-			[NotNull] AssemblyInfoDatabase assemblyInfoDatabase
+			[NotNull] IT4LightWeightAssemblyReferenceResolver lightWeightResolver
 		)
 		{
 			ResolveManager = resolveManager;
-			Preprocessor = preprocessor;
-			AssemblyInfoDatabase = assemblyInfoDatabase;
+			LightWeightResolver = lightWeightResolver;
 		}
 
-		public AssemblyReferenceTarget FindAssemblyReferenceTarget(string assemblyNameOrFile)
+		[CanBeNull]
+		private static AssemblyReferenceTarget FindAssemblyReferenceTarget(string assemblyNameOrFile)
 		{
 			// assembly path
 			var path = FileSystemPath.TryParse(assemblyNameOrFile);
@@ -52,88 +45,36 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			return nameInfo.ToAssemblyReferenceTarget();
 		}
 
-		public FileSystemPath Resolve(
+		[CanBeNull]
+		private FileSystemPath Resolve(
 			AssemblyReferenceTarget target,
 			IProject project,
 			IModuleReferenceResolveContext resolveContext
 		) => ResolveManager.Resolve(target, project, resolveContext);
 
-		public FileSystemPath Resolve(IT4AssemblyDirective directive)
-		{
-			if (directive.ResolutionContext == null) return null;
-			using (Preprocessor.Prepare(directive.ResolutionContext))
-			{
-				string resolved = directive.Path.ResolveString();
-				string path = Preprocessor.Preprocess(directive.ResolutionContext, resolved);
-				var resolveContext = directive.ResolutionContext.SelectResolveContext();
-				var target = FindAssemblyReferenceTarget(path);
-				if (target == null) return null;
-				return Resolve(target, directive.ResolutionContext.GetProject().NotNull(), resolveContext);
-			}
-		}
+		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.Path);
 
 		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{
 			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return null;
-			using (Preprocessor.Prepare(projectFile))
-			{
-				string resolved = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile).ResolveString();
-				string path = Preprocessor.Preprocess(projectFile, resolved);
-				var resolveContext = projectFile.SelectResolveContext();
-				var target = FindAssemblyReferenceTarget(path);
-				if (target == null) return null;
-				return Resolve(target, projectFile.GetProject().NotNull(), resolveContext);
-			}
+			var pathWithMacros = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile);
+			return Resolve(pathWithMacros);
 		}
 
-		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
-			IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			IModuleReferenceResolveContext resolveContext
-		)
+		public FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros)
 		{
-			var result = new List<T4AssemblyReferenceInfo>();
-			ResolveTransitiveDependencies(directDependencies, resolveContext, result);
-			return result;
-		}
+			var path = pathWithMacros.ResolvePath();
+			if (path.IsAbsolute) return path;
 
-		public IEnumerable<FileSystemPath> ResolveTransitiveDependencies(
-			IList<FileSystemPath> directDependencies,
-			IModuleReferenceResolveContext resolveContext
-		)
-		{
-			return ResolveTransitiveDependencies(directDependencies.SelectMany(directDependency => AssemblyInfoDatabase
-				.GetReferencedAssemblyNames(directDependency)
-				.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(assemblyNameInfo =>
-				{
-					var resolver = new AssemblyResolverOnFolders(directDependency.Parent);
-					resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-					if (path == null) return null;
-					return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
-				})), resolveContext).Select(it => it.Location).Concat(directDependencies);
-		}
+			string resolved = pathWithMacros.ResolveString();
+			var lightResolved = LightWeightResolver.TryResolve(pathWithMacros.ProjectFile, resolved);
+			if (lightResolved != null) return lightResolved;
 
-		private void ResolveTransitiveDependencies(
-			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			[NotNull] IModuleReferenceResolveContext resolveContext,
-			[NotNull] IList<T4AssemblyReferenceInfo> destination
-		)
-		{
-			foreach (var directDependency in directDependencies)
-			{
-				if (destination.Any(it => it.FullName == directDependency.FullName)) continue;
-				destination.Add(directDependency);
-				var indirectDependencies = AssemblyInfoDatabase
-					.GetReferencedAssemblyNames(directDependency.Location)
-					.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(assemblyNameInfo =>
-					{
-						var resolver = new AssemblyResolverOnFolders(directDependency.Location.Parent);
-						resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-						if (path == null) return null;
-						return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
-					});
-				ResolveTransitiveDependencies(indirectDependencies, resolveContext, destination);
-			}
+			var resolveContext = pathWithMacros.ProjectFile.SelectResolveContext();
+			var target = FindAssemblyReferenceTarget(resolved);
+			if (target == null) return null;
+			return Resolve(target, pathWithMacros.ProjectFile.GetProject().NotNull(), resolveContext);
 		}
 	}
 }

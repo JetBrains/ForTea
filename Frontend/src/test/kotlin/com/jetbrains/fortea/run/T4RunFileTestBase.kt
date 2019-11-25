@@ -53,8 +53,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
         && !it.name.endsWith(".tmp")
         && !it.name.endsWith(".gold")
     } else outputFileCandidates.single {
-      it.nameWithoutExtension == t4File.nameWithoutExtension
-        && it.name.endsWith(resultExtension)
+      it.name == t4File.nameWithoutExtension + resultExtension
     }
   }
 

@@ -142,8 +142,6 @@ namespace GammaJul.ForTea.Core.Parsing
 			if (sourceFile == null) return null;
 			var pathWithMacros = directive.GetPathForParsing(sourceFile);
 			var path = pathWithMacros.ResolvePath();
-			var project = sourceFile.GetProject();
-			if (project == null) return null;
 			var includeFile =
 				T4ParsingContextHelper.ExecuteGuarded(path, directive.Once, () => pathWithMacros.Resolve());
 			if (includeFile == null) return null;

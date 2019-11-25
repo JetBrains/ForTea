@@ -26,13 +26,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		public T4BuildResult ToT4BuildResult(ICollection<Diagnostic> diagnostics, [NotNull] IT4File file)
 		{
-			int id = GetProjectId(file);
+			int id = GetProjectId(file.LogicalPsiSourceFile.ToProjectFile().NotNull());
 			var kind = ToT4BuildResultKind(diagnostics);
 			var messages = diagnostics.Select(diagnostic => ToT4BuildMessage(diagnostic, id)).ToList();
 			return new T4BuildResult(kind, messages);
 		}
 
-		private int GetProjectId([NotNull] IT4File file) => Host?.GetIdByItem(file.GetProject().NotNull()) ?? 0;
+		private int GetProjectId([NotNull] IProjectFile file) => Host?.GetIdByItem(file.GetProject().NotNull()) ?? 0;
 
 		public T4BuildResult ToT4BuildResult(T4OutputGenerationException exception) =>
 			ToT4BuildResult(exception.FailureDatum.AsEnumerable());
@@ -47,8 +47,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			foreach (var data in rawData)
 			{
 				var location = new T4Location(data.Line, data.Column);
-				int projectId = GetProjectId(data.File);
-				string fullPath = data.File.GetSourceFile().GetLocation().FullPath;
+				int projectId = GetProjectId(data.ProjectFile);
+				string fullPath = data.ProjectFile.Location.FullPath;
 				string message = data.Message;
 				const T4BuildMessageKind kind = T4BuildMessageKind.Error;
 				messages.Add(new T4BuildMessage(kind, "Error", location, message, projectId, fullPath));

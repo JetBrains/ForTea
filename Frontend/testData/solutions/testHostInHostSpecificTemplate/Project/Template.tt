@@ -1,0 +1,4 @@
+<#@ template language="C#" hostspecific="true" #>
+<#
+    global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost host = Host;
+#>

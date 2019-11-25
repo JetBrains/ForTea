@@ -1,0 +1,3 @@
+<#@ template language="C#" hostspecific="false" #>
+<#@ output extension="txt" #>
+<# var host = Host; #>

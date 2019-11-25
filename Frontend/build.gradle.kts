@@ -257,15 +257,19 @@ tasks {
     }
   }
 
-  create("buildReSharperPlugin") {
+  create("buildBackend") {
     group = riderForTeaTargetsGroup
     dependsOn("prepare")
     doLast {
       exec {
-        executable = "msbuild"
-        args = listOf(backendPluginSolutionPath.canonicalPath)
+        executable = "dotnet"
+        args = listOf("build", backendPluginSolutionPath.canonicalPath)
       }
     }
+  }
+
+  getByName("runIde") {
+    dependsOn("buildBackend")
   }
 
   getByName("buildSearchableOptions") {

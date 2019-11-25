@@ -14,16 +14,28 @@ namespace JetBrains.ForTea.RiderPlugin.Daemon.ProblemAnalyzers
 	public sealed class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4AssemblyDirective>
 	{
 		[NotNull]
-		private IT4AssemblyReferenceResolver Resolver { get; }
+		private IT4AssemblyReferenceResolver AssemblyReferenceResolver { get; }
 
-		public T4UnresolvedPathAnalyzer([NotNull] IT4AssemblyReferenceResolver resolver) => Resolver = resolver;
+		[NotNull]
+		private IT4ProjectReferenceResolver ProjectReferenceResolver { get; }
+
+		public T4UnresolvedPathAnalyzer(
+			[NotNull] IT4AssemblyReferenceResolver resolver,
+			[NotNull] IT4ProjectReferenceResolver projectReferenceResolver
+		)
+		{
+			AssemblyReferenceResolver = resolver;
+			ProjectReferenceResolver = projectReferenceResolver;
+		}
 
 		protected override void DoRun(IT4AttributeValue element, IHighlightingConsumer consumer)
 		{
 			var attribute = DirectiveAttributeNavigator.GetByValue(element);
 			if (!(DirectiveNavigator.GetByAttribute(attribute) is IT4AssemblyDirective assemblyDirective)) return;
-			var systemPath = Resolver.Resolve(assemblyDirective);
-			if (systemPath != null && systemPath.ExistsFile) return;
+			var project = ProjectReferenceResolver.TryResolveProject(assemblyDirective.Path.ResolvePath());
+			if (project != null) return;
+			var path = AssemblyReferenceResolver.Resolve(assemblyDirective);
+			if (path != null && path.ExistsFile) return;
 			consumer.AddHighlighting(new UnresolvedAssemblyWarning(assemblyDirective.Name));
 		}
 

@@ -40,7 +40,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 			get
 			{
 				var root = Graph.FindBestRoot(ProjectFile);
-				if (TemplateKindProvider.GetTemplateKind(root) != T4TemplateKind.Preprocessed) return null;
+				if (!TemplateKindProvider.IsPreprocessedTemplate(root)) return null;
 				return root.GetProject();
 			}
 		}
