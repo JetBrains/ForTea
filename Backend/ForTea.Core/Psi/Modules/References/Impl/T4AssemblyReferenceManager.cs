@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 	{
 		[NotNull]
 		private IT4AssemblyReferenceResolver AssemblyReferenceResolver { get; }
-		
+
 		[NotNull]
 		private IT4ProjectReferenceResolver ProjectReferenceResolver { get; }
 
@@ -85,6 +85,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 		{
 			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
 			if (path == null) return false;
+			if (MyAssemblyReferences.ContainsKey(path)) return false;
+			if (MyProjectReferences.ContainsKey(path)) return false;
 			return TryAddProjectReference(path) || TryAddAssemblyReference(path);
 		}
 
