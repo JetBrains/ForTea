@@ -1,0 +1,3 @@
+<#@ template language="C#" #>
+<#@ output extension="txt" #>
+<#@ output encoding="UTF-8" #{caret}>

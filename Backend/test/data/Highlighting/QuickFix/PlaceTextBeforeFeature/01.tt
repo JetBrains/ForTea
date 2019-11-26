@@ -1,0 +1,6 @@
+<#+
+    void Foo()
+    {
+    }
+#>
+hello, worl{caret}d!
