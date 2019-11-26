@@ -61,6 +61,12 @@
         <Range>Include.GetHighlightingRange()</Range>
         <Behavour attributeID="HINT" overlapResolvePolicy="DEADCODE"/>
     </Warning>
+    <Warning name="RedundantAssembly" configurableSeverity="RedundantInclude">
+        <Parameter type="IT4AssemblyDirective" name="assembly"/>
+        <Message value="Assembly already referenced"/>
+        <Range>Assembly.GetHighlightingRange()</Range>
+        <Behavour attributeID="HINT" overlapResolvePolicy="DEADCODE"/>
+    </Warning>
     <Warning name="UnresolvedInclude" configurableSeverity="UnresolvedInclude">
         <Parameter type="ITokenNode" name="node"/>
         <Message value="Unresolved include path"/>

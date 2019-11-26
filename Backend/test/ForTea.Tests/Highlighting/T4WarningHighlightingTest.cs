@@ -19,6 +19,7 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("UnresolvedAssembly")]
 		[TestCase("EmptyDirective")]
 		[TestCase("UnsupportedLanguage")]
+		[TestCase("DuplicateAssemblyDirective")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.WARNING;

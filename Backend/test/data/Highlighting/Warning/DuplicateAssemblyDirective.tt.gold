@@ -1,0 +1,6 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="mscorlib" #>
+|<#@ assembly name="mscorlib" #>|(0)
+
+---------------------------------------------------------
+(0): ReSharper Hint: Assembly already referenced
