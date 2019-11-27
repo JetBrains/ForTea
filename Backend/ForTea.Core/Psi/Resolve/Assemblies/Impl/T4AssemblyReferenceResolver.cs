@@ -1,3 +1,4 @@
+using System;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
@@ -62,19 +63,56 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			return Resolve(pathWithMacros);
 		}
 
-		public FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros)
+		public FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros) =>
+			ResolveAsAbsolutePath(pathWithMacros)
+			?? ResolveAsLightReference(pathWithMacros)
+			?? ResolveAsAssemblyName(pathWithMacros)
+			?? ResolveAsAssemblyFile(pathWithMacros);
+
+		[CanBeNull]
+		private static FileSystemPath ResolveAsAbsolutePath([NotNull] IT4PathWithMacros pathWithMacros)
 		{
 			var path = pathWithMacros.ResolvePath();
 			if (path.IsAbsolute) return path;
+			return null;
+		}
 
+		[CanBeNull]
+		private FileSystemPath ResolveAsLightReference([NotNull] IT4PathWithMacros pathWithMacros)
+		{
 			string resolved = pathWithMacros.ResolveString();
 			var lightResolved = LightWeightResolver.TryResolve(pathWithMacros.ProjectFile, resolved);
 			if (lightResolved != null) return lightResolved;
+			return null;
+		}
 
-			var resolveContext = pathWithMacros.ProjectFile.SelectResolveContext();
-			var target = FindAssemblyReferenceTarget(resolved);
+		[CanBeNull]
+		private FileSystemPath ResolveAsAssemblyName([NotNull] IT4PathWithMacros pathWithMacros)
+		{
+			string assemblyName = pathWithMacros.ResolveString();
+			return ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, assemblyName);
+		}
+
+		[CanBeNull]
+		private FileSystemPath ResolveAsAssemblyFile([NotNull] IT4PathWithMacros pathWithMacros)
+		{
+			string name = pathWithMacros.ResolveString();
+			if (!name.EndsWith(".dll", StringComparison.Ordinal)) return null;
+			string fileName = name.Substring(0, name.Length - 4);
+			return ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, fileName);
+		}
+
+		[CanBeNull]
+		private FileSystemPath ResolveAssemblyNameOrFile(
+			[NotNull] IProjectFile projectFile,
+			[NotNull] string assemblyNameOrFile
+		)
+		{
+			var resolveContext = projectFile.SelectResolveContext();
+			var target = FindAssemblyReferenceTarget(assemblyNameOrFile);
 			if (target == null) return null;
-			return Resolve(target, pathWithMacros.ProjectFile.GetProject().NotNull(), resolveContext);
+			var project = projectFile.GetProject().NotNull();
+			return Resolve(target, project, resolveContext);
 		}
 	}
 }
