@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
@@ -12,29 +11,25 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Assemblies.Impl
 	{
 		public FileSystemPath TryResolve(IProjectFile file, string assemblyName)
 		{
-			// If the argument is the fully qualified path of an existing file, then we are done.
-			if (File.Exists(assemblyName)) return FileSystemPath.Parse(assemblyName);
-
-			string folderPath = (file.ParentFolder?.Location?.FullPath).NotNull();
-
 			try
 			{
+				// If the argument is the fully qualified path of an existing file, then we are done.
+				var fullPath = FileSystemPath.TryParse(assemblyName, FileSystemPathInternStrategy.DO_NOT_INTERN);
+				if (fullPath.IsAbsolute) return fullPath;
+				var folderPath = (file.ParentFolder?.Location).NotNull();
+
 				// Maybe the assembly is in the same folder as the text template that called the directive?
-				string candidate = Path.Combine(folderPath, assemblyName);
-				if (File.Exists(candidate)) return FileSystemPath.Parse(candidate);
-			}
-			catch (ArgumentException)
-			{
-			}
+				var sameFolderPath = folderPath.Combine(assemblyName, FileSystemPathInternStrategy.DO_NOT_INTERN);
+				if (sameFolderPath.ExistsFile) return sameFolderPath;
 
-			try
-			{
 				// Maybe the assembly name is missing extension?
-				string candidate = Path.Combine(folderPath, assemblyName + ".dll");
-				if (File.Exists(candidate)) return FileSystemPath.Parse(candidate);
+				var pathWithExtension =
+					folderPath.Combine(assemblyName + ".dll", FileSystemPathInternStrategy.DO_NOT_INTERN);
+				if (pathWithExtension.ExistsFile) return pathWithExtension;
 			}
 			catch (ArgumentException)
 			{
+				// If the assembly name contains illegal characters, we cannot resolve it (at least, this way)
 			}
 
 			return null;
