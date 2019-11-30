@@ -40,7 +40,8 @@ grammarKit {
 }
 
 val baseVersion = "2019.3"
-version = baseVersion
+val buildCounter = ext.properties["build.number"] ?: "9999"
+version = "$baseVersion.$buildCounter"
 
 intellij {
   type = "RD"
