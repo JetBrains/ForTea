@@ -23,9 +23,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	public sealed class T4FileDependencyCache : SimpleICache<T4FileDependencyData>,
 		IT4FileDependencyGraph, IT4FileGraphNotifier
 	{
-		[NotNull]
-		private ILogger Logger { get; }
-
 		public event Action<IEnumerable<FileSystemPath>> OnFilesIndirectlyAffected;
 
 		[NotNull]
@@ -53,9 +50,10 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		public T4FileDependencyCache(
 			Lifetime lifetime,
-			[NotNull] IPersistentIndexManager persistentIndexManager,
-			[NotNull] ILogger logger
-		) : base(lifetime, persistentIndexManager, T4FileDependencyDataMarshaller.Instance) => Logger = logger;
+			[NotNull] IPersistentIndexManager persistentIndexManager
+		) : base(lifetime, persistentIndexManager, T4FileDependencyDataMarshaller.Instance)
+		{
+		}
 
 		public IProjectFile FindBestRoot(IProjectFile file) =>
 			FindBestRoot(file.Location).FindMostSuitableFile(file);
