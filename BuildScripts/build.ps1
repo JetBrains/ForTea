@@ -51,15 +51,15 @@ Finally {
     Pop-Location
 }
 
-Write-Host "Building T4 backend"
+Write-Host "Restoring T4 backend packages"
 Push-Location -Path $backendPath
 Try {
     If ($Verbose -eq $true) {
-        dotnet msbuild -m ForTea.Backend.sln
+        dotnet restore ForTea.Backend.sln --no-cache --force        
         $code = $LastExitCode
     }
     Else {
-        dotnet msbuild -m ForTea.Backend.sln > $null
+        dotnet restore ForTea.Backend.sln --no-cache --force        
         $code = $LastExitCode
     }
     If ($code -ne 0) { throw "Could not compile backend. MsBuild exit code: $code." }    
@@ -67,6 +67,24 @@ Try {
 Finally {
     Pop-Location
 }
+
+Write-Host "Building T4 backend"
+Push-Location -Path $backendPath
+Try {
+    If ($Verbose -eq $true) {        
+        dotnet build ForTea.Backend.sln -c Release --no-restore --nologo --no-incremental        
+        $code = $LastExitCode
+    }
+    Else {        
+        dotnet build ForTea.Backend.sln -c Release --no-restore --nologo --no-incremental        
+        $code = $LastExitCode
+    }
+    If ($code -ne 0) { throw "Could not compile backend. MsBuild exit code: $code." }    
+}
+Finally {
+    Pop-Location
+}
+
 
 Write-Host $mainWorkName
 Push-Location -Path $frontendPath
