@@ -34,19 +34,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		}
 
 		[CanBeNull]
-		private static AssemblyReferenceTarget FindAssemblyReferenceTarget(string assemblyNameOrFile)
-		{
-			// assembly path
-			var path = FileSystemPath.TryParse(assemblyNameOrFile);
-			if (!path.IsEmpty && path.IsAbsolute) return path.ToAssemblyReferenceTarget();
-
-			// assembly name
-			var nameInfo = AssemblyNameInfo.TryParse(assemblyNameOrFile);
-			if (nameInfo == null) return null;
-			return nameInfo.ToAssemblyReferenceTarget();
-		}
-
-		[CanBeNull]
 		private FileSystemPath Resolve(
 			AssemblyReferenceTarget target,
 			IProject project,
@@ -78,28 +65,29 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		}
 
 		[CanBeNull]
-		private FileSystemPath ResolveAsLightReference([NotNull] IT4PathWithMacros pathWithMacros)
-		{
-			string resolved = pathWithMacros.ResolveString();
-			var lightResolved = LightWeightResolver.TryResolve(pathWithMacros.ProjectFile, resolved);
-			if (lightResolved != null) return lightResolved;
-			return null;
-		}
+		private FileSystemPath ResolveAsLightReference([NotNull] IT4PathWithMacros pathWithMacros) =>
+			LightWeightResolver.TryResolve(pathWithMacros.ProjectFile, pathWithMacros.ResolveString());
 
 		[CanBeNull]
-		private FileSystemPath ResolveAsAssemblyName([NotNull] IT4PathWithMacros pathWithMacros)
-		{
-			string assemblyName = pathWithMacros.ResolveString();
-			return ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, assemblyName);
-		}
+		private FileSystemPath ResolveAsAssemblyName([NotNull] IT4PathWithMacros pathWithMacros) =>
+			ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, pathWithMacros.ResolveString());
 
 		[CanBeNull]
 		private FileSystemPath ResolveAsAssemblyFile([NotNull] IT4PathWithMacros pathWithMacros)
 		{
 			string name = pathWithMacros.ResolveString();
-			if (!name.EndsWith(".dll", StringComparison.Ordinal)) return null;
+			string nameWithoutExtension = TryRemoveBinaryExtension(name);
+			if (nameWithoutExtension == null) return null;
 			string fileName = name.Substring(0, name.Length - 4);
 			return ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, fileName);
+		}
+
+		[CanBeNull]
+		private static string TryRemoveBinaryExtension([NotNull] string name)
+		{
+			if (name.EndsWith(".dll", StringComparison.Ordinal)) return name.Substring(0, name.Length - 4);
+			if (name.EndsWith(".exe", StringComparison.Ordinal)) return name.Substring(0, name.Length - 4);
+			return null;
 		}
 
 		[CanBeNull]
@@ -109,8 +97,9 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		)
 		{
 			var resolveContext = projectFile.SelectResolveContext();
-			var target = FindAssemblyReferenceTarget(assemblyNameOrFile);
-			if (target == null) return null;
+			var nameInfo = AssemblyNameInfo.TryParse(assemblyNameOrFile);
+			if (nameInfo == null) return null;
+			var target = new AssemblyReferenceTarget(nameInfo, FileSystemPath.Empty);
 			var project = projectFile.GetProject().NotNull();
 			return Resolve(target, project, resolveContext);
 		}
