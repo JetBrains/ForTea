@@ -1,0 +1,3 @@
+<T4_RUN_FILE_GUTTER_MARK><#@ template language="C#" #></T4_RUN_FILE_GUTTER_MARK>
+<#@ template language="C#" #>
+<# int x = 0; #>

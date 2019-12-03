@@ -1,2 +1,3 @@
 <#@ template language="C#" #>
+<#@ template language="C#" #>
 <# int x = 0; #>
