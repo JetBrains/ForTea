@@ -27,7 +27,7 @@ $gradleArgs += "--console=plain"
 Write-Host "Preparing to build T4 plugin"
 Push-Location -Path $frontendPath
 Try {
-    & "${baseDir}Frontend\gradlew.bat" :prepare --console=plain
+    & "${baseDir}Frontend\gradlew.bat" :prepare --console=plain -PBuildConfiguration=Release
     $code = $LastExitCode
     If ($code -ne 0) { throw "Could not prepare. Gradlew exit code: $code." }
 }
@@ -60,7 +60,7 @@ Finally {
 Write-Host $mainWorkName
 Push-Location -Path $frontendPath
 Try {
-    & "${baseDir}Frontend\gradlew.bat" $gradleArgs
+    & "${baseDir}Frontend\gradlew.bat" $gradleArgs -PBuildConfiguration=Release
     $code = $LastExitCode
     If ($code -ne 0) { throw "Main gradle work failed. Gradlew exit code: $code." }
 }
