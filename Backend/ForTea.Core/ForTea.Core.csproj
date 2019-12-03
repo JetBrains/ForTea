@@ -92,4 +92,12 @@
       <SubType>Designer</SubType>
     </ErrorsGen>
   </ItemGroup>
+  <Target Name="ReportCoreProjectSdk" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <CoreProjectSdkMessage>
+        Will use $(CoreProjectSdk) with version $(CoreProjectSdkVersion) to compile $(MSBuildProjectName).
+      </CoreProjectSdkMessage>
+    </PropertyGroup>
+    <Message Importance="high" Text="$(CoreProjectSdkMessage)"/>
+  </Target>
 </Project>
