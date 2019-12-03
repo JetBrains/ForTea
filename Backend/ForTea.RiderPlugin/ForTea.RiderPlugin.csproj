@@ -27,4 +27,11 @@
       <DependentUpon>T4CodeFoldingAttributes.tt</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <Target Name="EnsureRiderSdkPresence" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Rider SDK not set up. Please, run gradlew :prepare on the frontend first.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="$(RiderSDKVersion)==''" Text="$(ErrorText)"/>
+  </Target>
 </Project>
