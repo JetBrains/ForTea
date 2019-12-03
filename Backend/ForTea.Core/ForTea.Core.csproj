@@ -11,7 +11,7 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)targets\T4Targets.targets" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
+    <PackageReference Include="$(CoreProjectSdk)" Version="$(CoreProjectSdkVersion)">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
