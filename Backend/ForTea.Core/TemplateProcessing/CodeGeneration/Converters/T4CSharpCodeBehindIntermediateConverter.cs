@@ -109,7 +109,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			{
 				string name = TryGetGeneratedClassNameFromFile();
 				if (name == null) return GeneratedClassNameString;
-				return name + "Base";
+				return name;
 			}
 		}
 
