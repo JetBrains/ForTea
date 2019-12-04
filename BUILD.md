@@ -21,9 +21,7 @@ Building R# plugin
 ----
 To build R# plugin, run
 ```bash
-cd Frontend
-gradlew :prepare
 cd ../Backend
-./build
+./build pack
 ```
 Build outputs will be placed at `Backend/output/Debug/`
