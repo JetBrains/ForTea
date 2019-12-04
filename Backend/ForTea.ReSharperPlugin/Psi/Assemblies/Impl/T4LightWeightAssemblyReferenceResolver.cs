@@ -29,7 +29,9 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Assemblies.Impl
 			using var _ = Prepare(file);
 			string resolved = Components.CanBeNull?.Host?.ResolveAssemblyReference(assemblyName);
 			if (resolved == null) return null;
-			return FileSystemPath.Parse(resolved);
+			var path = FileSystemPath.Parse(resolved);
+			if (path.IsAbsolute) return path;
+			return null;
 		}
 
 		private IDisposable Prepare(IProjectFile file)
