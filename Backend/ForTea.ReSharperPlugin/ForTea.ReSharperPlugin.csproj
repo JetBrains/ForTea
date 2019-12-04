@@ -18,5 +18,12 @@
     <Reference Include="PresentationCore" />
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
-
+  <Target Name="ReportCoreProjectSdk" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <CoreProjectSdkMessage>
+        Will use JetBrains.ReSharper.SDK with version $(ReSharperSdkVersion) to compile $(MSBuildProjectName).
+      </CoreProjectSdkMessage>
+    </PropertyGroup>
+    <Message Importance="high" Text="$(CoreProjectSdkMessage)"/>
+  </Target>
 </Project>

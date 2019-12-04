@@ -34,4 +34,13 @@
     </PropertyGroup>
     <Error Condition="$(RiderSDKVersion)==''" Text="$(ErrorText)"/>
   </Target>
+
+  <Target Name="ReportRiderPluginProjectSdk" BeforeTargets="PrepareForBuild" AfterTargets="EnsureRiderSdkPresence">
+    <PropertyGroup>
+      <CoreProjectSdkMessage>
+        Will use JetBrains.Rider.SDK with version $(RiderSDKVersion)a to compile $(MSBuildProjectName).
+      </CoreProjectSdkMessage>
+    </PropertyGroup>
+    <Message Importance="high" Text="$(CoreProjectSdkMessage)"/>
+  </Target>
 </Project>
