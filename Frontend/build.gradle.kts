@@ -249,12 +249,6 @@ tasks {
   create("prepare") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgen", "writeNuGetConfig", "writeRiderSdkVersionProps")
-    doLast {
-      exec {
-        executable = "dotnet"
-        args = listOf("restore", backendPluginSolutionPath.canonicalPath)
-      }
-    }
   }
 
   create("buildBackend") {
