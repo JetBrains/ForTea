@@ -32,7 +32,7 @@
     <PropertyGroup>
       <ErrorText>Rider SDK not set up. Please, run gradlew :prepare on the frontend first.</ErrorText>
     </PropertyGroup>
-    <Error Condition="$(RiderSDKVersion)==''" Text="$(ErrorText)"/>
+    <Error Condition="$(RiderSDKVersion)==''" Text="$(ErrorText)" />
   </Target>
 
   <Target Name="ReportRiderPluginProjectSdk" BeforeTargets="PrepareForBuild" AfterTargets="EnsureRiderSdkPresence">
@@ -41,6 +41,6 @@
         Will use JetBrains.Rider.SDK with version $(RiderSDKVersion)a to compile $(MSBuildProjectName).
       </CoreProjectSdkMessage>
     </PropertyGroup>
-    <Message Importance="high" Text="$(CoreProjectSdkMessage)"/>
+    <Message Importance="high" Text="$(CoreProjectSdkMessage)" />
   </Target>
 </Project>

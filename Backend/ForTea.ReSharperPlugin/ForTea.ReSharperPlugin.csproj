@@ -24,6 +24,6 @@
         Will use JetBrains.ReSharper.SDK with version $(ReSharperSdkVersion) to compile $(MSBuildProjectName).
       </CoreProjectSdkMessage>
     </PropertyGroup>
-    <Message Importance="high" Text="$(CoreProjectSdkMessage)"/>
+    <Message Importance="high" Text="$(CoreProjectSdkMessage)" />
   </Target>
 </Project>

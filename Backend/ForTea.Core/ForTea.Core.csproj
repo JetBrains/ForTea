@@ -98,6 +98,6 @@
         Will use $(CoreProjectSdk) with version $(CoreProjectSdkVersion) to compile $(MSBuildProjectName).
       </CoreProjectSdkMessage>
     </PropertyGroup>
-    <Message Importance="high" Text="$(CoreProjectSdkMessage)"/>
+    <Message Importance="high" Text="$(CoreProjectSdkMessage)" />
   </Target>
 </Project>
