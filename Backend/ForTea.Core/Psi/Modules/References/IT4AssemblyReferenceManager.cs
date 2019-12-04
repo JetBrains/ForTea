@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
@@ -25,12 +25,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		[NotNull]
 		IModuleReferenceResolveContext ResolveContext { get; }
 
-		/// <returns>Whether a change was made</returns>
-		bool TryRemoveReference([NotNull] IT4PathWithMacros pathWithMacros);
+		/// <summary>
+		/// Add references to mscorlib, System and the default TextTemplating assemblies
+		/// </summary>
+		void AddBaseReferences();
 
-		/// <summary>Try to add an assembly reference to the list of assemblies.</summary>
-		/// <note> Does not refresh references, simply add a cookie to the cookies list. </note>
 		/// <returns>Whether a change was made</returns>
-		bool TryAddReference([NotNull] IT4PathWithMacros pathWithMacros);
+		bool ProcessDiff([NotNull] T4DeclaredAssembliesDiff diff);
 	}
 }
