@@ -2,7 +2,8 @@
 ====
 Prerequirements
 ----
-You'll need to have [.NET Core SDK](https://dotnet.microsoft.com/download) and [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) installed
+You'll need to have [.NET Core SDK](https://dotnet.microsoft.com/download) installed.  
+To build Rider plugin, you'll also need to have [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) installed.
 
 Building Rider plugin
 ----
