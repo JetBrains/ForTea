@@ -77,54 +77,87 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IProjectFile projectFile,
 			PsiModuleChange.ChangeType changeType,
 			[NotNull] PsiModuleChangeBuilder changeBuilder
-		) {
-			if (!_t4Environment.IsSupported) return changeType;
+		)
+		{
+			if (!_t4Environment.IsSupported)
+				// The plugin does not operate in
+				// old versions of Visual Studio
+				// and unknown environments.
+				return changeType;
+			// It would be logical to check the file type here and return if it's not T4.
+			// However, this is impossible because calculating file type
+			// requires the file to be attached to a project hierarchy,
+			// which sometimes doesn't hold.
 			_shellLocks.AssertWriteAccessAllowed();
 			ModuleWrapper moduleWrapper;
 			switch (changeType)
 			{
 				case PsiModuleChange.ChangeType.Added:
-					// Preprocessed .tt files should be handled by R# itself as if it's a normal project file,
-					// so that it has access to the current project types.
-					if (projectFile.LanguageType.Is<T4ProjectFileType>()
-					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
-					{
-						AddFile(projectFile, changeBuilder);
-						return null;
-					}
-					break;
+					if (!projectFile.LanguageType.Is<T4ProjectFileType>())
+						// We only handle T4 files and do not affect other project files.
+						break;
+					if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
+						// Otherwise, this is a new preprocessed file.
+						// We don't create modules for preprocessed files
+						// so that to let R# add them into the project,
+						// so that the template will have access to the current project types.
+						break;
+					// This is a new executable file, so we need to create a module for it.
+					AddFile(projectFile, changeBuilder);
+					// After the module is created, the request to add the file has been handled,
+					// so there's no need to create any other modules, so pass null as RequestedChange.
+					return null;
 
 				case PsiModuleChange.ChangeType.Removed:
-					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
-						RemoveFile(projectFile, changeBuilder, moduleWrapper);
-						return null;
-					}
-					break;
+					if (!_modules.TryGetValue(projectFile, out moduleWrapper))
+						// The file wasn't handled by us in the first place,
+						// so there's no way we can handle its removal.
+						break;
+					RemoveFile(projectFile, changeBuilder, moduleWrapper);
+					// Since we handled the module removal, there's nothing else to be done.
+					return null;
 
 				case PsiModuleChange.ChangeType.Modified:
-					if (_modules.TryGetValue(projectFile, out moduleWrapper)) {
-						if (!TemplateDataManager.IsPreprocessedTemplate(projectFile)) {
-							ModifyFile(changeBuilder, moduleWrapper);
-							return null;
+					if (_modules.TryGetValue(projectFile, out moduleWrapper))
+					{
+						if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
+						{
+							// The T4 file has a module but it shouldn't because it's preprocessed.
+							// This can happen when an executable file becomes preprocessed.
+							// We no longer need the module for it.
+							RemoveFile(projectFile, changeBuilder, moduleWrapper);
+							// After the module has been removed,
+							// the file needs to be added to the project it resides in.
+							// Requesting this change does exactly that.
+							return PsiModuleChange.ChangeType.Added;
 						}
 
-						// The T4 file went from Transformed to Preprocessed, it doesn't need a T4PsiModule anymore.
-						RemoveFile(projectFile, changeBuilder, moduleWrapper);
-						return PsiModuleChange.ChangeType.Added;
+						// This is the ordinary change in an executable T4 file.
+						// We can handle it.
+						ModifyFile(changeBuilder, moduleWrapper);
+						// Since we've handled the change, no need to delegate it to R#.
+						return null;
 					}
 
-					// The T4 file went from Preprocessed to Transformed, it now needs a T4PsiModule.
-					if (projectFile.LanguageType.Is<T4ProjectFileType>()
-					    && !TemplateDataManager.IsPreprocessedTemplate(projectFile))
-					{
-						AddFile(projectFile, changeBuilder);
-						return PsiModuleChange.ChangeType.Removed;
-					}
-
-					break;
-
+					// We don't know about this file. Maybe it is a T4 file we should become interested in?
+					if (!projectFile.LanguageType.Is<T4ProjectFileType>())
+						// No it's not.
+						break;
+					if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
+						// It is still a preprocessed file, we still don't want a module for it.
+						// Let R# continue managing this file.
+						break;
+					// The T4 is executable but has no module.
+					// This can happen if it used to be preprocessed but became executable.
+					// It now needs a T4PsiModule.
+					AddFile(projectFile, changeBuilder);
+					// After we've created this module,
+					// we need to let R# know that this file is now our business.
+					// That's why we request this file to be removed from the project it resides in.
+					return PsiModuleChange.ChangeType.Removed;
 			}
 
+			// If there's nothing we can do about this file, let R# work.
 			return changeType;
 		}
 

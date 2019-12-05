@@ -25,7 +25,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		{
 			var modules = new List<IPsiModule>(base.GetAllModules());
 			modules.AddRange(_t4PsiModuleProvider.GetModules());
-
 			return modules;
 		}
 
