@@ -80,7 +80,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 			// search as relative path
 			var asRelativePath = SourceFile.GetLocation().Directory.TryCombine(expanded);
-			if (asRelativePath.ExistsFile) return asRelativePath;
+			if (asRelativePath.IsAbsolute && asRelativePath.ExistsFile) return asRelativePath;
 
 			// search in global include paths
 			var asGlobalInclude = Environment.IncludePaths
@@ -121,8 +121,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			}
 		}
 
-		[NotNull, ItemNotNull]
-		private IEnumerable<string> RawMacros => MacroRegex
+		public IEnumerable<string> RawMacros => MacroRegex
 			.Matches(RawPath)
 			.Cast<Match>()
 			.Where(match => match.Success)
