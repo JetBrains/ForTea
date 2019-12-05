@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -20,11 +19,5 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 
 		[NotNull]
 		IProjectFile ProjectFile { get; }
-
-		[NotNull]
-		string RawPath { get; }
-
-		[NotNull, ItemNotNull]
-		IEnumerable<string> RawMacros { get; }
 	}
 }

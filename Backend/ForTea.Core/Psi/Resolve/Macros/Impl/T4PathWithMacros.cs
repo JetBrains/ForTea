@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private static Regex MacroRegex { get; } =
 			new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
-		public string RawPath { get; }
+		private string RawPath { get; }
 
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
@@ -121,7 +121,8 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			}
 		}
 
-		public IEnumerable<string> RawMacros => MacroRegex
+		[NotNull, ItemNotNull]
+		private IEnumerable<string> RawMacros => MacroRegex
 			.Matches(RawPath)
 			.Cast<Match>()
 			.Where(match => match.Success)
