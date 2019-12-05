@@ -108,7 +108,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			var documentManager = Solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(ProjectFile, documentManager);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
-			AssemblyReferenceManager.AddBaseReferences();
+			ChangeManager.ExecuteAfterChange(() =>
+			{
+				AssemblyReferenceManager.AddBaseReferences();
+				NotifyModuleChange();
+			});
 		}
 
 		private void OnFileDataChanged(Pair<IPsiSourceFile, T4DeclaredAssembliesDiff> pair)
@@ -133,8 +137,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		{
 			ShellLocks.AssertWriteAccessAllowed();
 			if (!AssemblyReferenceManager.ProcessDiff(dataDiff)) return;
+			NotifyModuleChange();
+		}
 
-			// tells the world the module has changed
+		private void NotifyModuleChange()
+		{
 			var changeBuilder = new PsiModuleChangeBuilder();
 			changeBuilder.AddModuleChange(this, PsiModuleChange.ChangeType.Modified);
 			// TODO: get rid of this queuing?
