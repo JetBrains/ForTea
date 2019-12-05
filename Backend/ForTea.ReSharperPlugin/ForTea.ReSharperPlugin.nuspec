@@ -7,7 +7,7 @@
 		<authors>Kirill Glazyrin, JetBrains; Julien Lebosquain</authors>
 		<description>Adds support for editing T4 text templating files (.tt)</description>
 		<releaseNotes>$releasenotes$</releaseNotes>
-		<projectUrl>https://github.com/MrJul/ForTea/</projectUrl>
+		<projectUrl>https://github.com/JetBrains/ForTea/</projectUrl>
 		<iconUrl>https://raw.github.com/MrJul/ForTea/master/Logo/ForTea%20128x128.png</iconUrl>
 		<licenseUrl>https://github.com/MrJul/ForTea/blob/master/LICENSE</licenseUrl>
 		<copyright>Copyright &#x00A9; 2012-2019 Julien Lebosquain; 2019-$currentyear$ Kirill Glazyrin, JetBrains</copyright>
