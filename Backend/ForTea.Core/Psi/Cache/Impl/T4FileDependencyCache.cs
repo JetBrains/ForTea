@@ -70,6 +70,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				.GetThisAndChildrenOfType<IT4IncludeDirective>()
 				.Where(directive => directive.IsVisibleInDocument())
 				.Select(directive => directive.Path.ResolvePath())
+				.Where(path => !path.IsEmpty)
 				.Distinct();
 			return new T4FileDependencyData(includes.ToList());
 		}

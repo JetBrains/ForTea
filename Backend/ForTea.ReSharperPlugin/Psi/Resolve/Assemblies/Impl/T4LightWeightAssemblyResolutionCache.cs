@@ -39,9 +39,10 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		protected override T4LightWeightAssemblyResolutionRequest Build(IT4File file)
 		{
 			var assembliesToResolve = file
-				.GetThisAndChildrenOfType<IT4DirectiveWithPath>()
+				.GetThisAndChildrenOfType<IT4AssemblyDirective>()
 				.Select(directive => directive.Path)
-				.Select(path => path.ResolveString());
+				.Select(path => path.ResolveString())
+				.Distinct();
 			return new T4LightWeightAssemblyResolutionRequest(assembliesToResolve);
 		}
 
