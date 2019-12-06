@@ -38,7 +38,7 @@
   <Target Name="ReportRiderPluginProjectSdk" BeforeTargets="PrepareForBuild" AfterTargets="EnsureRiderSdkPresence">
     <PropertyGroup>
       <CoreProjectSdkMessage>
-        Will use JetBrains.Rider.SDK with version $(RiderSDKVersion)a to compile $(MSBuildProjectName).
+        Will use JetBrains.Rider.SDK with version $(RiderSDKVersion to compile $(MSBuildProjectName).
       </CoreProjectSdkMessage>
     </PropertyGroup>
     <Message Importance="high" Text="$(CoreProjectSdkMessage)" />
