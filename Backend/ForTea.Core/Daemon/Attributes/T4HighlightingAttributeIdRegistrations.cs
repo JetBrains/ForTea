@@ -16,15 +16,6 @@ using JetBrains.TextControl.DocumentMarkup;
 	FallbackAttributeId = HighlightingAttributeIds.NUMBER
 )]
 [assembly: RegisterHighlighter(
-	T4HighlightingAttributeIds.BLOCK_TAG,
-	GroupId = T4HighlightingAttributeGroup.ID,
-	EffectType = EffectType.TEXT,
-	ForegroundColor = "#000000",
-	BackgroundColor = "#FBFB64",
-	Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
-	VSPriority = VSPriority.IDENTIFIERS
-)]
-[assembly: RegisterHighlighter(
 	T4HighlightingAttributeIds.ATTRIBUTE_VALUE,
 	EffectType = EffectType.TEXT,
 	GroupId = T4HighlightingAttributeGroup.ID,
