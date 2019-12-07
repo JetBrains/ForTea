@@ -29,7 +29,6 @@ internal class Build : NukeBuild
 	[Parameter] public readonly string NuGetApiKey;
 	[Solution] private readonly Solution Solution;
 	private const string MainProjectName = "ForTea.ReSharperPlugin";
-	private AbsolutePath MainProjectDirectory => RootDirectory / MainProjectName;
 	private AbsolutePath OutputDirectory => RootDirectory / "artifacts" / Configuration;
 
 	[NotNull]
@@ -43,8 +42,7 @@ internal class Build : NukeBuild
 	public Target Pack => target => target
 		.DependsOn(Compile)
 		.Executes(() => NuGetPack(settings => settings
-			.SetTargetPath(MainProjectDirectory / (MainProjectName + ".nuspec"))
-			.SetBasePath(MainProjectDirectory)
+			.SetTargetPath(RootDirectory / "ForTea.nuspec")
 			.SetOutputDirectory(OutputDirectory)
 			.SetProperty("jetBrainsYearSpan", GetJetBrainsYearSpan())
 			.SetProperty("releaseNotes", GetLatestReleaseNotes())
@@ -102,7 +100,7 @@ internal class Build : NukeBuild
 		}
 
 		string selected = NuGetPackageResolver
-			.GetLocalInstalledPackages(MainProjectDirectory / (MainProjectName + ".csproj"))
+			.GetLocalInstalledPackages(RootDirectory / MainProjectName / (MainProjectName + ".csproj"))
 			.Where(x => x.Id == "Wave")
 			.OrderByDescending(x => x.Version.Version)
 			.FirstOrDefault()
