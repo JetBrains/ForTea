@@ -6,6 +6,7 @@
 **/bin
 **/obj
 **/output
+**/artifacts
 **/_ReSharper.Caches
 **/.idea
 **.DotSettings

@@ -3,93 +3,116 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.ProjectModel;
+using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities;
-using Nuke.Common.Utilities.Collections;
-using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.NuGet.NuGetTasks;
 
 [CheckBuildProjectConfigurations]
-internal class Build : NukeBuild {
+internal class Build : NukeBuild
+{
+	[NotNull]
+	private static Regex ReSharperSdkVersionRegex { get; } =
+		new Regex("<ReSharperSdkVersion>(?<version>.*)</ReSharperSdkVersion>");
 
-	/// Support plugins are available for:
-	/// - JetBrains ReSharper        https://nuke.build/resharper
-	/// - JetBrains Rider            https://nuke.build/rider
-	/// - Microsoft VisualStudio     https://nuke.build/visualstudio
-	/// - Microsoft VSCode           https://nuke.build/vscode
+	[Parameter]
+	public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-	[Parameter] public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 	[Parameter] public readonly string NuGetSource = "https://plugins.jetbrains.com/";
+	[Parameter] public readonly string WaveVersion;
 	[Parameter] public readonly string NuGetApiKey;
-
-	[Solution] private readonly Solution _solution;
+	[Solution] private readonly Solution Solution;
 	private const string MainProjectName = "ForTea.ReSharperPlugin";
 	private AbsolutePath MainProjectDirectory => RootDirectory / MainProjectName;
-	private AbsolutePath OutputDirectory => RootDirectory / "output" / Configuration;
+	private AbsolutePath OutputDirectory => RootDirectory / "artifacts" / Configuration;
 
-	public Target Clean
-		=> _ => _
-			.Executes(() => {
-				RootDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-				EnsureCleanDirectory(OutputDirectory);
-			});
+	[NotNull]
+	public Target Compile => target => target
+		.Requires(() => !File.Exists(RootDirectory / "RiderSdkPackageVersion.props"))
+		.Executes(() => DotNetTasks.DotNetBuild(settings => settings
+			.SetConfiguration(Configuration)
+			.SetProjectFile(Solution)));
 
-	public Target Compile
-		=> _ => _
-			.Executes(() => {
-				DotNetTasks.DotNetBuild(s => s
-					.SetConfiguration(Configuration)
-					.SetProjectFile(_solution));
-			});
+	[NotNull]
+	public Target Pack => target => target
+		.DependsOn(Compile)
+		.Executes(() => NuGetPack(settings => settings
+			.SetTargetPath(MainProjectDirectory / (MainProjectName + ".nuspec"))
+			.SetBasePath(MainProjectDirectory)
+			.SetOutputDirectory(OutputDirectory)
+			.SetProperty("jetBrainsYearSpan", GetJetBrainsYearSpan())
+			.SetProperty("releaseNotes", GetLatestReleaseNotes())
+			.SetProperty("configuration", Configuration.ToString())
+			.SetProperty("sdkVersion", GetReSharperSdkVersion())
+			.SetProperty("wave", GetOrSelectWaveVersion())
+			.EnableNoPackageAnalysis()));
 
-	public Target Pack
-		=> _ => _
-			.DependsOn(Compile)
-			.Executes(() => {
-				var currentYear = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
-				var releaseNotes = GetReleaseNotes();
-				NuGetPack(s => s
-					.SetTargetPath(MainProjectDirectory / (MainProjectName + ".nuspec"))
-					.SetBasePath(MainProjectDirectory)
-					.SetOutputDirectory(OutputDirectory)
-					.SetProperty("currentyear", currentYear)
-					.SetProperty("releasenotes", releaseNotes)
-					.SetProperty("configuration", Configuration.ToString())
-					.EnableNoPackageAnalysis());
-			});
+	[NotNull]
+	public Target Push => target => target
+		.DependsOn(Pack)
+		.Requires(() => NuGetApiKey)
+		.Requires(() => Configuration.Release.Equals(Configuration))
+		.Requires(() => GlobFiles(OutputDirectory, "*.nupkg").Count == 1)
+		.Executes(() => NuGetPush(settings => settings
+			.SetTargetPath(GlobFiles(OutputDirectory, "*.nupkg").Single())
+			.SetSource(NuGetSource)
+			.SetApiKey(NuGetApiKey)));
 
-	public Target Push
-		=> _ => _
-			.DependsOn(Pack)
-			.Requires(() => NuGetApiKey)
-			.Requires(() => Configuration.Release.Equals(Configuration))
-			.Executes(() => GlobFiles(OutputDirectory, "*.nupkg")
-				.ForEach(x => NuGetPush(s => s
-					.SetTargetPath(x)
-					.SetSource(NuGetSource)
-					.SetApiKey(NuGetApiKey))));
+	[NotNull]
+	private string GetJetBrainsYearSpan()
+	{
+		const int startYear = 2019;
+		int currentYear = DateTime.Now.Year;
+		string startYearString = startYear.ToString(CultureInfo.InvariantCulture);
+		if (currentYear == startYear) return startYearString;
+		string currentYearString = currentYear.ToString(CultureInfo.InvariantCulture);
+		return $"{startYearString}-{currentYearString}";
+	}
 
-	private string GetReleaseVersion()
-		=> File.ReadAllLines(MainProjectDirectory / "Properties/AssemblyInfo.cs")
-			.Select(x => Regex.Match(x, @"^\[assembly: AssemblyVersion\(""([^""]*)""\)\]$"))
-			.Where(x => x.Success)
-			.Select(x => x.Groups[1].Value)
-			.FirstOrDefault();
+	[NotNull]
+	private static string GetLatestReleaseNotes() => File
+		.ReadAllLines(RootDirectory.Parent / "CHANGELOG.md")
+		.SkipWhile(x => !x.StartsWith("##", StringComparison.Ordinal))
+		.Skip(1)
+		.TakeWhile(x => !string.IsNullOrWhiteSpace(x))
+		.Select(x => $"\u2022{x.TrimStart('-')}")
+		.JoinNewLine();
 
-	private static string GetReleaseNotes()
-		=> File.ReadAllLines(RootDirectory.Parent / "CHANGELOG.md")
-			.SkipWhile(x => !x.StartsWith("##", StringComparison.Ordinal))
-			.Skip(1)
-			.TakeWhile(x => !String.IsNullOrWhiteSpace(x))
-			.Select(x => $"\u2022{x.TrimStart('-')}")
-			.JoinNewLine();
+	[NotNull]
+	private static string GetReSharperSdkVersion() => File
+		.ReadLines(RootDirectory / "targets" / "ReSharperPluginTargets.targets")
+		.Select(line => ReSharperSdkVersionRegex.Match(line))
+		.Single(match => match.Success)
+		.Groups["version"]
+		.Value;
 
-	public static int Main()
-		=> Execute<Build>(x => x.Compile);
+	[NotNull]
+	private string GetOrSelectWaveVersion()
+	{
+		if (WaveVersion != null)
+		{
+			Console.WriteLine($"Building for given wave version: {WaveVersion}");
+			return WaveVersion;
+		}
 
+		string selected = NuGetPackageResolver
+			.GetLocalInstalledPackages(MainProjectDirectory / (MainProjectName + ".csproj"))
+			.Where(x => x.Id == "Wave")
+			.OrderByDescending(x => x.Version.Version)
+			.FirstOrDefault()
+			.NotNull("There's no R# installed and no wave version is given. Please, pass wave version as an argument: '--waveVersion 193.0'")
+			.Version
+			.Version
+			.ToString(2);
+		Console.WriteLine($"No WaveVersion is given. Auto-detected version:{selected}");
+		return selected;
+	}
+
+	public static int Main() => Execute<Build>(x => x.Compile);
 }
