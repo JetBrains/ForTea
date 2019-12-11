@@ -1,5 +1,5 @@
 ﻿<Project>
   <PropertyGroup>
-    <ReSharperSdkVersion>2019.3.0-eap07</ReSharperSdkVersion>
+    <ReSharperSdkVersion>2019.3.0</ReSharperSdkVersion>
   </PropertyGroup>
 </Project>
