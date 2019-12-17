@@ -263,10 +263,6 @@ tasks {
     }
   }
 
-  getByName("runIde") {
-    dependsOn("buildBackend")
-  }
-
   getByName("buildSearchableOptions") {
     // A kind of hack.
     // The task is broken outside of Rider
