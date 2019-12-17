@@ -14,7 +14,11 @@ namespace GammaJul.ForTea.Core.Impl
 
 		public virtual IEnumerable<string> DefaultAssemblyNames
 		{
-			get { yield return "mscorlib"; }
+			get
+			{
+				yield return "mscorlib";
+				yield return "System";
+			}
 		}
 
 		public virtual bool IsSupported => false;
