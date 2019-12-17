@@ -1,0 +1,8 @@
+<#
+    int x;
+#>{caret}<#+
+    public void Foo()
+    {
+    }
+#>
+

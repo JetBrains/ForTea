@@ -14,7 +14,7 @@
                 <Description/>
             </Tag>
             <Tag name="NoSupportForVB" default="WARNING">
-                <Title>Visual Basic is not supported</Title>
+                <Title>Visual Basic is not supported yet</Title>
                 <Description/>
             </Tag>
             <Tag name="RedundantInclude" default="WARNING">
@@ -46,7 +46,7 @@
     </Warning>
     <Warning name="NoSupportForVB" configurableSeverity="NoSupportForVB">
         <Parameter type="IT4AttributeValue" name="value"/>
-        <Message value="Visual Basic is not supported"/>
+        <Message value="Visual Basic is not supported yet"/>
         <Range>Value.GetHighlightingRange()</Range>
     </Warning>
     <Warning name="IgnoredDirective" configurableSeverity="IgnoredDirective">
@@ -59,6 +59,12 @@
         <Parameter type="IT4IncludeDirective" name="include"/>
         <Message value="File already included"/>
         <Range>Include.GetHighlightingRange()</Range>
+        <Behavour attributeID="HINT" overlapResolvePolicy="DEADCODE"/>
+    </Warning>
+    <Warning name="RedundantAssembly" configurableSeverity="RedundantInclude">
+        <Parameter type="IT4AssemblyDirective" name="assembly"/>
+        <Message value="Assembly already referenced"/>
+        <Range>Assembly.GetHighlightingRange()</Range>
         <Behavour attributeID="HINT" overlapResolvePolicy="DEADCODE"/>
     </Warning>
     <Warning name="UnresolvedInclude" configurableSeverity="UnresolvedInclude">

@@ -5,7 +5,7 @@ namespace JetBrains.ForTea.RiderPlugin.Resources
 	/// </summary>
 	public static class T4TemplateExecutionNameBundle
 	{
-		public const string Run = "Execute Template";
+		public const string Run = "Run Template";
 		public const string Debug = "Debug Template";
 		public const string Preprocess = "Preprocess Template";
 	}

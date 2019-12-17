@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -10,7 +11,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 		[NotNull]
 		string ResolveString();
 
-		[NotNull]
+		[NotNull, Obsolete("Consider using explicit assembly/file resolver")]
 		FileSystemPath ResolvePath();
 
 		[CanBeNull]
@@ -18,8 +19,5 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 
 		[NotNull]
 		IProjectFile ProjectFile { get; }
-
-		[NotNull]
-		string RawPath { get; }
 	}
 }

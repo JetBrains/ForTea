@@ -12,6 +12,5 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		public FileSystemPath ResolvePath() => FileSystemPath.Empty;
 		public string ResolveString() => "";
 		public IProjectFile ProjectFile { get; }
-		public string RawPath => "";
 	}
 }

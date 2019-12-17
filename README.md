@@ -11,15 +11,10 @@ The Rider plugin also can automatically execute and preprocess T4 files.
 Installation
 ----
 #### Rider:
-Starting with `Rider 2019.3`, this plugin will be installed out of the box.  
-If you build the plugin manually, it can be installed using  
-_Settings > Plugins > (Gear icon) > Install plugin from disk_
+Starting with `Rider 2019.3`, this plugin will be installed out of the box.
 
 #### ReSharper:
-Visual Studio 2010, 2012, 2013, 2015, 2017 and 2019 are supported.  
-To use the latest version of the plugin, the latest stable ReSharper must be installed (older releases are still available for some older versions of ReSharper).  
-This plugin is not published. If you want to use it, you'll first need to build it. See BUILD.md for details.  
-After you've built the plugin, use Extension Manager from the ReSharper menu.
+The plugin is [available](https://plugins.jetbrains.com/plugin/13469-fortea/) in JetBrains Plugin Repository and can be installed using Extension Manager from the ReSharper menu.
 
 Features
 ----

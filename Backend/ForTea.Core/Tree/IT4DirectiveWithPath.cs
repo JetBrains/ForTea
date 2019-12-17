@@ -4,7 +4,7 @@ using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.Tree
 {
-	public interface IT4DirectiveWithPath
+	public interface IT4DirectiveWithPath : IT4TreeNode
 	{
 		[NotNull]
 		IProjectFile ResolutionContext { get; set; }

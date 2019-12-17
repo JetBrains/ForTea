@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private static Regex MacroRegex { get; } =
 			new Regex(@"\$\((\w+)\)", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
-		public string RawPath { get; }
+		private string RawPath { get; }
 
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }
@@ -80,7 +80,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 			// search as relative path
 			var asRelativePath = SourceFile.GetLocation().Directory.TryCombine(expanded);
-			if (asRelativePath.ExistsFile) return asRelativePath;
+			if (asRelativePath.IsAbsolute && asRelativePath.ExistsFile) return asRelativePath;
 
 			// search in global include paths
 			var asGlobalInclude = Environment.IncludePaths

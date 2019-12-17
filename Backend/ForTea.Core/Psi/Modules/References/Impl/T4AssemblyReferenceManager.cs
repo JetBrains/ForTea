@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
@@ -16,12 +19,15 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 	{
 		[NotNull]
 		private IT4AssemblyReferenceResolver AssemblyReferenceResolver { get; }
-		
+
 		[NotNull]
 		private IT4ProjectReferenceResolver ProjectReferenceResolver { get; }
 
 		[NotNull]
 		private IShellLocks ShellLocks { get; }
+
+		[NotNull]
+		private IT4Environment Environment { get; }
 
 		[NotNull]
 		private IDictionary<FileSystemPath, IAssemblyCookie> MyAssemblyReferences { get; }
@@ -32,11 +38,16 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			MyAssemblyReferences.Values.SelectNotNull(cookie => cookie.Assembly);
 
 		public IEnumerable<IModule> ProjectReferences => MyProjectReferences.Values;
-
 		public IEnumerable<FileSystemPath> RawReferences => MyAssemblyReferences.Keys.Concat(MyProjectReferences.Keys);
 
 		[NotNull]
-		private IProjectFile File { get; }
+		private IPsiSourceFile SourceFile { get; }
+
+		[NotNull]
+		private IProjectFile ProjectFile { get; }
+
+		[NotNull]
+		private ISolution Solution { get; }
 
 		[NotNull]
 		private IAssemblyFactory AssemblyFactory { get; }
@@ -45,7 +56,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 
 		internal T4AssemblyReferenceManager(
 			[NotNull] IAssemblyFactory assemblyFactory,
-			[NotNull] IProjectFile file,
+			[NotNull] IPsiSourceFile sourceFile,
+			[NotNull] IProjectFile projectFile,
 			[NotNull] IModuleReferenceResolveContext resolveContext,
 			[NotNull] IShellLocks shellLocks
 		)
@@ -53,15 +65,17 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			MyProjectReferences = new Dictionary<FileSystemPath, IProject>();
 			MyAssemblyReferences = new Dictionary<FileSystemPath, IAssemblyCookie>();
 			AssemblyFactory = assemblyFactory;
-			File = file;
+			ProjectFile = projectFile;
 			ResolveContext = resolveContext;
 			ShellLocks = shellLocks;
-			var solution = File.GetSolution();
-			AssemblyReferenceResolver = solution.GetComponent<IT4AssemblyReferenceResolver>();
-			ProjectReferenceResolver = solution.GetComponent<IT4ProjectReferenceResolver>();
+			SourceFile = sourceFile;
+			Solution = ProjectFile.GetSolution();
+			AssemblyReferenceResolver = Solution.GetComponent<IT4AssemblyReferenceResolver>();
+			ProjectReferenceResolver = Solution.GetComponent<IT4ProjectReferenceResolver>();
+			Environment = Solution.GetComponent<IT4Environment>();
 		}
 
-		public bool TryRemoveReference(IT4PathWithMacros pathWithMacros)
+		private bool TryRemoveReference(IT4PathWithMacros pathWithMacros)
 		{
 			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
 			if (path == null) return false;
@@ -81,10 +95,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			return false;
 		}
 
-		public bool TryAddReference(IT4PathWithMacros pathWithMacros)
+		private bool TryAddReference(IT4PathWithMacros pathWithMacros)
 		{
 			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
 			if (path == null) return false;
+			if (MyAssemblyReferences.ContainsKey(path)) return false;
+			if (MyProjectReferences.ContainsKey(path)) return false;
 			return TryAddProjectReference(path) || TryAddAssemblyReference(path);
 		}
 
@@ -101,6 +117,40 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			var cookie = AssemblyFactory.AddRef(path, "T4", ResolveContext);
 			if (cookie != null) MyAssemblyReferences.Add(path, cookie);
 			return true;
+		}
+
+		public void AddBaseReferences()
+		{
+			TryAddReference("mscorlib");
+			TryAddReference("System");
+			foreach (string assemblyName in Environment.TextTemplatingAssemblyNames)
+			{
+				TryAddReference(assemblyName);
+			}
+		}
+
+		private void TryAddReference([NotNull] string name)
+		{
+			var path = new T4PathWithMacros(name, SourceFile, ProjectFile, Solution);
+			TryAddReference(path);
+		}
+
+		public bool ProcessDiff(T4DeclaredAssembliesDiff diff)
+		{
+			bool hasChanges = false;
+			// removes the assembly references from the old assembly directives
+			foreach (var _ in diff.RemovedAssemblies.Where(TryRemoveReference))
+			{
+				hasChanges = true;
+			}
+
+			// adds assembly references from the new assembly directives
+			foreach (var _ in diff.AddedAssemblies.Where(TryAddReference))
+			{
+				hasChanges = true;
+			}
+
+			return hasChanges;
 		}
 
 		public void Dispose()

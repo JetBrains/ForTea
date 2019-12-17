@@ -1,6 +1,5 @@
 package com.jetbrains.fortea.highlighting
 
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.XmlHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
@@ -10,13 +9,9 @@ import com.jetbrains.fortea.lexer.T4Lexer
 import com.jetbrains.fortea.psi.T4ElementTypes
 
 object T4SyntaxHighlighter : SyntaxHighlighterBase() {
-  val BLOCK_MARKER = createTextAttributesKey("T4_BLOCK_MARKER", XmlHighlighterColors.XML_TAG)
-  val EQUAL = createTextAttributesKey("T4_DIRECTIVE_EQ_SIGN", XmlHighlighterColors.XML_ATTRIBUTE_VALUE)
-  val QUOTE = createTextAttributesKey("T4_DIRECTIVE_QUOTE", XmlHighlighterColors.XML_ATTRIBUTE_VALUE)
-
-  private val BLOCK_MARKER_KEYS = arrayOf(BLOCK_MARKER)
-  private val EQUAL_KEYS = arrayOf(EQUAL)
-  private val QUOTE_KEYS = arrayOf(QUOTE)
+  private val BLOCK_MARKER_KEYS = arrayOf(T4TextAttributeKeys.T4_BLOCK_MARKER)
+  private val EQUAL_KEYS = arrayOf(T4TextAttributeKeys.T4_DIRECTIVE_EQ_SIGN)
+  private val QUOTE_KEYS = arrayOf(T4TextAttributeKeys.T4_DIRECTIVE_QUOTE)
 
   override fun getTokenHighlights(elementType: IElementType?): Array<TextAttributesKey> = when (elementType) {
     T4ElementTypes.BLOCK_END -> BLOCK_MARKER_KEYS

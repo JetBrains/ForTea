@@ -1,0 +1,3 @@
+<#@ template language="C#" #>
+<#@ assembly name="mscorlib" #>
+<#@ assembly name="mscorlib" #>

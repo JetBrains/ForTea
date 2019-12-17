@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+	<metadata>
+		<id>JetBrains.ForTea</id>
+		<version>$sdkVersion$</version>
+		<title>ForTea</title>
+		<authors>Kirill Glazyrin, JetBrains; Julien Lebosquain</authors>
+		<description>Adds support for editing T4 text templating files (.tt)</description>
+		<releaseNotes>$releaseNotes$</releaseNotes>
+		<projectUrl>https://github.com/jetbrains/fortea/</projectUrl>
+		<iconUrl>https://raw.github.com/MrJul/ForTea/master/Logo/ForTea%20128x128.png</iconUrl>
+		<licenseUrl>https://github.com/jetbrains/fortea/blob/master/LICENSE</licenseUrl>
+		<copyright>Copyright &#x00A9; 2012-2019 Julien Lebosquain; Copyright &#x00A9; $jetBrainsYearSpan$ Kirill Glazyrin, JetBrains</copyright>
+		<tags>T4 Text Templating Template .tt</tags>
+		<dependencies>
+			<dependency id="Wave" version="[$wave$]" />
+		</dependencies>
+	</metadata>
+	<files>
+        <file src="output\ForTea.Core\$configuration$\ForTea.Core.dll" target="DotFiles" />
+		<file src="output\ForTea.ReSharperPlugin\$configuration$\ForTea.ReSharperPlugin.dll" target="DotFiles" />
+	</files>
+</package>

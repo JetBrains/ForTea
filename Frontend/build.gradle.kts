@@ -39,8 +39,9 @@ grammarKit {
   grammarKitRelease = "2019.3"
 }
 
-val baseVersion = "2019.3"
-version = baseVersion
+val baseVersion = "2020.1"
+val buildCounter = ext.properties["build.number"] ?: "9999"
+version = "$baseVersion.$buildCounter"
 
 intellij {
   type = "RD"
@@ -249,12 +250,6 @@ tasks {
   create("prepare") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgen", "writeNuGetConfig", "writeRiderSdkVersionProps")
-    doLast {
-      exec {
-        executable = "dotnet"
-        args = listOf("restore", backendPluginSolutionPath.canonicalPath)
-      }
-    }
   }
 
   create("buildBackend") {

@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Modules.References;
 using GammaJul.ForTea.Core.Psi.Modules.References.Impl;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
@@ -49,9 +48,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private IShellLocks ShellLocks { get; }
 
 		[NotNull]
-		private IT4Environment T4Environment { get; }
-
-		[NotNull]
 		private IPsiServices PsiServices { get; }
 
 		[NotNull]
@@ -91,7 +87,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			PsiServices = Solution.GetComponent<IPsiServices>();
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
-			T4Environment = t4Environment;
 			ChangeProvider = new FakeChangeProvider();
 			TargetFrameworkId = ProjectFile.SelectTargetFrameworkId(t4Environment);
 			Project = ProjectFile.GetProject().NotNull();
@@ -100,6 +95,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				: this.GetResolveContextEx(ProjectFile);
 			AssemblyReferenceManager = new T4AssemblyReferenceManager(
 				Solution.GetComponent<IAssemblyFactory>(),
+				SourceFile,
 				ProjectFile,
 				resolveContext,
 				shellLocks
@@ -112,7 +108,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			var documentManager = Solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(ProjectFile, documentManager);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
-			AddBaseReferences();
+			ChangeManager.ExecuteAfterChange(() =>
+			{
+				AssemblyReferenceManager.AddBaseReferences();
+				NotifyModuleChange();
+			});
 		}
 
 		private void OnFileDataChanged(Pair<IPsiSourceFile, T4DeclaredAssembliesDiff> pair)
@@ -136,24 +136,15 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private void OnFileDataChanged([NotNull] T4DeclaredAssembliesDiff dataDiff)
 		{
 			ShellLocks.AssertWriteAccessAllowed();
-			bool hasChanges = false;
-			// removes the assembly references from the old assembly directives
-			foreach (var _ in dataDiff.RemovedAssemblies.Where(AssemblyReferenceManager.TryRemoveReference))
-			{
-				hasChanges = true;
-			}
+			if (!AssemblyReferenceManager.ProcessDiff(dataDiff)) return;
+			NotifyModuleChange();
+		}
 
-			// adds assembly references from the new assembly directives
-			foreach (var _ in dataDiff.AddedAssemblies.Where(AssemblyReferenceManager.TryAddReference))
-			{
-				hasChanges = true;
-			}
-
-			if (!hasChanges) return;
-
-			// tells the world the module has changed
+		private void NotifyModuleChange()
+		{
 			var changeBuilder = new PsiModuleChangeBuilder();
 			changeBuilder.AddModuleChange(this, PsiModuleChange.ChangeType.Modified);
+			// TODO: get rid of this queuing?
 			ShellLocks.ExecuteOrQueueEx(
 				"T4PsiModuleChange",
 				() => ChangeManager.ExecuteAfterChange(
@@ -195,23 +186,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		);
 
 		public void Dispose() => AssemblyReferenceManager.Dispose();
-
-		private void AddBaseReferences()
-		{
-			TryAddReference("mscorlib");
-			TryAddReference("System");
-			foreach (string assemblyName in T4Environment.TextTemplatingAssemblyNames)
-			{
-				TryAddReference(assemblyName);
-			}
-		}
-
-		private void TryAddReference([NotNull] string name)
-		{
-			var path = new T4PathWithMacros(name, SourceFile, ProjectFile, GetSolution());
-			AssemblyReferenceManager.TryAddReference(path);
-		}
-
 		public IPsiServices GetPsiServices() => PsiServices;
 		public ISolution GetSolution() => Solution;
 		public ICollection<PreProcessingDirective> GetAllDefines() => EmptyList<PreProcessingDirective>.Instance;

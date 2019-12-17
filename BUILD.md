@@ -2,7 +2,8 @@
 ====
 Prerequirements
 ----
-You'll need to have [.NET Core SDK](https://dotnet.microsoft.com/download) and [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) installed
+You'll need to have [.NET Core SDK](https://dotnet.microsoft.com/download) installed.  
+To build Rider plugin, you'll also need to have [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) installed.
 
 Building Rider plugin
 ----
@@ -21,9 +22,7 @@ Building R# plugin
 ----
 To build R# plugin, run
 ```bash
-cd Frontend
-gradlew :prepare
 cd ../Backend
-./build
+./build pack
 ```
 Build outputs will be placed at `Backend/output/Debug/`

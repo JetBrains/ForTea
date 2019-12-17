@@ -1,1 +1,0 @@
-﻿.\build.ps1 -runFrontendTests

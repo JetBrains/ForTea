@@ -1,0 +1,6 @@
+<#+
+    public void Foo()
+    {
+#><#= 42 #><{caret}#
+    }
+#>

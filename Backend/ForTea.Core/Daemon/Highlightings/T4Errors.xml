@@ -9,7 +9,7 @@
         <Group name="T4 Compiler Errors" key="T4Errors"/>
     </StaticSeverityGroups>
     <Error name="TextAfterFeature" staticGroup="T4Errors">
-        <Parameter type="ITreeNode" name="text"/>
+        <Parameter type="IT4Token" name="text"/>
         <Message value="Text cannot be placed after last feature block"/>
         <Range>Text.GetHighlightingRange()</Range>
         <Behavour overlapResolvePolicy="ERROR"/>
@@ -28,9 +28,9 @@
         <Behavour overlapResolvePolicy="ERROR"/>
     </Error>
     <Error name="StatementAfterFeature" staticGroup="T4Errors">
-        <Parameter type="IT4StatementBlock" name="block"/>
+        <Parameter type="ITokenNode" name="blockStart"/>
         <Message value="Statement block cannot be placed after feature block"/>
-        <Range>Block.GetNavigationRange()</Range>
+        <Range>BlockStart.GetNavigationRange()</Range>
         <Behavour overlapResolvePolicy="ERROR"/>
     </Error>
     <Error name="UnresolvedMacro" staticGroup="T4Errors">

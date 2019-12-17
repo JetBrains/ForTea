@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Modules.MsBuild;
 namespace GammaJul.ForTea.Core.Psi.Properties
 {
 	[PsiSharedComponent]
-	public class T4GeneratedFilePropertiesProvider :
+	public sealed class T4GeneratedFilePropertiesProvider :
 		IMsbuildGeneratedFilePropertiesProvider,
 		IPsiSourceFilePropertiesProvider
 	{
@@ -33,7 +33,6 @@ namespace GammaJul.ForTea.Core.Psi.Properties
 			if (projectFile == null) return prevProperties;
 			var checker = sourceFile.GetSolution().GetComponent<IT4TargetFileChecker>();
 			if (checker.IsPreprocessResult(projectFile)) return T4PreprocessResultProjectFileProperties.Instance;
-			if (checker.IsGenerationResult(projectFile)) return T4GeneratedProjectFileProperties.Instance;
 			return prevProperties;
 		}
 	}

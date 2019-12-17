@@ -1,8 +1,10 @@
 using System;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -13,7 +15,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 {
 	[QuickFix]
-	public class T4ReplaceWithFeatureBlockQuickFix : QuickFixBase
+	public sealed class T4ReplaceWithFeatureBlockQuickFix : QuickFixBase
 	{
 		[NotNull]
 		private StatementAfterFeatureError Highlighting { get; }
@@ -25,8 +27,9 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 
 		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
 		{
-			var node = Highlighting.Block;
-			var newNode = T4ElementFactory.CreateFeatureBlock(node.Code.GetText());
+			var node = Highlighting.BlockStart.GetParentOfType<IT4StatementBlock>().NotNull();
+			string code = node.GetParentOfType<IT4CodeBlock>().NotNull().Code.GetText();
+			var newNode = T4ElementFactory.CreateFeatureBlock(code);
 			using (WriteLockCookie.Create(node.IsPhysical()))
 			{
 				ModificationUtil.ReplaceChild(node, newNode);
