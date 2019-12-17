@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core;
+using GammaJul.ForTea.Core.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.platforms;
@@ -11,24 +11,16 @@ using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace JetBrains.ForTea.RiderPlugin
 {
-	// TODO: use more accurate values
 	[ShellComponent]
-	public sealed class T4Environment : IT4Environment
+	public sealed class T4RiderEnvironment : T4DefaultEnvironment
 	{
-		public TargetFrameworkId TargetFrameworkId { get; } =
+		public override TargetFrameworkId TargetFrameworkId { get; } =
 			TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, new Version(4, 7, 2));
 
-		public CSharpLanguageLevel CSharpLanguageLevel => CSharpLanguageLevel.Latest;
+		public override CSharpLanguageLevel CSharpLanguageLevel => CSharpLanguageLevel.Latest;
 
-		public IEnumerable<string> TextTemplatingAssemblyNames
-		{
-			get
-			{
-				var assembliesDirectory = BestTextTemplatingDirectory / "Common7" / "IDE" / "PublicAssemblies";
-				var entries = assembliesDirectory.GetDirectoryEntries("Microsoft.VisualStudio.TextTemplating.*");
-				return entries.Select(it => it.GetAbsolutePath().FullPath);
-			}
-		}
+		public override IEnumerable<string> DefaultAssemblyNames =>
+			TextTemplatingAssemblyNames().Concat(base.DefaultAssemblyNames);
 
 		[NotNull]
 		private static FileSystemPath BestTextTemplatingDirectory
@@ -45,7 +37,17 @@ namespace JetBrains.ForTea.RiderPlugin
 			}
 		}
 
-		public bool IsSupported => true;
-		public IEnumerable<FileSystemPath> IncludePaths => Enumerable.Empty<FileSystemPath>();
+		[NotNull, ItemNotNull]
+		private static IEnumerable<string> TextTemplatingAssemblyNames()
+		{
+			var assembliesDirectory = BestTextTemplatingDirectory / "Common7" / "IDE" / "PublicAssemblies";
+			var entries = assembliesDirectory.GetDirectoryEntries("Microsoft.VisualStudio.TextTemplating.*");
+			foreach (string assembly in entries.Select(it => it.GetAbsolutePath().FullPath))
+			{
+				yield return assembly;
+			}
+		}
+
+		public override bool IsSupported => true;
 	}
 }

@@ -68,29 +68,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			).AsList();
 
 			if (!errors.IsEmpty) throw new T4OutputGenerationException(errors);
-			AddBaseReferences(directDependencies, file);
+			directDependencies.AddRange(Environment
+				.DefaultAssemblyNames
+				.Select(assemblyName => AssemblyReferenceResolver.Resolve(assemblyName, file.LogicalPsiSourceFile))
+			);
 			return LowLevelReferenceExtractionManager.ResolveTransitiveDependencies(
 				directDependencies,
 				projectFile.SelectResolveContext()
 			);
 		}
-
-		private void AddBaseReferences(
-			[NotNull, ItemNotNull] List<FileSystemPath> directDependencies,
-			[NotNull] IT4File file
-		)
-		{
-			directDependencies.Add(AddReference(file, "mscorlib"));
-			directDependencies.Add(AddReference(file, "System"));
-			directDependencies.AddRange(
-				Environment.TextTemplatingAssemblyNames.Select(assemblyName => AddReference(file, assemblyName))
-			);
-		}
-
-		[CanBeNull]
-		private FileSystemPath AddReference(
-			[NotNull] IT4File file,
-			[NotNull] string assemblyName
-		) => AssemblyReferenceResolver.Resolve(assemblyName, file.LogicalPsiSourceFile);
 	}
 }
