@@ -1,0 +1,15 @@
+<#+
+  internal class AstNodeReference
+  {
+    public AstNodeReference()
+    {
+      GenerateInterfaceDeclaration = true;
+    }
+
+    public string Name { get; set; }
+    public string Type { get; set; }
+    public bool IsArray { get; set; }
+    public bool GenerateInterfaceDeclaration { get; set; }
+    public bool OverrideImplementation { get; set; }
+  }
+#>

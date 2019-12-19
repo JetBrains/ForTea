@@ -7,4 +7,5 @@ class T4ExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4"
 
   @Test fun testGutterMarks() = doTest(T4RunMarkerAttributeIds.RUN_T4_FILE_MARKER_ID)
+  @Test fun testClass() = doTestAll()
 }
