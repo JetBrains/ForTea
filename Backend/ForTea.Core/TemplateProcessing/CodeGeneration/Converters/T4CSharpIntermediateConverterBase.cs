@@ -17,9 +17,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
-		[NotNull] private const string ToStringInstanceHelperResource =
-			"GammaJul.ForTea.Core.Resources.ToStringInstanceHelper.cs";
-
 		[NotNull]
 		protected T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
 
@@ -48,7 +45,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				.ToProjectFile()
 				.NotNull()
 				.CalculateExpectedNamespace(T4Language.Instance);
-			AppendNamespacePrefix();
 			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
 			{
@@ -67,10 +63,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			return Result;
 		}
 
-		protected virtual void AppendNamespacePrefix()
-		{
-		}
-
 		private void AppendNamespaceContents()
 		{
 			AppendImports();
@@ -84,9 +76,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine();
 			AppendBaseClass();
 		}
-
-		[CanBeNull]
-		protected string GetNamespace() => File.GetSourceFile()?.Properties.GetDefaultNamespace();
 
 		private void AppendImports()
 		{
@@ -126,18 +115,27 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
-			if (IntermediateResult.HasHost) AppendHost();
+			AppendProperties();
+			AppendConstructor();
 			AppendTransformMethod();
-			foreach (var description in IntermediateResult.FeatureDescriptions)
-			{
-				description.AppendContent(Result, this);
-			}
-
 			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
 			AppendTemplateInitialization(IntermediateResult.ParameterDescriptions);
 			PopIndent();
 			AppendIndent();
 			Result.AppendLine("}");
+		}
+
+		private void AppendProperties()
+		{
+			if (IntermediateResult.HasHost) AppendHost();
+			foreach (var description in IntermediateResult.FeatureDescriptions)
+			{
+				description.AppendContent(Result, this);
+			}
+		}
+
+		protected virtual void AppendConstructor()
+		{
 		}
 
 		private void AppendParameterDeclarations(
@@ -209,9 +207,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			else Result.Append(GeneratedBaseClassName);
 		}
 
-		protected void AppendBaseClass()
+		private void AppendBaseClass()
 		{
-			string resource = !IntermediateResult.HasBaseClass ? BaseClassResourceName : ToStringInstanceHelperResource;
+			if (IntermediateResult.HasBaseClass) return;
+			string resource = BaseClassResourceName;
 			var provider = new T4TemplateResourceProvider(resource);
 			Result.Append(provider.ProcessResource(GeneratedBaseClassName));
 		}
@@ -226,7 +225,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual string GeneratedClassName => GeneratedClassNameString;
 
 		[NotNull]
-		protected virtual string GeneratedBaseClassName => GeneratedBaseClassNameString;
+		protected virtual string GeneratedBaseClassName => T4TextTemplatingFQNs.TextTransformation;
 
 		protected abstract void AppendSyntheticAttribute();
 

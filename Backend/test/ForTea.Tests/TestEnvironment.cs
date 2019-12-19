@@ -24,7 +24,7 @@ namespace JetBrains.ForTea.Tests
 #pragma warning disable 169
 		// These fields are here to force load assemblies
 		private IT4Environment magic1; // ForTea.Core
-		private T4Environment magic2; // ForTea.RiderPlugin
+		private T4RiderEnvironment magic2; // ForTea.RiderPlugin
 #pragma warning restore 169
 	}
 }

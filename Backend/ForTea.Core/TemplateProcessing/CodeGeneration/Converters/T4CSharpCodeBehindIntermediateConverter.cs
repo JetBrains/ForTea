@@ -14,7 +14,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public sealed class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
 		[NotNull] public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
 		[NotNull] public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
 		[NotNull] public const string ExpressionCommentStartText = "/*_T4\x200CExpressionStart*/";
@@ -75,12 +74,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			Result.Append("        // ReSharper disable ");
 			Result.AppendLine(inspection);
-		}
-
-		protected override void AppendNamespacePrefix()
-		{
-			if (!IntermediateResult.HasHost) return;
-			Result.AppendLine(new T4TemplateResourceProvider(HostStubResourceName).ProcessResource());
 		}
 
 		protected override void AppendHost()

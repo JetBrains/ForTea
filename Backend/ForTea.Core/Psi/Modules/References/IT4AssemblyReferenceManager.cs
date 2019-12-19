@@ -25,9 +25,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		[NotNull]
 		IModuleReferenceResolveContext ResolveContext { get; }
 
-		/// <summary>
-		/// Add references to mscorlib, System and the default TextTemplating assemblies
-		/// </summary>
 		void AddBaseReferences();
 
 		/// <returns>Whether a change was made</returns>

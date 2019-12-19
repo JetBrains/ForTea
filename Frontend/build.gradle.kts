@@ -74,7 +74,8 @@ val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
-  "output/ForTea.RiderPlugin/$buildConfiguration/ForTea.RiderPlugin"
+  "output/ForTea.RiderPlugin/$buildConfiguration/ForTea.RiderPlugin",
+  "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.TextTemplating"
 )
 
 val nugetPackagesPath by lazy {
@@ -261,10 +262,6 @@ tasks {
         args = listOf("build", backendPluginSolutionPath.canonicalPath)
       }
     }
-  }
-
-  getByName("runIde") {
-    dependsOn("buildBackend")
   }
 
   getByName("buildSearchableOptions") {

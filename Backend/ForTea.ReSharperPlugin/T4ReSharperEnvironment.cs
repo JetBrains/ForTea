@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using GammaJul.ForTea.Core;
+using System.Linq;
+using GammaJul.ForTea.Core.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.platforms;
@@ -15,7 +16,7 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 
 	/// <summary>Contains environment-dependent information.</summary>
 	[ShellComponent]
-	public sealed class T4Environment : IT4Environment
+	public sealed class T4ReSharperEnvironment : T4DefaultEnvironment
 	{
 		[NotNull] private readonly IVsEnvironmentInformation _vsEnvironmentInformation;
 		[NotNull] private readonly string[] _textTemplatingAssemblyNames;
@@ -23,35 +24,34 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 		[CanBeNull] private IList<FileSystemPath> _includePaths;
 
 		/// <summary>Gets the target framework ID.</summary>
-		[NotNull]
-		public TargetFrameworkId TargetFrameworkId {
+		public override TargetFrameworkId TargetFrameworkId {
 			get {
-				if (_targetFrameworkId == null)
-					throw CreateUnsupportedEnvironmentException();
+				if (_targetFrameworkId == null) throw Unsupported();
 				return _targetFrameworkId;
 			}
 		}
 
 		/// <summary>Gets the C# language version.</summary>
-		public CSharpLanguageLevel CSharpLanguageLevel { get; }
+		public override CSharpLanguageLevel CSharpLanguageLevel { get; }
 
 		/// <summary>Gets the default included assemblies.</summary>
 		[NotNull]
-		public IEnumerable<string> TextTemplatingAssemblyNames {
+		private IEnumerable<string> TextTemplatingAssemblyNames {
 			get {
 				if (_targetFrameworkId == null)
-					throw CreateUnsupportedEnvironmentException();
+					throw Unsupported();
 				return _textTemplatingAssemblyNames;
 			}
 		}
 
+		public override IEnumerable<string> DefaultAssemblyNames =>
+			TextTemplatingAssemblyNames.Concat(base.DefaultAssemblyNames);
+
 		/// <summary>Gets whether the current environment is supported. VS2005 and VS2008 aren't.</summary>
-		public bool IsSupported
-			=> _targetFrameworkId != null;
+		public override bool IsSupported => _targetFrameworkId != null;
 
 		/// <summary>Gets the common include paths from the registry.</summary>
-		[NotNull]
-		public IEnumerable<FileSystemPath> IncludePaths {
+		public override IEnumerable<FileSystemPath> IncludePaths {
 			get {
 				if (_targetFrameworkId == null)
 					return EmptyList<FileSystemPath>.InstanceList;
@@ -87,10 +87,9 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 			}
 		}
 
-		[NotNull]
-		[Pure]
-		private static NotSupportedException CreateUnsupportedEnvironmentException()
-			=> new NotSupportedException("Unsupported environment.");
+		[NotNull, Pure]
+		private static NotSupportedException Unsupported() =>
+			throw new NotSupportedException("Unsupported environment");
 
 		[NotNull]
 		private static string CreateGacAssemblyName([NotNull] string name, int majorVersion)
@@ -108,7 +107,7 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 				.Combine(RelativePath.Parse("PublicAssemblies\\" + name + ".dll"))
 				.FullPath;
 
-		public T4Environment([NotNull] IVsEnvironmentInformation vsEnvironmentInformation)
+		public T4ReSharperEnvironment([NotNull] IVsEnvironmentInformation vsEnvironmentInformation)
 		{
 			_vsEnvironmentInformation = vsEnvironmentInformation;
 

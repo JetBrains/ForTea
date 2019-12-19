@@ -1,0 +1,4 @@
+<#
+	global::System.Collections.Generic.IEnumerable<int> g;
+	IEnumerable<int> f;
+#>

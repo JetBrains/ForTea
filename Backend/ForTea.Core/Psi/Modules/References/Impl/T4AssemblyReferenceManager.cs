@@ -121,9 +121,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 
 		public void AddBaseReferences()
 		{
-			TryAddReference("mscorlib");
-			TryAddReference("System");
-			foreach (string assemblyName in Environment.TextTemplatingAssemblyNames)
+			foreach (string assemblyName in Environment.DefaultAssemblyNames)
 			{
 				TryAddReference(assemblyName);
 			}
