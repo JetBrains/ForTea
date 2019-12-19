@@ -6,7 +6,9 @@ import com.jetbrains.rider.test.base.BaseTestWithMarkup
 
 abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
   abstract override fun getSolutionDirectoryName(): String
-  private val fileName = "Template.tt"
+  protected open val fileName get() = "Template.tt"
+  protected open val goldFileName get() = "$fileName.gold"
+  protected open val testFilePath get() = "${getSolutionDirectoryName()}/$fileName"
 
   fun doTest(attributeId: String) = doTestWithMarkupModel {
     waitForDaemon()
@@ -19,5 +21,5 @@ abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
   }
 
   private fun doTestWithMarkupModel(testAction: EditorImpl.() -> Unit) =
-    doTestWithMarkupModel(fileName, "${getSolutionDirectoryName()}/$fileName", "$fileName.gold", testAction)
+    doTestWithMarkupModel(fileName, testFilePath, goldFileName, testAction)
 }
