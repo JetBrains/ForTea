@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.run
 
 import com.intellij.execution.ExecutionManager
-import com.intellij.execution.impl.ExecutionManagerKtImpl
+import com.intellij.execution.impl.ExecutionManagerImpl
 import com.intellij.openapi.components.ServiceManager
 import com.jetbrains.fortea.configuration.execution.impl.T4SynchronousRunConfigurationExecutor
 import com.jetbrains.rdclient.util.idea.toVirtualFile
@@ -59,7 +59,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
 
   @BeforeMethod
   fun setUp() {
-    val manager = ServiceManager.getService(project, ExecutionManager::class.java) as ExecutionManagerKtImpl
+    val manager = ServiceManager.getService(project, ExecutionManager::class.java) as ExecutionManagerImpl
     manager.forceCompilationInTests = true
   }
 
