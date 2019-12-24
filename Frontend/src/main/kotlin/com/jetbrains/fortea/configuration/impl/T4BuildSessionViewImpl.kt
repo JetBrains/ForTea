@@ -1,5 +1,6 @@
 package com.jetbrains.fortea.configuration.impl
 
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.T4BuildToolWindowFactory
@@ -17,12 +18,13 @@ import javax.management.OperationsException
 
 class T4BuildSessionViewImpl(
   project: Project,
-  private val windowFactory: T4BuildToolWindowFactory
+  private val windowFactory: T4BuildToolWindowFactory,
+  private val application: Application
 ) : LifetimedProjectService(project), T4BuildSessionView {
   private val windowLifetimes = SequentialLifetimes(project.lifetime)
   private var currentWindowLifetime: Lifetime? = null
 
-  override fun openWindow(message: String) = windowFactory.application.invokeLater {
+  override fun openWindow(message: String) = application.invokeLater {
     val lifetime = windowLifetimes.next()
     currentWindowLifetime = lifetime
     val context = initializeContext(lifetime, ExecutingT4BuildHeader)
@@ -33,7 +35,7 @@ class T4BuildSessionViewImpl(
     context.invalidatePanelMode()
   }
 
-  override fun showT4BuildResult(result: T4BuildResult, file: String) = windowFactory.application.invokeLater {
+  override fun showT4BuildResult(result: T4BuildResult, file: String) = application.invokeLater {
     val lifetime = currentWindowLifetime ?: throw OperationsException("openWindow should be called first")
     val context = initializeContext(lifetime, ExecutingT4BuildHeader)
     context.updateStatus(result.buildResultKind.toBuildResultKind, T4BuildHeader)
@@ -41,7 +43,7 @@ class T4BuildSessionViewImpl(
     context.invalidatePanelMode()
   }
 
-  override fun showT4PreprocessingResult(result: T4PreprocessingResult, file: String) = windowFactory.application.invokeLater {
+  override fun showT4PreprocessingResult(result: T4PreprocessingResult, file: String) = application.invokeLater {
     val lifetime = currentWindowLifetime ?: throw OperationsException("openWindow should be called first")
     val context = initializeContext(lifetime, PreprocessingT4Header)
     val succeeded =

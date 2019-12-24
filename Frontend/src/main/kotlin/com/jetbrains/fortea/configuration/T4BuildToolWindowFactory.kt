@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.application.Application
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
@@ -20,12 +20,7 @@ import com.jetbrains.rider.projectView.ProjectModelViewHost
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
-class T4BuildToolWindowFactory(
-  project: Project,
-  private val buildToolWindowFactory: BuildToolWindowFactory,
-  private val projectModelViewHost: ProjectModelViewHost,
-  val application: Application
-) : LifetimedProjectService(project) {
+class T4BuildToolWindowFactory(project: Project) : LifetimedProjectService(project) {
   private val lock = Any()
   private var context: BuildToolWindowContext? = null
 
@@ -36,10 +31,11 @@ class T4BuildToolWindowFactory(
   }
 
   private fun create(lifetime: Lifetime, windowHeader: String): BuildToolWindowContext {
-    val toolWindow = buildToolWindowFactory.getOrRegisterToolWindow()
+    val toolWindow = BuildToolWindowFactory.getInstance(project).getOrRegisterToolWindow()
     val contentManager = toolWindow.contentManager
-    toolWindow.icon = AllIcons.Toolwindows.ToolWindowBuild
+    toolWindow.setIcon(AllIcons.Toolwindows.ToolWindowBuild)
     // Required for hiding window without content
+    val projectModelViewHost = ProjectModelViewHost.getInstance(project)
     val panel = BuildResultPanel(project, projectModelViewHost, componentLifetime)
     val toolWindowContent = contentManager.factory.createContent(null, windowHeader, true).apply {
       StatusBarUtil.setStatusBarInfo(project, "")
@@ -86,5 +82,10 @@ class T4BuildToolWindowFactory(
         ).component, BorderLayout.WEST
       )
     }
+  }
+
+  companion object {
+    fun getInstance(project: Project): T4BuildToolWindowFactory =
+      ServiceManager.getService(project, T4BuildToolWindowFactory::class.java)
   }
 }
