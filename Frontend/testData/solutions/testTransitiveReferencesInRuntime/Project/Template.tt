@@ -1,0 +1,6 @@
+<#@ template language="C#" #>
+<#@ assembly name="$(SolutionDir)Lib\Foo.dll" #>
+<#@ assembly name="$(SolutionDir)Lib\FooBase.dll" #>
+<# // Note that there is no reference to Bar.dll, which is referenced by FooBase.dll #>
+<#@ import namespace="FooNamespace" #>
+<#= new Foo().GetAnswer() #>

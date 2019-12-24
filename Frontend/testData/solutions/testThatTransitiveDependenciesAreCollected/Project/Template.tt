@@ -1,4 +1,0 @@
-﻿<#@ template language="C#" #>
-<#@ assembly name="$(SolutionDir)Lib\Foo.dll" #>
-<#@ import namespace="FooNamespace" #>
-<#= new Foo().GetType().BaseType.Assembly.GetName() #>
