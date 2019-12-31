@@ -2,6 +2,11 @@
     [switch]$runFrontendTests,
     [switch]$run
 )
+
+gci env:
+Write-Host "Default Java executable:"
+where java
+
 if (Test-Path Env:DOTNET_SDK_DIRECTORY) 
 {
     Set-Item -Path Env:PATH -Value "$($Env:DOTNET_SDK_DIRECTORY);$($Env:PATH)"
