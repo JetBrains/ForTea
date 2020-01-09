@@ -2,11 +2,10 @@ package com.jetbrains.fortea.configuration
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.jetbrains.fortea.icons.T4Icons
 import com.jetbrains.fortea.language.T4Language
 import com.jetbrains.rider.actions.base.RiderContextAwareAnAction
-import com.jetbrains.rider.icons.ReSharperCommonIcons.Debug
-import com.jetbrains.rider.icons.ReSharperUnitTestingIcons
+import icons.ReSharperIcons.Common.Debug
+import icons.ReSharperIcons.UnitTesting.RunTest
 import javax.swing.Icon
 
 abstract class T4BackendAction(backendActionId: String, icon: Icon? = null) :
@@ -21,6 +20,6 @@ abstract class T4BackendAction(backendActionId: String, icon: Icon? = null) :
   }
 }
 
-class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", ReSharperUnitTestingIcons.RunTest)
+class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", RunTest)
 class T4DebugTemplateBackendAction : T4BackendAction("T4.DebugFromContext", Debug)
 class T4PreprocessTemplateBackendAction : T4BackendAction("T4.PreprocessFromContext")
