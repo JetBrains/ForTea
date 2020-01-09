@@ -14,8 +14,8 @@ object T4FileType : RiderLanguageFileTypeBase(T4Language), TemplateLanguageFileT
     }
   }
 
-  override fun getDefaultExtension() = "T4"
-  override fun getDescription() = "T4 template file"
+  override fun getDefaultExtension() = "tt"
+  override fun getDescription() = "T4 template"
   override fun getIcon(): Icon = T4Icons.T4
   override fun getName() = "T4"
 }
