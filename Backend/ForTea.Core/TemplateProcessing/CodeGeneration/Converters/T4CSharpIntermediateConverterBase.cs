@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -39,7 +43,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		public T4CSharpCodeGenerationResult Convert()
 		{
 			AppendGeneratedMessage();
-			string ns = GetNamespace();
+			string ns = File
+				.LogicalPsiSourceFile
+				.ToProjectFile()
+				.NotNull()
+				.CalculateExpectedNamespace(T4Language.Instance);
 			AppendNamespacePrefix();
 			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
