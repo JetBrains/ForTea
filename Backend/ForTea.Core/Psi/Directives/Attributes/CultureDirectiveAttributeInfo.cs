@@ -15,7 +15,13 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 
 		[NotNull]
 		private static JetHashSet<string> CreateCultureCodes()
-			=> CultureInfo.GetCultures(CultureTypes.SpecificCultures).ToJetHashSet(info => info.Name, StringComparer.OrdinalIgnoreCase);
+		{
+			var set = CultureInfo
+				.GetCultures(CultureTypes.SpecificCultures)
+				.ToJetHashSet(info => info.Name, StringComparer.OrdinalIgnoreCase);
+			set.Add("");
+			return set;
+		}
 
 		public override bool IsValid(string value)
 			=> _cultureCodes.Value.Contains(value);

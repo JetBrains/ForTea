@@ -24,6 +24,7 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("IllegalCharacter")]
 		[TestCase("UnresolvedMacro")]
 		[TestCase("UnresolvedEnvironmentVariable")]
+		[TestCase("EmptyCultureAttribute", TestName = "RIDER-34744")]
 		public void TestHighlighting(string name) => DoOneTest(name);
 
 		protected override Severity Target => Severity.ERROR;
