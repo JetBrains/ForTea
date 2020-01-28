@@ -14,20 +14,14 @@ import com.jetbrains.rider.build.Diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.Diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*
 import com.jetbrains.rider.util.idea.lifetime
-import javax.management.OperationsException
 
 class T4BuildSessionViewImpl(
   project: Project,
   private val windowFactory: T4BuildToolWindowFactory,
   private val application: Application
 ) : LifetimedProjectService(project), T4BuildSessionView {
-  private val windowLifetimes = SequentialLifetimes(project.lifetime)
-  private var currentWindowLifetime: Lifetime? = null
-
   override fun openWindow(message: String) = application.invokeLater {
-    val lifetime = windowLifetimes.next()
-    currentWindowLifetime = lifetime
-    val context = initializeContext(lifetime, ExecutingT4BuildHeader)
+    val context = initializeContext(ExecutingT4BuildHeader)
     context.clear()
     context.showToolWindowIfHidden(true)
     val buildEvent = MessageBuildEvent(null, BuildMessageKind.Message, message)
@@ -36,16 +30,14 @@ class T4BuildSessionViewImpl(
   }
 
   override fun showT4BuildResult(result: T4BuildResult, file: String) = application.invokeLater {
-    val lifetime = currentWindowLifetime ?: throw OperationsException("openWindow should be called first")
-    val context = initializeContext(lifetime, ExecutingT4BuildHeader)
+    val context = initializeContext(ExecutingT4BuildHeader)
     context.updateStatus(result.buildResultKind.toBuildResultKind, T4BuildHeader)
     showMessages(result, file, context)
     context.invalidatePanelMode()
   }
 
   override fun showT4PreprocessingResult(result: T4PreprocessingResult, file: String) = application.invokeLater {
-    val lifetime = currentWindowLifetime ?: throw OperationsException("openWindow should be called first")
-    val context = initializeContext(lifetime, PreprocessingT4Header)
+    val context = initializeContext(PreprocessingT4Header)
     val succeeded =
       if (result.succeeded) BuildResultKind.Successful
       else BuildResultKind.HasErrors
@@ -62,8 +54,8 @@ class T4BuildSessionViewImpl(
     toBuildDiagnostic(it, file)
   }.forEach(context::addBuildEvent)
 
-  private fun initializeContext(lifetime: Lifetime, windowHeader: String): BuildToolWindowContext {
-    val context = windowFactory.getOrCreateContext(lifetime, windowHeader)
+  private fun initializeContext(windowHeader: String): BuildToolWindowContext {
+    val context = windowFactory.getOrCreateContext(windowHeader)
     if (!context.isActive) context.showToolWindowIfHidden(true)
     return context
   }

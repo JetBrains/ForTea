@@ -24,13 +24,13 @@ class T4BuildToolWindowFactory(project: Project) : LifetimedProjectService(proje
   private val lock = Any()
   private var context: BuildToolWindowContext? = null
 
-  fun getOrCreateContext(lifetime: Lifetime, windowHeader: String): BuildToolWindowContext {
+  fun getOrCreateContext(windowHeader: String): BuildToolWindowContext {
     synchronized(lock) {
-      return context ?: create(lifetime, windowHeader)
+      return context ?: create(windowHeader)
     }
   }
 
-  private fun create(lifetime: Lifetime, windowHeader: String): BuildToolWindowContext {
+  private fun create(windowHeader: String): BuildToolWindowContext {
     val toolWindow = BuildToolWindowFactory.getInstance(project).getOrRegisterToolWindow()
     val contentManager = toolWindow.contentManager
     toolWindow.setIcon(AllIcons.Toolwindows.ToolWindowBuild)
@@ -46,12 +46,7 @@ class T4BuildToolWindowFactory(project: Project) : LifetimedProjectService(proje
 
     contentManager.addContent(toolWindowContent)
     val ctx = BuildToolWindowContext(toolWindow, toolWindowContent, panel)
-    lifetime.bracket({ context = ctx }, {
-      synchronized(lock) {
-        contentManager.removeContent(toolWindowContent, true)
-        context = null
-      }
-    })
+    context = ctx
     return ctx
   }
 
