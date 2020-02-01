@@ -146,18 +146,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			// Host directive does not work for runtime templates
 		}
 
-		protected override string GeneratedClassName
-		{
-			get
-			{
-				File.AssertContainsNoIncludeContext();
-				string fileName = File.LogicalPsiSourceFile.Name.WithoutExtension();
-				if (ValidityChecker.IsValidIdentifier(fileName)) return fileName;
-				return GeneratedClassNameString;
-			}
-		}
-
+		protected override string GeneratedClassName => File.CreateGeneratedClassName();
 		protected override string GeneratedBaseClassName => GeneratedClassName + "Base";
+		protected override string GeneratedBaseClassFQN => GeneratedBaseClassName;
 
 		protected override void AppendIndent(int size)
 		{

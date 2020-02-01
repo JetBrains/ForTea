@@ -1,8 +1,11 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -28,6 +31,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		) => new T4CSharpCodeBehindIntermediateConverter(intermediateResult, File);
+		)
+		{
+			var rootTemplateKindProvider = Solution.GetComponent<IT4RootTemplateKindProvider>();
+			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile().NotNull();
+			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(projectFile))
+				return new T4CSharpPreprocessedCodeBehindIntermediateConverter(intermediateResult, File);
+			return new T4CSharpExecutableCodeBehindIntermediateConverter(intermediateResult, File);
+		}
 	}
 }

@@ -192,8 +192,8 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			if (!tokenNode.GetTokenType().IsComment) return false;
 			switch (tokenNode.GetText())
 			{
-				case T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText:
-				case T4CSharpCodeBehindIntermediateConverter.ExpressionCommentEndText: return true;
+				case T4CSharpCodeBehindIntermediateConverterBase.CodeCommentEndText:
+				case T4CSharpCodeBehindIntermediateConverterBase.ExpressionCommentEndText: return true;
 				default: return false;
 			}
 		}

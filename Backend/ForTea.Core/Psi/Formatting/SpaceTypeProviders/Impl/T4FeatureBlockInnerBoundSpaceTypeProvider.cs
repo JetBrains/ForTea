@@ -8,7 +8,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders.Impl
 		T4BlockInnerBoundSpaceTypeProviderBase<IT4FeatureBlock>
 	{
 		protected override SpaceType Type => SpaceType.VerticalNearBrackets;
-		protected override string StartComment => T4CSharpCodeBehindIntermediateConverter.CodeCommentStartText;
-		protected override string EndComment => T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
+		protected override string StartComment => T4CSharpCodeBehindIntermediateConverterBase.CodeCommentStartText;
+		protected override string EndComment => T4CSharpCodeBehindIntermediateConverterBase.CodeCommentEndText;
 	}
 }

@@ -204,7 +204,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendBaseClassName()
 		{
 			if (IntermediateResult.HasBaseClass) Result.Append(IntermediateResult.CollectedBaseClass);
-			else Result.Append(GeneratedBaseClassName);
+			else Result.Append(GeneratedBaseClassFQN);
 		}
 
 		private void AppendBaseClass()
@@ -225,7 +225,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual string GeneratedClassName => GeneratedClassNameString;
 
 		[NotNull]
-		protected virtual string GeneratedBaseClassName => T4TextTemplatingFQNs.TextTransformation;
+		protected abstract string GeneratedBaseClassName { get; }
+
+		[NotNull]
+		protected abstract string GeneratedBaseClassFQN { get; }
 
 		protected abstract void AppendSyntheticAttribute();
 

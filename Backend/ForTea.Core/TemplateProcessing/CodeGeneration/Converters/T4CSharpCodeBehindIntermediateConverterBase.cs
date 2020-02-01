@@ -12,7 +12,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
-	public sealed class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
+	public abstract class T4CSharpCodeBehindIntermediateConverterBase : T4CSharpIntermediateConverterBase
 	{
 		[NotNull] public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
 		[NotNull] public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
@@ -26,7 +26,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			"RedundantNameQualifier"
 		};
 
-		public T4CSharpCodeBehindIntermediateConverter(
+		protected T4CSharpCodeBehindIntermediateConverterBase(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
 			[NotNull] IT4File file
 		) : base(intermediateResult, file)
@@ -81,29 +81,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine(
 				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
-		}
-
-		[CanBeNull]
-		private string TryGetGeneratedClassNameFromFile()
-		{
-			var projectFile = File.GetSourceFile()?.ToProjectFile();
-			if (projectFile == null) return null;
-			var dataManager = File.GetSolution().GetComponent<IT4TemplateKindProvider>();
-			if (!dataManager.IsPreprocessedTemplate(projectFile)) return null;
-			string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-			if (fileName == null) return null;
-			if (!ValidityChecker.IsValidIdentifier(fileName)) return null;
-			return fileName;
-		}
-
-		protected override string GeneratedClassName
-		{
-			get
-			{
-				string name = TryGetGeneratedClassNameFromFile();
-				if (name == null) return GeneratedClassNameString;
-				return name;
-			}
 		}
 
 		// No indents should be inserted in code-behind file in order to avoid indenting code in code blocks
