@@ -1,0 +1,4 @@
+<#
+	global::ProjectWithT4IncludedInSubfolder.OtherDir.Includer a = this;
+	global::ProjectWithT4IncludedInSubfolder.OtherDir.IncluderBase b = this;
+#>
