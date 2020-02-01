@@ -1,0 +1,11 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ include file="$(ProjectDir)OtherDir\OtherTemplate.ttinclude"#>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.<ERROR_UNRESOLVED>Linq</ERROR_UNRESOLVED>" #>
+<#= Meaning #>
+<#
+	global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost proof1 = Host;
+	global::Project.Subdirectory.GeneratedTextTransformation proof2 = this;
+	global::Microsoft.VisualStudio.TextTemplating.TextTransformation proof3 = this;
+	global::System.Collections.Generic.IEnumerable<int> proof4 = global::System.<ERROR_UNRESOLVED>Linq</ERROR_UNRESOLVED>.Enumerable.Empty<int>();
+#>

@@ -1,0 +1,12 @@
+<#@ template language="C#" hostspecific="false" #>
+<#@ assembly name="System.Core" #>
+<#@ include file="$(ProjectDir)OtherDir\OtherTemplate.ttinclude"#>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#= Meaning #>
+<#
+	global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost proof1 = Host;
+	global::Project.Subdirectory.GeneratedTextTransformation proof2 = this;
+	global::Microsoft.VisualStudio.TextTemplating.TextTransformation proof3 = this;
+	global::System.Collections.Generic.IEnumerable<int> proof4 = global::System.Linq.Enumerable.Empty<int>();
+#>
