@@ -1,0 +1,4 @@
+<#
+    global::ProjectWithComplexPreprocessedT4.Folder.Template x = this;
+    global::ProjectWithComplexPreprocessedT4.Folder.TemplateBase y = this;
+#>
