@@ -1,4 +1,12 @@
 <#
+    // FQN to make sure that mscorlib is referenced
 	global::System.Collections.Generic.IEnumerable<int> g;
+	// a class that was imported in the includer
 	IEnumerable<int> f;
+	// make sure TextTemplating assembly is referenced
+	global::Microsoft.VisualStudio.TextTemplating.TextTransformation h = this;
+	// make sure the class name is correct
+	global::ProjectWithT4AndIncluder.GeneratedTextTransformation i = this;
+	// make sure that host is available
+	global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost j = Host;
 #>
