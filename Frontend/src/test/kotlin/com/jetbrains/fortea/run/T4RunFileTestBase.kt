@@ -28,7 +28,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
   override val waitForCaches = true
   override fun getSolutionDirectoryName() = testMethod.name
 
-  protected val t4File
+  protected open val t4File: File
     get() = project
       .solutionDirectory
       .combine("Project")

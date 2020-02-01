@@ -1,0 +1,16 @@
+<#
+	global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost proof5 = Host;
+	global::Project.Subdirectory.GeneratedTextTransformation proof6 = this;
+	global::Microsoft.VisualStudio.TextTemplating.TextTransformation proof7 = this;
+	global::System.Collections.Generic.IEnumerable<int> proof8 = global::System.Linq.Enumerable.Empty<int>();
+#>
+<#+
+	private static int Meaning
+	{
+		get
+		{
+			IEnumerable<int> e = new[] {32, 9, 1};
+			return e.Sum();
+		}
+	}
+#>
