@@ -27,9 +27,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 	/// <summary>PSI module managing a single T4 file.</summary>
 	public sealed class T4FilePsiModule : ConcurrentUserDataHolder, IT4FilePsiModule, IDisposable
 	{
-		[NotNull]
-		private const string Prefix = "[T4]";
-
+		[NotNull] private const string Prefix = "[T4]";
 		private Lifetime Lifetime { get; }
 
 		[NotNull]
@@ -52,6 +50,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 
 		[NotNull]
 		private IProjectFile ProjectFile { get; }
+
+		[NotNull]
+		private string PersistentId { get; }
 
 		private IChangeProvider ChangeProvider { get; }
 		private ISolution Solution { get; }
@@ -108,12 +109,16 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			var documentManager = Solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(ProjectFile, documentManager);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
+			PersistentId = BuildPersistentId();
 			ChangeManager.ExecuteAfterChange(() =>
 			{
 				AssemblyReferenceManager.AddBaseReferences();
 				NotifyModuleChange();
 			});
 		}
+
+		[NotNull]
+		private string BuildPersistentId() => Prefix + ProjectFile.GetPersistentID();
 
 		private void OnFileDataChanged(Pair<IPsiSourceFile, T4DeclaredAssembliesDiff> pair)
 		{
@@ -190,6 +195,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		public ISolution GetSolution() => Solution;
 		public ICollection<PreProcessingDirective> GetAllDefines() => EmptyList<PreProcessingDirective>.Instance;
 		public bool IsValid() => Project.IsValid() && PsiServices.Modules.HasModule(this);
-		public string GetPersistentID() => Prefix + ProjectFile.GetPersistentID();
+		public string GetPersistentID() => PersistentId;
 	}
 }
