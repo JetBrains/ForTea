@@ -10,7 +10,7 @@ import com.jetbrains.rider.projectView.solution
 class T4RunConfigurationCreator(project: Project, host: ProjectModelViewHost) {
   init {
     val model = project.solution.t4ProtocolModel
-    model.requestExecution.set(T4AsyncRunConfigurationExecutor(project, host)::execute)
-    model.requestDebug.set(T4AsyncDebugConfigurationExecutor(project, host)::execute)
+    model.requestExecution.set(handler = T4AsyncRunConfigurationExecutor(project, host)::execute)
+    model.requestDebug.set(handler = T4AsyncDebugConfigurationExecutor(project, host)::execute)
   }
 }
