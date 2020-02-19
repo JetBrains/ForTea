@@ -9,21 +9,13 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.ReSharperPlugin</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.ReSharper.SDK" Version="$(ReSharperSdkVersion)" />
     <PackageReference Include="Microsoft.VisualStudio.Text.UI.Wpf" Version="10.0.189-g83e7c53a57" />
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" Version="10.0.30320" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" Version="8.0.50728" />
     <Reference Include="PresentationCore" />
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
-  <Target Name="ReportCoreProjectSdk" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <CoreProjectSdkMessage>
-        Will use JetBrains.ReSharper.SDK with version $(ReSharperSdkVersion) to compile $(MSBuildProjectName).
-      </CoreProjectSdkMessage>
-    </PropertyGroup>
-    <Message Importance="high" Text="$(CoreProjectSdkMessage)" />
-  </Target>
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')"/>
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio.Props')"/>
 </Project>

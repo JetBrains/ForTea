@@ -22,6 +22,8 @@ Building R# plugin
 ----
 To build R# plugin, run
 ```bash
+cd Frontend
+gradlew :prepare
 cd ../Backend
 ./build pack
 ```

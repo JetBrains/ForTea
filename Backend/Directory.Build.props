@@ -1,21 +1,6 @@
 ﻿<Project>
-  <PropertyGroup>
-    <RiderSdkVersionLocation>RiderSdkPackageVersion.props</RiderSdkVersionLocation>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
   </ItemGroup>
-  <Import Project="targets\ReSharperPluginTargets.targets" />
-
-  <!-- Rider -->
-  <Import Project="$(RiderSdkVersionLocation)" Condition="Exists($(RiderSdkVersionLocation))"/>
-  <PropertyGroup Condition="Exists($(RiderSdkVersionLocation))">
-    <CoreProjectSdk>JetBrains.Rider.SDK</CoreProjectSdk>
-    <CoreProjectSdkVersion>$(RiderSDKVersion)</CoreProjectSdkVersion>
-  </PropertyGroup>
-  <!-- ReSharper -->
-  <PropertyGroup Condition="!Exists($(RiderSdkVersionLocation))">
-    <CoreProjectSdk>JetBrains.ReSharper.SDK</CoreProjectSdk>
-    <CoreProjectSdkVersion>$(ReSharperSdkVersion)</CoreProjectSdkVersion>
-  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\Frontend\build\DotNetSdkPath.generated.props"/>
 </Project>

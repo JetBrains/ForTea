@@ -17,10 +17,6 @@ using static Nuke.Common.Tools.NuGet.NuGetTasks;
 [CheckBuildProjectConfigurations]
 internal class Build : NukeBuild
 {
-	[NotNull]
-	private static Regex ReSharperSdkVersionRegex { get; } =
-		new Regex("<ReSharperSdkVersion>(?<version>.*)</ReSharperSdkVersion>");
-
 	[Parameter]
 	public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
@@ -33,7 +29,6 @@ internal class Build : NukeBuild
 
 	[NotNull]
 	public Target Compile => target => target
-		.Requires(() => !File.Exists(RootDirectory / "RiderSdkPackageVersion.props"))
 		.Executes(() => DotNetTasks.DotNetBuild(settings => settings
 			.SetConfiguration(Configuration)
 			.SetProjectFile(Solution)));
@@ -81,14 +76,6 @@ internal class Build : NukeBuild
 		.TakeWhile(x => !string.IsNullOrWhiteSpace(x))
 		.Select(x => $"\u2022{x.TrimStart('-')}")
 		.JoinNewLine();
-
-	[NotNull]
-	private static string GetReSharperSdkVersion() => File
-		.ReadLines(RootDirectory / "targets" / "ReSharperPluginTargets.targets")
-		.Select(line => ReSharperSdkVersionRegex.Match(line))
-		.Single(match => match.Success)
-		.Groups["version"]
-		.Value;
 
 	[NotNull]
 	private string GetOrSelectWaveVersion()
