@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.Execution;
@@ -42,7 +41,6 @@ internal class Build : NukeBuild
 			.SetProperty("jetBrainsYearSpan", GetJetBrainsYearSpan())
 			.SetProperty("releaseNotes", GetLatestReleaseNotes())
 			.SetProperty("configuration", Configuration.ToString())
-			.SetProperty("sdkVersion", GetReSharperSdkVersion())
 			.SetProperty("wave", GetOrSelectWaveVersion())
 			.EnableNoPackageAnalysis()));
 
