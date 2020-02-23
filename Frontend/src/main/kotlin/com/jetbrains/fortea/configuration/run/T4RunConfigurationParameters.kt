@@ -1,6 +1,5 @@
 package com.jetbrains.fortea.configuration.run
 
-import com.intellij.util.execution.ParametersListUtil
 import com.jetbrains.rider.model.T4ExecutionRequest
 import com.jetbrains.rider.run.configurations.exe.ExeConfigurationParameters
 import com.jetbrains.rider.runtime.DotNetExecutable
@@ -22,7 +21,7 @@ open class T4RunConfigurationParameters(
     exePath,
     "",
     workingDirectory,
-    ParametersListUtil.parse(programParameters),
+    programParameters,
     false,
     useExternalConsole,
     envs,
