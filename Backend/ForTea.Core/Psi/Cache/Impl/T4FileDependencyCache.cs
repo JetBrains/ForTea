@@ -21,6 +21,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	public sealed class T4FileDependencyCache : T4PsiAwareCacheBase<T4FileDependencyData, T4FileDependencyData>,
 		IT4FileDependencyGraph, IT4FileGraphNotifier
 	{
+		[NotNull]
+		public override string Version => "2";
+
 		public event Action<IEnumerable<FileSystemPath>> OnFilesIndirectlyAffected;
 
 		[NotNull]
