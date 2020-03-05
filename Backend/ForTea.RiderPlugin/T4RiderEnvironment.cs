@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Services;
 using JetBrains.Application;
+using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi.CSharp;
+using JetBrains.Util;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 using Microsoft.VisualStudio.TextTemplating;
 
@@ -27,6 +29,11 @@ namespace JetBrains.ForTea.RiderPlugin
 
 				yield return typeof(ITextTemplatingEngineHost).Assembly.Location;
 			}
+		}
+
+		public override IEnumerable<FileSystemPath> AdditionalCompilationAssemblyLocations
+		{
+			get { yield return FileSystemPath.Parse(typeof(Lifetime).Assembly.Location); }
 		}
 
 		public override bool IsSupported => true;

@@ -19,6 +19,9 @@ namespace GammaJul.ForTea.Core
 		[NotNull, ItemNotNull]
 		IEnumerable<string> DefaultAssemblyNames { get; }
 
+		[NotNull, ItemNotNull]
+		IEnumerable<FileSystemPath> AdditionalCompilationAssemblyLocations { get; }
+
 		/// <summary>Gets whether the current environment is supported. VS2005 and VS2008 aren't.</summary>
 		bool IsSupported { get; }
 
