@@ -42,10 +42,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			Environment = environment;
 		}
 
-		public IEnumerable<MetadataReference> ExtractPortableReferences(Lifetime lifetime, IT4File file) =>
+		public IEnumerable<MetadataReference> ExtractPortableReferencesForResolve(Lifetime lifetime, IT4File file) =>
 			ExtractReferenceLocations(file)
 				.Select(location => LowLevelReferenceExtractionManager.ResolveMetadata(lifetime, location))
 				.AsList();
+
+		public IEnumerable<MetadataReference> ExtractPortableReferencesForCompilation(
+			Lifetime lifetime,
+			IT4File file
+		) => ExtractPortableReferencesForResolve(lifetime, file)
+			.Concat(Environment
+				.AdditionalCompilationAssemblyLocations
+				.Select(location =>
+					LowLevelReferenceExtractionManager.ResolveMetadata(lifetime, location)
+				)
+			);
 
 		public IEnumerable<T4AssemblyReferenceInfo> ExtractReferenceLocationsTransitive(IT4File file)
 		{
