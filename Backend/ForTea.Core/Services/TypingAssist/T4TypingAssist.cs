@@ -344,10 +344,18 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			[NotNull] IExternalIntellisenseHost externalIntellisenseHost,
 			[NotNull] SkippingTypingAssist skippingTypingAssist,
 			[NotNull] ITypingAssistManager typingAssistManager,
-			[NotNull] ICodeCompletionSessionManager codeCompletionSessionManager
-		)
-			: base(solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost, skippingTypingAssist) {
-			
+			[NotNull] ICodeCompletionSessionManager codeCompletionSessionManager,
+			[NotNull] LastTypingAssistAction lastTypingAssistAction
+		) : base(
+			solution,
+			settingsStore,
+			cachingLexerService,
+			commandProcessor,
+			psiServices,
+			externalIntellisenseHost,
+			skippingTypingAssist,
+			lastTypingAssistAction
+		) {
 			_codeCompletionSessionManager = codeCompletionSessionManager;
 
 			typingAssistManager.AddTypingHandler(lifetime, '=', this, OnEqualTyped, IsTypingSmartParenthesisHandlerAvailable);

@@ -57,7 +57,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 			[NotNull] ISettingsStore settingsStore,
 			[NotNull] ITypingAssistManager typingAssistManager,
 			[NotNull] IPsiServices psiServices,
-			[NotNull] IExternalIntellisenseHost externalIntellisenseHost
+			[NotNull] IExternalIntellisenseHost externalIntellisenseHost,
+			[NotNull] LastTypingAssistAction lastTypingAssistAction
 		) : base(
 			lifetime,
 			solution,
@@ -67,7 +68,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 			settingsStore,
 			typingAssistManager,
 			psiServices,
-			externalIntellisenseHost
+			externalIntellisenseHost,
+			lastTypingAssistAction
 		)
 		{
 		}
