@@ -5,7 +5,7 @@ using JetBrains.ProjectModel;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-	public struct T4EnvDTEHost
+	public readonly struct T4EnvDTEHost
 	{
 		[NotNull]
 		public LifetimeDefinition LifetimeDefinition { get; }
