@@ -13,6 +13,10 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	/// <typeparam name="TResponse">The result of handling the request on the main thread</typeparam>
 	public abstract class T4PsiAwareCacheBase<TRequest, TResponse> : SimpleICache<TResponse> where TRequest : class
 	{
+		[NotNull]
+		public override string Version => "2";
+
+
 		protected T4PsiAwareCacheBase(
 			Lifetime lifetime,
 			IPersistentIndexManager persistentIndexManager,
