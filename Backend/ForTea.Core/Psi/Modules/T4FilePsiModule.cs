@@ -94,6 +94,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			var resolveContext = Project.IsMiscFilesProject()
 				? UniversalModuleReferenceContext.Instance
 				: this.GetResolveContextEx(ProjectFile);
+			var documentManager = Solution.GetComponent<DocumentManager>();
+			SourceFile = CreateSourceFile(ProjectFile, documentManager, resolveContext);
 			AssemblyReferenceManager = new T4AssemblyReferenceManager(
 				Solution.GetComponent<IAssemblyFactory>(),
 				SourceFile,
@@ -105,9 +107,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
 			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
-
-			var documentManager = Solution.GetComponent<DocumentManager>();
-			SourceFile = CreateSourceFile(ProjectFile, documentManager);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
 			PersistentId = BuildPersistentId();
 			ChangeManager.ExecuteAfterChange(() =>
@@ -180,14 +179,15 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		[NotNull]
 		private PsiProjectFile CreateSourceFile(
 			[NotNull] IProjectFile projectFile,
-			[NotNull] DocumentManager documentManager
+			[NotNull] DocumentManager documentManager,
+			[NotNull] IModuleReferenceResolveContext resolveContext
 		) => new PsiProjectFile(
 			this,
 			projectFile,
 			(pf, sf) => new T4PsiProjectFileProperties(pf, sf, true),
 			JetFunc<IProjectFile, IPsiSourceFile>.True,
 			documentManager,
-			AssemblyReferenceManager.ResolveContext
+			resolveContext
 		);
 
 		public void Dispose() => AssemblyReferenceManager.Dispose();
