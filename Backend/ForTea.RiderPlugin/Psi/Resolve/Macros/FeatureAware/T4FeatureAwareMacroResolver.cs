@@ -47,7 +47,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			IProjectFile file
 		)
 		{
-			Logger.Warn("Resolving {0} heavy (msbuild) macros", heavyMacros.Count);
+			Logger.Verbose("Resolving {0} heavy (msbuild) macros", heavyMacros.Count);
 			var project = file.GetProject();
 			var mark = project?.GetProjectMark();
 			if (mark == null) return EmptyDictionary<string, string>.Instance;
