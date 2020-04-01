@@ -52,7 +52,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 		[NotNull]
 		private IAssemblyFactory AssemblyFactory { get; }
 
-		public IModuleReferenceResolveContext ResolveContext { get; }
+		private IModuleReferenceResolveContext ResolveContext { get; }
 
 		internal T4AssemblyReferenceManager(
 			[NotNull] IAssemblyFactory assemblyFactory,

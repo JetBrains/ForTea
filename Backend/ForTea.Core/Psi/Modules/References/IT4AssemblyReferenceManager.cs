@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
-using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
 using JetBrains.Util;
 
@@ -21,9 +20,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		[NotNull]
 		[ItemNotNull]
 		IEnumerable<FileSystemPath> RawReferences { get; }
-
-		[NotNull]
-		IModuleReferenceResolveContext ResolveContext { get; }
 
 		void AddBaseReferences();
 
