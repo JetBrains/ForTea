@@ -90,11 +90,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
 			ChangeProvider = new FakeChangeProvider();
-			TargetFrameworkId = t4Environment.SelectTargetFrameworkId(primaryTargetFrameworkId);
+			TargetFrameworkId = t4Environment.SelectTargetFrameworkId(primaryTargetFrameworkId, projectFile);
 			Project = ProjectFile.GetProject().NotNull();
 			var resolveContext = Project.IsMiscFilesProject()
 				? UniversalModuleReferenceContext.Instance
 				: this.GetResolveContextEx(ProjectFile);
+			Assertion.Assert(resolveContext.TargetFramework == TargetFrameworkId, "Failed to select TargetFrameworkId");
 			var documentManager = Solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(ProjectFile, documentManager, resolveContext);
 			AssemblyReferenceManager = new T4AssemblyReferenceManager(
