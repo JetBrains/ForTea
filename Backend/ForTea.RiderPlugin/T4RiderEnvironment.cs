@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Impl;
 using JetBrains.Application;
-using JetBrains.Application.platforms;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 using Microsoft.VisualStudio.TextTemplating;
@@ -12,8 +11,8 @@ namespace JetBrains.ForTea.RiderPlugin
 	[ShellComponent]
 	public sealed class T4RiderEnvironment : T4DefaultEnvironment
 	{
-		public override TargetFrameworkId TargetFrameworkId { get; } =
-			TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, new Version(4, 7, 2));
+		public override TargetFrameworkId TargetFrameworkId =>
+			TargetFrameworkId.AllKnownIds.Where(id => id.IsNetFramework).Max();
 
 		public override CSharpLanguageLevel CSharpLanguageLevel => CSharpLanguageLevel.Latest;
 
