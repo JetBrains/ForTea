@@ -58,7 +58,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				project.Locks,
 				changeManager,
 				t4Environment,
-				templateKindProvider
+				templateKindProvider,
+				handler.PrimaryModule?.TargetFrameworkId
 			);
 		}
 

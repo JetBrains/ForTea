@@ -18,16 +18,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 
 		[NotNull]
 		public static TargetFrameworkId SelectTargetFrameworkId(
-			[NotNull] this IProjectFile file,
-			[NotNull] IT4Environment t4Environment
+			[NotNull] this IT4Environment t4Environment,
+			[CanBeNull] TargetFrameworkId candidate
 		)
 		{
-			var project = file.GetProject();
-			if (project?.IsMiscFilesProject() != false) return UniversalModuleReferenceContext.Instance.TargetFramework;
-			var containingTargetFrameworkId = project.GetResolveContext().TargetFramework;
 			// Generated C# code contains references to CodeDom, and thus can only be compiled by classical .NET
 			// TODO: generate code without CodeDom in .NET Core projects
-			if (containingTargetFrameworkId.IsNetFramework) return containingTargetFrameworkId;
+			if (candidate != null && candidate.IsNetFramework) return candidate;
 			return t4Environment.TargetFrameworkId;
 		}
 	}
