@@ -27,7 +27,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 	/// <summary>PSI module managing a single T4 file.</summary>
 	public sealed class T4FilePsiModule : ConcurrentUserDataHolder, IT4FilePsiModule, IDisposable
 	{
-		[NotNull] private const string Prefix = "[T4]";
+		[NotNull] public const string Prefix = "[T4]";
 		private Lifetime Lifetime { get; }
 
 		[NotNull]

@@ -165,7 +165,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			ISolution solution = projectFile.GetSolution();
 
 			// creates a new T4PsiModule for the file
-			LifetimeDefinition lifetimeDefinition = Lifetime.Define(_lifetime, "[T4]" + projectFile.Name);
+			var lifetimeDefinition = Lifetime.Define(_lifetime, T4FilePsiModule.Prefix + projectFile.Name);
 			var psiModule = new T4FilePsiModule(
 				lifetimeDefinition.Lifetime,
 				projectFile,
