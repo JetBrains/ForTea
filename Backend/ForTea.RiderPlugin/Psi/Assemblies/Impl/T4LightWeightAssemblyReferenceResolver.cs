@@ -14,17 +14,17 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Assemblies.Impl
 			try
 			{
 				// If the argument is the fully qualified path of an existing file, then we are done.
-				var fullPath = FileSystemPath.TryParse(assemblyName, FileSystemPathInternStrategy.DO_NOT_INTERN);
+				var fullPath = FileSystemPath.TryParse(assemblyName);
 				if (fullPath.IsAbsolute) return fullPath;
 				var folderPath = (file.ParentFolder?.Location).NotNull();
 
 				// Maybe the assembly is in the same folder as the text template that called the directive?
-				var sameFolderPath = folderPath.Combine(assemblyName, FileSystemPathInternStrategy.DO_NOT_INTERN);
+				var sameFolderPath = folderPath.Combine(assemblyName);
 				if (sameFolderPath.ExistsFile) return sameFolderPath;
 
 				// Maybe the assembly name is missing extension?
 				var pathWithExtension =
-					folderPath.Combine(assemblyName + ".dll", FileSystemPathInternStrategy.DO_NOT_INTERN);
+					folderPath.Combine(assemblyName + ".dll");
 				if (pathWithExtension.ExistsFile) return pathWithExtension;
 			}
 			catch (ArgumentException)
