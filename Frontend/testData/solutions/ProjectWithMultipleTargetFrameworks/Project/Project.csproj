@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>net472;netcoreapp3.0</TargetFrameworks>
+        <BarLocation>$(ProjectDir)Libraries\Bar.dll</BarLocation>
+    </PropertyGroup>
+
+</Project>
