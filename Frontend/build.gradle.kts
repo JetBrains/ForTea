@@ -187,6 +187,7 @@ tasks {
   withType<Test> {
     dependsOn(generateT4Lexer)
     useTestNG()
+    environment("LOCAL_ENV_RUN", "true")
     testLogging {
       showStandardStreams = true
       exceptionFormat = TestExceptionFormat.FULL
