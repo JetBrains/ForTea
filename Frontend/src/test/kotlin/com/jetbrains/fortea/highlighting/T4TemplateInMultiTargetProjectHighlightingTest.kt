@@ -6,6 +6,6 @@ class T4TemplateInMultiTargetProjectHighlightingTest : T4HighlightingTestBase() 
   override fun getSolutionDirectoryName() = "ProjectWithMultipleTargetFrameworks"
   override val testFilePath get() = "Project/$fileName"
 
-//  @Test fun testSimpleFile() = doTestAll()
+  @Test fun testSimpleFile() = doTestAll()
   @Test fun testFileWithMsBuildProperty() = doTestAll()
 }
