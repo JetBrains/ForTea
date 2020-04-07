@@ -37,9 +37,12 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 				builder.Append(' ');
 				builder.Append(attributeInfo.Name);
-				builder.Append("=\"");
-				builder.Append(attribute.Value.GetText());
-				builder.Append('"');
+				if (attribute.Value != null)
+				{
+					builder.Append("=\"");
+					builder.Append(attribute.Value.GetText());
+					builder.Append('"');
+				}
 			}
 			return builder.ToString();
 		}
