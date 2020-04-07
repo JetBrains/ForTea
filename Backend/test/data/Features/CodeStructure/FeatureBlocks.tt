@@ -1,0 +1,26 @@
+<#@ template language="C#" #>
+<#+
+    public static void Foo()
+    {
+        for (int i = 0; i < 10; i += 1)
+        {
+#>
+<#= "omg" #>
+<#+
+        }
+    }
+
+    private class Inner1
+    {
+        public virtual void Bar(int arg)
+        {
+        }
+    }
+
+    private class Inner2: Inner1
+    {
+        public override void Bar(int arg)
+        {
+        }
+    }
+#>

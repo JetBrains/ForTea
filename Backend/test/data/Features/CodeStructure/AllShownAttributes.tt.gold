@@ -1,0 +1,6 @@
+﻿File: AllShownAttributes.tt
+ template
+ assembly name="System.Core"
+ import namespace="System.Linq"
+ include file="location"
+ parameter name="hello"
