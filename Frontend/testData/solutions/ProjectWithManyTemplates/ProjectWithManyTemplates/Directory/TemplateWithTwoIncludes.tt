@@ -1,0 +1,3 @@
+<#@ template language="C#" #>
+<#@ include file="$(ProjectDir)IncludeWithOtherFunction.ttinclude" #>
+<#@ include file="IncludeWithUsage.ttinclude" #>
