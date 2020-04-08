@@ -1,0 +1,3 @@
+﻿<#@ assembly name="$(BarLocation)" #>
+<#@ import namespace="BarNamespace" #>
+<#= Bar.Answer #>

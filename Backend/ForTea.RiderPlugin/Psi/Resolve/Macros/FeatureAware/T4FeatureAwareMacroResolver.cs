@@ -47,19 +47,18 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			IProjectFile file
 		)
 		{
-			Logger.Warn("Resolving {0} heavy (msbuild) macros", heavyMacros.Count);
-			var mark = file.GetProject()?.GetProjectMark();
+			Logger.Verbose("Resolving {0} heavy (msbuild) macros", heavyMacros.Count);
+			var project = file.GetProject();
+			var mark = project?.GetProjectMark();
 			if (mark == null) return EmptyDictionary<string, string>.Instance;
 			var projectsHostContainer = Solution.ProjectsHostContainer();
 			var msBuildSessionHolder = projectsHostContainer.GetComponent<MsBuildSessionHolder>();
 			var msBuildSession = msBuildSessionHolder.Session;
 			var result = new Dictionary<string, string>();
+			var currentTargetFrameworkId = project.GetCurrentTargetFrameworkId();
 			foreach (string heavyMacro in heavyMacros)
 			{
-				string value = msBuildSession
-					.GetProjectProperty(mark, heavyMacro)
-					.Select(it => it.EvaluatedValue)
-					.SingleOrDefault();
+				string value = msBuildSession.GetProjectProperty(mark, heavyMacro, currentTargetFrameworkId);
 				if (value == null) continue;
 				result.Add(heavyMacro, value);
 			}

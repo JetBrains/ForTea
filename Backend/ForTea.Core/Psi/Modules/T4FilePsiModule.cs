@@ -77,7 +77,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] IProjectFile projectFile,
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IShellLocks shellLocks,
-			[NotNull] IT4Environment t4Environment
+			[NotNull] IT4Environment t4Environment,
+			[CanBeNull] TargetFrameworkId primaryTargetFrameworkId
 		)
 		{
 			Lifetime = lifetime;
@@ -89,11 +90,12 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
 			ChangeProvider = new FakeChangeProvider();
-			TargetFrameworkId = ProjectFile.SelectTargetFrameworkId(t4Environment);
+			TargetFrameworkId = t4Environment.SelectTargetFrameworkId(primaryTargetFrameworkId, projectFile);
 			Project = ProjectFile.GetProject().NotNull();
 			var resolveContext = Project.IsMiscFilesProject()
 				? UniversalModuleReferenceContext.Instance
 				: this.GetResolveContextEx(ProjectFile);
+			Assertion.Assert(resolveContext.TargetFramework == TargetFrameworkId, "Failed to select TargetFrameworkId");
 			var documentManager = Solution.GetComponent<DocumentManager>();
 			SourceFile = CreateSourceFile(ProjectFile, documentManager, resolveContext);
 			AssemblyReferenceManager = new T4AssemblyReferenceManager(
@@ -108,7 +110,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
 			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
-			PersistentId = BuildPersistentId();
+			PersistentId = BuildPersistentId(primaryTargetFrameworkId);
 			ChangeManager.ExecuteAfterChange(() =>
 			{
 				AssemblyReferenceManager.AddBaseReferences();
@@ -117,7 +119,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		}
 
 		[NotNull]
-		private string BuildPersistentId() => Prefix + ProjectFile.GetPersistentID();
+		private string BuildPersistentId([CanBeNull] TargetFrameworkId primaryTargetFrameworkId) =>
+			$"{Prefix}(path: {ProjectFile.GetPersistentID()}, containing project target framework id: {primaryTargetFrameworkId?.UniqueString ?? "null"})";
 
 		private void OnFileDataChanged(Pair<IPsiSourceFile, T4DeclaredAssembliesDiff> pair)
 		{

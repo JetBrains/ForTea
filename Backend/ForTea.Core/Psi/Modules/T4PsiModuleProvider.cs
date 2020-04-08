@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
+using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core.Psi.Modules {
 
@@ -30,6 +31,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 		[NotNull]
 		private IT4TemplateKindProvider TemplateDataManager { get; }
+
+		[CanBeNull]
+		private TargetFrameworkId PrimaryTargetFrameworkId { get; }
 
 		private readonly struct ModuleWrapper {
 
@@ -171,7 +175,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				projectFile,
 				_changeManager,
 				_shellLocks,
-				_t4Environment
+				_t4Environment,
+				PrimaryTargetFrameworkId
 			);
 			_modules[projectFile] = new ModuleWrapper(psiModule, lifetimeDefinition);
 			changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added);
@@ -210,7 +215,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IT4TemplateKindProvider templateDataManager
+			[NotNull] IT4TemplateKindProvider templateDataManager,
+			[CanBeNull] TargetFrameworkId primaryTargetFrameworkId = null
 		)
 		{
 			_lifetime = lifetime;
@@ -218,6 +224,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
 			TemplateDataManager = templateDataManager;
+			PrimaryTargetFrameworkId = primaryTargetFrameworkId;
 		}
 
 	}
