@@ -89,7 +89,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			PsiServices = Solution.GetComponent<IPsiServices>();
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
-			ChangeProvider = new FakeChangeProvider();
+			ChangeProvider = new T4WriteOnlyChangeProvider();
 			TargetFrameworkId = t4Environment.SelectTargetFrameworkId(primaryTargetFrameworkId, projectFile);
 			Project = ProjectFile.GetProject().NotNull();
 			var resolveContext = Project.IsMiscFilesProject()
@@ -111,12 +111,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
 			PersistentId = BuildPersistentId(primaryTargetFrameworkId);
-			ChangeManager.ExecuteAfterChange(() =>
-			{
-				AssemblyReferenceManager.AddBaseReferences();
-				NotifyModuleChange();
-			});
 		}
+
+		public void AddBaseReferences() => AssemblyReferenceManager.AddBaseReferences();
 
 		[NotNull]
 		private string BuildPersistentId([CanBeNull] TargetFrameworkId primaryTargetFrameworkId) =>
@@ -144,11 +141,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		{
 			ShellLocks.AssertWriteAccessAllowed();
 			if (!AssemblyReferenceManager.ProcessDiff(dataDiff)) return;
-			NotifyModuleChange();
-		}
-
-		private void NotifyModuleChange()
-		{
 			var changeBuilder = new PsiModuleChangeBuilder();
 			changeBuilder.AddModuleChange(this, PsiModuleChange.ChangeType.Modified);
 			// TODO: get rid of this queuing?

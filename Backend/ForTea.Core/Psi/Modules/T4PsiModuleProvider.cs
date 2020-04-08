@@ -179,6 +179,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				PrimaryTargetFrameworkId
 			);
 			_modules[projectFile] = new ModuleWrapper(psiModule, lifetimeDefinition);
+			psiModule.AddBaseReferences();
 			changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added);
 			changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Added);
 
