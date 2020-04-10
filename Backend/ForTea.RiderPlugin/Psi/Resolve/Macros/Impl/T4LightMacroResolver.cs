@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
-using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.MSBuild;
@@ -9,20 +7,17 @@ using JetBrains.ProjectModel.Properties;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 
-namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
+namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl
 {
 	[SolutionComponent]
-	public class T4MacroResolver : T4MacroResolverBase
+	public class T4LightMacroResolver : IT4LightMacroResolver
 	{
 		[NotNull]
-		protected ISolution Solution { get; }
+		private ISolution Solution { get; }
 
-		public T4MacroResolver([NotNull] ISolution solution) => Solution = solution;
+		public T4LightMacroResolver([NotNull] ISolution solution) => Solution = solution;
 
-		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(IList<string> macros,
-			IProjectFile file) => EmptyDictionary<string, string>.Instance;
-
-		protected override Dictionary<string, string> ResolveAllLightMacrosInternal(IProjectFile file)
+		public virtual Dictionary<string, string> ResolveAllLightMacros(IProjectFile file)
 		{
 			var result = new Dictionary<string, string>(CaseInsensitiveComparison.Comparer);
 			AddBasicMacros(result);
@@ -75,34 +70,6 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			result.Add("SolutionDir", Solution.SolutionDirectory.FullPathWithTrailingPathSeparator());
 			result.Add("SolutionName", Solution.Name);
 			result.Add("SolutionPath", Solution.SolutionFilePath.FullPathWithTrailingPathSeparator());
-		}
-
-		private static ISet<string> UnsupportedMacros { get; } =
-			new JetHashSet<string>(CaseInsensitiveComparison.Comparer)
-			{
-				"DevEnvDir",
-				"FrameworkDir",
-				"FrameworkSDKDir",
-				"FrameworkVersion",
-				"FxCopDir",
-				"PlatformShortName",
-				"ProjectExt",
-				"RemoteMachine",
-				"SolutionExt",
-				"TargetFileName",
-				"TargetName",
-				"TargetPath",
-				"VCInstallDir",
-				"VSInstallDir",
-				"WebDeployPath",
-				"WebDeployRoot"
-			};
-
-		public override bool IsSupported(IT4Macro macro)
-		{
-			string value = macro.RawAttributeValue?.GetText();
-			if (value == null) return true;
-			return !UnsupportedMacros.Contains(value);
 		}
 	}
 }

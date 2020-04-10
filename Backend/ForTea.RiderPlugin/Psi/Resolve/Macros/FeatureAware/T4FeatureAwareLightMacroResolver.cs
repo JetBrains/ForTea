@@ -1,12 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.Application.Components;
-using JetBrains.Platform.MsBuildHost.ProjectModel;
+using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.ProjectsHost;
-using JetBrains.ProjectModel.ProjectsHost.MsBuild;
-using JetBrains.ProjectModel.ProjectsHost.SolutionHost;
 using JetBrains.ReSharper.Host.Features.Processes;
 using JetBrains.ReSharper.Host.Features.Toolset.Detecting;
 using JetBrains.Util;
@@ -14,7 +10,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 {
 	[SolutionComponent]
-	public sealed class T4FeatureAwareMacroResolver : T4MacroResolver
+	public sealed class T4FeatureAwareLightMacroResolver : T4LightMacroResolver
 	{
 		[NotNull]
 		private IBuildToolWellKnownPropertiesStore MsBuildProperties { get; }
@@ -25,50 +21,21 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 		[NotNull]
 		private RiderProcessStartInfoEnvironment Environment { get; }
 
-		[NotNull]
-		private ILogger Logger { get; }
-
-		public T4FeatureAwareMacroResolver(
+		public T4FeatureAwareLightMacroResolver(
 			[NotNull] ISolution solution,
 			[NotNull] ISolutionToolset solutionToolset,
 			[NotNull] IBuildToolWellKnownPropertiesStore msBuildProperties,
-			[NotNull] RiderProcessStartInfoEnvironment environment,
-			[NotNull] ILogger logger
+			[NotNull] RiderProcessStartInfoEnvironment environment
 		) : base(solution)
 		{
-			MsBuildProperties = msBuildProperties;
 			SolutionToolset = solutionToolset;
+			MsBuildProperties = msBuildProperties;
 			Environment = environment;
-			Logger = logger;
 		}
 
-		protected override IReadOnlyDictionary<string, string> ResolveOnlyHeavyMacros(
-			IList<string> heavyMacros,
-			IProjectFile file
-		)
+		public override Dictionary<string, string> ResolveAllLightMacros(IProjectFile file)
 		{
-			Logger.Verbose("Resolving {0} heavy (msbuild) macros", heavyMacros.Count);
-			var project = file.GetProject();
-			var mark = project?.GetProjectMark();
-			if (mark == null) return EmptyDictionary<string, string>.Instance;
-			var projectsHostContainer = Solution.ProjectsHostContainer();
-			var msBuildSessionHolder = projectsHostContainer.GetComponent<MsBuildSessionHolder>();
-			var msBuildSession = msBuildSessionHolder.Session;
-			var result = new Dictionary<string, string>();
-			var currentTargetFrameworkId = project.GetCurrentTargetFrameworkId();
-			foreach (string heavyMacro in heavyMacros)
-			{
-				string value = msBuildSession.GetProjectProperty(mark, heavyMacro, currentTargetFrameworkId);
-				if (value == null) continue;
-				result.Add(heavyMacro, value);
-			}
-
-			return result;
-		}
-
-		protected override Dictionary<string, string> ResolveAllLightMacrosInternal(IProjectFile file)
-		{
-			var result = base.ResolveAllLightMacrosInternal(file);
+			var result = base.ResolveAllLightMacros(file);
 			AddMsBuildMacros(result);
 			AddPlatformMacros(result);
 			return result;

@@ -1,5 +1,4 @@
 using GammaJul.ForTea.Core.Parsing.Ranges;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
@@ -7,6 +6,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -104,7 +104,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		{
 			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile();
 			if (projectFile == null) return "";
-			var resolver = File.GetSolution().GetComponent<IT4MacroResolver>();
+			var resolver = File.GetSolution().GetComponent<IT4LightMacroResolver>();
 			var macros = resolver.ResolveAllLightMacros(projectFile);
 			return macros.AggregateString(",\n", (builder, pair) => builder
 				.Append("{\"")
