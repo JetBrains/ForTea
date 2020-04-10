@@ -6,16 +6,12 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
-using JetBrains.Util.dataStructures;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
 	[SolutionComponent]
 	public sealed class T4FileDependencyInvalidator
 	{
-		[NotNull]
-		private ISolution Solution { get; }
-
 		[NotNull, ItemNotNull]
 		private ISet<IPsiSourceFile> IndirectDependencies { get; } = new HashSet<IPsiSourceFile>();
 
@@ -25,19 +21,12 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		/// </summary>
 		private T4CommitStage CommitStage { get; set; }
 
-		[NotNull]
-		private IPsiServices PsiServices { get; }
-
 		public T4FileDependencyInvalidator(
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
-			[NotNull] IPsiServices services,
-			[NotNull] ISolution solution,
-			[NotNull] IPsiServices psiServices
+			[NotNull] IPsiServices services
 		)
 		{
-			Solution = solution;
-			PsiServices = psiServices;
 			services.Files.ObserveAfterCommit(lifetime, () =>
 			{
 				if (CommitStage == T4CommitStage.DependencyInvalidation) return;
@@ -62,18 +51,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 					CommitStage = T4CommitStage.UserChangeApplication;
 				}
 			});
-			notifier.OnFilesIndirectlyAffected += paths =>
+			notifier.OnFilesIndirectlyAffected += files =>
 			{
 				if (CommitStage == T4CommitStage.DependencyInvalidation) return;
 				// We want all files that were included before the update
 				// and all the files that have become included now
 				// to be updated, so we'll mark them as dirty later
-				IndirectDependencies.AddRange(paths
-					.Distinct()
-					.SelectMany(Solution.FindProjectItemsByLocation)
-					.OfType<IProjectFile>()
-					.Select(PsiServices.Modules.GetPsiSourceFilesFor)
-					.SelectMany(sourceFiles => sourceFiles.AsEnumerable()));
+				IndirectDependencies.AddRange(files);
 			};
 		}
 	}
