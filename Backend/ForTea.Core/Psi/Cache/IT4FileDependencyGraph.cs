@@ -1,5 +1,5 @@
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
 {
@@ -14,6 +14,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		/// </summary>
 		/// TODO: cache root?
 		[NotNull]
-		IProjectFile FindBestRoot([NotNull] IProjectFile file);
+		IPsiSourceFile FindBestRoot([NotNull] IPsiSourceFile file);
 	}
 }

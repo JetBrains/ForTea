@@ -1,18 +1,21 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Utils;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
+	[SolutionComponent]
 	public sealed class T4GraphSinkSearcher
 	{
 		[NotNull]
-		private IDictionary<FileSystemPath, T4FileDependencyData> Graph { get; }
+		private IT4PsiFileSelector Selector { get; }
 
-		public T4GraphSinkSearcher([NotNull] IDictionary<FileSystemPath, T4FileDependencyData> graph) =>
-			Graph = graph;
+		public T4GraphSinkSearcher([NotNull] IT4PsiFileSelector selector) => Selector = selector;
 
 		/// <summary>
 		/// Perform a breadth-first search for a sink.
@@ -24,23 +27,27 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		/// returns source.
 		/// </summary>
 		[NotNull]
-		public FileSystemPath FindClosestSink([NotNull] FileSystemPath source)
+		public IPsiSourceFile FindClosestSink(
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] IPsiSourceFile source
+		)
 		{
 			var guard = new T4IncludeGuard();
-			guard.StartProcessing(source);
-			ISet<FileSystemPath> currentLayer = new JetHashSet<FileSystemPath>(new[] {source});
+			guard.StartProcessing(source.GetLocation());
+			ISet<IPsiSourceFile> currentLayer = new JetHashSet<IPsiSourceFile>(new[] {source});
 			while (!currentLayer.IsEmpty())
 			{
-				var currentLayerSink = TrySelectSink(currentLayer);
+				var currentLayerSink = TrySelectSink(provider, currentLayer);
 				if (currentLayerSink != null) return currentLayerSink;
 				var previousLayer = currentLayer;
 				currentLayer = previousLayer
-					.SelectNotNull(it => Graph.TryGetValue(it)?.Paths)
+					.SelectNotNull(file => provider(file)?.Includers
+						.Select(path => Selector.FindMostSuitableFile(path, file)))
 					.SelectMany(it => it)
 					.Where(path =>
 					{
-						bool canProcess = guard.CanProcess(path);
-						if (canProcess) guard.StartProcessing(path);
+						bool canProcess = guard.CanProcess(path.GetLocation());
+						if (canProcess) guard.StartProcessing(path.GetLocation());
 						return canProcess;
 					}).AsSet();
 			}
@@ -52,10 +59,15 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		}
 
 		[CanBeNull]
-		private FileSystemPath TrySelectSink([NotNull] ISet<FileSystemPath> candidates) =>
-			candidates.Where(IsSink).OrderBy(path => path.Name).FirstOrDefault();
+		private IPsiSourceFile TrySelectSink(
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] ISet<IPsiSourceFile> candidates
+		) =>
+			candidates.Where(file => IsSink(provider, file)).OrderBy(path => path.Name).FirstOrDefault();
 
-		private bool IsSink([NotNull] FileSystemPath vertex) =>
-			Graph.TryGetValue(vertex)?.Paths.IsEmpty() == true;
+		private bool IsSink(
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] IPsiSourceFile vertex
+		) => provider(vertex)?.Includers.IsEmpty() == true;
 	}
 }

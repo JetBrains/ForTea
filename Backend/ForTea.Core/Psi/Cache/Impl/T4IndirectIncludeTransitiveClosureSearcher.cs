@@ -1,69 +1,84 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.Util;
+using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
+	[SolutionComponent]
 	public sealed class T4IndirectIncludeTransitiveClosureSearcher
 	{
 		[NotNull]
-		private IDictionary<FileSystemPath, T4FileDependencyData> IncluderToIncludes { get; }
+		private IT4PsiFileSelector Selector { get; }
 
-		[NotNull]
-		private IDictionary<FileSystemPath, T4FileDependencyData> IncludeToIncluders { get; }
-
-		public T4IndirectIncludeTransitiveClosureSearcher(
-			[NotNull] IDictionary<FileSystemPath, T4FileDependencyData> includerToIncludes,
-			[NotNull] IDictionary<FileSystemPath, T4FileDependencyData> includeToIncluders
-		)
-		{
-			IncluderToIncludes = includerToIncludes;
-			IncludeToIncluders = includeToIncluders;
-		}
+		public T4IndirectIncludeTransitiveClosureSearcher([NotNull] IT4PsiFileSelector selector) => Selector = selector;
 
 		[NotNull, ItemNotNull]
-		public IEnumerable<FileSystemPath> FindClosure([NotNull] FileSystemPath path) =>
-			FindAllIncludes(FindAllIncluders(path));
+		public IEnumerable<IPsiSourceFile> FindClosure(
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] IPsiSourceFile file
+		) => FindAllIncludes(provider, FindAllIncluders(provider, file));
 
 		/// <summary>
 		/// Performs DFS to collect all the files that include the current one,
 		/// avoiding loops in includes if necessary
 		/// </summary>
 		[NotNull, ItemNotNull]
-		private IEnumerable<FileSystemPath> FindAllIncluders([NotNull] FileSystemPath path)
+		private IEnumerable<IPsiSourceFile> FindAllIncluders(
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] IPsiSourceFile file
+		)
 		{
-			var result = new JetHashSet<FileSystemPath>();
-			FindAllChildren(path, IncludeToIncluders, result);
+			var result = new JetHashSet<IPsiSourceFile>();
+			FindAllParents(file, provider, result);
 			return result;
 		}
 
 		[NotNull, ItemNotNull]
-		private IEnumerable<FileSystemPath> FindAllIncludes(
-			[NotNull, ItemNotNull] IEnumerable<FileSystemPath> includers
+		private IEnumerable<IPsiSourceFile> FindAllIncludes(
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> includers
 		)
 		{
-			var result = new JetHashSet<FileSystemPath>();
+			var result = new JetHashSet<IPsiSourceFile>();
 			foreach (var includer in includers)
 			{
-				FindAllChildren(includer, IncluderToIncludes, result);
+				FindAllChildren(includer, provider, result);
 			}
 
 			return result;
 		}
 
-		private static void FindAllChildren(
-			[NotNull] FileSystemPath path,
-			[NotNull] IDictionary<FileSystemPath, T4FileDependencyData> graph,
-			[NotNull, ItemNotNull] ISet<FileSystemPath> destination
+		private void FindAllChildren(
+			[NotNull] IPsiSourceFile file,
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull, ItemNotNull] ISet<IPsiSourceFile> destination
 		)
 		{
-			if (destination.Contains(path)) return;
-			destination.Add(path);
-			var data = graph.TryGetValue(path);
+			if (destination.Contains(file)) return;
+			destination.Add(file);
+			var data = provider(file);
 			if (data == null) return;
-			foreach (var child in data.Paths)
+			foreach (var child in data.Includes)
 			{
-				FindAllChildren(child, graph, destination);
+				FindAllChildren(Selector.FindMostSuitableFile(child, file), provider, destination);
+			}
+		}
+
+		private void FindAllParents(
+			[NotNull] IPsiSourceFile file,
+			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull, ItemNotNull] ISet<IPsiSourceFile> destination
+		)
+		{
+			if (destination.Contains(file)) return;
+			destination.Add(file);
+			var data = provider(file);
+			if (data == null) return;
+			foreach (var parent in data.Includers)
+			{
+				FindAllParents(Selector.FindMostSuitableFile(parent, file), provider, destination);
 			}
 		}
 	}
