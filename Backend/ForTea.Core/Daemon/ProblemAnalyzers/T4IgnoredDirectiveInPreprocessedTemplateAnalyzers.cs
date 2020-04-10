@@ -15,10 +15,9 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		protected override void Run(TDirective element, ElementProblemAnalyzerData data, IHighlightingConsumer consumer)
 		{
 			var sourceFile = element.GetSourceFile().NotNull();
-			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var solution = sourceFile.GetSolution();
 			var templateKindProvider = solution.GetComponent<IT4RootTemplateKindProvider>();
-			if (!templateKindProvider.IsRootPreprocessedTemplate(projectFile)) return;
+			if (!templateKindProvider.IsRootPreprocessedTemplate(sourceFile)) return;
 			consumer.AddHighlighting(new IgnoredDirectiveWarning(element));
 		}
 	}

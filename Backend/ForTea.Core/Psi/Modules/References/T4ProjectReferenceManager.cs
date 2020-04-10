@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 
@@ -29,7 +30,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		private IT4TemplateKindProvider TemplateKindProvider { get; }
 
 		[NotNull]
-		private IProjectFile ProjectFile { get; }
+		private IPsiSourceFile SourceFile { get; }
 
 		[NotNull]
 		private ISolution Solution { get; }
@@ -39,20 +40,20 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		{
 			get
 			{
-				var root = Graph.FindBestRoot(ProjectFile);
+				var root = Graph.FindBestRoot(SourceFile);
 				if (!TemplateKindProvider.IsPreprocessedTemplate(root)) return null;
 				return root.GetProject();
 			}
 		}
 
 		public T4ProjectReferenceManager(
-			[NotNull] IProjectFile projectFile,
+			[NotNull] IPsiSourceFile sourceFile,
 			[NotNull] ISolution solution
 		)
 		{
 			Graph = solution.GetComponent<IT4FileDependencyGraph>();
 			TemplateKindProvider = solution.GetComponent<IT4TemplateKindProvider>();
-			ProjectFile = projectFile;
+			SourceFile = sourceFile;
 			Solution = solution;
 		}
 

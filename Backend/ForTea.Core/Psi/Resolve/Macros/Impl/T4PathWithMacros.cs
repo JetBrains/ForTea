@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GammaJul.ForTea.Core.Psi.OutsideSolution;
+using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -38,7 +38,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4PathWithMacros>();
 
 		[NotNull]
-		private T4OutsideSolutionSourceFileManager OutsideSolutionManager { get; }
+		private IT4PsiFileSelector Selector { get; }
 
 		public T4PathWithMacros(
 			[CanBeNull] string rawPath,
@@ -53,22 +53,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Solution = solution ?? SourceFile.GetSolution();
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
 			Environment = Solution.GetComponent<IT4Environment>();
-			OutsideSolutionManager = Solution.GetComponent<T4OutsideSolutionSourceFileManager>();
+			Selector = Solution.GetComponent<IT4PsiFileSelector>();
 		}
 
-		public IPsiSourceFile Resolve()
-		{
-			var path = ResolvePath();
-			if (path.IsEmpty) return null;
-			var solutionSourceFile = Solution
-				.FindProjectItemsByLocation(path)
-				.OfType<IProjectFile>()
-				.SingleItem()?.ToSourceFile();
-			var file = solutionSourceFile;
-			if (file != null) return file;
-			if (path.ExistsFile) return OutsideSolutionManager.GetOrCreateSourceFile(path);
-			return null;
-		}
+		public IPsiSourceFile Resolve() => Selector.FindMostSuitableFile(ResolvePath(), SourceFile);
 
 		public FileSystemPath ResolvePath()
 		{

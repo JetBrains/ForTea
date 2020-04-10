@@ -5,7 +5,6 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 {
@@ -34,8 +33,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		)
 		{
 			var rootTemplateKindProvider = Solution.GetComponent<IT4RootTemplateKindProvider>();
-			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile().NotNull();
-			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(projectFile))
+			var sourceFile = File.PhysicalPsiSourceFile.NotNull();
+			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(sourceFile))
 				return new T4CSharpPreprocessedCodeBehindIntermediateConverter(intermediateResult, File);
 			return new T4CSharpExecutableCodeBehindIntermediateConverter(intermediateResult, File);
 		}
