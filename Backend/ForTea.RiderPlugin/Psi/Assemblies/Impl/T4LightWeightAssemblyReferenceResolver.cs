@@ -1,5 +1,5 @@
 using System;
-using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
+using GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.Util;
@@ -7,9 +7,9 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.Psi.Assemblies.Impl
 {
 	[SolutionComponent]
-	public sealed class T4LightWeightAssemblyReferenceResolver : IT4LightWeightAssemblyReferenceResolver
+	public sealed class T4LightWeightAssemblyReferenceResolver : T4BasicLightWeightAssemblyReferenceResolver
 	{
-		public FileSystemPath TryResolve(IProjectFile file, string assemblyName)
+		public override FileSystemPath TryResolve(IProjectFile file, string assemblyName)
 		{
 			try
 			{
