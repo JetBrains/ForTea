@@ -20,7 +20,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		{
 			((IT4TreeNode) macroParam.Dollar).Accept(this);
 			((IT4TreeNode) macroParam.LeftParenthesis).Accept(this);
-			((IT4TreeNode) macroParam.RightParenthesis).Accept(this);
+			((IT4TreeNode) macroParam.RightParenthesis)?.Accept(this);
 			var value = macroParam.RawAttributeValue;
 			if (value == null) return;
 			var range = value.GetDocumentRange();
