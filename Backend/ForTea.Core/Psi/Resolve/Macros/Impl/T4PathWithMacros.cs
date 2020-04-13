@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -18,8 +17,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 
 		private string RawPath { get; }
 
-		[NotNull]
-		private IPsiSourceFile SourceFile { get; }
+		public IPsiSourceFile SourceFile { get; }
 
 		// Source file might have no corresponding project file;
 		// This is the most suitable project file in that case
@@ -29,16 +27,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		private IT4MacroResolver Resolver { get; }
 
 		[NotNull]
-		private IT4Environment Environment { get; }
-
-		[NotNull]
 		private ISolution Solution { get; }
 
 		[NotNull]
 		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4PathWithMacros>();
-
-		[NotNull]
-		private IT4PsiFileSelector Selector { get; }
 
 		public T4PathWithMacros(
 			[CanBeNull] string rawPath,
@@ -51,14 +43,30 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			SourceFile = file;
 			ProjectFile = projectFile;
 			Solution = solution ?? SourceFile.GetSolution();
+			ResolvedString = Lazy.Of(() =>
+			{
+				if (string.IsNullOrEmpty(RawPath) || !ContainsMacros) return RawPath;
+				if (projectFile == null)
+				{
+					Logger.Warn("Could not find any project file for macro resolution");
+					return RawPath;
+				}
+
+				var macroValues = Resolver.ResolveHeavyMacros(RawMacros, ProjectFile);
+				string result = Environment.ExpandEnvironmentVariables(RawPath);
+				return MacroRegex.Replace(result, match =>
+				{
+					var group = match.Groups[1];
+					string macro = @group.Value;
+					if (!@group.Success) return macro;
+					if (!macroValues.TryGetValue(macro, out string value)) return macro;
+					return value;
+				});
+			}, true);
 			Resolver = Solution.GetComponent<IT4MacroResolver>();
-			Environment = Solution.GetComponent<IT4Environment>();
-			Selector = Solution.GetComponent<IT4PsiFileSelector>();
 		}
 
-		public IPsiSourceFile Resolve() => Selector.FindMostSuitableFile(ResolvePath(), SourceFile);
-
-		public FileSystemPath ResolvePath()
+		public FileSystemPath TryResolveAbsolutePath()
 		{
 			string expanded = ResolveString();
 
@@ -70,34 +78,13 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			var asRelativePath = SourceFile.GetLocation().Directory.TryCombine(expanded);
 			if (asRelativePath.IsAbsolute && asRelativePath.ExistsFile) return asRelativePath;
 
-			// search in global include paths
-			var asGlobalInclude = Environment.IncludePaths
-				.Select(includePath => includePath.Combine(expanded))
-				.FirstOrDefault(resultPath => resultPath.ExistsFile);
-
-			return asGlobalInclude ?? FileSystemPath.Empty;
+			return null;
 		}
 
-		public string ResolveString()
-		{
-			if (string.IsNullOrEmpty(RawPath) || !ContainsMacros) return RawPath;
-			if (ProjectFile == null)
-			{
-				Logger.Warn("Could not find any project file for macro resolution");
-				return RawPath;
-			}
+		[NotNull, ItemNotNull]
+		private Lazy<string> ResolvedString { get; }
 
-			var macroValues = Resolver.ResolveHeavyMacros(RawMacros, ProjectFile);
-			string result = System.Environment.ExpandEnvironmentVariables(RawPath);
-			return MacroRegex.Replace(result, match =>
-			{
-				var group = match.Groups[1];
-				string macro = group.Value;
-				if (!group.Success) return macro;
-				if (!macroValues.TryGetValue(macro, out string value)) return macro;
-				return value;
-			});
-		}
+		public string ResolveString() => ResolvedString.Value;
 
 		private bool ContainsMacros
 		{

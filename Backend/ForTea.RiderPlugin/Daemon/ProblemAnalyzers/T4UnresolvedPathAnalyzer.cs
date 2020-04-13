@@ -32,10 +32,13 @@ namespace JetBrains.ForTea.RiderPlugin.Daemon.ProblemAnalyzers
 		{
 			var attribute = DirectiveAttributeNavigator.GetByValue(element);
 			if (!(DirectiveNavigator.GetByAttribute(attribute) is IT4AssemblyDirective assemblyDirective)) return;
-			var project = ProjectReferenceResolver.TryResolveProject(assemblyDirective.Path.ResolvePath());
-			if (project != null) return;
 			var path = AssemblyReferenceResolver.Resolve(assemblyDirective);
-			if (path != null && path.ExistsFile) return;
+			if (path != null)
+			{
+				if (ProjectReferenceResolver.TryResolveProject(path) != null) return;
+				if (path.ExistsFile) return;
+			}
+
 			var pathNode = assemblyDirective.GetAttributeValueToken(T4DirectiveInfoManager.Assembly.NameAttribute.Name);
 			if (pathNode == null) return;
 			consumer.AddHighlighting(new UnresolvedAssemblyError(pathNode));

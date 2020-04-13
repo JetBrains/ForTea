@@ -27,19 +27,14 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 		public IT4PathWithMacros Path => CreateIncludePath(RawPath);
 
 		[NotNull]
-		public IT4PathWithMacros GetPathForParsing([NotNull] IPsiSourceFile file)
-		{
-			string rawPath = RawPath;
-			if (rawPath == null) return new T4EmptyPathWithMacros(ResolutionContext);
-			return new T4PathWithMacros(rawPath, file, ResolutionContext);
-		}
+		public IT4PathWithMacros GetPathForParsing([NotNull] IPsiSourceFile file) =>
+			new T4PathWithMacros(RawPath ?? "", file, ResolutionContext);
 
 		[NotNull]
 		private IT4PathWithMacros CreateIncludePath([CanBeNull] string includeFileName)
 		{
-			if (includeFileName == null) return new T4EmptyPathWithMacros(ResolutionContext);
 			var sourceFile = this.GetParentOfType<IT4FileLikeNode>().NotNull().LogicalPsiSourceFile;
-			return new T4PathWithMacros(includeFileName, sourceFile, ResolutionContext);
+			return new T4PathWithMacros(includeFileName ?? "", sourceFile, ResolutionContext);
 		}
 
 		public IT4IncludedFile IncludedFile => NextSibling as IT4IncludedFile;

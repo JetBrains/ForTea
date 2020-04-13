@@ -1,4 +1,3 @@
-using System;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -8,16 +7,19 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 {
 	public interface IT4PathWithMacros
 	{
+		/// <note>
+		/// Implementation caches that value
+		/// </note>
 		[NotNull]
 		string ResolveString();
 
-		[NotNull, Obsolete("Consider using explicit assembly/file resolver")]
-		FileSystemPath ResolvePath();
-
 		[CanBeNull]
-		IPsiSourceFile Resolve();
+		FileSystemPath TryResolveAbsolutePath();
 
 		[NotNull]
 		IProjectFile ProjectFile { get; }
+
+		[NotNull]
+		IPsiSourceFile SourceFile { get; }
 	}
 }

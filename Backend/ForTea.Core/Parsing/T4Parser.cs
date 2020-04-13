@@ -4,10 +4,12 @@ using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Psi.Resolve;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -28,6 +30,9 @@ namespace GammaJul.ForTea.Core.Parsing
 
 		[NotNull]
 		private T4MacroResolveContext Context { get; }
+
+		[CanBeNull]
+		private IT4IncludeResolver IncludeResolver { get; }
 
 		[NotNull]
 		private IT4LexerSelector LexerSelector { get; }
@@ -53,6 +58,7 @@ namespace GammaJul.ForTea.Core.Parsing
 			LexerSelector = lexerSelector;
 			Context = context ?? new T4MacroResolveContext();
 			SetLexer(new T4FilteringLexer(lexer));
+			IncludeResolver = physicalSourceFile?.GetSolution().GetComponent<IT4IncludeResolver>();
 		}
 
 		[NotNull]
@@ -146,9 +152,13 @@ namespace GammaJul.ForTea.Core.Parsing
 			var sourceFile = LogicalSourceFile;
 			if (sourceFile == null) return null;
 			var pathWithMacros = directive.GetPathForParsing(sourceFile);
-			var path = pathWithMacros.ResolvePath();
-			var includeFile =
-				T4ParsingContextHelper.ExecuteGuarded(path, directive.Once, () => pathWithMacros.Resolve());
+			var path = IncludeResolver?.ResolvePath(pathWithMacros);
+			if (path == null) return null;
+			var includeFile = T4ParsingContextHelper.ExecuteGuarded(
+				path,
+				directive.Once,
+				() => IncludeResolver?.Resolve(pathWithMacros)
+			);
 			if (includeFile == null) return null;
 			return BuildIncludedT4Tree(includeFile);
 		}

@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -15,6 +17,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 	{
 		[NotNull]
 		private T4IncludeGuard Guard { get; }
+
+		[NotNull]
+		private IT4IncludeResolver IncludeResolver { get; }
 
 		[NotNull, ItemNotNull]
 		private List<HighlightingInfo> MyHighlightings { get; } = new List<HighlightingInfo>();
@@ -30,6 +35,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			Guard = new T4IncludeGuard();
 			Guard.StartProcessing(initialFile.GetLocation());
+			IncludeResolver = initialFile.GetSolution().GetComponent<IT4IncludeResolver>();
 		}
 
 		public bool InteriorShouldBeProcessed(ITreeNode element) => true;
@@ -78,7 +84,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ProcessInclude([NotNull] IT4IncludeDirective include)
 		{
-			var sourceFile = include.Path.Resolve();
+			var sourceFile = IncludeResolver.Resolve(include.Path);
 			if (sourceFile == null)
 			{
 				ReportUnresolvedPath(include);

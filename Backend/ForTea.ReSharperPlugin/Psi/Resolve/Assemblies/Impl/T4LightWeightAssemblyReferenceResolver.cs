@@ -1,4 +1,5 @@
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
@@ -16,12 +17,13 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		public T4LightWeightAssemblyReferenceResolver([NotNull] T4LightWeightAssemblyResolutionCache cache) =>
 			Cache = cache;
 
-		public override FileSystemPath TryResolve(IProjectFile file, string assemblyName)
+		public override FileSystemPath TryResolve(IT4PathWithMacros path)
 		{
-			FileSystemPath path = null;
-			Cache.Map.TryGetValue(file.ToSourceFile().NotNull())?.ResolvedAssemblies
-				.TryGetValue(assemblyName, out path);
-			return path;
+			string assemblyName = path.ResolveString();
+			FileSystemPath result = null;
+			Cache.Map.TryGetValue(path.ProjectFile.ToSourceFile().NotNull())?.ResolvedAssemblies
+				.TryGetValue(assemblyName, out result);
+			return result;
 		}
 	}
 }

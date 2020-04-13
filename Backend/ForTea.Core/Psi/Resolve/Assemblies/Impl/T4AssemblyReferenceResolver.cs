@@ -51,22 +51,13 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		}
 
 		public FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros) =>
-			ResolveAsAbsolutePath(pathWithMacros)
-			?? ResolveAsLightReference(pathWithMacros)
+			ResolveAsLightReference(pathWithMacros)
 			?? ResolveAsAssemblyName(pathWithMacros)
 			?? ResolveAsAssemblyFile(pathWithMacros);
 
 		[CanBeNull]
-		private static FileSystemPath ResolveAsAbsolutePath([NotNull] IT4PathWithMacros pathWithMacros)
-		{
-			var path = pathWithMacros.ResolvePath();
-			if (path.IsAbsolute) return path;
-			return null;
-		}
-
-		[CanBeNull]
 		private FileSystemPath ResolveAsLightReference([NotNull] IT4PathWithMacros pathWithMacros) =>
-			LightWeightResolver.TryResolve(pathWithMacros.ProjectFile, pathWithMacros.ResolveString());
+			LightWeightResolver.TryResolve(pathWithMacros);
 
 		[CanBeNull]
 		private FileSystemPath ResolveAsAssemblyName([NotNull] IT4PathWithMacros pathWithMacros) =>

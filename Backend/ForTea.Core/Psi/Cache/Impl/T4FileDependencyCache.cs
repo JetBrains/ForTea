@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -29,6 +30,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		private IT4PsiFileSelector PsiFileSelector { get; }
 
+		[NotNull]
+		private IT4IncludeResolver IncludeResolver { get; }
+
 		public event Action<IEnumerable<IPsiSourceFile>> OnFilesIndirectlyAffected;
 
 		[CanBeNull]
@@ -39,12 +43,14 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			[NotNull] IPersistentIndexManager persistentIndexManager,
 			[NotNull] T4GraphSinkSearcher graphSinkSearcher,
 			[NotNull] T4IndirectIncludeTransitiveClosureSearcher transitiveClosureSearcher,
-			[NotNull] IT4PsiFileSelector psiFileSelector
+			[NotNull] IT4PsiFileSelector psiFileSelector,
+			[NotNull] IT4IncludeResolver includeResolver
 		) : base(lifetime, persistentIndexManager, T4FileDependencyDataMarshaller.Instance)
 		{
 			GraphSinkSearcher = graphSinkSearcher;
 			TransitiveClosureSearcher = transitiveClosureSearcher;
 			PsiFileSelector = psiFileSelector;
+			IncludeResolver = includeResolver;
 		}
 
 		public IPsiSourceFile FindBestRoot(IPsiSourceFile include) =>
@@ -57,7 +63,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		protected override T4IncludeData Build(IT4File file) => new T4IncludeData(file
 			.BlocksEnumerable
 			.OfType<IT4IncludeDirective>()
-			.Select(directive => directive.Path.ResolvePath())
+			.Select(directive => IncludeResolver.ResolvePath(directive.Path))
 			.Where(path => !path.IsEmpty)
 			.Distinct()
 			.ToList()
