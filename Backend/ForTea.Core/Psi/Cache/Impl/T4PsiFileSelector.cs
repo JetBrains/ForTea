@@ -17,7 +17,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		public T4PsiFileSelector([NotNull] T4OutsideSolutionSourceFileManager outsideSolutionManager) =>
 			OutsideSolutionManager = outsideSolutionManager;
 
-		[CanBeNull]
 		public IPsiSourceFile FindMostSuitableFile(FileSystemPath path, IPsiSourceFile requester)
 		{
 			var psf = PsiSourceFile(path, requester);

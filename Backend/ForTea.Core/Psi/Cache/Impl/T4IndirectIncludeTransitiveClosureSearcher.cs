@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -60,9 +61,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			destination.Add(file);
 			var data = provider(file);
 			if (data == null) return;
-			foreach (var child in data.Includes)
+			foreach (var sourceFile in data
+				.Includes
+				.Select(child => Selector.FindMostSuitableFile(child, file))
+				.Where(sourceFile => sourceFile != null)
+			)
 			{
-				FindAllChildren(Selector.FindMostSuitableFile(child, file), provider, destination);
+				FindAllChildren(sourceFile, provider, destination);
 			}
 		}
 
@@ -76,9 +81,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			destination.Add(file);
 			var data = provider(file);
 			if (data == null) return;
-			foreach (var parent in data.Includers)
+			foreach (var sourceFile in data
+				.Includers
+				.Select(child => Selector.FindMostSuitableFile(child, file))
+				.Where(sourceFile => sourceFile != null)
+			)
 			{
-				FindAllParents(Selector.FindMostSuitableFile(parent, file), provider, destination);
+				FindAllParents(sourceFile, provider, destination);
 			}
 		}
 	}

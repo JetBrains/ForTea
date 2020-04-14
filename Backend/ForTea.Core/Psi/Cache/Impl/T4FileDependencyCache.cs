@@ -86,6 +86,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			foreach (var include in includes)
 			{
 				var includedSourceFile = PsiFileSelector.FindMostSuitableFile(include, sourceFile);
+				if (includedSourceFile == null) continue;
 				var existingData = Map.TryGetValue(includedSourceFile);
 				if (existingData == null)
 				{
