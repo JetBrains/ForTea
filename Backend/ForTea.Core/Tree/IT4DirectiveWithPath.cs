@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Tree
 {
@@ -10,6 +11,6 @@ namespace GammaJul.ForTea.Core.Tree
 		IProjectFile ResolutionContext { get; set; }
 
 		[NotNull]
-		IT4PathWithMacros Path { get; }
+		IT4PathWithMacros GetOrCreatePath([CanBeNull] IPsiSourceFile file = null);
 	}
 }

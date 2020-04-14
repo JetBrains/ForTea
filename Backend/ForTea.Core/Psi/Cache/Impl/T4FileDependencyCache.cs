@@ -63,7 +63,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		protected override T4IncludeData Build(IT4File file) => new T4IncludeData(file
 			.BlocksEnumerable
 			.OfType<IT4IncludeDirective>()
-			.Select(directive => IncludeResolver.ResolvePath(directive.Path))
+			.Select(directive => IncludeResolver.ResolvePath(directive.GetOrCreatePath()))
 			.Where(path => !path.IsEmpty)
 			.Distinct()
 			.ToList()

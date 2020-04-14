@@ -40,7 +40,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			IModuleReferenceResolveContext resolveContext
 		) => ResolveManager.Resolve(target, project, resolveContext);
 
-		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.Path);
+		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.GetOrCreatePath());
 
 		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{

@@ -147,11 +147,10 @@ namespace GammaJul.ForTea.Core.Parsing
 		}
 
 		[CanBeNull]
-		private CompositeElement ResolveIncludeDirective([NotNull] IncludeDirective directive)
+		private CompositeElement ResolveIncludeDirective([NotNull] IT4IncludeDirective directive)
 		{
-			var sourceFile = LogicalSourceFile;
-			if (sourceFile == null) return null;
-			var pathWithMacros = directive.GetPathForParsing(sourceFile);
+			if (LogicalSourceFile == null) return null;
+			var pathWithMacros = directive.GetOrCreatePath(LogicalSourceFile);
 			var path = IncludeResolver?.ResolvePath(pathWithMacros);
 			if (path == null) return null;
 			var includeFile = T4ParsingContextHelper.ExecuteGuarded(

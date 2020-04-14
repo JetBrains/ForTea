@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Util;
@@ -15,8 +14,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		private void HandleAssemblyDirective([NotNull] IT4AssemblyDirective directive)
 		{
 			// i.e. non-empty
-			if (!(directive.Path is T4PathWithMacros path)) return;
-			ReferencedAssemblies.Add(path);
+			var existingPath = directive.GetOrCreatePath();
+			if (!existingPath.ResolveString().IsNotEmpty()) return;
+			ReferencedAssemblies.Add(existingPath);
 		}
 
 		/// <summary>Computes a difference between this data and another one.</summary>

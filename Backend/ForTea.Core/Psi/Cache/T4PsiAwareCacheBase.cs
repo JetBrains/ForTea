@@ -14,8 +14,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	public abstract class T4PsiAwareCacheBase<TRequest, TResponse> : SimpleICache<TResponse> where TRequest : class
 	{
 		[NotNull]
-		public override string Version => "5";
-
+		public override string Version => "6";
 
 		protected T4PsiAwareCacheBase(
 			Lifetime lifetime,

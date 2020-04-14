@@ -24,7 +24,12 @@ namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 
 		protected override string Expand(IT4Macro macro)
 		{
-			var projectFile = macro.GetSourceFile().NotNull().ToProjectFile().NotNull();
+			var projectFile = macro
+				.GetParentOfType<IT4FileLikeNode>()
+				.NotNull()
+				.PhysicalPsiSourceFile
+				.ToProjectFile()
+				.NotNull();
 			string name = macro.RawAttributeValue?.GetText();
 			if (name == null) return null;
 			var macros = Resolver.ResolveHeavyMacros(new[] {name}, projectFile);

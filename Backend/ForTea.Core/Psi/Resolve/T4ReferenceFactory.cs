@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve
 		{
 			if (!element.Language.Is<T4Language>()) return ReferenceCollection.Empty;
 			if (!(element is IT4IncludeDirective directive)) return ReferenceCollection.Empty;
-			var path = IncludeResolver.ResolvePath(directive.Path);
+			var path = IncludeResolver.ResolvePath(directive.GetOrCreatePath());
 			if (path.IsEmpty) return ReferenceCollection.Empty;
 			var attribute = directive.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute);
 			if (attribute == null) return ReferenceCollection.Empty;
