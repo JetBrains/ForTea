@@ -43,5 +43,23 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			SourceFile = sourceFile;
 			ProjectFile = projectFile;
 		}
+
+		public override bool Equals(object obj) =>
+			ReferenceEquals(this, obj)
+			|| obj is T4ResolvedPath other
+			&& ResolvedPath == other.ResolvedPath
+			&& SourceFile.Equals(other.SourceFile)
+			&& Equals(ProjectFile, other.ProjectFile);
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int hashCode = ResolvedPath.GetHashCode();
+				hashCode = (hashCode * 397) ^ SourceFile.GetHashCode();
+				hashCode = (hashCode * 397) ^ (ProjectFile != null ? ProjectFile.GetHashCode() : 0);
+				return hashCode;
+			}
+		}
 	}
 }
