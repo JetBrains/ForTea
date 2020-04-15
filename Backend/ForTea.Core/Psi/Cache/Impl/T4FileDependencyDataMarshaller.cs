@@ -6,6 +6,8 @@ using JetBrains.Util.PersistentMap;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
+	/// Note that a marshaller for <see cref="T4ReversedFileDependencyData"/> does not exist.
+	/// That class is not intended to be persisted
 	public sealed class T4FileDependencyDataMarshaller : IUnsafeMarshaller<T4FileDependencyData>
 	{
 		private IUnsafeMarshaller<IList<FileSystemPath>> PathListMarshaller { get; } =
@@ -21,18 +23,11 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		public static T4FileDependencyDataMarshaller Instance { get; } = new T4FileDependencyDataMarshaller();
 
-		public void Marshal([NotNull] UnsafeWriter writer, [NotNull] T4FileDependencyData value)
-		{
+		public void Marshal([NotNull] UnsafeWriter writer, [NotNull] T4FileDependencyData value) =>
 			PathListMarshaller.Marshal(writer, value.Includes);
-			PathListMarshaller.Marshal(writer, value.Includers);
-		}
 
 		[NotNull]
-		public T4FileDependencyData Unmarshal([NotNull] UnsafeReader reader)
-		{
-			var includes = PathListMarshaller.Unmarshal(reader);
-			var includers = PathListMarshaller.Unmarshal(reader);
-			return new T4FileDependencyData(includes, includers);
-		}
+		public T4FileDependencyData Unmarshal([NotNull] UnsafeReader reader) =>
+			new T4FileDependencyData(PathListMarshaller.Unmarshal(reader));
 	}
 }

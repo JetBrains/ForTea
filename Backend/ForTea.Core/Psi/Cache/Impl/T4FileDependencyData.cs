@@ -9,16 +9,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull, ItemNotNull]
 		public IList<FileSystemPath> Includes { get; }
 
-		[NotNull]
-		public IList<FileSystemPath> Includers { get; }
-
-		public T4FileDependencyData(
-			[NotNull, ItemNotNull] IList<FileSystemPath> includes,
-			[NotNull] IList<FileSystemPath> includers
-		)
-		{
-			Includes = includes;
-			Includers = includers;
-		}
+		public T4FileDependencyData([NotNull, ItemNotNull] IList<FileSystemPath> includes) => Includes = includes;
 	}
 }

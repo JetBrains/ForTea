@@ -28,7 +28,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		/// </summary>
 		[NotNull]
 		public IPsiSourceFile FindClosestSink(
-			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> provider,
 			[NotNull] IPsiSourceFile source
 		)
 		{
@@ -60,13 +60,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		[CanBeNull]
 		private IPsiSourceFile TrySelectSink(
-			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> provider,
 			[NotNull] ISet<IPsiSourceFile> candidates
 		) =>
 			candidates.Where(file => IsSink(provider, file)).OrderBy(path => path.Name).FirstOrDefault();
 
 		private bool IsSink(
-			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> provider,
 			[NotNull] IPsiSourceFile vertex
 		) => provider(vertex)?.Includers.IsEmpty() == true;
 	}

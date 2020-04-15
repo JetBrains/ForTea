@@ -18,8 +18,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull, ItemNotNull]
 		public IEnumerable<IPsiSourceFile> FindClosure(
 			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> reversedProvider,
 			[NotNull] IPsiSourceFile file
-		) => FindAllIncludes(provider, FindAllIncluders(provider, file));
+		) => FindAllIncludes(provider, FindAllIncluders(reversedProvider, file));
 
 		/// <summary>
 		/// Performs DFS to collect all the files that include the current one,
@@ -27,12 +28,12 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		/// </summary>
 		[NotNull, ItemNotNull]
 		private IEnumerable<IPsiSourceFile> FindAllIncluders(
-			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> reversedProvider,
 			[NotNull] IPsiSourceFile file
 		)
 		{
 			var result = new JetHashSet<IPsiSourceFile>();
-			FindAllParents(file, provider, result);
+			FindAllParents(file, reversedProvider, result);
 			return result;
 		}
 
@@ -73,13 +74,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		private void FindAllParents(
 			[NotNull] IPsiSourceFile file,
-			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
+			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> reversedProvider,
 			[NotNull, ItemNotNull] ISet<IPsiSourceFile> destination
 		)
 		{
 			if (destination.Contains(file)) return;
 			destination.Add(file);
-			var data = provider(file);
+			var data = reversedProvider(file);
 			if (data == null) return;
 			foreach (var sourceFile in data
 				.Includers
@@ -87,7 +88,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				.Where(sourceFile => sourceFile != null)
 			)
 			{
-				FindAllParents(sourceFile, provider, destination);
+				FindAllParents(sourceFile, reversedProvider, destination);
 			}
 		}
 	}
