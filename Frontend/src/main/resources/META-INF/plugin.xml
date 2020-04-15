@@ -2,7 +2,7 @@
   <name>ForTea</name>
   <id>org.jetbrains.fortea</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
-  <description>Support for Microsoft T4 template language</description>
+  <description>Support for T4 (Text Template Transformation Toolkit) template language</description>
 
   <version>0.01</version>
   <idea-version since-build="191"/>

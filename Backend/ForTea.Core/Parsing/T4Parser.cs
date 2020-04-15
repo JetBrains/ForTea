@@ -15,6 +15,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Parsing
 {
@@ -145,6 +146,7 @@ namespace GammaJul.ForTea.Core.Parsing
 				macros.AddRange(directive.RawMacros);
 			}
 
+			if (macros.IsEmpty()) return;
 			var resolvedMacros = MacroResolver.ResolveHeavyMacros(macros, context);
 			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
 			{
