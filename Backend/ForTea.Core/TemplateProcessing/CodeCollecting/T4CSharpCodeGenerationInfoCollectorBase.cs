@@ -72,7 +72,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			AppendRemainingMessage(element);
 			if (!(element is IT4IncludeDirective include)) return;
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			var sourceFile = IncludeResolver.Resolve(include.GetOrCreatePath());
+			var sourceFile = IncludeResolver.Resolve(include.ResolvedPath);
 			if (sourceFile == null)
 			{
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
@@ -120,7 +120,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			string suffix = Result.State.ProduceBeforeEof();
 			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
-			Guard.TryEndProcessing(IncludeResolver.Resolve(includeDirectiveParam.GetOrCreatePath()).GetLocation());
+			Guard.TryEndProcessing(IncludeResolver.Resolve(includeDirectiveParam.ResolvedPath).GetLocation());
 			var intermediateResults = Results.Pop();
 			Result.Append(intermediateResults);
 		}

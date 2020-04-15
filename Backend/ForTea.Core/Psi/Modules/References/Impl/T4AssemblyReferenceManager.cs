@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
@@ -75,7 +74,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			Environment = Solution.GetComponent<IT4Environment>();
 		}
 
-		private bool TryRemoveReference(IT4PathWithMacros pathWithMacros)
+		private bool TryRemoveReference([NotNull] T4ResolvedPath pathWithMacros)
 		{
 			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
 			if (path == null) return false;
@@ -95,7 +94,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			return false;
 		}
 
-		private bool TryAddReference(IT4PathWithMacros pathWithMacros)
+		private bool TryAddReference([NotNull] T4ResolvedPath pathWithMacros)
 		{
 			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
 			if (path == null) return false;
@@ -128,11 +127,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			}
 		}
 
-		private void TryAddReference([NotNull] string name)
-		{
-			var path = new T4PathWithMacros(name, SourceFile, ProjectFile, Solution);
-			TryAddReference(path);
-		}
+		private void TryAddReference([NotNull] string name) =>
+			TryAddReference(new T4ResolvedPath(name, SourceFile, ProjectFile));
 
 		public bool ProcessDiff(T4DeclaredAssembliesDiff diff)
 		{

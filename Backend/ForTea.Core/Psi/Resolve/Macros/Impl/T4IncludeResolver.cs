@@ -22,21 +22,20 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Environment = environment;
 		}
 
-		public FileSystemPath ResolvePath(IT4PathWithMacros path)
+		public FileSystemPath ResolvePath(T4ResolvedPath path)
 		{
 			var absolute = path.TryResolveAbsolutePath();
 			if (absolute != null) return absolute;
 
-			string expanded = path.ResolveString();
 			// search in global include paths
 			var asGlobalInclude = Environment.IncludePaths
-				.Select(includePath => includePath.Combine(expanded))
+				.Select(includePath => includePath.Combine(path.ResolvedPath))
 				.FirstOrDefault(resultPath => resultPath.ExistsFile);
 
 			return asGlobalInclude ?? FileSystemPath.Empty;
 		}
 
-		public IPsiSourceFile Resolve(IT4PathWithMacros path) =>
+		public IPsiSourceFile Resolve(T4ResolvedPath path) =>
 			Selector.FindMostSuitableFile(ResolvePath(path), path.SourceFile);
 	}
 }

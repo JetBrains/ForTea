@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
@@ -7,6 +7,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 	public interface IT4LightWeightAssemblyReferenceResolver
 	{
 		[CanBeNull]
-		FileSystemPath TryResolve([NotNull] IT4PathWithMacros path);
+		FileSystemPath TryResolve([NotNull] T4ResolvedPath path);
 	}
 }

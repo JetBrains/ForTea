@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Lexing;
@@ -34,6 +35,9 @@ namespace GammaJul.ForTea.Core.Parsing
 		[CanBeNull]
 		private IT4IncludeResolver IncludeResolver { get; }
 
+		[CanBeNull]
+		private IT4MacroResolver MacroResolver { get; }
+
 		[NotNull]
 		private IT4LexerSelector LexerSelector { get; }
 
@@ -58,7 +62,9 @@ namespace GammaJul.ForTea.Core.Parsing
 			LexerSelector = lexerSelector;
 			Context = context ?? new T4MacroResolveContext();
 			SetLexer(new T4FilteringLexer(lexer));
-			IncludeResolver = physicalSourceFile?.GetSolution().GetComponent<IT4IncludeResolver>();
+			var solution = physicalSourceFile?.GetSolution();
+			IncludeResolver = solution?.GetComponent<IT4IncludeResolver>();
+			MacroResolver = solution?.GetComponent<IT4MacroResolver>();
 		}
 
 		[NotNull]
@@ -102,7 +108,7 @@ namespace GammaJul.ForTea.Core.Parsing
 						var file = (File) ParseFileInternal();
 						T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
 						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
-						SetUpResolveContexts(file);
+						ResolveMacros(file);
 						ResolveIncludes(file);
 						return file;
 					}
@@ -128,11 +134,21 @@ namespace GammaJul.ForTea.Core.Parsing
 			return HandleErrorInDirective(result, new UnexpectedToken("Missing directive name"));
 		}
 
-		private void SetUpResolveContexts([NotNull] IT4File file)
+		private void ResolveMacros([NotNull] IT4File file)
 		{
+			var context = Context.MostSuitableProjectFile;
+			var logicalSourceFile = LogicalSourceFile;
+			if (context == null || logicalSourceFile == null || MacroResolver == null) return;
+			var macros = new List<string>();
 			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
 			{
-				directive.ResolutionContext = Context.MostSuitableProjectFile;
+				macros.AddRange(directive.RawMacros);
+			}
+
+			var resolvedMacros = MacroResolver.ResolveHeavyMacros(macros, context);
+			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
+			{
+				directive.InitializeResolvedPath(resolvedMacros, logicalSourceFile, context);
 			}
 		}
 
@@ -150,7 +166,7 @@ namespace GammaJul.ForTea.Core.Parsing
 		private CompositeElement ResolveIncludeDirective([NotNull] IT4IncludeDirective directive)
 		{
 			if (LogicalSourceFile == null) return null;
-			var pathWithMacros = directive.GetOrCreatePath(LogicalSourceFile);
+			var pathWithMacros = directive.ResolvedPath;
 			var path = IncludeResolver?.ResolvePath(pathWithMacros);
 			if (path == null) return null;
 			var includeFile = T4ParsingContextHelper.ExecuteGuarded(

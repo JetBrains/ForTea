@@ -84,7 +84,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ProcessInclude([NotNull] IT4IncludeDirective include)
 		{
-			var sourceFile = IncludeResolver.Resolve(include.GetOrCreatePath());
+			var sourceFile = IncludeResolver.Resolve(include.ResolvedPath);
 			if (sourceFile == null)
 			{
 				ReportUnresolvedPath(include);
