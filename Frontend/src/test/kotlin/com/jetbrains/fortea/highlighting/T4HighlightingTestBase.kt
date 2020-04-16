@@ -21,9 +21,15 @@ abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
     dumpHighlightersTree(severity)
   }
 
+  @Deprecated("Dumping all highlighters causes flackiness", ReplaceWith("doTestErrors()"))
   fun doTestAll() = doTestWithMarkupModel {
     waitForDaemon()
     dumpHighlightersTree()
+  }
+
+  fun doTestErrors() = doTestWithMarkupModel {
+    waitForDaemon()
+    dumpHighlightersTree(HighlightSeverity.ERROR)
   }
 
   private fun doTestWithMarkupModel(testAction: EditorImpl.() -> Unit) =

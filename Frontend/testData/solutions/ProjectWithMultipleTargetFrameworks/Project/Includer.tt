@@ -1,0 +1,6 @@
+<#@ include file="Template.tt" #>
+<#+
+    public static void FunctionFromIncluder()
+    {
+    }
+#>
