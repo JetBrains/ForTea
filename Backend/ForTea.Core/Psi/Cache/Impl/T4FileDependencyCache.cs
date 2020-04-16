@@ -80,14 +80,25 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		private JetHashSet<IPsiSourceFile> FindIndirectIncludesTransitiveClosure([NotNull] IPsiSourceFile file) =>
 			TransitiveClosureSearcher.FindClosure(TryGetIncludes, TryGetIncluders, file);
 
-		protected override T4IncludeData Build(IT4File file) => new T4IncludeData(file
-			.GetThisAndChildrenOfType<IT4IncludeDirective>()
-			.Where(directive => directive.IsVisibleInDocument())
-			.Select(directive => IncludeResolver.ResolvePath(directive.ResolvedPath))
-			.Where(path => !path.IsEmpty)
-			.Distinct()
-			.ToList()
-		);
+		protected override T4IncludeData Build(IT4File file)
+		{
+			if (file.PhysicalPsiSourceFile?.IsBeingIndirectlyUpdated() == true)
+			{
+				// Since the contents of this file did not change,
+				// the list of its direct includes did not change either,
+				// so there's no point in doing anything here
+				return null;
+			}
+
+			return new T4IncludeData(file
+				.GetThisAndChildrenOfType<IT4IncludeDirective>()
+				.Where(directive => directive.IsVisibleInDocument())
+				.Select(directive => IncludeResolver.ResolvePath(directive.ResolvedPath))
+				.Where(path => !path.IsEmpty)
+				.Distinct()
+				.ToList()
+			);
+		}
 
 		[CanBeNull]
 		private IEnumerable<IPsiSourceFile> GetIncludes([NotNull] IPsiSourceFile sourceFile) => Map
@@ -97,6 +108,11 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		public override void Merge(IPsiSourceFile sourceFile, object builtPart)
 		{
+			if (builtPart == null) {
+				// Indirect dependency invalidation
+				RemoveFromDirty(sourceFile);
+				return;
+			}
 			var data = (T4IncludeData) builtPart.NotNull();
 
 			var oldTransitiveIncludes = FindIndirectIncludesTransitiveClosure(sourceFile);
@@ -111,7 +127,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				GetIncludes(sourceFile) ?? EmptyList<IPsiSourceFile>.Instance
 			);
 
-			OnFilesIndirectlyAffected.Fire(oldTransitiveIncludes.Union(newTransitiveIncludes));
+			OnFilesIndirectlyAffected.Fire(oldTransitiveIncludes.Union(newTransitiveIncludes).Except(sourceFile));
 
 			oldIncludes.Compare(newIncludes, out var addedItems, out var removedItems);
 			UpdateIncluders(ReversedMap, sourceFile, addedItems, removedItems);
