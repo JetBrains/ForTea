@@ -10,7 +10,7 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 	[DaemonTooltipProvider(typeof(IT4MacroTooltipProvider))]
 	[StaticSeverityHighlighting(
 		Severity.INFO,
-		HighlightingGroupIds.IdentifierHighlightingsGroup,
+		typeof(HighlightingGroupIds.IdentifierHighlightings),
 		OverlapResolve = OverlapResolveKind.NONE,
 		ShowToolTipInStatusBar = false
 	)]
@@ -34,7 +34,7 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 	[DaemonTooltipProvider(typeof(IT4EnvironmentVariableTooltipProvider))]
 	[StaticSeverityHighlighting(
 		Severity.INFO,
-		HighlightingGroupIds.IdentifierHighlightingsGroup,
+		typeof(HighlightingGroupIds.IdentifierHighlightings),
 		OverlapResolve = OverlapResolveKind.NONE,
 		ShowToolTipInStatusBar = false
 	)]
