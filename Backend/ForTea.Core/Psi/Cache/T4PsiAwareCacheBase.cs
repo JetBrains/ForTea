@@ -14,7 +14,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	public abstract class T4PsiAwareCacheBase<TRequest, TResponse> : SimpleICache<TResponse> where TRequest : class
 	{
 		[NotNull]
-		public override string Version => "20";
+		public override string Version => "21";
 
 		protected T4PsiAwareCacheBase(
 			Lifetime lifetime,
@@ -39,7 +39,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			return sf.LanguageType is T4ProjectFileType;
 		}
 
-		[NotNull]
 		public sealed override object Build(IPsiSourceFile sourceFile, bool isStartup)
 		{
 			// It is safe to access the PSI here.
@@ -50,7 +49,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			return Build(t4File.NotNull());
 		}
 
-		[NotNull]
+		[CanBeNull]
 		protected abstract TRequest Build([NotNull] IT4File file);
 	}
 }
