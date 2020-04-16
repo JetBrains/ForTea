@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		public T4IndirectIncludeTransitiveClosureSearcher([NotNull] IT4PsiFileSelector selector) => Selector = selector;
 
 		[NotNull, ItemNotNull]
-		public IEnumerable<IPsiSourceFile> FindClosure(
+		public JetHashSet<IPsiSourceFile> FindClosure(
 			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
 			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> reversedProvider,
 			[NotNull] IPsiSourceFile file
@@ -38,7 +38,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		}
 
 		[NotNull, ItemNotNull]
-		private IEnumerable<IPsiSourceFile> FindAllIncludes(
+		private JetHashSet<IPsiSourceFile> FindAllIncludes(
 			[NotNull] Func<IPsiSourceFile, T4FileDependencyData> provider,
 			[NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> includers
 		)

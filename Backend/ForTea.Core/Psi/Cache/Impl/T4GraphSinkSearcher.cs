@@ -68,6 +68,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		private bool IsSink(
 			[NotNull] Func<IPsiSourceFile, T4ReversedFileDependencyData> provider,
 			[NotNull] IPsiSourceFile vertex
-		) => provider(vertex)?.Includers.IsEmpty() == true;
+		) => provider(vertex)?.Includers.IsEmpty() != false;
 	}
 }

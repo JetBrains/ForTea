@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
-using JetBrains.Application.Threading;
 using JetBrains.Collections;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
@@ -42,11 +41,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		private IT4IncludeResolver IncludeResolver { get; }
 
 		public event Action<IEnumerable<IPsiSourceFile>> OnFilesIndirectlyAffected;
-
 		private IDictionary<IPsiSourceFile, T4ReversedFileDependencyData> ReversedMap { get; set; }
-
-		[NotNull]
-		private IShellLocks Locks { get; }
 
 		[CanBeNull]
 		private T4FileDependencyData TryGetIncludes([NotNull] IPsiSourceFile file) => Map.TryGetValue(file);
@@ -62,7 +57,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			[NotNull] T4IndirectIncludeTransitiveClosureSearcher transitiveClosureSearcher,
 			[NotNull] IT4PsiFileSelector psiFileSelector,
 			[NotNull] IT4IncludeResolver includeResolver,
-			[NotNull] IShellLocks locks,
 			[NotNull] ILogger logger
 		) : base(lifetime, persistentIndexManager, T4FileDependencyDataMarshaller.Instance)
 		{
@@ -70,7 +64,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			TransitiveClosureSearcher = transitiveClosureSearcher;
 			PsiFileSelector = psiFileSelector;
 			IncludeResolver = includeResolver;
-			Locks = locks;
 			Logger = logger;
 		}
 
@@ -78,36 +71,44 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			GraphSinkSearcher.FindClosestSink(TryGetIncluders, include);
 
 		[NotNull, ItemNotNull]
-		private IEnumerable<IPsiSourceFile> FindIndirectIncludesTransitiveClosure([NotNull] IPsiSourceFile file) =>
+		private JetHashSet<IPsiSourceFile> FindIndirectIncludesTransitiveClosure([NotNull] IPsiSourceFile file) =>
 			TransitiveClosureSearcher.FindClosure(TryGetIncludes, TryGetIncluders, file);
 
 		protected override T4IncludeData Build(IT4File file) => new T4IncludeData(file
-			.BlocksEnumerable
-			.OfType<IT4IncludeDirective>()
+			.GetThisAndChildrenOfType<IT4IncludeDirective>()
+			.Where(directive => directive.IsVisibleInDocument())
 			.Select(directive => IncludeResolver.ResolvePath(directive.ResolvedPath))
 			.Where(path => !path.IsEmpty)
 			.Distinct()
 			.ToList()
 		);
 
+		[CanBeNull]
+		private IEnumerable<IPsiSourceFile> GetIncludes([NotNull] IPsiSourceFile sourceFile) => Map
+			.TryGetValue(sourceFile)
+			?.Includes
+			.Select(path => PsiFileSelector.FindMostSuitableFile(path, sourceFile));
+
 		public override void Merge(IPsiSourceFile sourceFile, object builtPart)
 		{
 			var data = (T4IncludeData) builtPart.NotNull();
-			var includes = data.Includes;
-			var oldIncludes = FindIndirectIncludesTransitiveClosure(sourceFile);
-			base.Merge(sourceFile, new T4FileDependencyData(includes));
-			var newIncludes = FindIndirectIncludesTransitiveClosure(sourceFile);
-			OnFilesIndirectlyAffected?.Invoke(oldIncludes.Union(newIncludes));
-			UpdateIncluders(sourceFile, includes);
-		}
 
-		private void UpdateIncluders([NotNull] IPsiSourceFile sourceFile, [NotNull] IList<FileSystemPath> includes)
-		{
-			// ReversedMap.TryGetValue is not a concurrent operation,
-			// and races would be fatal here,
-			// so we need to be sure that this is only called from the main thread
-			Locks.AssertMainThread();
-			UpdateIncluders(ReversedMap, sourceFile, includes);
+			var oldTransitiveIncludes = FindIndirectIncludesTransitiveClosure(sourceFile);
+			var oldIncludes = new JetHashSet<IPsiSourceFile>(
+				GetIncludes(sourceFile) ?? EmptyList<IPsiSourceFile>.Instance
+			);
+
+			base.Merge(sourceFile, new T4FileDependencyData(data.Includes));
+
+			var newTransitiveIncludes = FindIndirectIncludesTransitiveClosure(sourceFile);
+			var newIncludes = new JetHashSet<IPsiSourceFile>(
+				GetIncludes(sourceFile) ?? EmptyList<IPsiSourceFile>.Instance
+			);
+
+			OnFilesIndirectlyAffected?.Invoke(oldTransitiveIncludes.Union(newTransitiveIncludes));
+
+			oldIncludes.Compare(newIncludes, out var addedItems, out var removedItems);
+			UpdateIncluders(ReversedMap, sourceFile, addedItems, removedItems);
 		}
 
 		[NotNull]
@@ -124,9 +125,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				// This lock is intentionally taken per-file to avoid too long blocking. Just in case.
 				using (ReadLockCookie.Create())
 				{
-					UpdateIncluders(result, sourceFile, data.Includes);
+					var includes = new JetHashSet<IPsiSourceFile>(
+						data.Includes.Select(include => PsiFileSelector.FindMostSuitableFile(include, sourceFile))
+					);
+					UpdateIncluders(result, sourceFile, includes, JetHashSet<IPsiSourceFile>.Empty);
 				}
 			}
+
 			stopWatch.Stop();
 			Logger.Verbose("Loading T4 cache took {0} ms", stopWatch.ElapsedMilliseconds);
 			return result;
@@ -141,18 +146,24 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		private void UpdateIncluders(
 			[NotNull] IDictionary<IPsiSourceFile, T4ReversedFileDependencyData> map,
 			[NotNull] IPsiSourceFile includer,
-			[NotNull] IList<FileSystemPath> includes
+			[NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> addedIncludes,
+			[NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> removedIncludes
 		)
 		{
-			foreach (var include in includes)
+			foreach (var removedInclude in removedIncludes.WhereNotNull())
 			{
-				var includedSourceFile = PsiFileSelector.FindMostSuitableFile(include, includer);
-				if (includedSourceFile == null) continue;
-				var existingData = map.TryGetValue(includedSourceFile);
+				var existingData = map.TryGetValue(removedInclude);
+				existingData?.Includers.Remove(includer.GetLocation());
+				if (existingData?.Includers.Count == 0) map.Remove(removedInclude);
+			}
+
+			foreach (var addedInclude in addedIncludes.WhereNotNull())
+			{
+				var existingData = map.TryGetValue(addedInclude);
 				if (existingData == null)
 				{
 					var includers = new List<FileSystemPath> {includer.GetLocation()};
-					map[includedSourceFile] = new T4ReversedFileDependencyData(includers);
+					map[addedInclude] = new T4ReversedFileDependencyData(includers);
 				}
 				else
 				{
