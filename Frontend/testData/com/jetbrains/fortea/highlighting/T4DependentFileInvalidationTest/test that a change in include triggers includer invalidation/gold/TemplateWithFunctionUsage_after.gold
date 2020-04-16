@@ -1,3 +1,6 @@
 <#@ template language="C#" #>
 <#@ include file="IncludeWithFunction.ttinclude" #>
 <#= <ERROR_UNRESOLVED>Foo</ERROR_UNRESOLVED>() #>
+<#+
+	private static int Bas() => 42;
+#>

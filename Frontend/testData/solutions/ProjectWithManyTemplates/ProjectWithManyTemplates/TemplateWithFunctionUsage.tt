@@ -1,3 +1,6 @@
 <#@ template language="C#" #>
 <#@ include file="IncludeWithFunction.ttinclude" #>
 <#= Foo() #>
+<#+
+	private static int Bas() => 42;
+#>

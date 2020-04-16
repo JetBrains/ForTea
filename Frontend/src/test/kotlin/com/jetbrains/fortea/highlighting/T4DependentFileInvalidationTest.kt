@@ -13,7 +13,6 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
 import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 import java.io.File
 import java.io.PrintStream
@@ -25,10 +24,8 @@ import java.io.PrintStream
  * This is what this test is all about.
  *
  * I made some changes in that API and will supposedly merge them into net202.
- * TODO: reuse platform code here as soon as that code is available in SDK
  * TODO: can I remove waitForDaemon() calls?
  */
-@Ignore("TODO: find out why it fails. Possibly a race")
 class T4DependentFileInvalidationTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithManyTemplates"
   private val projectName = "ProjectWithManyTemplates"
@@ -42,7 +39,7 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
   fun `test that a change in include triggers includer invalidation`() {
     doTestWithMarkupModel("$projectName/TemplateWithFunctionUsage.tt", "TemplateWithFunctionUsage_before.gold") {
       waitForDaemon()
-      dumpHighlightersTree(HighlightSeverity.ERROR)
+      dumpErrors()
     }
     withOpenedEditor("$projectName/IncludeWithFunction.ttinclude") {
       setCaretAfterWord("Foo")
@@ -50,7 +47,7 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
     }
     doTestWithMarkupModel("$projectName/TemplateWithFunctionUsage.tt", "TemplateWithFunctionUsage_after.gold") {
       waitForDaemon()
-      dumpHighlightersTree(HighlightSeverity.ERROR)
+      dumpErrors()
     }
   }
 
@@ -58,16 +55,16 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
   fun `test that a change in includer triggers include invalidation`() {
     doTestWithMarkupModel("$projectName/IncludeWithFunction.ttinclude", "IncludeWithFunction_before.gold") {
       waitForDaemon()
-      dumpHighlightersTree()
+      dumpErrors()
     }
     withOpenedEditor("$projectName/TemplateWithFunctionUsage.tt") {
-      setCaretAfterWord("Foo")
+      setCaretAfterWord("Bas")
       typeWithLatency("1")
       commitBackendPsiFiles()
     }
     doTestWithMarkupModel("$projectName/IncludeWithFunction.ttinclude", "IncludeWithFunction_after.gold") {
       waitForDaemon()
-      dumpHighlightersTree()
+      dumpErrors()
     }
   }
 
@@ -75,7 +72,7 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
   fun `test that a change in a file triggers indirect include invalidation`() {
     doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_before.gold") {
       waitForDaemon()
-      dumpHighlightersTree(HighlightSeverity.ERROR)
+      dumpErrors()
     }
     withOpenedEditor("$projectName/IncludeWithOtherFunction.ttinclude") {
       setCaretAfterWord("Bar")
@@ -83,7 +80,7 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
     }
     doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_after.gold") {
       waitForDaemon()
-      dumpHighlightersTree(HighlightSeverity.ERROR)
+      dumpErrors()
     }
   }
 
@@ -102,8 +99,8 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
     printStream.print(annotateDocumentWithHighlighterTags(markupAdapter, { highlighter ->
       highlighter.severity?.let { it.myVal >= severity.myVal } ?: false
     }))
-  private fun EditorImpl.dumpHighlightersTree() =
-    printStream.print(annotateDocumentWithHighlighterTags(markupAdapter, { true }))
+
+  private fun EditorImpl.dumpErrors() = dumpHighlightersTree(HighlightSeverity.ERROR)
 
   private val EditorImpl.markupAdapter: IFrontendDocumentMarkupAdapter
     get() = FrontendMarkupHost.getMarkupContributor(project!!, document)!!.markupAdapter
