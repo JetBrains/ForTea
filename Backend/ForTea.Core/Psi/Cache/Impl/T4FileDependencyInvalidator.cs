@@ -51,14 +51,14 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 					CommitStage = T4CommitStage.UserChangeApplication;
 				}
 			});
-			notifier.OnFilesIndirectlyAffected += files =>
+			notifier.OnFilesIndirectlyAffected.Advise(lifetime, files =>
 			{
 				if (CommitStage == T4CommitStage.DependencyInvalidation) return;
 				// We want all files that were included before the update
 				// and all the files that have become included now
 				// to be updated, so we'll mark them as dirty later
 				IndirectDependencies.AddRange(files);
-			};
+			});
 		}
 	}
 }

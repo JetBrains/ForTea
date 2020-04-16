@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,6 +6,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.Collections;
+using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
@@ -40,7 +40,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		private IT4IncludeResolver IncludeResolver { get; }
 
-		public event Action<IEnumerable<IPsiSourceFile>> OnFilesIndirectlyAffected;
+		[NotNull]
+		public Signal<IEnumerable<IPsiSourceFile>> OnFilesIndirectlyAffected { get; }
+
 		private IDictionary<IPsiSourceFile, T4ReversedFileDependencyData> ReversedMap { get; set; }
 
 		[CanBeNull]
@@ -65,6 +67,10 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			PsiFileSelector = psiFileSelector;
 			IncludeResolver = includeResolver;
 			Logger = logger;
+			OnFilesIndirectlyAffected = new Signal<IEnumerable<IPsiSourceFile>>(
+				lifetime,
+				"T4FileDependencyCache notification about a change in indirect includes"
+			);
 		}
 
 		public IPsiSourceFile FindBestRoot(IPsiSourceFile include) =>
@@ -105,7 +111,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				GetIncludes(sourceFile) ?? EmptyList<IPsiSourceFile>.Instance
 			);
 
-			OnFilesIndirectlyAffected?.Invoke(oldTransitiveIncludes.Union(newTransitiveIncludes));
+			OnFilesIndirectlyAffected.Fire(oldTransitiveIncludes.Union(newTransitiveIncludes));
 
 			oldIncludes.Compare(newIncludes, out var addedItems, out var removedItems);
 			UpdateIncluders(ReversedMap, sourceFile, addedItems, removedItems);
