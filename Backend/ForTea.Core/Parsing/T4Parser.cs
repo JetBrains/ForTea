@@ -146,8 +146,9 @@ namespace GammaJul.ForTea.Core.Parsing
 				macros.AddRange(directive.RawMacros);
 			}
 
-			if (macros.IsEmpty()) return;
-			var resolvedMacros = MacroResolver.ResolveHeavyMacros(macros, context);
+			IReadOnlyDictionary<string, string> resolvedMacros;
+			if (macros.IsEmpty()) resolvedMacros = EmptyDictionary<string, string>.Instance;
+			else resolvedMacros = MacroResolver.ResolveHeavyMacros(macros, context);
 			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
 			{
 				directive.InitializeResolvedPath(resolvedMacros, logicalSourceFile, context);
