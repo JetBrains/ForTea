@@ -1,0 +1,7 @@
+<#+
+	public void FuncFromInclude4()
+	{
+		int x = 0;
+		int y = x + x * x;
+	}
+#>
