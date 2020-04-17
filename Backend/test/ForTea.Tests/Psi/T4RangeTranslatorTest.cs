@@ -4,6 +4,7 @@ using JetBrains.DocumentManagers;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.ReSharper.TestFramework;
 using NUnit.Framework;
 
@@ -12,19 +13,28 @@ namespace JetBrains.ForTea.Tests.Psi
 	public sealed class T4RangeTranslatorTest : BaseTestWithSingleProject
 	{
 		[Test]
-		public void TestRangesInIntermediateInclude() => WithSingleProject(
-			new[] {"Includer.tt", "Include.ttinclude", "Include2.ttinclude"},
-			(lifetime, solution, project) =>
+		public void TestThatTwoTranslationsAreInverseFunctions()
+		{
+			var fileNames = new[] {"Includer.tt", "Include.ttinclude", "Include2.ttinclude"};
+			WithSingleProject(fileNames, (lifetime, solution, project) =>
 			{
-				var includeProjectFile = project.GetSubFiles("Include.ttinclude").Single();
-				var psiFile = (IT4File) includeProjectFile.GetPrimaryPsiFile().NotNull();
-				var translator = ((IT4FileLikeNode) psiFile).DocumentRangeTranslator;
-				var includerDocument = includeProjectFile.GetDocument();
-				var originalDocumentRange = new DocumentRange(new DocumentOffset(includerDocument, 119));
-				var treeRange = translator.Translate(originalDocumentRange);
-				var resultingRange = translator.Translate(treeRange);
-				Assert.AreEqual(originalDocumentRange, resultingRange);
-			}
-		);
+				using var cookie = ReadLockCookie.Create();
+				foreach (string fileName in fileNames)
+				{
+					var projectFile = project.GetSubFiles(fileName).Single();
+					var psiFile = (IT4File) projectFile.GetPrimaryPsiFile().NotNull();
+					var translator = ((IT4FileLikeNode) psiFile).DocumentRangeTranslator;
+					var document = projectFile.GetDocument();
+					// Do not want to analyze edge cases here
+					for (int offset = 1; offset < document.GetTextLength() - 2; offset += 1)
+					{
+						var originalDocumentRange = new DocumentRange(new DocumentOffset(document, offset));
+						var treeRange = translator.Translate(originalDocumentRange);
+						var resultingRange = translator.Translate(treeRange);
+						Assert.AreEqual(originalDocumentRange, resultingRange);
+					}
+				}
+			});
+		}
 	}
 }
