@@ -42,7 +42,7 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 
 			var treeStartOffset = Translate(documentStartOffset);
 			if (!treeStartOffset.IsValid()) return TreeTextRange.InvalidRange;
-			return TreeTextRange.FromLength(treeStartOffset, documentRange.Length);
+			return TreeTextRange.FromLength(rootStartOffset + treeStartOffset, documentRange.Length);
 		}
 
 		private TreeOffset Translate(int documentOffset)
