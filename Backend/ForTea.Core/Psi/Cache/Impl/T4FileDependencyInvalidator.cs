@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Utils;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
@@ -31,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			[NotNull] IPsiServices services
 		)
 		{
-			services.Files.ObserveAfterCommit(lifetime, () => services.Locks.Queue(
+			services.Files.ObserveAfterCommit(lifetime, () => services.Locks.QueueOrExecute(
 				lifetime,
 				"T4 indirect dependencies invalidation",
 				() =>
