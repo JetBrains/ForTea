@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		public string Indent(
 			[NotNull] ITreeNode node,
 			CustomIndentType indentType,
-			[NotNull] FmtSettings<CSharpFormatSettingsKey> settings
+			[NotNull] FmtSettingsClassic<CSharpFormatSettingsKey> settings
 		)
 		{
 			if (node == null) throw new ArgumentNullException(nameof(node));
@@ -47,7 +47,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 
 		[Pure]
 		[CanBeNull]
-		private string IndentFeatureBlockMember([NotNull] ITreeNode node, FmtSettings<CSharpFormatSettingsKey> settings)
+		private string IndentFeatureBlockMember([NotNull] ITreeNode node, FmtSettingsClassic<CSharpFormatSettingsKey> settings)
 		{
 			// In feature blocks, there are class features declared
 			if (!IsClassFeature(node)) return null;
@@ -65,7 +65,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		private string IndentTransformTextMember(
 			[NotNull] ITreeNode node,
 			CustomIndentType indentType,
-			FmtSettings<CSharpFormatSettingsKey> settings
+			FmtSettingsClassic<CSharpFormatSettingsKey> settings
 		)
 		{
 			var rangeTranslator = GetRangeTranslator(node);
