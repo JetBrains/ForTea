@@ -59,6 +59,7 @@ namespace GammaJul.ForTea.Core.Parsing
 		public override TreeElement ParseFile()
 		{
 			var result = ParseFileWithoutCleanup();
+			SetUpRangeTranslators(result);
 			result.SetSourceFile(PhysicalSourceFile);
 			T4ParsingContextHelper.Reset();
 			return result;
@@ -73,7 +74,6 @@ namespace GammaJul.ForTea.Core.Parsing
 			}
 		}
 
-		// TODO heresy
 		private static void SetUpRangeTranslators([NotNull] IncludedFile file)
 		{
 			file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file);
@@ -98,7 +98,6 @@ namespace GammaJul.ForTea.Core.Parsing
 						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
 						SetUpResolveContexts(file);
 						ResolveIncludes(file);
-						SetUpRangeTranslators(file);
 						return file;
 					}
 				).NotNull("Attempted to parse same file recursively twice");
