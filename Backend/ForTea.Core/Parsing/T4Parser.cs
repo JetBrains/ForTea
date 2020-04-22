@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using GammaJul.ForTea.Core.Parser;
+using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Parsing.Ranges;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
@@ -29,6 +29,9 @@ namespace GammaJul.ForTea.Core.Parsing
 		[NotNull]
 		private T4MacroResolveContext Context { get; }
 
+		[NotNull]
+		private IT4LexerSelector LexerSelector { get; }
+
 		/// <note>
 		/// Since the other ParseFile method is used in some external places,
 		/// this method should not contain any additional logic
@@ -40,12 +43,14 @@ namespace GammaJul.ForTea.Core.Parsing
 			[NotNull] ILexer lexer,
 			[CanBeNull] IPsiSourceFile logicalSourceFile,
 			[CanBeNull] IPsiSourceFile physicalSourceFile,
+			[NotNull] IT4LexerSelector lexerSelector,
 			[CanBeNull] T4MacroResolveContext context = null
 		)
 		{
 			OriginalLexer = lexer;
 			LogicalSourceFile = logicalSourceFile;
 			PhysicalSourceFile = physicalSourceFile;
+			LexerSelector = lexerSelector;
 			Context = context ?? new T4MacroResolveContext();
 			SetLexer(new T4FilteringLexer(lexer));
 		}
@@ -68,6 +73,7 @@ namespace GammaJul.ForTea.Core.Parsing
 			}
 		}
 
+		// TODO heresy
 		private static void SetUpRangeTranslators([NotNull] IncludedFile file)
 		{
 			file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file);
@@ -151,12 +157,11 @@ namespace GammaJul.ForTea.Core.Parsing
 		[NotNull]
 		private CompositeElement BuildIncludedT4Tree([NotNull] IPsiSourceFile target)
 		{
-			var languageService = T4Language.Instance.LanguageService().NotNull();
-			var lexer = languageService.GetPrimaryLexerFactory().CreateLexer(target.Document.Buffer);
+			var lexer = LexerSelector.SelectLexer(target);
 			// We need to parse File here, not IncludedFile,
 			// because File makes some important error recovery and token reinsertion
-			return IncludedFile.FromOtherNode(new T4Parser(lexer, target, PhysicalSourceFile, Context)
-				.ParseFileWithoutCleanup());
+			var parser = new T4Parser(lexer, target, PhysicalSourceFile, LexerSelector, Context);
+			return IncludedFile.FromOtherNode(parser.ParseFileWithoutCleanup());
 		}
 
 		[Obsolete("This method should never be called", true)]
