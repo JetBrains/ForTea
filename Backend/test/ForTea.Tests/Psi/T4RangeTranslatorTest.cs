@@ -10,6 +10,7 @@ using JetBrains.IDE;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.ReSharper.TestFramework;
 using JetBrains.TextControl;
@@ -53,6 +54,7 @@ namespace JetBrains.ForTea.Tests.Psi
 					// The beginning of the newline
 					textControl.Caret.MoveTo(83, CaretVisualPlacement.Generic);
 					textControl.EmulateAction(TextControlActions.ActionIds.Backspace);
+					solution.GetComponent<IPsiFiles>().CommitAllDocuments();
 					writer.Write(textControl.Document.GetText());
 				}));
 			}
