@@ -25,6 +25,8 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			new T4InsideExpressionBlockSpaceTypeProvider()
 		};
 
+		public override bool NeedsOldEngine => true;
+
 		public override FmtSettingsClassic<CSharpFormatSettingsKey> AdjustFormattingSettings(
 			[NotNull] FmtSettingsClassic<CSharpFormatSettingsKey> settings,
 			[NotNull] ISettingsOptimization settingsOptimization
