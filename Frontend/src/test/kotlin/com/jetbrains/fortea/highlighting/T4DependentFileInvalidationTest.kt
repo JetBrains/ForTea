@@ -6,13 +6,13 @@ import com.jetbrains.rdclient.daemon.IFrontendDocumentMarkupAdapter
 import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
 import com.jetbrains.rdclient.testFramework.typeWithLatency
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.annotateDocumentWithHighlighterTags
 import com.jetbrains.rider.daemon.util.severity
+import com.jetbrains.rider.solutionAnalysis.SolutionAnalysisHost
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
-import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
-import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 import java.io.File
 import java.io.PrintStream
@@ -37,59 +37,43 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
 
   @Test
   fun `test that a change in include triggers includer invalidation`() {
-    doTestWithMarkupModel("$projectName/TemplateWithFunctionUsage.tt", "TemplateWithFunctionUsage_before.gold") {
-      waitForDaemon()
-      dumpErrors()
-    }
+    doTestWithMarkupModel("$projectName/TemplateWithFunctionUsage.tt", "TemplateWithFunctionUsage_before.gold")
     withOpenedEditor("$projectName/IncludeWithFunction.ttinclude") {
       setCaretAfterWord("Foo")
       typeWithLatency("1")
     }
-    doTestWithMarkupModel("$projectName/TemplateWithFunctionUsage.tt", "TemplateWithFunctionUsage_after.gold") {
-      waitForDaemon()
-      dumpErrors()
-    }
+    doTestWithMarkupModel("$projectName/TemplateWithFunctionUsage.tt", "TemplateWithFunctionUsage_after.gold")
   }
 
   @Test
   fun `test that a change in includer triggers include invalidation`() {
-    doTestWithMarkupModel("$projectName/IncludeWithFunction.ttinclude", "IncludeWithFunction_before.gold") {
-      waitForDaemon()
-      dumpErrors()
-    }
+    doTestWithMarkupModel("$projectName/IncludeWithFunction.ttinclude", "IncludeWithFunction_before.gold")
     withOpenedEditor("$projectName/TemplateWithFunctionUsage.tt") {
       setCaretAfterWord("Bas")
       typeWithLatency("1")
       commitBackendPsiFiles()
     }
-    doTestWithMarkupModel("$projectName/IncludeWithFunction.ttinclude", "IncludeWithFunction_after.gold") {
-      waitForDaemon()
-      dumpErrors()
-    }
+    doTestWithMarkupModel("$projectName/IncludeWithFunction.ttinclude", "IncludeWithFunction_after.gold")
   }
 
   @Test
   fun `test that a change in a file triggers indirect include invalidation`() {
-    doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_before.gold") {
-      waitForDaemon()
-      dumpErrors()
-    }
+    doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_before.gold")
     withOpenedEditor("$projectName/IncludeWithOtherFunction.ttinclude") {
       setCaretAfterWord("Bar")
       typeWithLatency("1")
     }
-    doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_after.gold") {
-      waitForDaemon()
-      dumpErrors()
-    }
+    doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_after.gold")
   }
 
-  private fun doTestWithMarkupModel(testFilePath: String, goldFileName: String, testAction: EditorImpl.() -> Unit) {
+  private fun doTestWithMarkupModel(testFilePath: String, goldFileName: String) {
     withOpenedEditor(testFilePath) {
       val goldFile = File(testCaseGoldDirectory, goldFileName).apply { if (!exists()) { parentFile.mkdirs(); } }
       executeWithGold(goldFile) { stream: PrintStream ->
         _printStream = stream
-        testAction(this)
+        waitForDaemon()
+        commitBackendPsiFiles()
+        dumpErrors()
         _printStream = null
       }
     }
