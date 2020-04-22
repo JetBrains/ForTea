@@ -15,8 +15,6 @@ namespace JetBrains.ForTea.Tests.Highlighting
 		[TestCase("RedundantInclude", Ignore="Includes are not resolved in tests")]
 		[TestCase("UnexpectedAttribute")]
 		[TestCase("UnexpectedDirective")]
-		[TestCase("UnresolvedInclude")]
-		[TestCase("UnresolvedAssembly")]
 		[TestCase("EmptyDirective")]
 		[TestCase("UnsupportedLanguage")]
 		[TestCase("DuplicateAssemblyDirective")]

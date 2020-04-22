@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 namespace JetBrains.ForTea.RiderPlugin.Daemon.ProblemAnalyzers
 {
 	[ElementProblemAnalyzer(typeof(IT4AssemblyDirective), HighlightingTypes =
-		new[] {typeof(UnresolvedAssemblyWarning)})]
+		new[] {typeof(UnresolvedAssemblyError)})]
 	public sealed class T4UnresolvedPathAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4AssemblyDirective>
 	{
 		[NotNull]
@@ -36,7 +36,9 @@ namespace JetBrains.ForTea.RiderPlugin.Daemon.ProblemAnalyzers
 			if (project != null) return;
 			var path = AssemblyReferenceResolver.Resolve(assemblyDirective);
 			if (path != null && path.ExistsFile) return;
-			consumer.AddHighlighting(new UnresolvedAssemblyWarning(assemblyDirective.Name));
+			var pathNode = assemblyDirective.GetAttributeValueToken(T4DirectiveInfoManager.Assembly.NameAttribute.Name);
+			if (pathNode == null) return;
+			consumer.AddHighlighting(new UnresolvedAssemblyError(pathNode));
 		}
 
 		protected override DirectiveAttributeInfo GetTargetAttribute() => T4DirectiveInfoManager.Assembly.NameAttribute;

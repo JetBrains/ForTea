@@ -104,8 +104,9 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 
 		private void ReportUnresolvedPath([NotNull] IT4IncludeDirective include)
 		{
-			var name = include.Name;
-			AddHighlighting(name, new UnresolvedIncludeWarning(name));
+			var path = include.GetAttributeValueToken(T4DirectiveInfoManager.Include.FileAttribute.Name);
+			if (path == null) return;
+			AddHighlighting(path, new UnresolvedIncludeError(path));
 		}
 
 		private void ReportRedundantInclude([NotNull] IT4IncludeDirective include)

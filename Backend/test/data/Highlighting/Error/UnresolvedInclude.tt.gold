@@ -1,0 +1,4 @@
+﻿<#@ include file="|Foo.txt|(0)" #>
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Unresolved include

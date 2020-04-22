@@ -8,5 +8,5 @@ class T4ExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
 
   @Test fun testGutterMarks() = doTest(T4RunMarkerAttributeIds.RUN_T4_FILE_MARKER_ID)
   @Test fun testClass() = doTestAll()
-  @Test fun testIncompleteMacro() = doTestAll()
+  @Test fun testIncompleteMacro() = doTestErrors()
 }

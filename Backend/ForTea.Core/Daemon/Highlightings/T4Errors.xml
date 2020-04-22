@@ -80,4 +80,16 @@
         <Range>Macro.GetHighlightingRange()</Range>
         <Behavour overlapResolvePolicy="ERROR"/>
     </Error>
+    <Error name="UnresolvedInclude" staticGroup="T4Errors">
+        <Parameter type="IT4TreeNode" name="node"/>
+        <Message value="Unresolved include"/>
+        <Range>Node.GetHighlightingRange()</Range>
+        <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="UNRESOLVED_ERROR"/>
+    </Error>
+    <Error name="UnresolvedAssembly" staticGroup="T4Errors">
+        <Parameter type="IT4TreeNode" name="node"/>
+        <Message value="Unresolved assembly"/>
+        <Range>Node.GetNavigationRange()</Range>
+        <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="UNRESOLVED_ERROR"/>
+    </Error>
 </Errors>

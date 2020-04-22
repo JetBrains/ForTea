@@ -1,4 +1,0 @@
-﻿<#@ |include|(0) file="Foo.txt" #>
-
----------------------------------------------------------
-(0): ReSharper Warning: Unresolved include path
