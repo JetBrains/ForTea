@@ -6,6 +6,7 @@ using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Resources.Shell;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
@@ -29,10 +30,18 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		public T4FileDependencyInvalidator(
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
-			[NotNull] IPsiServices services
+			[NotNull] IPsiServices services,
+			[NotNull] IPsiCachesState state
 		)
 		{
-			services.Files.ObserveAfterCommit(lifetime, () => services.Locks.QueueOrExecute(
+			services.Files.ObserveAfterCommit(lifetime, TriggerDependencyInvalidation);
+			state.IsInitialUpdateFinished.Change.Advise(lifetime, args =>
+			{
+				if (!args.HasNew || !args.New) return;
+				TriggerDependencyInvalidation();
+			});
+
+			void TriggerDependencyInvalidation() => services.Locks.QueueOrExecute(
 				lifetime,
 				"T4 indirect dependencies invalidation",
 				() =>
@@ -53,7 +62,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 					PreviousIterationIndirectDependencies = IndirectDependencies;
 					IndirectDependencies = new HashSet<IPsiSourceFile>();
 				}
-			));
+			);
+
 			notifier.OnFilesIndirectlyAffected.Advise(lifetime, files =>
 			{
 				services.Locks.AssertMainThread();
