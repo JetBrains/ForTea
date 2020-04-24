@@ -10,14 +10,14 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generators
 {
-	public sealed class T4CSharpExecutableCodeGenerator : T4CSharpPreprocessedCodeGenerator
+	public sealed class T4CSharpExecutableCodeGenerator : T4CSharpCodeGeneratorBase
 	{
 		public T4CSharpExecutableCodeGenerator(
 			[NotNull] IT4File file,
 			[NotNull] ISolution solution
-		) : base(file, solution)
-		{
-		}
+		) : base(file) => Collector = new T4CSharpCodeGenerationInfoCollector(file, solution);
+
+		protected override T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
 
 		protected override T4CSharpIntermediateConverterBase CreateConverter(
 			T4CSharpCodeGenerationIntermediateResult intermediateResult
