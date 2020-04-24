@@ -5,16 +5,12 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
 	public class T4CSharpIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		public T4CSharpIntermediateConverter(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		) : base(intermediateResult, file)
+		public T4CSharpIntermediateConverter([NotNull] IT4File file) : base(file)
 		{
 		}
 
@@ -81,7 +77,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 		}
 
-		protected override void AppendClass()
+		protected override void AppendClass(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			AppendIndent();
 			Result.AppendLine();
@@ -93,10 +89,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine(
 				"[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"JetBrains.ForTea.TextTemplating\", \"42.42.42.42\")]");
-			base.AppendClass();
+			base.AppendClass(intermediateResult);
 		}
 
-		protected override void AppendTransformMethod()
+		protected override void AppendTransformMethod(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			Result.AppendLine("#line hidden");
 			AppendIndent();
@@ -105,7 +101,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine("/// Create the template output");
 			AppendIndent();
 			Result.AppendLine("/// </summary>");
-			base.AppendTransformMethod();
+			base.AppendTransformMethod(intermediateResult);
 		}
 
 		private void AppendClassSummary()

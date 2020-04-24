@@ -1,14 +1,9 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
-using JetBrains.ReSharper.Psi.CSharp.Util;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -26,10 +21,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			"RedundantNameQualifier"
 		};
 
-		protected T4CSharpCodeBehindIntermediateConverterBase(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		) : base(intermediateResult, file)
+		protected T4CSharpCodeBehindIntermediateConverterBase([NotNull] IT4File file) : base(file)
 		{
 		}
 

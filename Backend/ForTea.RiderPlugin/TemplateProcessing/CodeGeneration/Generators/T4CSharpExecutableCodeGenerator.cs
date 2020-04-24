@@ -19,12 +19,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generat
 
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
 
-		protected override T4CSharpIntermediateConverterBase CreateConverter(
-			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		)
+		protected override T4CSharpIntermediateConverterBase Converter
 		{
-			var referenceExtractionManager = File.GetSolution().GetComponent<IT4ReferenceExtractionManager>();
-			return new T4CSharpExecutableIntermediateConverter(intermediateResult, File, referenceExtractionManager);
+			get
+			{
+				var referenceExtractionManager = File.GetSolution().GetComponent<IT4ReferenceExtractionManager>();
+				return new T4CSharpExecutableIntermediateConverter(File, referenceExtractionManager);
+			}
 		}
 	}
 }

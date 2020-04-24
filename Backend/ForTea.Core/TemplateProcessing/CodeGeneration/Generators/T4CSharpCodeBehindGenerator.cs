@@ -29,15 +29,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		protected override T4CSharpCodeGenerationInfoCollectorBase Collector =>
 			new T4CSharpCodeBehindGenerationInfoCollector(File, Solution);
 
-		protected override T4CSharpIntermediateConverterBase CreateConverter(
-			T4CSharpCodeGenerationIntermediateResult intermediateResult
-		)
+		protected override T4CSharpIntermediateConverterBase Converter
 		{
-			var rootTemplateKindProvider = Solution.GetComponent<IT4RootTemplateKindProvider>();
-			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile().NotNull();
-			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(projectFile))
-				return new T4CSharpPreprocessedCodeBehindIntermediateConverter(intermediateResult, File);
-			return new T4CSharpExecutableCodeBehindIntermediateConverter(intermediateResult, File);
+			get
+			{
+				var rootTemplateKindProvider = Solution.GetComponent<IT4RootTemplateKindProvider>();
+				var projectFile = File.PhysicalPsiSourceFile.ToProjectFile().NotNull();
+				if (rootTemplateKindProvider.IsRootPreprocessedTemplate(projectFile))
+					return new T4CSharpPreprocessedCodeBehindIntermediateConverter(File);
+				return new T4CSharpExecutableCodeBehindIntermediateConverter(File);
+			}
 		}
 	}
 }

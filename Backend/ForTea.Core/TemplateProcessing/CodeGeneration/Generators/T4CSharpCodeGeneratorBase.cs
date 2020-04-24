@@ -1,4 +1,3 @@
-using System;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
@@ -18,7 +17,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 
 		[NotNull]
 		public T4CSharpCodeGenerationResult Generate() =>
-			CreateConverter(Collector.Collect()).Convert();
+			Converter.Convert(Collector.Collect());
 
 		[NotNull]
 		public T4CSharpCodeGenerationResult GenerateSafe()
@@ -39,7 +38,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators
 		protected abstract T4CSharpCodeGenerationInfoCollectorBase Collector { get; }
 
 		[NotNull]
-		protected abstract T4CSharpIntermediateConverterBase CreateConverter(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult);
+		protected abstract T4CSharpIntermediateConverterBase Converter { get; }
 	}
 }

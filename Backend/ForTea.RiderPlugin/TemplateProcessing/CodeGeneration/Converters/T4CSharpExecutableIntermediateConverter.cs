@@ -36,10 +36,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
 
 		public T4CSharpExecutableIntermediateConverter(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
 			[NotNull] IT4File file,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
-		) : base(intermediateResult, file)
+		) : base(file)
 		{
 			file.AssertContainsNoIncludeContext();
 			ReferenceExtractionManager = referenceExtractionManager;
@@ -47,10 +46,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
 		// When creating executable, we reference JetBrains.TextTemplating,
 		// which already contains the definition for TextTransformation
-		protected override void AppendClasses()
+		protected override void AppendClasses(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			AppendMainContainer();
-			AppendClass();
+			AppendMainContainer(intermediateResult);
+			AppendClass(intermediateResult);
 		}
 
 		protected override void AppendHost()
@@ -62,14 +61,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
 		protected override bool ShouldAppendPragmaDirectives => true;
 
-		protected override void AppendConstructor()
+		protected override void AppendConstructor(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			AppendIndent();
 			Result.AppendLine("public GeneratedTextTransformation()");
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
-			if (IntermediateResult.HasHost) AppendHostInitialization();
+			if (intermediateResult.HasHost) AppendHostInitialization();
 			PopIndent();
 			PopIndent();
 			Result.AppendLine("}");
@@ -115,11 +114,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			);
 		}
 
-		private void AppendMainContainer()
+		private void AppendMainContainer([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			string resource = IntermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
+			string resource = intermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
 			var provider = new T4TemplateResourceProvider(resource);
-			string encoding = IntermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
+			string encoding = intermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
 			string suffix = provider.ProcessResource(GeneratedClassName, encoding);
 			Result.Append(suffix);
 			AppendAssemblyRegistering();

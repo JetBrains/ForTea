@@ -18,26 +18,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
 
 		[NotNull]
-		protected T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
-
-		[NotNull]
 		protected T4CSharpCodeGenerationResult Result { get; }
 
 		[NotNull]
 		protected IT4File File { get; }
 
-		protected T4CSharpIntermediateConverterBase(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		)
+		protected T4CSharpIntermediateConverterBase([NotNull] IT4File file)
 		{
-			IntermediateResult = intermediateResult;
 			File = file;
 			Result = new T4CSharpCodeGenerationResult(File);
 		}
 
 		[NotNull]
-		public T4CSharpCodeGenerationResult Convert()
+		public T4CSharpCodeGenerationResult Convert(
+			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
+		)
 		{
 			AppendGeneratedMessage();
 			string ns = File
@@ -51,33 +46,33 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				Result.AppendLine($"namespace {ns}");
 				Result.AppendLine("{");
 				PushIndent();
-				AppendNamespaceContents();
+				AppendNamespaceContents(intermediateResult);
 				PopIndent();
 				Result.AppendLine("}");
 			}
 			else
 			{
-				AppendNamespaceContents();
+				AppendNamespaceContents(intermediateResult);
 			}
 
 			return Result;
 		}
 
-		private void AppendNamespaceContents()
+		private void AppendNamespaceContents([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			AppendImports();
-			AppendClasses();
+			AppendImports(intermediateResult);
+			AppendClasses(intermediateResult);
 		}
 
-		protected virtual void AppendClasses()
+		protected virtual void AppendClasses([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			AppendClass();
+			AppendClass(intermediateResult);
 			AppendIndent();
 			Result.AppendLine();
-			AppendBaseClass();
+			AppendBaseClass(intermediateResult);
 		}
 
-		private void AppendImports()
+		private void AppendImports([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			if (ShouldAppendPragmaDirectives)
 			{
@@ -87,7 +82,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			AppendIndent();
 			Result.AppendLine("using System;");
-			if (IntermediateResult.HasHost)
+			if (intermediateResult.HasHost)
 			{
 				AppendIndent();
 				Result.AppendLine("using System.CodeDom.Compiler;");
@@ -99,42 +94,42 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				Result.AppendLine("#pragma warning restore 8019");
 			}
 
-			foreach (var description in IntermediateResult.ImportDescriptions)
+			foreach (var description in intermediateResult.ImportDescriptions)
 			{
 				description.AppendContent(Result, this);
 			}
 		}
 
-		protected virtual void AppendClass()
+		protected virtual void AppendClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			AppendSyntheticAttribute();
 			AppendIndent();
 			Result.Append($"public partial class {GeneratedClassName} : ");
-			AppendBaseClassName();
+			AppendBaseClassName(intermediateResult);
 			Result.AppendLine();
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
-			AppendProperties();
-			AppendConstructor();
-			AppendTransformMethod();
-			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
-			AppendTemplateInitialization(IntermediateResult.ParameterDescriptions);
+			AppendProperties(intermediateResult);
+			AppendConstructor(intermediateResult);
+			AppendTransformMethod(intermediateResult);
+			AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
+			AppendTemplateInitialization(intermediateResult.ParameterDescriptions);
 			PopIndent();
 			AppendIndent();
 			Result.AppendLine("}");
 		}
 
-		private void AppendProperties()
+		private void AppendProperties([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			if (IntermediateResult.HasHost) AppendHost();
-			foreach (var description in IntermediateResult.FeatureDescriptions)
+			if (intermediateResult.HasHost) AppendHost();
+			foreach (var description in intermediateResult.FeatureDescriptions)
 			{
 				description.AppendContent(Result, this);
 			}
 		}
 
-		protected virtual void AppendConstructor()
+		protected virtual void AppendConstructor([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 		}
 
@@ -177,19 +172,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine("}");
 		}
 
-		protected virtual void AppendTransformMethod()
+		protected virtual void AppendTransformMethod(
+			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
+		)
 		{
 			AppendSyntheticAttribute();
 			AppendIndent();
 			Result.Append("public ");
-			Result.Append(IntermediateResult.HasBaseClass ? "override" : "virtual");
+			Result.Append(intermediateResult.HasBaseClass ? "override" : "virtual");
 			Result.AppendLine($" string {TransformTextMethodName}()");
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
 			AppendIndent();
 			Result.AppendLine();
-			foreach (var description in IntermediateResult.TransformationDescriptions)
+			foreach (var description in intermediateResult.TransformationDescriptions)
 			{
 				description.AppendContent(Result, this);
 			}
@@ -201,15 +198,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine("}");
 		}
 
-		private void AppendBaseClassName()
+		private void AppendBaseClassName([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			if (IntermediateResult.HasBaseClass) Result.Append(IntermediateResult.CollectedBaseClass);
+			if (intermediateResult.HasBaseClass) Result.Append(intermediateResult.CollectedBaseClass);
 			else Result.Append(GeneratedBaseClassFQN);
 		}
 
-		private void AppendBaseClass()
+		private void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			if (IntermediateResult.HasBaseClass) return;
+			if (intermediateResult.HasBaseClass) return;
 			string resource = BaseClassResourceName;
 			var provider = new T4TemplateResourceProvider(resource);
 			Result.Append(provider.ProcessResource(GeneratedBaseClassName));
