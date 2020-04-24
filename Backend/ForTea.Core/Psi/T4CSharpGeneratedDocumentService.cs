@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.FileType;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
@@ -29,11 +29,7 @@ namespace GammaJul.ForTea.Core.Psi
 		{
 			if (!(modificationInfo.NewPsiFile is IT4File t4File)) return null;
 			if (!T4DirectiveInfoManager.GetLanguageType(t4File).Is<CSharpLanguage>()) return null;
-
-			var solution = modificationInfo.SourceFile.GetSolution();
-			var generator = new T4CSharpCodeBehindGenerator(t4File, solution);
-			var result = generator.GenerateSafe();
-
+			var result = T4CodeGeneration.GenerateCodeBehind(t4File);
 			var csharpLanguageService = CSharpLanguage.Instance.LanguageService();
 			if (csharpLanguageService == null) return null;
 
