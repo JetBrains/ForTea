@@ -2,15 +2,21 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
+namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters
 {
-	public class T4CSharpIntermediateConverter : T4CSharpIntermediateConverterBase
+	public class T4CSharpRealIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		public T4CSharpIntermediateConverter([NotNull] IT4File file) : base(file)
+		public T4CSharpRealIntermediateConverter(
+			[NotNull] IT4File file,
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider
+		) : base(file, classNameProvider)
 		{
 		}
 
@@ -134,10 +140,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			// Host directive does not work for runtime templates
 		}
-
-		protected override string GeneratedClassName => File.CreateGeneratedClassName();
-		protected override string GeneratedBaseClassName => GeneratedClassName + "Base";
-		protected override string GeneratedBaseClassFQN => GeneratedBaseClassName;
 
 		protected override void AppendIndent(int size)
 		{

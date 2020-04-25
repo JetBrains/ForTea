@@ -1,6 +1,6 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters;
@@ -32,7 +32,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration
 		{
 			var solution = file.GetSolution();
 			var collector = new T4CSharpCodeGenerationInfoCollector(solution);
-			var converter = new T4CSharpIntermediateConverter(file);
+			var nameProvider = new T4PreprocessedClassNameProvider(file);
+			var converter = new T4CSharpRealIntermediateConverter(file, nameProvider);
 			return converter.Convert(collector.Collect(file));
 		}
 	}

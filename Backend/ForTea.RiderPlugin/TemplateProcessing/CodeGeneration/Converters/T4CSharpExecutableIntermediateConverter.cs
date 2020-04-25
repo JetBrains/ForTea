@@ -2,7 +2,7 @@ using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
@@ -17,7 +17,7 @@ using JetBrains.Util.dataStructures.TypedIntrinsics;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters
 {
-	public sealed class T4CSharpExecutableIntermediateConverter : T4CSharpIntermediateConverter
+	public sealed class T4CSharpExecutableIntermediateConverter : T4CSharpRealIntermediateConverter
 	{
 		[NotNull] private const string SuffixResource =
 			"GammaJul.ForTea.Core.Resources.TemplateBaseFullExecutableSuffix.cs";
@@ -28,17 +28,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		[NotNull] private const string AssemblyRegisteringResource =
 			"GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs";
 
-		protected override string GeneratedClassName => GeneratedClassNameString;
-		protected override string GeneratedBaseClassName => GeneratedBaseClassNameString;
-		protected override string GeneratedBaseClassFQN => T4TextTemplatingFQNs.TextTransformation;
-
 		[NotNull]
 		private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
 
 		public T4CSharpExecutableIntermediateConverter(
 			[NotNull] IT4File file,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
-		) : base(file)
+		) : base(file, new T4ExecutableClassNameProvider())
 		{
 			file.AssertContainsNoIncludeContext();
 			ReferenceExtractionManager = referenceExtractionManager;
@@ -119,7 +115,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			string resource = intermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
 			var provider = new T4TemplateResourceProvider(resource);
 			string encoding = intermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
-			string suffix = provider.ProcessResource(GeneratedClassName, encoding);
+			string suffix = provider.ProcessResource(ClassNameProvider.GeneratedClassName, encoding);
 			Result.Append(suffix);
 			AppendAssemblyRegistering();
 			// assembly registration code is part of main class,
