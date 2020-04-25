@@ -16,13 +16,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected sealed override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
 
-		protected sealed override void AppendSyntheticAttribute()
-		{
-			// Synthetic attribute is only used for avoiding completion.
-			// It is not valid during compilation,
-			// so it should not be inserted in code
-		}
-
 		protected sealed override void AppendParameterInitialization(
 			IReadOnlyCollection<T4ParameterDescription> descriptions
 		)

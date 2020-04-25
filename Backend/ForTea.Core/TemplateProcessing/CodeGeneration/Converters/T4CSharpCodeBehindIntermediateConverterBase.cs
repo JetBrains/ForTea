@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -26,12 +25,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
-
-		protected override void AppendSyntheticAttribute()
-		{
-			AppendIndent();
-			Result.AppendLine($"[{SyntheticAttribute.Name}]");
-		}
 
 		protected override void AppendParameterInitialization(
 			IReadOnlyCollection<T4ParameterDescription> descriptions

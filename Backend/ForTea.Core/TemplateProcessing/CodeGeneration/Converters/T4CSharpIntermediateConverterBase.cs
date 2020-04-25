@@ -102,7 +102,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected virtual void AppendClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			AppendSyntheticAttribute();
 			AppendIndent();
 			Result.Append($"public partial class {GeneratedClassName} : ");
 			AppendBaseClassName(intermediateResult);
@@ -144,9 +143,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 		}
 
-		private void AppendFieldDeclaration([NotNull] T4ParameterDescription description)
+		protected virtual void AppendFieldDeclaration([NotNull] T4ParameterDescription description)
 		{
-			AppendSyntheticAttribute();
 			AppendIndent();
 			Result.Append("private global::");
 			Result.Append(description.TypeString);
@@ -155,12 +153,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine(";");
 		}
 
-		private void AppendTemplateInitialization(
+		protected virtual void AppendTemplateInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions
 		)
 		{
 			if (descriptions.IsEmpty()) return;
-			AppendSyntheticAttribute();
 			AppendIndent();
 			Result.AppendLine("public void Initialize()");
 			AppendIndent();
@@ -176,7 +173,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
 		)
 		{
-			AppendSyntheticAttribute();
 			AppendIndent();
 			Result.Append("public ");
 			Result.Append(intermediateResult.HasBaseClass ? "override" : "virtual");
@@ -226,8 +222,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		[NotNull]
 		protected abstract string GeneratedBaseClassFQN { get; }
-
-		protected abstract void AppendSyntheticAttribute();
 
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
