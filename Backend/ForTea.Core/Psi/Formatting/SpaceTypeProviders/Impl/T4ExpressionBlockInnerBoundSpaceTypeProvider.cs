@@ -8,7 +8,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders.Impl
 		T4BlockInnerBoundSpaceTypeProviderBase<IT4ExpressionBlock>
 	{
 		protected override SpaceType Type => SpaceType.Horizontal;
-		protected override string StartComment => T4CSharpCodeBehindIntermediateConverterBase.ExpressionCommentStartText;
-		protected override string EndComment => T4CSharpCodeBehindIntermediateConverterBase.ExpressionCommentEndText;
+		protected override string StartComment => T4CSharpCodeBehindIntermediateConverter.ExpressionCommentStartText;
+		protected override string EndComment => T4CSharpCodeBehindIntermediateConverter.ExpressionCommentEndText;
 	}
 }

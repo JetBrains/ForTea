@@ -51,8 +51,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		protected override void AppendHost()
 		{
 			AppendIndent();
-			Result.AppendLine(
-				$"public virtual {T4TextTemplatingFQNs.HostInterface} Host {{ get; }}");
+			Result.AppendLine($"public virtual {T4TextTemplatingFQNs.HostInterface} Host {{ get; }}");
 		}
 
 		protected override bool ShouldAppendPragmaDirectives => true;

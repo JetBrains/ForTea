@@ -35,11 +35,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		[NotNull]
-		public T4CSharpCodeGenerationResult Convert(
+		public virtual T4CSharpCodeGenerationResult Convert(
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
 		)
 		{
-			AppendGeneratedMessage();
 			string ns = File
 				.LogicalPsiSourceFile
 				.ToProjectFile()
@@ -151,8 +150,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual void AppendFieldDeclaration([NotNull] T4ParameterDescription description)
 		{
 			AppendIndent();
-			Result.Append("private global::");
-			Result.Append(description.TypeString);
+			Result.Append("private ");
+			description.AppendType(Result);
 			Result.Append(" ");
 			Result.Append(description.FieldNameString);
 			Result.AppendLine(";");
@@ -224,10 +223,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
-
-		protected virtual void AppendGeneratedMessage()
-		{
-		}
 
 		protected virtual bool ShouldAppendPragmaDirectives => false;
 

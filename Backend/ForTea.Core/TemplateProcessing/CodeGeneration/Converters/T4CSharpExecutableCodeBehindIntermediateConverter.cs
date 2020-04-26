@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
-	public sealed class T4CSharpExecutableCodeBehindIntermediateConverter : T4CSharpCodeBehindIntermediateConverterBase
+	public sealed class T4CSharpExecutableCodeBehindIntermediateConverter : T4CSharpCodeBehindIntermediateConverter
 	{
 		public T4CSharpExecutableCodeBehindIntermediateConverter([NotNull] IT4File file) : base(
 			file,

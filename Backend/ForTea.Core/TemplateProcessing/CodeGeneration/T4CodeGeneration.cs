@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -25,12 +26,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 			var solution = file.GetSolution();
 			var rootTemplateKindProvider = solution.GetComponent<IT4RootTemplateKindProvider>();
 			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile().NotNull();
-			T4CSharpCodeBehindIntermediateConverterBase Converter;
+			T4CSharpCodeBehindIntermediateConverter converter;
 			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(projectFile))
-				Converter = new T4CSharpPreprocessedCodeBehindIntermediateConverter(file);
-			else Converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
+			{
+				var provider = new T4PreprocessedClassNameProvider(file);
+				converter = new T4CSharpCodeBehindIntermediateConverter(file, provider);
+			}
+			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
 			var Collector = new T4CSharpCodeBehindGenerationInfoCollector(solution);
-			return Converter.Convert(Collector.Collect(file));
+			return converter.Convert(Collector.Collect(file));
 		}
 	}
 }
