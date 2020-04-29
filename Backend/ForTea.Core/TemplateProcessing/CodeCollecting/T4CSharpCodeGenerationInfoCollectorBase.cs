@@ -8,6 +8,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -17,9 +18,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 	public abstract class T4CSharpCodeGenerationInfoCollectorBase : TreeNodeVisitor, IRecursiveElementProcessor
 	{
 		#region Properties
-		[NotNull]
-		private IT4File File { get; }
-
 		[NotNull]
 		private T4EncodingsManager EncodingsManager { get; }
 
@@ -38,12 +36,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		protected T4CSharpCodeGenerationIntermediateResult Result => Results.Peek();
 		#endregion Properties
 
-		protected T4CSharpCodeGenerationInfoCollectorBase(
-			[NotNull] IT4File file,
-			[NotNull] ISolution solution
-		)
+		protected T4CSharpCodeGenerationInfoCollectorBase([NotNull] ISolution solution)
 		{
-			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
 			Guard = new T4IncludeGuard();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
@@ -51,13 +45,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		}
 
 		[NotNull]
-		public T4CSharpCodeGenerationIntermediateResult Collect()
+		public T4CSharpCodeGenerationIntermediateResult Collect([NotNull] IT4File file)
 		{
-			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile();
-			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(File, Interrupter);
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			Guard.StartProcessing(File.LogicalPsiSourceFile.GetLocation());
-			File.ProcessDescendants(this);
+			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile();
+			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(file, Interrupter);
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(file, Interrupter));
+			Guard.StartProcessing(file.LogicalPsiSourceFile.GetLocation());
+			file.ProcessDescendants(this);
 			string suffix = Result.State.ProduceBeforeEof();
 			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
 			Guard.EndProcessing();
@@ -71,14 +65,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			AppendRemainingMessage(element);
 			if (!(element is IT4IncludeDirective include)) return;
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
+			var file = (IT4File) element.GetContainingFile().NotNull();
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(file, Interrupter));
 			var sourceFile = IncludeResolver.Resolve(include.ResolvedPath);
 			if (sourceFile == null)
 			{
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(File.LogicalPsiSourceFile.GetLocation());
+				Guard.StartProcessing(file.LogicalPsiSourceFile.GetLocation());
 				return;
 			}
 

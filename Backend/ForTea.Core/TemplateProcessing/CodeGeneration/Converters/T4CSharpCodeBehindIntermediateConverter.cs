@@ -1,18 +1,12 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.Services;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp.Parsing;
-using JetBrains.ReSharper.Psi.CSharp.Util;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
-	public abstract class T4CSharpCodeBehindIntermediateConverterBase : T4CSharpIntermediateConverterBase
+	public class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
 		[NotNull] public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
 		[NotNull] public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
@@ -26,20 +20,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			"RedundantNameQualifier"
 		};
 
-		protected T4CSharpCodeBehindIntermediateConverterBase(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		) : base(intermediateResult, file)
+		public T4CSharpCodeBehindIntermediateConverter(
+			[NotNull] IT4File file,
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider
+		) : base(file, classNameProvider)
 		{
 		}
 
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
-
-		protected override void AppendSyntheticAttribute()
-		{
-			AppendIndent();
-			Result.AppendLine($"[{SyntheticAttribute.Name}]");
-		}
 
 		protected override void AppendParameterInitialization(
 			IReadOnlyCollection<T4ParameterDescription> descriptions
@@ -55,16 +43,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				AppendDisabledInspections(inspection);
 			}
 
-			Result.Append("        private global::");
-			var type = description.TypeToken;
-			if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
-			Result.AppendMapped(type);
-
+			Result.Append("        private ");
+			description.AppendTypeMapped(Result);
 			Result.Append(" ");
-			var name = description.NameToken;
-			if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
-			Result.AppendMapped(name);
-
+			description.AppendName(Result);
 			Result.Append(" => ");
 			Result.Append(description.FieldNameString);
 			Result.AppendLine(";");

@@ -1,6 +1,8 @@
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
@@ -8,16 +10,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 	public sealed class T4ParameterDescription
 	{
 		[NotNull]
-		public ITreeNode TypeToken { get; }
+		private ITreeNode TypeToken { get; }
 
 		[NotNull]
-		public ITreeNode NameToken { get; }
-
-		[NotNull]
-		public string TypeString { get; }
-
-		[NotNull]
-		public string NameString { get; }
+		private ITreeNode NameToken { get; }
 
 		[NotNull]
 		public string FieldNameString { get; }
@@ -25,15 +21,32 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		private T4ParameterDescription(
 			[NotNull] ITreeNode typeToken,
 			[NotNull] ITreeNode nameToken,
-			[NotNull] string typeString,
 			[NotNull] string nameString
 		)
 		{
 			TypeToken = typeToken;
 			NameToken = nameToken;
-			TypeString = typeString.EscapeKeyword();
-			NameString = nameString.EscapeKeyword();
 			FieldNameString = $"_{nameString}Field";
+		}
+
+		public void AppendName([NotNull] T4CSharpCodeGenerationResult result)
+		{
+			if (CSharpLexer.IsKeyword(NameToken.GetText())) result.Append("@");
+			result.AppendMapped(NameToken);
+		}
+
+		public void AppendTypeMapped([NotNull] T4CSharpCodeGenerationResult result)
+		{
+			result.Append("global::");
+			if (CSharpLexer.IsKeyword(TypeToken.GetText())) result.Append("@");
+			result.AppendMapped(TypeToken);
+		}
+
+		public void AppendType([NotNull] T4CSharpCodeGenerationResult result)
+		{
+			result.Append("global::");
+			if (CSharpLexer.IsKeyword(TypeToken.GetText())) result.Append("@");
+			result.Append(TypeToken.GetText());
 		}
 
 		[CanBeNull]
@@ -45,7 +58,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			string nameText = nameToken?.GetText();
 			if (string.IsNullOrEmpty(typeText)) return null;
 			if (string.IsNullOrEmpty(nameText)) return null;
-			return new T4ParameterDescription(typeToken, nameToken, typeText, nameText);
+			return new T4ParameterDescription(typeToken, nameToken, nameText);
 		}
 	}
 }

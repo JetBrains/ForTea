@@ -16,13 +16,13 @@ namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders.Impl
 		private static bool IsNearExpressionBlockLeftBoundary([NotNull] CSharpFmtStageContext ctx)
 		{
 			if (!(ctx.RightChild is ICommentNode comment)) return false;
-			return comment.GetText() == T4CSharpCodeBehindIntermediateConverterBase.ExpressionCommentStartText;
+			return comment.GetText() == T4CSharpCodeBehindIntermediateConverter.ExpressionCommentStartText;
 		}
 
 		private static bool IsNearExpressionBlockRightBoundary([NotNull] CSharpFmtStageContext ctx)
 		{
 			if (!(ctx.LeftChild is ICommentNode comment)) return false;
-			return comment.GetText() == T4CSharpCodeBehindIntermediateConverterBase.ExpressionCommentEndText;
+			return comment.GetText() == T4CSharpCodeBehindIntermediateConverter.ExpressionCommentEndText;
 		}
 	}
 }

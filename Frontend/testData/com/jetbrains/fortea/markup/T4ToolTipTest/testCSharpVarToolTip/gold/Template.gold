@@ -1,0 +1,8 @@
+<#
+    <object>var</object> x = new object();
+    foreach (<int>var</int> index in new[] {1, 2, 3})
+    {
+#><#= index #>
+<#
+    }
+#>
