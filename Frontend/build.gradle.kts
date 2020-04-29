@@ -192,8 +192,7 @@ tasks {
       showStandardStreams = true
       exceptionFormat = TestExceptionFormat.FULL
     }
-    val rerunSuccessfulTests = true
-    outputs.upToDateWhen { !rerunSuccessfulTests }
+    outputs.upToDateWhen { false }
     ignoreFailures = true
   }
 

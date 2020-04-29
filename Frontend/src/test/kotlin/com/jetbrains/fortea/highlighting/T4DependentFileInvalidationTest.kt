@@ -2,17 +2,17 @@ package com.jetbrains.fortea.highlighting
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.impl.EditorImpl
-import com.jetbrains.rdclient.daemon.IFrontendDocumentMarkupAdapter
+import com.jetbrains.rdclient.daemon.FrontendMarkupAdapter
 import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
 import com.jetbrains.rdclient.testFramework.typeWithLatency
 import com.jetbrains.rdclient.testFramework.waitForDaemon
-import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.annotateDocumentWithHighlighterTags
 import com.jetbrains.rider.daemon.util.severity
-import com.jetbrains.rider.solutionAnalysis.SolutionAnalysisHost
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
+import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 import java.io.File
 import java.io.PrintStream
@@ -86,6 +86,6 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
 
   private fun EditorImpl.dumpErrors() = dumpHighlightersTree(HighlightSeverity.ERROR)
 
-  private val EditorImpl.markupAdapter: IFrontendDocumentMarkupAdapter
+  private val EditorImpl.markupAdapter: FrontendMarkupAdapter
     get() = FrontendMarkupHost.getMarkupContributor(project!!, document)!!.markupAdapter
 }

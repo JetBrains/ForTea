@@ -2,30 +2,25 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp.Util;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
+namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters
 {
-	public class T4CSharpIntermediateConverter : T4CSharpIntermediateConverterBase
+	public class T4CSharpRealIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		public T4CSharpIntermediateConverter(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		) : base(intermediateResult, file)
+		public T4CSharpRealIntermediateConverter(
+			[NotNull] IT4File file,
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider
+		) : base(file, classNameProvider)
 		{
 		}
 
 		protected sealed override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
-
-		protected sealed override void AppendSyntheticAttribute()
-		{
-			// Synthetic attribute is only used for avoiding completion.
-			// It is not valid during compilation,
-			// so it should not be inserted in code
-		}
 
 		protected sealed override void AppendParameterInitialization(
 			IReadOnlyCollection<T4ParameterDescription> descriptions
@@ -81,7 +76,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 		}
 
-		protected override void AppendClass()
+		protected override void AppendClass(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			AppendIndent();
 			Result.AppendLine();
@@ -93,10 +88,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.AppendLine(
 				"[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"JetBrains.ForTea.TextTemplating\", \"42.42.42.42\")]");
-			base.AppendClass();
+			base.AppendClass(intermediateResult);
 		}
 
-		protected override void AppendTransformMethod()
+		protected override void AppendTransformMethod(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			Result.AppendLine("#line hidden");
 			AppendIndent();
@@ -105,7 +100,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine("/// Create the template output");
 			AppendIndent();
 			Result.AppendLine("/// </summary>");
-			base.AppendTransformMethod();
+			base.AppendTransformMethod(intermediateResult);
 		}
 
 		private void AppendClassSummary()
@@ -145,10 +140,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			// Host directive does not work for runtime templates
 		}
-
-		protected override string GeneratedClassName => File.CreateGeneratedClassName();
-		protected override string GeneratedBaseClassName => GeneratedClassName + "Base";
-		protected override string GeneratedBaseClassFQN => GeneratedBaseClassName;
 
 		protected override void AppendIndent(int size)
 		{

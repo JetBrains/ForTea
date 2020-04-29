@@ -1,0 +1,5 @@
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#
+  TextTransformation x = this;
+  TemplateBase y = this;<caret>
+#>

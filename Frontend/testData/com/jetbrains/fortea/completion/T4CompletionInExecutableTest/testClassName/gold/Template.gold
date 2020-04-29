@@ -1,0 +1,4 @@
+<#
+  GeneratedTextTransformation x = this;
+  Template y = this;<caret>
+#>

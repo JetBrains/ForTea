@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Generators;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
@@ -64,7 +64,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 			var location = new T4FileLocation(solution.GetComponent<ProjectModelViewHost>().GetIdByItem(projectFile));
 			try
 			{
-				string message = new T4CSharpPreprocessedCodeGenerator(contextFreeTree, solution).Generate().RawText;
+				string message = T4RiderCodeGeneration.GeneratePreprocessedCode(contextFreeTree).RawText;
 				solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "T4 template preprocessing", () =>
 				{
 					using (WriteLockCookie.Create())

@@ -1,0 +1,3 @@
+<#@ include file="$(<T4_MACRO>SolutionDir</T4_MACRO>)Include.ttinclude" #>
+<#@ assembly name="$(Foo)" #>
+<#@ assembly hello="$(<T4_MACRO>SolutionDir</T4_MACRO>)" #>

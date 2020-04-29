@@ -1,14 +1,9 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.Services;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
-using JetBrains.ReSharper.Psi.CSharp.Util;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
@@ -27,19 +22,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		};
 
 		protected T4CSharpCodeBehindIntermediateConverterBase(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		) : base(intermediateResult, file)
+			[NotNull] IT4File file,
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider
+		) : base(file, classNameProvider)
 		{
 		}
 
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
-
-		protected override void AppendSyntheticAttribute()
-		{
-			AppendIndent();
-			Result.AppendLine($"[{SyntheticAttribute.Name}]");
-		}
 
 		protected override void AppendParameterInitialization(
 			IReadOnlyCollection<T4ParameterDescription> descriptions
