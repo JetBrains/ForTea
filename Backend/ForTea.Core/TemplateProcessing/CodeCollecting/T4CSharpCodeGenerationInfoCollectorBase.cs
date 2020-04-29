@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
@@ -21,6 +22,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		private T4EncodingsManager EncodingsManager { get; }
 
 		[NotNull]
+		private IT4IncludeResolver IncludeResolver { get; }
+
+		[NotNull]
 		private T4IncludeGuard Guard { get; }
 
 		[NotNull, ItemNotNull]
@@ -37,6 +41,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
 			Guard = new T4IncludeGuard();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
+			IncludeResolver = solution.GetComponent<IT4IncludeResolver>();
 		}
 
 		[NotNull]
@@ -62,7 +67,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (!(element is IT4IncludeDirective include)) return;
 			var file = (IT4File) element.GetContainingFile().NotNull();
 			Results.Push(new T4CSharpCodeGenerationIntermediateResult(file, Interrupter));
-			var sourceFile = include.Path.Resolve();
+			var sourceFile = IncludeResolver.Resolve(include.ResolvedPath);
 			if (sourceFile == null)
 			{
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
@@ -110,7 +115,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			string suffix = Result.State.ProduceBeforeEof();
 			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
-			Guard.TryEndProcessing(includeDirectiveParam.Path.Resolve().GetLocation());
+			Guard.TryEndProcessing(IncludeResolver.Resolve(includeDirectiveParam.ResolvedPath).GetLocation());
 			var intermediateResults = Results.Pop();
 			Result.Append(intermediateResults);
 		}

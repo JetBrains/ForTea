@@ -6,7 +6,6 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
@@ -25,16 +24,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 		{
 			var solution = file.GetSolution();
 			var rootTemplateKindProvider = solution.GetComponent<IT4RootTemplateKindProvider>();
-			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile().NotNull();
-			T4CSharpCodeBehindIntermediateConverter converter;
-			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(projectFile))
+			T4CSharpCodeBehindIntermediateConverter сonverter;
+			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(file.PhysicalPsiSourceFile.NotNull()))
 			{
 				var provider = new T4PreprocessedClassNameProvider(file);
-				converter = new T4CSharpCodeBehindIntermediateConverter(file, provider);
+				сonverter = new T4CSharpCodeBehindIntermediateConverter(file, provider);
 			}
-			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
-			var Collector = new T4CSharpCodeBehindGenerationInfoCollector(solution);
-			return converter.Convert(Collector.Collect(file));
+			else сonverter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
+			var сollector = new T4CSharpCodeBehindGenerationInfoCollector(solution);
+			return сonverter.Convert(сollector.Collect(file));
 		}
 	}
 }

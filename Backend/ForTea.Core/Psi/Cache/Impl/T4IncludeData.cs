@@ -4,11 +4,11 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-	public sealed class T4FileDependencyData
+	public sealed class T4IncludeData
 	{
 		[NotNull, ItemNotNull]
 		public IList<FileSystemPath> Includes { get; }
 
-		public T4FileDependencyData([NotNull, ItemNotNull] IList<FileSystemPath> includes) => Includes = includes;
+		public T4IncludeData([NotNull, ItemNotNull] IList<FileSystemPath> includes) => Includes = includes;
 	}
 }

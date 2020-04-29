@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
-using JetBrains.Util;
+using JetBrains.DataFlow;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
 {
 	public interface IT4FileGraphNotifier
 	{
-		event Action<IEnumerable<FileSystemPath>> OnFilesIndirectlyAffected;
+		Signal<IEnumerable<IPsiSourceFile>> OnFilesIndirectlyAffected { get; }
 	}
 }

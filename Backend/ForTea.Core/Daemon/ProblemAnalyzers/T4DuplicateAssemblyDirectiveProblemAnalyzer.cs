@@ -35,7 +35,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 				.NotNull()
 				.GetThisAndChildrenOfType<IT4AssemblyDirective>()
 				.Where(it => it.GetTreeStartOffset() < elementStart)
-				.Where(it => Resolver.Resolve(it.Path) == assemblyPath);
+				.Where(it => Resolver.Resolve(it.ResolvedPath) == assemblyPath);
 			if (!earlierAssemblies.Any()) return;
 			consumer.AddHighlighting(new RedundantAssemblyWarning(element));
 		}

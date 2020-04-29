@@ -50,10 +50,9 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 				return new T4Parser(lexer, null, null, T4DocumentLexerSelector.Instance);
 			}
 
-			var projectFile = sourceFile.ToProjectFile();
 			var solution = sourceFile.GetSolution();
 			var graph = solution.GetComponent<IT4FileDependencyGraph>();
-			var rootSourceFile = graph.FindBestRoot(projectFile).ToSourceFile().NotNull();
+			var rootSourceFile = graph.FindBestRoot(sourceFile).NotNull();
 			var selector = new T4DelegatingLexerSelector(lexer, sourceFile, T4DocumentLexerSelector.Instance);
 			var rootLexer = selector.SelectLexer(rootSourceFile);
 			return new T4Parser(rootLexer, rootSourceFile, sourceFile, selector);

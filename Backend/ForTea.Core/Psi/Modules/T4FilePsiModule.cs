@@ -105,7 +105,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				resolveContext,
 				shellLocks
 			);
-			ProjectReferenceManager = new T4ProjectReferenceManager(ProjectFile, Solution);
+			ProjectReferenceManager = new T4ProjectReferenceManager(SourceFile, Solution);
 
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
 			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);

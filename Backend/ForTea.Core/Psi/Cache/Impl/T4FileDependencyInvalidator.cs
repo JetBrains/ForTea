@@ -1,80 +1,74 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Util;
-using JetBrains.Util.dataStructures;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
+	/// <summary>
+	/// PSI for T4 files might depend on other T4 files.
+	/// To keep it up-to-date, we need to mark a file as dirty
+	/// whenever anything it depends on is changed in any way.
+	/// </summary>
 	[SolutionComponent]
-	public sealed class T4FileDependencyInvalidator
+	public class T4FileDependencyInvalidator
 	{
-		[NotNull]
-		private ISolution Solution { get; }
+		[NotNull, ItemNotNull]
+		private ISet<IPsiSourceFile> IndirectDependencies { get; set; } =
+			new HashSet<IPsiSourceFile>();
 
 		[NotNull, ItemNotNull]
-		private ISet<IPsiSourceFile> IndirectDependencies { get; } = new HashSet<IPsiSourceFile>();
-
-		/// <summary>
-		/// Guarantees that T4 file invalidation does not invalidate more than necessary
-		/// and does not get stuck in an infinite loop
-		/// </summary>
-		private T4CommitStage CommitStage { get; set; }
+		private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; set; } =
+			new HashSet<IPsiSourceFile>();
 
 		[NotNull]
-		private IPsiServices PsiServices { get; }
+		protected IPsiServices Services { get; }
+
+		private Lifetime Lifetime { get; }
 
 		public T4FileDependencyInvalidator(
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
-			[NotNull] IPsiServices services,
-			[NotNull] ISolution solution,
-			[NotNull] IPsiServices psiServices
+			[NotNull] IPsiServices services
 		)
 		{
-			Solution = solution;
-			PsiServices = psiServices;
-			services.Files.ObserveAfterCommit(lifetime, () =>
-			{
-				if (CommitStage == T4CommitStage.DependencyInvalidation) return;
-				CommitStage = T4CommitStage.DependencyInvalidation;
-				try
-				{
-					using (WriteLockCookie.Create())
-					{
-						// Filter just in case a miracle happens and the file gets deleted before being marked as dirty
-						foreach (var file in IndirectDependencies.Where(file => file.IsValid()))
-						{
-							services.Files.MarkAsDirty(file);
-							services.Caches.MarkAsDirty(file);
-						}
-					}
+			Lifetime = lifetime;
+			Services = services;
+			services.Files.ObserveAfterCommit(lifetime, AfterCommit);
+			notifier.OnFilesIndirectlyAffected.Advise(lifetime, OnFilesIndirectlyAffected);
+		}
 
-					IndirectDependencies.Clear();
-					services.Files.CommitAllDocuments();
-				}
-				finally
-				{
-					CommitStage = T4CommitStage.UserChangeApplication;
-				}
-			});
-			notifier.OnFilesIndirectlyAffected += paths =>
+		protected virtual void AfterCommit() =>
+			Services.Locks.ExecuteOrQueue(Lifetime, "T4 indirect dependencies invalidation", () =>
 			{
-				if (CommitStage == T4CommitStage.DependencyInvalidation) return;
-				// We want all files that were included before the update
-				// and all the files that have become included now
-				// to be updated, so we'll mark them as dirty later
-				IndirectDependencies.AddRange(paths
-					.Distinct()
-					.SelectMany(Solution.FindProjectItemsByLocation)
-					.OfType<IProjectFile>()
-					.Select(PsiServices.Modules.GetPsiSourceFilesFor)
-					.SelectMany(sourceFiles => sourceFiles.AsEnumerable()));
-			};
+				using var cookie = WriteLockCookie.Create();
+				foreach (var file in IndirectDependencies)
+				{
+					file.SetBeingIndirectlyUpdated(true);
+					Services.Caches.MarkAsDirty(file);
+					Services.Files.MarkAsDirty(file);
+				}
+
+				foreach (var file in PreviousIterationIndirectDependencies.Except(IndirectDependencies))
+				{
+					file.SetBeingIndirectlyUpdated(false);
+				}
+
+				PreviousIterationIndirectDependencies = IndirectDependencies;
+				IndirectDependencies = new HashSet<IPsiSourceFile>();
+			});
+
+		protected virtual void OnFilesIndirectlyAffected([NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> files)
+		{
+			Services.Locks.AssertMainThread();
+			foreach (var file in files)
+			{
+				IndirectDependencies.Add(file);
+			}
 		}
 	}
 }

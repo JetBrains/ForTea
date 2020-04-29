@@ -1,4 +1,4 @@
-namespace GammaJul.ForTea.Core.Psi.Cache.Impl
+namespace JetBrains.ForTea.Tests.Mock
 {
 	public enum T4CommitStage
 	{

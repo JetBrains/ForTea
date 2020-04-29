@@ -1,6 +1,5 @@
 using System;
 using GammaJul.ForTea.Core.Psi.Modules;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -40,42 +39,33 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			IModuleReferenceResolveContext resolveContext
 		) => ResolveManager.Resolve(target, project, resolveContext);
 
-		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.Path);
+		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.ResolvedPath);
 
 		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{
 			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return null;
-			var pathWithMacros = new T4PathWithMacros(assemblyNameOrFile, sourceFile, projectFile);
-			return Resolve(pathWithMacros);
+			var path = new T4ResolvedPath(assemblyNameOrFile, sourceFile, projectFile);
+			return Resolve(path);
 		}
 
-		public FileSystemPath Resolve([NotNull] IT4PathWithMacros pathWithMacros) =>
-			ResolveAsAbsolutePath(pathWithMacros)
-			?? ResolveAsLightReference(pathWithMacros)
-			?? ResolveAsAssemblyName(pathWithMacros)
-			?? ResolveAsAssemblyFile(pathWithMacros);
+		public FileSystemPath Resolve(T4ResolvedPath path) =>
+			ResolveAsLightReference(path)
+			?? ResolveAsAssemblyName(path)
+			?? ResolveAsAssemblyFile(path);
 
 		[CanBeNull]
-		private static FileSystemPath ResolveAsAbsolutePath([NotNull] IT4PathWithMacros pathWithMacros)
+		private FileSystemPath ResolveAsLightReference([NotNull] T4ResolvedPath pathWithMacros) =>
+			LightWeightResolver.TryResolve(pathWithMacros);
+
+		[CanBeNull]
+		private FileSystemPath ResolveAsAssemblyName([NotNull] T4ResolvedPath pathWithMacros) =>
+			ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, pathWithMacros.ResolvedPath);
+
+		[CanBeNull]
+		private FileSystemPath ResolveAsAssemblyFile([NotNull] T4ResolvedPath pathWithMacros)
 		{
-			var path = pathWithMacros.ResolvePath();
-			if (path.IsAbsolute) return path;
-			return null;
-		}
-
-		[CanBeNull]
-		private FileSystemPath ResolveAsLightReference([NotNull] IT4PathWithMacros pathWithMacros) =>
-			LightWeightResolver.TryResolve(pathWithMacros.ProjectFile, pathWithMacros.ResolveString());
-
-		[CanBeNull]
-		private FileSystemPath ResolveAsAssemblyName([NotNull] IT4PathWithMacros pathWithMacros) =>
-			ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, pathWithMacros.ResolveString());
-
-		[CanBeNull]
-		private FileSystemPath ResolveAsAssemblyFile([NotNull] IT4PathWithMacros pathWithMacros)
-		{
-			string name = pathWithMacros.ResolveString();
+			string name = pathWithMacros.ResolvedPath;
 			string nameWithoutExtension = TryRemoveBinaryExtension(name);
 			if (nameWithoutExtension == null) return null;
 			string fileName = name.Substring(0, name.Length - 4);

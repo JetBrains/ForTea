@@ -40,8 +40,8 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		{
 			var assembliesToResolve = file
 				.GetThisAndChildrenOfType<IT4AssemblyDirective>()
-				.Select(directive => directive.Path)
-				.Select(path => path.ResolveString())
+				.Select(directive => directive.ResolvedPath)
+				.Select(path => path.ResolvedPath)
 				.Distinct();
 			return new T4LightWeightAssemblyResolutionRequest(assembliesToResolve);
 		}

@@ -4,7 +4,6 @@ using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
-using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -68,8 +67,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			if (!(moduleTo is T4FilePsiModule t4Module)) return base.InternalsVisibleTo(moduleTo, moduleFrom);
 			if (moduleFrom is IAssemblyPsiModule) return false;
 			if (!(moduleFrom is IProjectPsiModule projectModule)) return false;
-			var projectFile = t4Module.SourceFile.ToProjectFile().NotNull();
-			var root = projectFile.GetSolution().GetComponent<IT4FileDependencyGraph>().FindBestRoot(projectFile);
+			var sourceFile = t4Module.SourceFile;
+			var root = sourceFile.GetSolution().GetComponent<IT4FileDependencyGraph>().FindBestRoot(sourceFile);
 			if (!TemplateKindProvider.IsPreprocessedTemplate(root)) return false;
 			return Equals(root.GetProject(), projectModule.Project);
 		}
