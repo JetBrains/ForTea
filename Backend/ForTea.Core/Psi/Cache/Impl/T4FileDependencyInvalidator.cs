@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Utils;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
@@ -16,7 +15,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	/// whenever anything it depends on is changed in any way.
 	/// </summary>
 	[SolutionComponent]
-	public sealed class T4FileDependencyInvalidator
+	public class T4FileDependencyInvalidator
 	{
 		[NotNull, ItemNotNull]
 		private ISet<IPsiSourceFile> IndirectDependencies { get; set; } =
@@ -26,42 +25,50 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; set; } =
 			new HashSet<IPsiSourceFile>();
 
+		[NotNull]
+		protected IPsiServices Services { get; }
+
+		private Lifetime Lifetime { get; }
+
 		public T4FileDependencyInvalidator(
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
 			[NotNull] IPsiServices services
 		)
 		{
-			services.Files.ObserveAfterCommit(lifetime, () => services.Locks.QueueOrExecute(
-				lifetime,
-				"T4 indirect dependencies invalidation",
-				() =>
-				{
-					using var cookie = WriteLockCookie.Create();
-					foreach (var file in IndirectDependencies)
-					{
-						file.SetBeingIndirectlyUpdated(true);
-						services.Caches.MarkAsDirty(file);
-						services.Files.MarkAsDirty(file);
-					}
+			Lifetime = lifetime;
+			Services = services;
+			services.Files.ObserveAfterCommit(lifetime, AfterCommit);
+			notifier.OnFilesIndirectlyAffected.Advise(lifetime, OnFilesIndirectlyAffected);
+		}
 
-					foreach (var file in PreviousIterationIndirectDependencies.Except(IndirectDependencies))
-					{
-						file.SetBeingIndirectlyUpdated(false);
-					}
-
-					PreviousIterationIndirectDependencies = IndirectDependencies;
-					IndirectDependencies = new HashSet<IPsiSourceFile>();
-				}
-			));
-			notifier.OnFilesIndirectlyAffected.Advise(lifetime, files =>
+		protected virtual void AfterCommit() =>
+			Services.Locks.ExecuteOrQueue(Lifetime, "T4 indirect dependencies invalidation", () =>
 			{
-				services.Locks.AssertMainThread();
-				foreach (var file in files)
+				using var cookie = WriteLockCookie.Create();
+				foreach (var file in IndirectDependencies)
 				{
-					IndirectDependencies.Add(file);
+					file.SetBeingIndirectlyUpdated(true);
+					Services.Caches.MarkAsDirty(file);
+					Services.Files.MarkAsDirty(file);
 				}
+
+				foreach (var file in PreviousIterationIndirectDependencies.Except(IndirectDependencies))
+				{
+					file.SetBeingIndirectlyUpdated(false);
+				}
+
+				PreviousIterationIndirectDependencies = IndirectDependencies;
+				IndirectDependencies = new HashSet<IPsiSourceFile>();
 			});
+
+		protected virtual void OnFilesIndirectlyAffected([NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> files)
+		{
+			Services.Locks.AssertMainThread();
+			foreach (var file in files)
+			{
+				IndirectDependencies.Add(file);
+			}
 		}
 	}
 }
