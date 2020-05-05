@@ -46,8 +46,7 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 		private static string CreateMessage([NotNull, ItemNotNull] IList<DirectiveAttributeInfo> infos) =>
 			infos.Count switch
 			{
-				_ when infos.Count < 0 => "",
-				0 => throw new InvalidOperationException(),
+				_ when infos.Count <= 0 => throw new InvalidOperationException(),
 				1 => "Missing required attribute: {0}".FormatEx(infos.Single().Name),
 				_ => infos
 					.Take(infos.Count - 1)
