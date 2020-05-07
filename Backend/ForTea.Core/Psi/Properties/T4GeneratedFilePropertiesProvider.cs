@@ -31,7 +31,16 @@ namespace GammaJul.ForTea.Core.Psi.Properties
 		{
 			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return prevProperties;
-			var checker = sourceFile.GetSolution().GetComponent<IT4TargetFileChecker>();
+
+			// Solution can actually be null for invalid files.
+			// Access to the component has to be safe because this is a shell component,
+			// while IT4TargetFileChecker is a solution component,
+			// so accessing it directly can cause an exception
+			// if the daemon requests properties for a file after solution has been closed
+
+			// ReSharper disable once ConstantConditionalAccessQualifier
+			var checker = sourceFile.GetSolution()?.TryGetComponent<IT4TargetFileChecker>();
+			if (checker == null) return prevProperties;
 			if (checker.IsPreprocessResult(projectFile)) return T4PreprocessResultProjectFileProperties.Instance;
 			return prevProperties;
 		}
