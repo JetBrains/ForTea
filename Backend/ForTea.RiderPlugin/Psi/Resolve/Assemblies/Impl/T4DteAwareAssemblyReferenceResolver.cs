@@ -8,7 +8,7 @@ using EnvDTE90;
 using EnvDTE90a;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
@@ -29,8 +29,8 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 		{
 		}
 
-		public override FileSystemPath Resolve(IT4PathWithMacros pathWithMacros) =>
-			base.Resolve(pathWithMacros) ?? ResolveAsDte(pathWithMacros.ResolveString());
+		public override FileSystemPath Resolve(T4ResolvedPath pathWithMacros) =>
+			base.Resolve(pathWithMacros) ?? ResolveAsDte(pathWithMacros.ResolvedPath);
 
 		[CanBeNull]
 		private static FileSystemPath ResolveAsDte([NotNull] string assemblyName)
