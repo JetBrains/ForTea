@@ -43,11 +43,11 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 		[NotNull, ItemNotNull]
 		private static IEnumerable<Assembly> EnvDTEAssemblies { get; } = new[]
 		{
-			typeof(Solution).Assembly,
-			typeof(Solution2).Assembly,
-			typeof(Solution3).Assembly,
-			typeof(Debugger4).Assembly,
-			typeof(Solution4).Assembly
+			typeof(Solution).Assembly, // EnvDTE.dll
+			typeof(Solution2).Assembly, // EnvDTE80.dll
+			typeof(Solution3).Assembly, // EnvDTE90.dll
+			typeof(Debugger4).Assembly, // EnvDTE90a.dll
+			typeof(Solution4).Assembly // EnvDTE100.dll
 		};
 
 		private static IDictionary<string, Assembly> NameToEnvDTEAssemblyMap { get; } = EnvDTEAssemblies
