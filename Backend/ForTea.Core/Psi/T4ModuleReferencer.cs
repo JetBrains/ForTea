@@ -10,6 +10,7 @@ using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Transactions;
+using JetBrains.Util;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core.Psi {
@@ -27,7 +28,7 @@ namespace GammaJul.ForTea.Core.Psi {
 			&& moduleToReference.ContainingProjectModule is IAssembly assembly
 			&& _environment.TargetFrameworkId.IsReferenceAllowed(assembly.TargetFrameworkId);
 
-		public bool CanReferenceModule(IPsiModule module, IPsiModule moduleToReference, IPresentableItem presentation)
+		public bool CanReferenceModule(IPsiModule module, IPsiModule moduleToReference, UserDataHolder userDataHolder)
 			=> CanReferenceModule(module, moduleToReference);
 
 		public bool ReferenceModule(IPsiModule module, IPsiModule moduleToReference)

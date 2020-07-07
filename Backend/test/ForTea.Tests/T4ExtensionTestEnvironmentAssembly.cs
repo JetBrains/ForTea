@@ -89,7 +89,7 @@ namespace JetBrains.ForTea.Tests
 
 				// Components in a file
 				// NOTE: this file can't be a [Transformed]SubplatformFileForPackaging because the components are built out of the transformed files themselves, and this would require another level of post-transformed files, which we would not yet like to do
-				return new SimpleFileItem(
+				return new ImmutableFileItem(
 					NugetApplicationPackageConvention.GetJetMetadataEffectivePath(packageArtifact),
 					StructuredStorages.CreateMemoryStream(storage => resolver.GetObjectData(storage)));
 			});
