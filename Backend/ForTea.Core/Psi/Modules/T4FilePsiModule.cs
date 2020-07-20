@@ -60,6 +60,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		public string Name => Prefix + SourceFile.Name;
 		public string DisplayName => Prefix + SourceFile.DisplayName;
 		public TargetFrameworkId TargetFrameworkId { get; }
+		public TargetFrameworkId OriginalTargetFrameworkId { get; }
 		public PsiLanguageType PsiLanguage => T4Language.Instance;
 		public ProjectFileType ProjectFileType => T4ProjectFileType.Instance;
 		public IModule ContainingProjectModule => Project;
@@ -109,6 +110,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
 			PersistentId = BuildPersistentId(primaryTargetFrameworkId);
+			OriginalTargetFrameworkId = primaryTargetFrameworkId;
 		}
 
 		public void AddBaseReferences() => AssemblyReferenceManager.AddBaseReferences();

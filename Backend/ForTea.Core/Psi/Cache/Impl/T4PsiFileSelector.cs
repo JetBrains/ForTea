@@ -1,8 +1,10 @@
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
@@ -33,14 +35,14 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				.FindProjectItemsByLocation(path)
 				.OfType<IProjectFile>()
 				.AsList();
-			var targetFrameworkId = requester.PsiModule.TargetFrameworkId;
+			var targetFrameworkId = requester.PsiModule.GetT4TargetFrameworkId().NotNull();
 			var correctBuildActionItem = potentialProjectFiles
 				.FirstOrDefault(file => file.Properties.GetBuildAction(targetFrameworkId) == BuildAction.NONE);
 			var projectFile = correctBuildActionItem ?? potentialProjectFiles.FirstOrDefault();
 			if (projectFile == null) return null;
 			var sourceFiles = projectFile.ToSourceFiles();
 			var correctTargetFrameworkItem = sourceFiles
-				.FirstOrDefault<object>(null, (_, file) => file.PsiModule.TargetFrameworkId == targetFrameworkId);
+				.FirstOrDefault<object>(null, (_, file) => file.PsiModule.GetT4TargetFrameworkId() == targetFrameworkId);
 			return correctTargetFrameworkItem ?? sourceFiles.FirstOrDefault();
 		}
 	}

@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
@@ -8,5 +9,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 	{
 		[NotNull]
 		IPsiSourceFile SourceFile { get; }
+
+		[CanBeNull]
+		TargetFrameworkId OriginalTargetFrameworkId { get; }
 	}
 }
