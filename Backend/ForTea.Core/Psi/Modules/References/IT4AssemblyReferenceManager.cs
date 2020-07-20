@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Modules.References
 {
@@ -16,10 +15,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References
 		[NotNull]
 		[ItemNotNull]
 		IEnumerable<IModule> ProjectReferences { get; }
-
-		[NotNull]
-		[ItemNotNull]
-		IEnumerable<FileSystemPath> RawReferences { get; }
 
 		void AddBaseReferences();
 

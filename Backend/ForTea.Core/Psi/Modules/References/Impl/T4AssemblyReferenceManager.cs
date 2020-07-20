@@ -37,7 +37,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			MyAssemblyReferences.Values.SelectNotNull(cookie => cookie.Assembly);
 
 		public IEnumerable<IModule> ProjectReferences => MyProjectReferences.Values;
-		public IEnumerable<FileSystemPath> RawReferences => MyAssemblyReferences.Keys.Concat(MyProjectReferences.Keys);
 
 		[NotNull]
 		private IPsiSourceFile SourceFile { get; }

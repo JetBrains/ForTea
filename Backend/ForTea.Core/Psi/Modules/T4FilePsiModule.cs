@@ -70,8 +70,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			get { yield return SourceFile; }
 		}
 
-		public IEnumerable<FileSystemPath> RawReferences => AssemblyReferenceManager.RawReferences;
-
 		public T4FilePsiModule(
 			Lifetime lifetime,
 			[NotNull] IProjectFile projectFile,
