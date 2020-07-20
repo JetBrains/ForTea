@@ -1,17 +1,17 @@
-using JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.TextControl.DocumentMarkup;
 
-[assembly: RegisterHighlighter(PredefinedHighlighterIds.Identifier, EffectType = EffectType.TEXT)]
-[assembly: RegisterHighlighter(PredefinedHighlighterIds.UserType, EffectType = EffectType.TEXT)]
-[assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeDelegate, EffectType = EffectType.TEXT)]
-[assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeEnum, EffectType = EffectType.TEXT)]
-[assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeInterface, EffectType = EffectType.TEXT)]
-[assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeTypeParameter, EffectType = EffectType.TEXT)]
-[assembly: RegisterHighlighter(PredefinedHighlighterIds.UserTypeValueType, EffectType = EffectType.TEXT)]
-
-namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings {
-	public static class PredefinedHighlighterIds {
+namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings
+{
+	[RegisterHighlighter(Identifier, EffectType = EffectType.TEXT),
+	 RegisterHighlighter(UserType, EffectType = EffectType.TEXT),
+	 RegisterHighlighter(UserTypeDelegate, EffectType = EffectType.TEXT),
+	 RegisterHighlighter(UserTypeEnum, EffectType = EffectType.TEXT),
+	 RegisterHighlighter(UserTypeInterface, EffectType = EffectType.TEXT),
+	 RegisterHighlighter(UserTypeTypeParameter, EffectType = EffectType.TEXT),
+	 RegisterHighlighter(UserTypeValueType, EffectType = EffectType.TEXT)]
+	public static class PredefinedHighlighterIds
+	{
 		public const string Comment = HighlightingAttributeIds.COMMENT;
 		public const string Identifier = "Identifier";
 		public const string Keyword = HighlightingAttributeIds.KEYWORD;
