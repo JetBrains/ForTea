@@ -1,8 +1,9 @@
 using GammaJul.ForTea.Core.Daemon.Attributes;
-using JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes;
 using JetBrains.TextControl.DocumentMarkup;
 
-[assembly: RegisterHighlighter(
+namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
+{
+[RegisterHighlighter(
 	T4HighlightingAttributeIds.BLOCK_TAG,
 	GroupId = T4HighlightingAttributeGroup.ID,
 	EffectType = EffectType.TEXT,
@@ -11,3 +12,5 @@ using JetBrains.TextControl.DocumentMarkup;
 	Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
 	VSPriority = VSPriority.IDENTIFIERS
 )]
+public static class T4ReSharperHighlightingAttributeIds{}
+}
