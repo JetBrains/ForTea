@@ -2,8 +2,11 @@ package com.jetbrains.fortea.highlighting
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.impl.EditorImpl
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
+import com.jetbrains.rider.test.base.PrepareTestEnvironment
+import org.testng.annotations.BeforeSuite
 
 abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
   abstract override fun getSolutionDirectoryName(): String
@@ -34,4 +37,8 @@ abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
 
   private fun doTestWithMarkupModel(testAction: EditorImpl.() -> Unit) =
     doTestWithMarkupModel(fileName, testFilePath, goldFileName, testAction)
+
+//  @BeforeSuite(dependsOnMethods = ["initApplication"])
+//  fun postInitApplication() =
+//    VfsRootAccess.allowRootAccess(project, PrepareTestEnvironment.dotnetCoreCliPath)
 }
