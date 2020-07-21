@@ -4,7 +4,6 @@ using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
@@ -15,8 +14,17 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		private T4OutsideSolutionSourceFileManager OutsideSolutionManager { get; }
 
-		public T4PsiFileSelector([NotNull] T4OutsideSolutionSourceFileManager outsideSolutionManager) =>
+		[NotNull]
+		private ILogger Logger { get; }
+
+		public T4PsiFileSelector(
+			[NotNull] T4OutsideSolutionSourceFileManager outsideSolutionManager,
+			[NotNull] ILogger logger
+		)
+		{
 			OutsideSolutionManager = outsideSolutionManager;
+			Logger = logger;
+		}
 
 		public IPsiSourceFile FindMostSuitableFile(FileSystemPath path, IPsiSourceFile requester)
 		{
@@ -27,7 +35,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		}
 
 		[CanBeNull]
-		private static IPsiSourceFile TryFindFileInSolution([NotNull] FileSystemPath path, [NotNull] IPsiSourceFile requester)
+		private IPsiSourceFile TryFindFileInSolution([NotNull] FileSystemPath path, [NotNull] IPsiSourceFile requester)
 		{
 			if (path.IsEmpty) return null;
 			var potentialProjectFiles = requester
@@ -35,9 +43,24 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				.FindProjectItemsByLocation(path)
 				.OfType<IProjectFile>()
 				.AsList();
-			var targetFrameworkId = requester.PsiModule.GetT4TargetFrameworkId().NotNull();
-			var correctBuildActionItem = potentialProjectFiles
-				.FirstOrDefault(file => file.Properties.GetBuildAction(targetFrameworkId) == BuildAction.NONE);
+			var requesterPsiModule = requester.PsiModule;
+			var targetFrameworkId = requesterPsiModule.GetT4TargetFrameworkId();
+			IProjectFile correctBuildActionItem;
+			if (targetFrameworkId == null)
+			{
+				correctBuildActionItem = null;
+				Logger.Warn(
+					"Requester has no target framework! Requester: {0}, requester module: {1}",
+					requester.GetType(),
+					requesterPsiModule.GetType()
+				);
+			}
+			else
+			{
+				correctBuildActionItem = potentialProjectFiles
+					.FirstOrDefault(file => file.Properties.GetBuildAction(targetFrameworkId) == BuildAction.NONE);
+			}
+
 			var projectFile = correctBuildActionItem ?? potentialProjectFiles.FirstOrDefault();
 			if (projectFile == null) return null;
 			var sourceFiles = projectFile.ToSourceFiles();
