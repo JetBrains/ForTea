@@ -2,7 +2,10 @@ package com.jetbrains.fortea.run
 
 import com.intellij.execution.ExecutionManager
 import com.intellij.execution.impl.ExecutionManagerImpl
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.jetbrains.fortea.configuration.execution.impl.T4SynchronousRunConfigurationExecutor
 import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
@@ -14,6 +17,7 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.base.PrepareTestEnvironment
 import com.jetbrains.rider.test.framework.combine
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.flushQueues
@@ -21,10 +25,12 @@ import com.jetbrains.rider.test.scriptingApi.waitAllCommandsFinished
 import com.jetbrains.rider.test.scriptingApi.waitForProjectModelReady
 import com.jetbrains.rider.util.idea.application
 import com.jetbrains.rider.util.idea.getComponent
+import org.testng.annotations.AfterSuite
 import org.testng.annotations.BeforeMethod
+import org.testng.annotations.BeforeSuite
 import java.io.File
 
-open class T4RunFileTestBase : BaseTestWithSolution() {
+open class T4RunFileTestBase : BaseTestWithSolution(), Disposable {
   override val waitForCaches = true
   override fun getSolutionDirectoryName() = testMethod.name
 
@@ -101,4 +107,15 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
   protected fun assertNoOutputWithExtension(extension: String) = assert(outputFileCandidates.none {
     it.nameWithoutExtension == t4File.nameWithoutExtension && it.name.endsWith(extension)
   })
+
+  override fun dispose() = Unit
+
+  @BeforeSuite(dependsOnMethods = ["initApplication"])
+  fun postSetupSolution() {
+    VfsRootAccess.allowRootAccess(this, PrepareTestEnvironment.dotnetCoreCliPath)
+    VfsRootAccess.allowRootAccess(this, PrepareTestEnvironment.msbuildPath)
+  }
+
+  @AfterSuite
+  fun postCloseSolution() = Disposer.dispose(this)
 }
