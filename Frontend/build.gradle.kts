@@ -40,7 +40,7 @@ grammarKit {
   grammarKitRelease = "2019.3"
 }
 
-val baseVersion = "2020.2"
+val baseVersion = "2020.3"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
