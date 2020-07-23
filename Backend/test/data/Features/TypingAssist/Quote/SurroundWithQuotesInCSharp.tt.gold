@@ -1,0 +1,3 @@
+﻿<#
+    string s = "hello, world!"{caret}
+#>

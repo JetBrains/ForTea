@@ -25,6 +25,7 @@ namespace JetBrains.ForTea.Tests.Features.TypingAssist
 		[TestCase("OneQuoteInText", 1)]
 		[TestCase("TwoQuotesInText", 2)]
 		[TestCase("ThreeQuotesInText", 3)]
+		[TestCase("SurroundWithQuotesInCSharp", 1)]
 		public void TestTypingAssist([NotNull] string name, int quoteNumber)
 		{
 			QuoteNumber = quoteNumber;
