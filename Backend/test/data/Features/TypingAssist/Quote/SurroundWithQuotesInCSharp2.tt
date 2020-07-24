@@ -1,0 +1,8 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#
+    var x = {selstart}1 
+      + @"\n" + "\r" +
+      + {selend}4;
+#>
