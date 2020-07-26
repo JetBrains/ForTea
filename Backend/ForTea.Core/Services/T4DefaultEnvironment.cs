@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
-namespace GammaJul.ForTea.Core.Impl
+namespace GammaJul.ForTea.Core.Services
 {
 	[ShellComponent]
 	public class T4DefaultEnvironment : IT4Environment

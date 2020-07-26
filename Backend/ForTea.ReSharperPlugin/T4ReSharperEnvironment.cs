@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using GammaJul.ForTea.Core.Impl;
+using GammaJul.ForTea.Core.Services;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.platforms;

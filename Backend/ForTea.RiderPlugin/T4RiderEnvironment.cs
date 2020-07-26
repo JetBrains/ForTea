@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Impl;
+using GammaJul.ForTea.Core.Services;
 using JetBrains.Application;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
