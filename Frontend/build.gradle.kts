@@ -244,6 +244,10 @@ tasks {
     // it is built on the server as Ridier bundled plugin
     enabled = buildConfiguration == "Release"
   }
+
+  getByName("buildPlugin") {
+    dependsOn("prepare")
+  }
 }
 
 defaultTasks("prepare")
