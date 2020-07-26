@@ -1,0 +1,5 @@
+<#@ template language="C#" visibility="internal" #>
+<#+
+    public InternalClass SomePublicProperty { get; } = null;
+    internal class InternalClass {}
+#>

@@ -107,7 +107,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected virtual void AppendClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			AppendIndent();
-			Result.Append($"public partial class {ClassNameProvider.GeneratedClassName} : ");
+			Result.Append(intermediateResult.AccessRightsText);
+			Result.Append($" partial class {ClassNameProvider.GeneratedClassName} : ");
 			AppendBaseClassName(intermediateResult);
 			Result.AppendLine();
 			AppendIndent();
