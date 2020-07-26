@@ -1,7 +1,3 @@
-    /// <summary>
-    /// Base class for this transformation
-    /// </summary>
-    public class $(PARAMETER_0)
     {
     	/// <summary>
     	/// The string builder that generation-time code is using to assemble generated output

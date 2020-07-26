@@ -70,6 +70,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 		}
 
+		protected override string BaseClassDescription =>
+			"    /// <summary>\n    /// Base class for this transformation\n    /// </summary>";
+
 		protected override bool ShouldAppendPragmaDirectives => true;
 
 		#region IT4ElementAppendFormatProvider

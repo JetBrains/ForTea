@@ -208,13 +208,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			if (intermediateResult.HasBaseClass) return;
+			Result.AppendLine(BaseClassDescription);
+			AppendIndent();
+			Result.Append(intermediateResult.AccessRightsText);
+			Result.Append(" class ");
+			Result.AppendLine(ClassNameProvider.GeneratedBaseClassName);
 			string resource = BaseClassResourceName;
 			var provider = new T4TemplateResourceProvider(resource);
-			Result.Append(provider.ProcessResource(ClassNameProvider.GeneratedBaseClassName));
+			Result.Append(provider.Template);
 		}
 
 		protected abstract void AppendHost();
 		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
+
+		[NotNull]
+		protected abstract string BaseClassDescription { get; }
 
 		[NotNull]
 		protected abstract string BaseClassResourceName { get; }

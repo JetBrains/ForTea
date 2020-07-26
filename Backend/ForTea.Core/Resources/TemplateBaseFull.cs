@@ -1,11 +1,3 @@
-    #line default
-    #line hidden
-    #region Base class
-    /// <summary>
-    /// Base class for this transformation
-    /// </summary>
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("JetBrains.ForTea.TextTemplating", "42.42.42.42")]
-    public class $(PARAMETER_0)
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
