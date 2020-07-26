@@ -133,7 +133,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			.Select(rangeTranslator.GeneratedToOriginal)
 			.Where(originalRange => originalRange.IsValid())
 			.SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
-			.Any(it => it is IT4StatementBlock);
+			.Any(it => it.GetParentOfType<IT4StatementBlock>() != null);
 
 		[Pure]
 		private static bool HasLineBreak([NotNull] IT4CodeBlock codeBlock, int nodeStart, TreeOffset blockStart) =>

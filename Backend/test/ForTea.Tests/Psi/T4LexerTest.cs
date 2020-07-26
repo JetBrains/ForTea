@@ -18,6 +18,7 @@ namespace JetBrains.ForTea.Tests.Psi
 		[TestCase("VBCode")]
 		[TestCase("ComplexValue")]
 		[TestCase("EmptyDirective")]
+		[TestCase("MultilineExpression")]
 		public void TestLexer(string name) => DoOneTest(name);
 
 		[TestCase("ForgottenBlockEnd")]

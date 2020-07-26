@@ -5,8 +5,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders
 {
-	internal abstract class T4BlockInnerBoundSpaceTypeProviderBase<TBlock> : T4BlockSpaceTypeProviderBase
-		where TBlock : class, IT4CodeBlock
+	internal abstract class T4BlockInnerBoundSpaceTypeProviderBase : T4BlockSpaceTypeProviderBase
 	{
 		protected override bool IsApplicable(CSharpFmtStageContext ctx) =>
 			IsInBlockLeftBound(ctx) || IsInBlockRightBound(ctx);
@@ -15,7 +14,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders
 		{
 			if (!(ctx.LeftChild is ICommentNode comment)) return false;
 			if (comment.GetText() != StartComment) return false;
-			var rightExpressionBlock = ctx.RightChild.GetFirstTokenIn().GetT4ContainerFromCSharpNode<TBlock>();
+			var rightExpressionBlock = ctx.RightChild.GetFirstTokenIn().GetT4ContainerFromCSharpNode<IT4CodeBlock>();
 			if (rightExpressionBlock == null) return false;
 			return true;
 		}
@@ -24,7 +23,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders
 		{
 			if (!(ctx.RightChild is ICommentNode comment)) return false;
 			if (comment.GetText() != EndComment) return false;
-			var leftExpressionBlock = ctx.LeftChild.GetLastTokenIn().GetT4ContainerFromCSharpNode<TBlock>();
+			var leftExpressionBlock = ctx.LeftChild.GetLastTokenIn().GetT4ContainerFromCSharpNode<IT4CodeBlock>();
 			if (leftExpressionBlock == null) return false;
 			return true;
 		}

@@ -19,7 +19,6 @@ namespace JetBrains.ForTea.Tests.Features
 	[Category("Formatting")]
 	[Category("T4")]
 	[TestFileExtension(T4FileExtensions.MainExtension)]
-	[Ignore("Formatter is broken")]
 	public class T4FormatterTest : BaseTestWithTextControl
 	{
 		protected override string RelativeTestDataPath => @"Features\CodeFormatter";
