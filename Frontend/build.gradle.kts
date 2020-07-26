@@ -236,17 +236,6 @@ tasks {
     dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps")
   }
 
-  create("buildBackend") {
-    group = riderForTeaTargetsGroup
-    dependsOn("prepare")
-    doLast {
-      exec {
-        executable = "dotnet"
-        args = listOf("build", backendPluginSolutionPath.canonicalPath)
-      }
-    }
-  }
-
   getByName("buildSearchableOptions") {
     // A kind of hack.
     // The task is broken outside of Rider
