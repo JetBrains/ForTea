@@ -15,7 +15,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
 	[SolutionComponent]
-	public sealed class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
+	public class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
 	{
 		[NotNull]
 		private IT4LightWeightAssemblyReferenceResolver LightWeightResolver { get; }
@@ -54,16 +54,18 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			?? ResolveAsAssemblyName(path)
 			?? ResolveAsAssemblyFile(path);
 
+		public virtual FileSystemPath ResolveWithoutCaching(T4ResolvedPath path) => Resolve(path);
+
 		[CanBeNull]
 		private FileSystemPath ResolveAsLightReference([NotNull] T4ResolvedPath pathWithMacros) =>
 			LightWeightResolver.TryResolve(pathWithMacros);
 
 		[CanBeNull]
-		private FileSystemPath ResolveAsAssemblyName([NotNull] T4ResolvedPath pathWithMacros) =>
+		protected FileSystemPath ResolveAsAssemblyName([NotNull] T4ResolvedPath pathWithMacros) =>
 			ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, pathWithMacros.ResolvedPath);
 
 		[CanBeNull]
-		private FileSystemPath ResolveAsAssemblyFile([NotNull] T4ResolvedPath pathWithMacros)
+		protected FileSystemPath ResolveAsAssemblyFile([NotNull] T4ResolvedPath pathWithMacros)
 		{
 			string name = pathWithMacros.ResolvedPath;
 			string nameWithoutExtension = TryRemoveBinaryExtension(name);

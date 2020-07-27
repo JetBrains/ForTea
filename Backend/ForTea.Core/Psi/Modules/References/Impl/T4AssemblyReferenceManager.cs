@@ -75,7 +75,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 
 		private bool TryRemoveReference([NotNull] T4ResolvedPath pathWithMacros)
 		{
-			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
+			var path = AssemblyReferenceResolver.ResolveWithoutCaching(pathWithMacros);
 			if (path == null) return false;
 			if (MyAssemblyReferences.TryGetValue(path, out var cookie))
 			{
@@ -95,7 +95,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 
 		private bool TryAddReference([NotNull] T4ResolvedPath pathWithMacros)
 		{
-			var path = AssemblyReferenceResolver.Resolve(pathWithMacros);
+			var path = AssemblyReferenceResolver.ResolveWithoutCaching(pathWithMacros);
 			if (path == null) return false;
 			if (MyAssemblyReferences.ContainsKey(path)) return false;
 			if (MyProjectReferences.ContainsKey(path)) return false;

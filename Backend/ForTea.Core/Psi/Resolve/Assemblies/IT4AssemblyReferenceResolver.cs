@@ -14,6 +14,9 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 		[CanBeNull]
 		FileSystemPath Resolve([NotNull] T4ResolvedPath path);
 
+		[CanBeNull]
+		FileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path);
+
 		/// <note>
 		/// assemblyName is assumed to NOT contain macros
 		/// </note>

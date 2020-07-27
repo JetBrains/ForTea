@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
@@ -59,6 +60,13 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 				.ToDictionary();
 			var data = new T4LightWeightAssemblyResolutionData(response);
 			base.Merge(sourceFile, data);
+		}
+
+		[CanBeNull]
+		public FileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path)
+		{
+			using var _ = Prepare(path.ProjectFile);
+			return TryResolve(path.ResolvedPath);
 		}
 
 		[CanBeNull]
