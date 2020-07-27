@@ -1,6 +1,7 @@
 build
 classes
-.idea
+.idea/*
+!.idea/*.png
 .gradle
 *.iml
 src/main/java/com/jetbrains/fortea/*
@@ -9,3 +10,4 @@ src/main/java/com/jetbrains/fortea/*
 #**/java/*
 #!**/java/
 #!**/java/com/jetbrains/fortea/parser
+testData/**/.idea
