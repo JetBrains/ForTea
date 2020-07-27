@@ -2,10 +2,6 @@ package com.jetbrains.fortea.run
 
 import org.testng.annotations.Test
 
-// Important note:
-//   method names will at some point be parsed as program arguments,
-//   so they cannot contain spaces!
-
 class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatFileCanBeExecuted() = doTest()
   @Test fun testThatHostSpecificTemplateCanBeExecuted() = doTest()
@@ -58,4 +54,5 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testInProjectTransitiveIncludeResolution() = doTest()
   @Test fun testOutOfProjectTransitiveIncludeResolution() = doTest()
   @Test fun testInProjectNonTrivialIncludeResolution() = doTest()
+  @Test fun `test execution with spaces in path`() = doTest(dumpCsproj = false)
 }

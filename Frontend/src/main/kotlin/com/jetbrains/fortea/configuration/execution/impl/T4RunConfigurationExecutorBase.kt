@@ -35,7 +35,7 @@ abstract class T4RunConfigurationExecutorBase(
     val parameters = T4RunConfigurationParameters(
       request,
       protocolConfiguration.executablePath,
-      protocolConfiguration.outputPath,
+      "\"${protocolConfiguration.outputPath}\"",
       PathUtil.getParentPath(t4Path)
     )
     return T4RunConfiguration(virtualFile.name, project, parameters)
