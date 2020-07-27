@@ -21,7 +21,7 @@ class T4RunFileTest : T4RunFileTestBase() {
     saveSolution()
     assertNoOutputWithExtension(".cs")
   }
-//  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
+  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
   @Test fun testThatTemplateCanProduceBigXml() = doTest()
   @Test fun testThatTemplateIsCaseInsensitive() = doTest()
 //  @Test fun testThatFileExtensionCanBeUpdatedCorrectly() {
