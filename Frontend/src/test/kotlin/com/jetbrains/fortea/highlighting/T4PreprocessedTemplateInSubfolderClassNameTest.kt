@@ -7,5 +7,5 @@ class T4PreprocessedTemplateInSubfolderClassNameTest  : T4HighlightingTestBase()
   override val testFilePath: String
     get() = "${getSolutionDirectoryName()}/Folder/$fileName"
 
-  @Test fun testClassName() = doTestAll()
+  @Test fun testClassName() = doTestErrors()
 }

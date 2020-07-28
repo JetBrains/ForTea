@@ -5,5 +5,5 @@ import org.testng.annotations.Test
 class T4PreprocessedTemplateHighlightingTest : T4HighlightingTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithPreprocessedT4"
 
-  @Test fun testPartials() = doTestAll()
+  @Test fun testPartials() = doTestErrors()
 }

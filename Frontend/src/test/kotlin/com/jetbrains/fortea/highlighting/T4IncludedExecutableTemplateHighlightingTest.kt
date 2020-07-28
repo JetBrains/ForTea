@@ -6,5 +6,5 @@ class T4IncludedExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4AndIncluder"
 
   // https://youtrack.jetbrains.com/issue/RIDER-36962
-  @Test fun testReferenceResolutionInHostSpecificInclude() = doTestAll()
+  @Test fun testReferenceResolutionInHostSpecificInclude() = doTestErrors()
 }
