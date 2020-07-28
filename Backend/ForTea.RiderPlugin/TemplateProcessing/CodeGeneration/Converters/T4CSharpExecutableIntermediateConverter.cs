@@ -66,6 +66,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			if (intermediateResult.HasHost) AppendHostInitialization();
 			PopIndent();
 			PopIndent();
+			AppendIndent();
 			Result.AppendLine("}");
 		}
 

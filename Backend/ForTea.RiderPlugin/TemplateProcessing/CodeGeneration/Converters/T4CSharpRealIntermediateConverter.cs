@@ -93,6 +93,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
 		protected override void AppendTransformMethod(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
+			AppendIndent();
 			Result.AppendLine("#line hidden");
 			AppendIndent();
 			Result.AppendLine("/// <summary>");
