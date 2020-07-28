@@ -73,8 +73,17 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 					// Prepare the paths
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);
 					var compilation = CreateCompilation(code, references, executablePath);
-					executablePath.Parent.CreateDirectory();
-					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
+					var location = executablePath.Parent;
+					switch (location.Exists)
+					{
+						case FileSystemPath.Existence.File:
+							location.DeleteFile();
+							goto case FileSystemPath.Existence.Missing;
+						case FileSystemPath.Existence.Missing:
+							location.CreateDirectory();
+							break;
+					}
+					var pdbPath = location.Combine(executablePath.Name.WithOtherExtension("pdb"));
 
 					// Delegate to Roslyn
 					var emitOptions = new EmitOptions(
