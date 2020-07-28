@@ -55,4 +55,6 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testOutOfProjectTransitiveIncludeResolution() = doTest()
   @Test fun testInProjectNonTrivialIncludeResolution() = doTest()
   @Test fun `test execution with spaces in path`() = doTest(dumpCsproj = false)
+  @Test fun `test that Program_tt can be executed`() = doTest(dumpCsproj = false)
+  @Test fun `test that Program_tt can be executed 2`() = doTest(dumpCsproj = false)
 }

@@ -1,0 +1,13 @@
+<#@ template language="C#" #>
+using System; 
+
+namespace T4Issue
+{
+    class Program
+    {
+        public static void Main()
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}
