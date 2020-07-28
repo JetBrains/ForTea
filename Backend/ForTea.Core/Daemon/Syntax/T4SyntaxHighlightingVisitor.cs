@@ -46,6 +46,9 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			AddHighlighting(T4HighlightingAttributeIds.ATTRIBUTE_VALUE, node);
 		}
 
+		public override void VisitCodeBlockNode(IT4CodeBlock codeBlockParam) =>
+			AddHighlighting(T4HighlightingAttributeIds.CODE_BLOCK, codeBlockParam);
+
 		private static bool IsAttributeValue([NotNull] ITreeNode node) =>
 			node.GetParentOfType<IT4AttributeValue>() != null;
 

@@ -21,5 +21,6 @@ namespace GammaJul.ForTea.Core.Daemon.Attributes
 		public const string DIRECTIVE = "T4 Directive";
 		public const string DIRECTIVE_ATTRIBUTE = "T4 Directive Attribute";
 		public const string ATTRIBUTE_VALUE = "T4 Attribute Value";
+		public const string CODE_BLOCK = "T4 Code Block";
 	}
 }

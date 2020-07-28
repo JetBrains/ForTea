@@ -1,14 +1,20 @@
-/*
 using GammaJul.ForTea.Core.Daemon.Attributes;
-using JetBrains.ReSharper.Feature.Services.Daemon.Attributes.Idea;
+using JetBrains.ReSharper.Host.Features.SyntaxHighlighting.Web;
 using JetBrains.TextControl.DocumentMarkup;
 
-[assembly: RegisterHighlighter(
-	T4HighlightingAttributeIds.BLOCK_TAG,
-	EffectType = EffectType.TEXT,
-	GroupId = T4HighlightingAttributeGroup.ID,
-	FallbackAttributeId = IdeaXmlHighlighterColorsAttributeIds.XML_TAG,
-	RiderPresentableName = "Block Marker",
-	Layer = HighlighterLayer.SYNTAX
-)]
-*/
+namespace JetBrains.ForTea.RiderPlugin.Daemon.Attributes
+{
+	[RegisterHighlighter(
+		T4HighlightingAttributeIds.CODE_BLOCK,
+		EffectType = EffectType.HIGHLIGHT_ABOVE_TEXT_MARKER,
+		GroupId = T4HighlightingAttributeGroup.ID,
+		FallbackAttributeId = RazorSyntaxHighlightingAttributeIds.RAZOR_CODE_BLOCK,
+		Layer = HighlighterLayer.SYNTAX,
+		BackgroundColor = "#FBFBFB",
+		DarkBackgroundColor = "#303030",
+		RiderPresentableName = "Code Block"
+	)]
+	public static class T4RiderHighlightingAttributeIds
+	{
+	}
+}

@@ -11,6 +11,14 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 	BackgroundColor = "#FBFB64",
 	Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
 	VSPriority = VSPriority.IDENTIFIERS
+), RegisterHighlighter(
+	 T4HighlightingAttributeIds.CODE_BLOCK,
+	 EffectType = EffectType.HIGHLIGHT_ABOVE_TEXT_MARKER,
+	 GroupId = T4HighlightingAttributeGroup.ID,
+	 Layer = HighlighterLayer.SYNTAX,
+	 BackgroundColor = "#F9F9F9",
+	 DarkBackgroundColor = "#2C2C2C",
+	 RiderPresentableName = "Code Block"
 )]
 public static class T4ReSharperHighlightingAttributeIds{}
 }
