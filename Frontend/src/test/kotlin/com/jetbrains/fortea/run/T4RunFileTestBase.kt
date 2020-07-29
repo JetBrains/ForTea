@@ -76,6 +76,13 @@ open class T4RunFileTestBase : BaseTestWithSolution(), Disposable {
     if (dumpCsproj) dumpCsproj()
   }
 
+  protected fun testExecutionFailure(resultExtension: String, dumpCsproj: Boolean = false) {
+    executeT4File()
+    saveSolution()
+    assertNoOutputWithExtension(resultExtension)
+    if (dumpCsproj) dumpCsproj()
+  }
+
   protected fun executeT4File() {
     val host = project.getComponent<ProjectModelViewHost>()
     val virtualFile = t4File.path.toVirtualFile(true).shouldNotBeNull()

@@ -16,11 +16,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatMsBuildPropertiesAreResolved() = doTest()
   @Test fun testThatAssemblyCanBeReferenced() = doTest()
   @Test fun testTransitiveReferencesInRuntime() = doTest()
-  @Test fun testTransitiveReferencesInCompilation() {
-    executeT4File()
-    saveSolution()
-    assertNoOutputWithExtension(".cs")
-  }
+  @Test fun testTransitiveReferencesInCompilation() = testExecutionFailure(".cs")
   @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
   @Test fun testThatTemplateCanProduceBigXml() = doTest()
   @Test fun testThatTemplateIsCaseInsensitive() = doTest()
@@ -44,19 +40,13 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testHowTextInFeatureIsHandled() = doTest()
 //  @Test fun testThatOutputOfUnbuiltProjectCanBeReferenced() = doTest()
   @Test fun testHostInHostSpecificTemplate() = doTest()
-  @Test fun testHostInNonHostSpecificTemplate() {
-    executeT4File()
-    saveSolution()
-    assertNoOutputWithExtension(".txt")
-    dumpCsproj()
-  }
-
+  @Test fun testHostInNonHostSpecificTemplate() = testExecutionFailure(".txt", true)
   @Test fun testInProjectTransitiveIncludeResolution() = doTest()
   @Test fun testOutOfProjectTransitiveIncludeResolution() = doTest()
   @Test fun testInProjectNonTrivialIncludeResolution() = doTest()
   @Test fun `test execution with spaces in path`() = doTest(dumpCsproj = false)
   @Test fun `test that Program_tt can be executed`() = doTest(dumpCsproj = false)
   @Test fun `test that Program_tt can be executed 2`() = doTest(dumpCsproj = false)
-  @Test fun `test that ValueTuple can be accessed`() = doTest(dumpCsproj = false)
-  @Test fun `test that ValueTuple can be accessed 2`() = doTest(dumpCsproj = false)
+  @Test fun `test access to ValueTuple`() = doTest(dumpCsproj = false)
+  @Test fun `test access to ValueTuple in old framework`() = testExecutionFailure(".txt")
 }
