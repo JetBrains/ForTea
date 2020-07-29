@@ -181,6 +181,7 @@ tasks {
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+    this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
     dependsOn(generateT4Lexer)
   }
 

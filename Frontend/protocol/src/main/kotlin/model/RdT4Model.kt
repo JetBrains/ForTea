@@ -58,6 +58,10 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
     field("isVisible", bool)
   }
 
+  val T4MarkupModelExtension = classdef extends SolutionModel.MarkupModelExtension {
+    call("rawTextExtension", void, string.nullable).async
+  }
+
   init {
     // Backend calls these to create and run new configurations
     val requestExecution = call("requestExecution", T4ExecutionRequest, void).async
