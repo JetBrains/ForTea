@@ -38,6 +38,8 @@ namespace JetBrains.ForTea.Tests.Features
 		[TestCase("OneLineStatement")]
 		[TestCase("StatementBlockAfterExpressionBlock")]
 		[TestCase("ImportDirective")]
+		[TestCase("ValueTuple")]
+		[TestCase("LargeFile1")]
 		public void TestFormatter([NotNull] string name) => DoOneTest(name);
 
 		protected override void DoTest(Lifetime lifetime, IProject testProject)
