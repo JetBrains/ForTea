@@ -69,10 +69,10 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				IndirectDependencies = new HashSet<IPsiSourceFile>();
 			});
 
-		protected virtual void OnFilesIndirectlyAffected([NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> files)
+		protected virtual void OnFilesIndirectlyAffected(T4FileInvalidationData data)
 		{
 			Services.Locks.AssertMainThread();
-			foreach (var file in files)
+			foreach (var file in data.IndirectlyAffectedFiles)
 			{
 				IndirectDependencies.Add(file);
 			}

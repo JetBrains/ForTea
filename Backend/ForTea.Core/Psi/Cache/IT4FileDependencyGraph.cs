@@ -13,6 +13,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		/// i.e. the uppermost file that includes the current one.
 		/// </summary>
 		/// TODO: cache root?
+		/// TODO: do it now!
 		[NotNull]
 		IPsiSourceFile FindBestRoot([NotNull] IPsiSourceFile file);
 	}

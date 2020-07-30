@@ -58,13 +58,13 @@ namespace JetBrains.ForTea.Tests.Mock
 			}
 		}
 
-		protected override void OnFilesIndirectlyAffected(IEnumerable<IPsiSourceFile> files)
+		protected override void OnFilesIndirectlyAffected(T4FileInvalidationData data)
 		{
 			if (CommitStage == T4CommitStage.DependencyInvalidation) return;
 			// We want all files that were included before the update
 			// and all the files that have become included now
 			// to be updated, so we'll mark them as dirty later
-			IndirectDependencies.AddRange(files);
+			IndirectDependencies.AddRange(data.IndirectlyAffectedFiles);
 		}
 	}
 }

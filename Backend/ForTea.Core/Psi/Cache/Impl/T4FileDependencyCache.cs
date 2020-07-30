@@ -40,8 +40,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		private IT4IncludeResolver IncludeResolver { get; }
 
-		[NotNull]
-		public Signal<IEnumerable<IPsiSourceFile>> OnFilesIndirectlyAffected { get; }
+		public Signal<T4FileInvalidationData> OnFilesIndirectlyAffected { get; }
 
 		private IDictionary<IPsiSourceFile, T4ReversedFileDependencyData> ReversedMap { get; set; }
 
@@ -67,7 +66,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			PsiFileSelector = psiFileSelector;
 			IncludeResolver = includeResolver;
 			Logger = logger;
-			OnFilesIndirectlyAffected = new Signal<IEnumerable<IPsiSourceFile>>(
+			OnFilesIndirectlyAffected = new Signal<T4FileInvalidationData>(
 				lifetime,
 				"T4FileDependencyCache notification about a change in indirect includes"
 			);
@@ -127,7 +126,11 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				GetIncludes(sourceFile) ?? EmptyList<IPsiSourceFile>.Instance
 			);
 
-			OnFilesIndirectlyAffected.Fire(oldTransitiveIncludes.Union(newTransitiveIncludes).Except(sourceFile));
+			var fileInvalidationData = new T4FileInvalidationData(
+				oldTransitiveIncludes.Union(newTransitiveIncludes).Except(sourceFile),
+				sourceFile
+			);
+			OnFilesIndirectlyAffected.Fire(fileInvalidationData);
 
 			oldIncludes.Compare(newIncludes, out var addedItems, out var removedItems);
 			UpdateIncluders(ReversedMap, sourceFile, addedItems, removedItems);

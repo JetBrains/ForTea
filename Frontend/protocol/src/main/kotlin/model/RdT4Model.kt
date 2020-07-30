@@ -59,7 +59,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   }
 
   val T4MarkupModelExtension = classdef extends SolutionModel.MarkupModelExtension {
-    call("rawTextExtension", void, string.nullable).async
+    property("rawTextExtension", string).async
   }
 
   init {
