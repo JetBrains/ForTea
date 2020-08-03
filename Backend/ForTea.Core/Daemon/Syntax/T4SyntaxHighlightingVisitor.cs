@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void VisitMacroNode(IT4Macro macroParam)
 		{
 			((IT4TreeNode) macroParam.Dollar).Accept(this);
-			((IT4TreeNode) macroParam.LeftParenthesis).Accept(this);
+			((IT4TreeNode) macroParam.LeftParenthesis)?.Accept(this);
 			((IT4TreeNode) macroParam.RightParenthesis)?.Accept(this);
 			var value = macroParam.RawAttributeValue;
 			if (value == null) return;
