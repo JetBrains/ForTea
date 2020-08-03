@@ -1,4 +1,3 @@
-using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Tree;
@@ -29,10 +28,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 
 		public override void VisitEnvironmentVariableNode(IT4EnvironmentVariable environmentVariableParam)
 		{
-			foreach (var node in environmentVariableParam.StartPercentEnumerable.Cast<IT4Token>())
-			{
-				node.Accept(this);
-			}
+			(environmentVariableParam.StartPercent as IT4Token)?.Accept(this);
+			(environmentVariableParam.EndPercent as IT4Token)?.Accept(this);
 
 			var value = environmentVariableParam.RawAttributeValue;
 			if (value == null) return;
