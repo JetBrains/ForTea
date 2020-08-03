@@ -75,6 +75,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected override bool ShouldAppendPragmaDirectives => true;
 
+		protected override string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass)
+		{
+			if (!hasCustomBaseClass) return VirtualKeyword;
+			return base.GetTransformTextOverridabilityModifier(true);
+		}
+
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => CodeCommentStartText;
 		public override string CodeCommentEnd => CodeCommentEndText;

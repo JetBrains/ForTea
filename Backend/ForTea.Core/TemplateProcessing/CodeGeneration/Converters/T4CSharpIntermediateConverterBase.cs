@@ -17,6 +17,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull] public const string GeneratedClassNameString = "GeneratedTextTransformation";
 		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
 		[NotNull] internal const string TransformTextMethodName = "TransformText";
+		[NotNull] protected const string OverrideKeyword = "override";
+		[NotNull] protected const string VirtualKeyword = "virtual";
 
 		[NotNull]
 		protected T4CSharpCodeGenerationResult Result { get; }
@@ -180,7 +182,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendIndent();
 			Result.Append("public ");
-			Result.Append(intermediateResult.HasBaseClass ? "override" : "virtual");
+			Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
 			Result.AppendLine($" string {TransformTextMethodName}()");
 			AppendIndent();
 			Result.AppendLine("{");
@@ -234,6 +236,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
 
 		protected virtual bool ShouldAppendPragmaDirectives => false;
+
+		[NotNull]
+		protected virtual string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass) => OverrideKeyword;
 
 		#region Indentation
 		protected int CurrentIndent { get; private set; }

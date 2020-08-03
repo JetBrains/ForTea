@@ -165,6 +165,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""JetBrains.ForTea.TextTemplating"", ""42.42.42.42"")]";
 
+		protected override string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass)
+		{
+			if (!hasCustomBaseClass) return VirtualKeyword;
+			return base.GetTransformTextOverridabilityModifier(true);
+		}
+
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => "";
 		public override string CodeCommentEnd => "";

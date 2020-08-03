@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TextTemplating
 	/// <summary>
 	/// Base class for this transformation
 	/// </summary>
-	public abstract class TextTransformation
+	public abstract class TextTransformation : IDisposable
 	{
 		#region Fields
 		private StringBuilder generationEnvironmentField;
@@ -217,6 +217,28 @@ namespace Microsoft.VisualStudio.TextTemplating
 		{
 			indentLengths.Clear();
 			currentIndentField = "";
+		}
+		#endregion
+
+		#region Microsoft compatibility
+		public abstract string TransformText();
+
+		public virtual void Initialize()
+		{
+		}
+
+		~TextTransformation() => Dispose(false);
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			generationEnvironmentField = null;
+			errorsField = null;
 		}
 		#endregion
 	}

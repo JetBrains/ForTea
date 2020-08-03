@@ -22,6 +22,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected override void AppendClasses(T4CSharpCodeGenerationIntermediateResult intermediateResult) =>
 			AppendClass(intermediateResult);
 
+		protected override string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass) => OverrideKeyword;
+
 		#region SyntheticAttribute
 		private void AppendSyntheticAttribute()
 		{

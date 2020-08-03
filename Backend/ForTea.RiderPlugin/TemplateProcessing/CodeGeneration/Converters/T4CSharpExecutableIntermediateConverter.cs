@@ -141,6 +141,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 				.Append(StringLiteralConverter.EscapeToRegular(it.Location.FullPath))
 				.Append("\"}"));
 
+		protected override string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass) => OverrideKeyword;
+
 		#region IT4ElementAppendFormatProvider
 		public override string ToStringConversionPrefix =>
 			T4TextTemplatingFQNs.ToStringHelper + ".ToStringWithCulture(";
