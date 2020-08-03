@@ -36,6 +36,7 @@ abstract class T4RunConfigurationExecutorBase(protected val project: Project) : 
       request,
       protocolConfiguration.executablePath,
       "\"${protocolConfiguration.outputPath}\"",
+      protocolConfiguration.envDTEPort,
       PathUtil.getParentPath(t4Path)
     )
     return T4RunConfiguration(virtualFile.name, project, parameters)

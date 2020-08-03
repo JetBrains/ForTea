@@ -8,6 +8,7 @@ open class T4RunConfigurationParameters(
   val request: T4ExecutionRequest,
   exePath: String,
   programParameters: String,
+  private val envDTEPort: Int,
   workingDirectory: String
 ) : ExeConfigurationParameters(
   exePath,
@@ -24,7 +25,7 @@ open class T4RunConfigurationParameters(
     programParameters,
     false,
     useExternalConsole,
-    envs,
+    envs + ("T4_ENVDTE_CLIENT_PORT" to envDTEPort.toString()),
     true,
     { _, _ -> },
     null,

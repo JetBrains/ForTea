@@ -71,7 +71,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private void RegisterCallbacks([NotNull] T4ProtocolModel model, [NotNull] IT4ModelInteractionHelper helper)
 		{
 			model.RequestCompilation.Set(helper.Wrap(Compile, Converter.FatalError()));
-			model.GetConfiguration.Set(helper.Wrap(CalculateConfiguration, new T4ConfigurationModel("", "")));
+			model.GetConfiguration.Set(helper.Wrap(CalculateConfiguration, new T4ConfigurationModel("", "", 0)));
 			model.GetProjectDependencies.Set(helper.Wrap(CalculateProjectDependencies, new List<int>()));
 			model.ExecutionSucceeded.Set(helper.Wrap(ExecutionSucceeded));
 			model.ExecutionFailed.Set(helper.Wrap(ExecutionFailed));
@@ -88,7 +88,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		[NotNull]
 		private T4ConfigurationModel CalculateConfiguration([NotNull] IT4File file) => new T4ConfigurationModel(
 			TargetFileManager.GetTemporaryExecutableLocation(file).FullPath.Replace("\\", "/"),
-			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/")
+			TargetFileManager.GetExpectedTemporaryTargetFileLocation(file).FullPath.Replace("\\", "/"),
+			ExecutionManager.GetEnvDTEPort(file)
 		);
 
 		private T4BuildResult Compile([NotNull] IPsiSourceFile sourceFile)
