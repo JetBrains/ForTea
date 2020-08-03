@@ -325,6 +325,25 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			return true;
 		}
 
+		private bool OnClosingParenthesisTyped([NotNull] ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			if (!IsInAttributeValue(textControl)) return false;
+
+			// Get the token type after caret
+			var lexer = GetCachingLexer(textControl);
+			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
+			if (lexer == null || offset <= 0 || !lexer.FindTokenAt(offset)) return false;
+			var tokenType = lexer.TokenType;
+
+			// If it's not a parenthesis, we don't care, so let the IDE handle it
+			if (tokenType != T4TokenNodeTypes.RIGHT_PARENTHESIS) return false;
+
+			// If it is, over-type it
+			textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+			return true;
+		}
+
 		public T4TypingAssist(
 			Lifetime lifetime,
 			[NotNull] ISolution solution,
@@ -355,6 +374,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			typingAssistManager.AddTypingHandler(lifetime, '$', this, OnDollarTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '%', this, OnPercentTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, OnEnterPressed, IsActionHandlerAvailable);
+			typingAssistManager.AddTypingHandler(lifetime, ')', this, OnClosingParenthesisTyped, IsTypingSmartParenthesisHandlerAvailable);
 		}
 	}
 
