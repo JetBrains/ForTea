@@ -68,7 +68,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 				.FirstOrDefault()
 				?.GetFirstAttribute(extension)
 				?.Value
-				.GetText();
+				?.GetText();
 
 			if (targetExtension == null) return null;
 
