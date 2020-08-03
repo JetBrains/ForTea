@@ -53,8 +53,8 @@ class T4EditorSyntaxHighlighter(
     // as soon as we know how to highlight them.
     //
     // project.lifetime is quite a long-lived lifetime,
-    // but it's not a big deal here, because the markup model
-    // gets disposed as soon as the editor closes anyway
+    // but it's not a big deal here, because the editable entity
+    // gets disposed properly anyway
     document.getT4EditableEntityModel(project)?.rawTextExtension?.advise(highlighterLifetime) { extension ->
       if (extension == rawTextLayerExtension) return@advise
       virtualFile.t4OutputExtension = extension

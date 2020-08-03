@@ -7,7 +7,6 @@ import com.jetbrains.rider.model.nova.ide.SolutionModel.EditableEntity
 
 object T4EditableEntityModel : Ext(EditableEntity) {
   init {
-    // todo: do we need it to be async?
     property("rawTextExtension", string.nullable).async.doc("Extension of the output file." +
       " If the file contains output directive with extension attribute, relies on that attribute value." +
       " Returns \"cs\" for executable files without explicitly specified extension." +
