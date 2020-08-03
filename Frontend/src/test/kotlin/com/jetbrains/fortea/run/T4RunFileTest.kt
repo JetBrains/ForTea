@@ -64,4 +64,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test that host resolves an empty string`() = doTest(dumpCsproj = false)
   @Test fun `test how host resolves null`() = testExecutionFailure(".txt")
   @Test fun `test file with a macro twice`() = doTest(dumpCsproj = false)
+  @Test fun testDefaultReferences() = doTest(dumpCsproj = false)
+  @Test fun testHostSpecificDefaultReferences() = doTest(dumpCsproj = false)
+  @Test fun testThatHostSpecificTemplateCanAccessEnvDTE() = doTest(dumpCsproj = false)
 }
