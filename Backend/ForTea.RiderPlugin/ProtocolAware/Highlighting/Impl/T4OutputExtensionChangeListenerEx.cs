@@ -11,7 +11,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 		private static readonly Key<T4OutputExtensionChangeListener> T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY =
 			new Key<T4OutputExtensionChangeListener>("T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY");
 
-		public static void CreateListener(
+		public static void CreateOutputExtensionChangeListener(
 			[NotNull] this IDocument thіs,
 			Lifetime lifetime,
 			[NotNull] T4OutputExtensionChangeListener listener
@@ -21,7 +21,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 		);
 
 		[CanBeNull]
-		public static T4OutputExtensionChangeListener GetListener([NotNull] this IDocument thіs) =>
+		public static T4OutputExtensionChangeListener GetOutputExtensionChangeListener([NotNull] this IDocument thіs) =>
 			thіs.GetData(T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY);
 	}
 }

@@ -71,7 +71,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			}
 
 			var t4EditableEntityModel = editableEntity.GetT4EditableEntityModel();
-			document.CreateListener(
+			document.CreateOutputExtensionChangeListener(
 				editableEntityLifetime,
 				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)
 			);

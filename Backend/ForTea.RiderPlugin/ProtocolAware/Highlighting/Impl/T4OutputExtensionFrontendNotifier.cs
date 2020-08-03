@@ -43,7 +43,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 
 		public void NotifyFrontend([NotNull] IPsiSourceFile file)
 		{
-			var listener = CreateListener(file);
+			var listener = TryGetListener(file);
 			if (listener == null) return;
 			string extension = GetTargetExtension(file);
 			listener.ExtensionChanged(extension);
@@ -63,12 +63,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 		}
 
 		[CanBeNull]
-		private T4OutputExtensionChangeListener CreateListener([NotNull] IPsiSourceFile file)
+		private T4OutputExtensionChangeListener TryGetListener([NotNull] IPsiSourceFile file)
 		{
 			var projectFile = file.ToProjectFile();
 			if (projectFile == null) return null;
 			var document = DocumentManager.TryGetDocument(projectFile);
-			return document?.GetListener();
+			return document?.GetOutputExtensionChangeListener();
 		}
 	}
 }
