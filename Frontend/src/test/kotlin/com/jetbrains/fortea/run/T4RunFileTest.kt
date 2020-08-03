@@ -49,4 +49,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test that Program_tt can be executed 2`() = doTest(dumpCsproj = false)
   @Test fun `test access to ValueTuple`() = doTest(dumpCsproj = false)
   @Test fun `test access to ValueTuple in old framework`() = testExecutionFailure(".txt")
+  @Test fun testDefaultReferences() = doTest(dumpCsproj = false)
+  @Test fun testHostSpecificDefaultReferences() = doTest(dumpCsproj = false)
+  @Test fun testThatHostSpecificTemplateCanAccessEnvDTE() = doTest(dumpCsproj = false)
 }
