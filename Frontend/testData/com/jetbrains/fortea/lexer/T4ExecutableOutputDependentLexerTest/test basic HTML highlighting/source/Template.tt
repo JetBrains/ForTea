@@ -1,0 +1,38 @@
+<#@ template language="C#" #>
+<#@ output extension="html" #>
+<#
+  string title = "My cool site";
+  string functionName = "helloJavaScript";
+  string colour = "red";
+#>
+<html>
+<head>
+  <title>
+    <#= title #>
+  </title>
+  <!-- CSS and JavaScript syntax highlighting works out of the box :) -->
+  <script>
+    function <#= functionName #>() {
+      return this;
+    }
+  </script>
+  <style>
+    p {
+      color: <#= colour #>;
+      text-align: center;
+    }
+  </style>
+</head>
+<body background="black">
+<#
+    for (int i = 0; i < 10; i += 1)
+    {
+#>
+  <span style="font-weight:bold">
+    Hello #<#= i #>!<br>
+  </span>
+<#
+    }
+#>
+</body>
+</html>

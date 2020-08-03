@@ -1,0 +1,86 @@
+T4TokenType.DIRECTIVE_START             | <#@
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | template
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | language
+T4TokenType.EQUAL                       | =
+T4TokenType.QUOTE                       | "
+T4TokenType.RAW_ATTRIBUTE_VALUE         | C#
+T4TokenType.QUOTE                       | "
+WHITE_SPACE                             |  
+T4TokenType.BLOCK_END                   | #>
+T4TokenType.NEW_LINE                    | \n
+T4TokenType.DIRECTIVE_START             | <#@
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | output
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | extension
+T4TokenType.EQUAL                       | =
+T4TokenType.QUOTE                       | "
+T4TokenType.RAW_ATTRIBUTE_VALUE         | cs
+T4TokenType.QUOTE                       | "
+WHITE_SPACE                             |  
+T4TokenType.BLOCK_END                   | #>
+T4TokenType.NEW_LINE                    | \n
+USING_KEYWORD                           | using
+WHITE_SPACE                             |  
+IDENTIFIER                              | System
+SEMICOLON                               | ;
+T4TokenType.NEW_LINE                    | \n
+T4TokenType.NEW_LINE                    | \n
+T4TokenType.STATEMENT_BLOCK_START       | <#
+NEW_LINE                                | \n
+WHITE_SPACE                             |     
+INT_KEYWORD                             | int
+WHITE_SPACE                             |  
+IDENTIFIER                              | meaning
+WHITE_SPACE                             |  
+EQ                                      | =
+WHITE_SPACE                             |  
+INTEGER_LITERAL                         | 42
+SEMICOLON                               | ;
+NEW_LINE                                | \n
+T4TokenType.BLOCK_END                   | #>
+T4TokenType.NEW_LINE                    | \n
+T4TokenType.NEW_LINE                    | \n
+NAMESPACE_KEYWORD                       | namespace
+WHITE_SPACE                             |  
+IDENTIFIER                              | ProjectWithT4
+T4TokenType.NEW_LINE                    | \n
+LBRACE                                  | {
+T4TokenType.NEW_LINE                    | \n
+WHITE_SPACE                             |     
+PUBLIC_KEYWORD                          | public
+WHITE_SPACE                             |  
+STATIC_KEYWORD                          | static
+WHITE_SPACE                             |  
+CLASS_KEYWORD                           | class
+WHITE_SPACE                             |  
+IDENTIFIER                              | MeaningProvider
+T4TokenType.NEW_LINE                    | \n
+WHITE_SPACE                             |     
+LBRACE                                  | {
+T4TokenType.NEW_LINE                    | \n
+WHITE_SPACE                             |         
+PUBLIC_KEYWORD                          | public
+WHITE_SPACE                             |  
+STATIC_KEYWORD                          | static
+WHITE_SPACE                             |  
+INT_KEYWORD                             | int
+WHITE_SPACE                             |  
+IDENTIFIER                              | Meaning
+WHITE_SPACE                             |  
+LAMBDA_ARROW                            | =>
+WHITE_SPACE                             |  
+T4TokenType.EXPRESSION_BLOCK_START      | <#=
+WHITE_SPACE                             |  
+IDENTIFIER                              | meaning
+WHITE_SPACE                             |  
+T4TokenType.BLOCK_END                   | #>
+SEMICOLON                               | ;
+T4TokenType.NEW_LINE                    | \n
+WHITE_SPACE                             |     
+RBRACE                                  | }
+T4TokenType.NEW_LINE                    | \n
+RBRACE                                  | }
+T4TokenType.NEW_LINE                    | \n
