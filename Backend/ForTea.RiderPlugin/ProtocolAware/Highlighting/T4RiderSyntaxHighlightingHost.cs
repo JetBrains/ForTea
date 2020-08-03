@@ -76,38 +76,37 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)
 			);
 
-			SubscribeToNotification(editableEntityLifetime, document);
+			InitializeExtension(editableEntityLifetime, document);
 		}
 
-		private void SubscribeToNotification(Lifetime lifetime, [NotNull] IDocument targetDocument)
+		private void InitializeExtension(Lifetime lifetime, [NotNull] IDocument targetDocument)
 		{
 			var file = targetDocument.GetPsiSourceFile(Solution);
 			if (file == null) return;
 			if (State.IsInitialUpdateFinished.Value)
 			{
 				Files.ExecuteAfterCommitAllDocuments(() => Notifier.NotifyFrontend(file));
+				return;
 			}
-			else
+
+			var initialUpdateLifetime = lifetime.CreateNested();
+			initialUpdateLifetime.AllowTerminationUnderExecution = true;
+			State.IsInitialUpdateFinished.Change.Advise(initialUpdateLifetime.Lifetime, current =>
 			{
-				var initialUpdateLifetime = lifetime.CreateNested();
-				initialUpdateLifetime.AllowTerminationUnderExecution = true;
-				State.IsInitialUpdateFinished.Change.Advise(initialUpdateLifetime.Lifetime, current =>
-				{
-					if (!current.HasNew || !current.New) return;
-					using var cookie = ReadLockCookie.Create();
-					Notifier.NotifyFrontend(file);
-					// The lifetime of the component is used here to avoid memory leaks.
-					// If we used adapterLifetime here, and the adapter dies
-					// at the exact same moment as the initial update finishes,
-					// the initialUpdateLifetime would never be terminated.
-					// Also, cannot do that synchronously due to Lifetime API restrictions
-					Solution.Locks.Queue(
-						Lifetime,
-						"T4: unsubscribe from InitialUpdateFinished",
-						() => initialUpdateLifetime.Terminate()
-					);
-				});
-			}
+				if (!current.HasNew || !current.New) return;
+				using var cookie = ReadLockCookie.Create();
+				Notifier.NotifyFrontend(file);
+				// The lifetime of the component is used here to avoid memory leaks.
+				// If we used adapterLifetime here, and the adapter dies
+				// at the exact same moment as the initial update finishes,
+				// the initialUpdateLifetime would never be terminated.
+				// Also, cannot do that synchronously due to Lifetime API restrictions
+				Solution.Locks.Queue(
+					Lifetime,
+					"T4: unsubscribe from InitialUpdateFinished",
+					() => initialUpdateLifetime.Terminate()
+				);
+			});
 		}
 	}
 }
