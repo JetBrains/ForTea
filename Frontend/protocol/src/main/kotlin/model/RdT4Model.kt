@@ -41,6 +41,7 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   val T4ConfigurationModel = structdef {
     field("executablePath", string)
     field("outputPath", string)
+    field("envDTEPort", int)
   }
 
   val T4FileLocation = structdef {

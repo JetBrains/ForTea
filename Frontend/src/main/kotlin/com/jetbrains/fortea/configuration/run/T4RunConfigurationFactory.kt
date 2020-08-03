@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull
 
 object T4RunConfigurationFactory : ConfigurationFactory(T4RunConfigurationType) {
   override fun createTemplateConfiguration(@NotNull project: Project) = T4RunConfiguration(
-    "T4 Template", project, T4RunConfigurationParameters(T4ExecutionRequest(T4FileLocation(0), false), "", "", "")
+    "T4 Template", project, T4RunConfigurationParameters(T4ExecutionRequest(T4FileLocation(0), false), "", "", 0, "")
   )
 
   override fun getId() = "Run T4 Template"

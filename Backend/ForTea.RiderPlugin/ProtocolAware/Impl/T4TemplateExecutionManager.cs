@@ -23,7 +23,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 	public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
 		[NotNull]
-		private IDictionary<FileSystemPath, LifetimeDefinition> RunningFiles { get; }
+		private IDictionary<FileSystemPath, T4EnvDTEHost> RunningFiles { get; }
 
 		[NotNull]
 		private object ExecutionLocker { get; } = new object();
@@ -69,11 +69,18 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			TemplateMetadataManager = templateMetadataManager;
 			BackgroundTaskHost = backgroundTaskHost;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
-			RunningFiles = new Dictionary<FileSystemPath, LifetimeDefinition>();
+			RunningFiles = new Dictionary<FileSystemPath, T4EnvDTEHost>();
 		}
 
 		public void RememberExecution(IT4File file, bool withProgress) =>
 			RememberExecution(file.PhysicalPsiSourceFile.NotNull().GetLocation(), withProgress);
+
+		public int GetEnvDTEPort(IT4File file)
+		{
+			bool hasInfo = RunningFiles.TryGetValue(file.PhysicalPsiSourceFile.GetLocation(), out var info);
+			if (!hasInfo) return 0;
+			return info.ConnectionManager.Port;
+		}
 
 		private void RememberExecution([NotNull] FileSystemPath path, bool withProgress)
 		{
@@ -97,7 +104,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				);
 			}
 
-			RunningFiles[path] = definition;
+			RunningFiles[path] = new T4EnvDTEHost(definition, Solution);
 		}
 
 		public void UpdateTemplateKind(IT4File file)
@@ -172,8 +179,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			lock (ExecutionLocker)
 			{
 				var location = file.PhysicalPsiSourceFile.GetLocation();
-				var definition = RunningFiles[location];
-				definition.Terminate();
+				var runtime = RunningFiles[location];
+				runtime.LifetimeDefinition.Terminate();
 				RunningFiles.Remove(location);
 			}
 		}
