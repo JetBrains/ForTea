@@ -4,6 +4,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 {
 	public interface IT4OutputExtensionChangeListener
 	{
-		void ExtensionChanged([NotNull] string newExtension);
+		void ExtensionChanged([CanBeNull] string newExtension);
 	}
 }

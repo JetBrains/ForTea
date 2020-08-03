@@ -65,7 +65,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.GetSourceFile().NotNull();
 			string name = sourceFile.Name;
-			string targetExtension = file.GetTargetExtension();
+			string targetExtension = file.GetTargetExtension() ?? T4CSharpCodeGenerationUtils.DefaultTargetExtension;
 			return name.WithOtherExtension(targetExtension);
 		}
 

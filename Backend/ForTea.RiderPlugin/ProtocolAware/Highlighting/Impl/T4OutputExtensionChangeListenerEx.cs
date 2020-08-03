@@ -1,7 +1,6 @@
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
-using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
@@ -21,8 +20,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 			() => thіs.PutData(T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY, null)
 		);
 
-		[NotNull]
+		[CanBeNull]
 		public static IT4OutputExtensionChangeListener GetListener([NotNull] this IDocument thіs) =>
-			thіs.GetData(T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY).NotNull();
+			thіs.GetData(T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY);
 	}
 }

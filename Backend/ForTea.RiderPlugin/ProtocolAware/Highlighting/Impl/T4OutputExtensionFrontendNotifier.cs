@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing;
+using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentManagers;
@@ -45,7 +46,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 			var listener = CreateListener(file);
 			if (listener == null) return;
 			string extension = GetTargetExtension(file);
-			if (extension == null) return;
 			listener.ExtensionChanged(extension);
 		}
 
@@ -56,7 +56,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 			var psi = root.GetPrimaryPsiFile();
 			if (!(psi is IT4File t4File)) return null;
 			string extension = t4File.GetTargetExtension();
-			return extension;
+			if (extension != null) return extension;
+			var provider = file.GetSolution().GetComponent<IT4TemplateKindProvider>();
+			if (provider.IsPreprocessedTemplate(root)) return null;
+			return T4CSharpCodeGenerationUtils.DefaultTargetExtension;
 		}
 
 		[CanBeNull]

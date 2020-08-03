@@ -54,8 +54,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 
 		/// <returns>
 		/// Target extension. Leading dot, if any, is removed.
+		/// Returns null if the file does not contain
+		/// 'output' directive with 'extension' attribute.
 		/// </returns>
-		[NotNull]
+		[CanBeNull]
 		public static string GetTargetExtension([NotNull] this IT4File file)
 		{
 			if (file == null) throw new ArgumentNullException(nameof(file));
@@ -68,7 +70,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 				?.Value
 				.GetText();
 
-			if (targetExtension == null) return DefaultTargetExtension;
+			if (targetExtension == null) return null;
 
 			return targetExtension.StartsWith(".", StringComparison.Ordinal)
 				? targetExtension.Substring(1)

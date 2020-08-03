@@ -1,78 +1,84 @@
 package com.jetbrains.fortea.highlighting
 
-import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.colors.EditorColorsScheme
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.LayerDescriptor
 import com.intellij.openapi.editor.ex.util.LayeredLexerEditorHighlighter
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.impl.text.EditorHighlighterUpdater
 import com.intellij.openapi.fileTypes.FileTypeRegistry
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.rd.createNestedDisposable
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.jetbrains.fortea.highlighting.T4ProtocolRawTextHighlightingExtension.Companion.T4_MARKUP_MODEL_EXTENSION_KEY
 import com.jetbrains.fortea.psi.T4ElementTypes
-import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
+import com.jetbrains.rider.document.getFirstEditor
 import com.jetbrains.rider.ideaInterop.fileTypes.csharp.CSharpFileType
 import com.jetbrains.rider.model.T4MarkupModelExtension
 
 class T4EditorSyntaxHighlighter(
-  private val project: Project?,
-  private val virtualFile: VirtualFile?,
+  private val project: Project,
+  private val virtualFile: VirtualFile,
   colors: EditorColorsScheme
 ) : LayeredLexerEditorHighlighter(T4SyntaxHighlighter, colors) {
+  private val highlighterLifetime = project.lifetime.createNested()
+  private val rawTextLayerExtension = virtualFile.t4OutputExtension
+
   private var t4MarkupModel: T4MarkupModelExtension? = null
-  private var rawTextLayerExtension: String? = null
-  private var outputExtension: String? = null
 
   init {
+    registerLayers()
+    subscribeToOutputExtensionUpdates()
+  }
+
+  private fun registerLayers() {
     val codeHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(CSharpFileType, project, virtualFile)!!
     registerLayer(T4ElementTypes.RAW_CODE, LayerDescriptor(codeHighlighter, ""))
-    setUp()
+    if (rawTextLayerExtension == null) return
+    val rawTextFileType = FileTypeRegistry.getInstance().getFileTypeByFileName("dummy.$rawTextLayerExtension")
+    val rawTextHighlighter = SyntaxHighlighterFactory
+      .getSyntaxHighlighter(rawTextFileType, project, virtualFile)
+      ?: return
+    registerLayer(T4ElementTypes.RAW_TEXT, LayerDescriptor(rawTextHighlighter, "\n"))
   }
 
-  private fun setUp() {
-    if (virtualFile == null) return
+  private fun subscribeToOutputExtensionUpdates() {
     // Since we're in a highlighting a document, it most likely is opened in the editor and has a document
     val document = FileDocumentManager.getInstance().getDocument(virtualFile) ?: return
-    if (project == null) return
-    val markupContributor = FrontendMarkupHost.getMarkupContributor(project, document)
-    val adapter = markupContributor?.markupAdapter
-    t4MarkupModel = adapter?.getExtension(T4_MARKUP_MODEL_EXTENSION_KEY)
-    // Cannot highlight the text yet. We'll reset the layers
-    // as soon as we know how to highlight them
-    subscribe(document)
-  }
 
-  private fun subscribe(document: Document) {
-    if (project == null) return
+    // TODO: create a custom extension to EditableEntity instead of plugging into markup
+    t4MarkupModel = FrontendMarkupHost
+      .getMarkupContributor(project, document)
+      ?.markupAdapter
+      ?.getExtension(T4_MARKUP_MODEL_EXTENSION_KEY)
+
+    val editor = document.getFirstEditor(project)
+    if (editor !is EditorEx) return
+    val highlighterDisposable = highlighterLifetime.lifetime.createNestedDisposable()
+    // Cannot highlight the text yet. We'll reset the layers
+    // as soon as we know how to highlight them.
+    //
     // project.lifetime is quite a long-lived lifetime,
     // but it's not a big deal here, because the markup model
     // gets disposed as soon as the editor closes anyway
-    t4MarkupModel?.rawTextExtension?.advise(project.lifetime) { extension ->
-      if (extension == outputExtension) return@advise
-      outputExtension = extension
-      application.invokeLater {
-        synchronized(this) {
-          // will trigger layer invalidation
-          setText(document.text)
-        }
-      }
+    t4MarkupModel?.rawTextExtension?.advise(highlighterLifetime) { extension ->
+      if (extension == rawTextLayerExtension) return@advise
+      virtualFile.t4OutputExtension = extension
+      val updater = EditorHighlighterUpdater(project, highlighterDisposable, editor, virtualFile)
+      updater.updateHighlighters()
+      highlighterLifetime.terminate(true)
     }
   }
 
-  override fun updateLayers(): Boolean {
-    if (project == null) return false
-    if (rawTextLayerExtension == outputExtension) return false
-    rawTextLayerExtension = outputExtension
-    val rawTextFileType = FileTypeRegistry.getInstance().getFileTypeByFileName("dummy.$rawTextLayerExtension")
-    val rawTextHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(rawTextFileType, project, virtualFile)
-    if (rawTextHighlighter == null) {
-      unregisterLayer(T4ElementTypes.RAW_TEXT)
-      return false
-    }
-    registerLayer(T4ElementTypes.RAW_TEXT, LayerDescriptor(rawTextHighlighter, "\n"))
-    return true
+  companion object {
+    private val OUTPUT_EXTENSION_KEY = Key<String>("OUTPUT_EXTENSION_KEY")
+
+    private var VirtualFile.t4OutputExtension
+      get() = getUserData(OUTPUT_EXTENSION_KEY)
+      set(value) = putUserData(OUTPUT_EXTENSION_KEY, value)
   }
 }
