@@ -63,7 +63,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 		}
 
 		[CanBeNull]
-		private IT4OutputExtensionChangeListener CreateListener([NotNull] IPsiSourceFile file)
+		private T4OutputExtensionChangeListener CreateListener([NotNull] IPsiSourceFile file)
 		{
 			var projectFile = file.ToProjectFile();
 			if (projectFile == null) return null;

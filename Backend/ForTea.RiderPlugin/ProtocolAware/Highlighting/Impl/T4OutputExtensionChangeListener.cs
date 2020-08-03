@@ -3,7 +3,7 @@ using JetBrains.Collections.Viewable;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 {
-	public sealed class T4OutputExtensionChangeListener : IT4OutputExtensionChangeListener
+	public sealed class T4OutputExtensionChangeListener
 	{
 		[NotNull]
 		private IViewableProperty<string> Sink { get; }

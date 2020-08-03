@@ -8,20 +8,20 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 	public static class T4OutputExtensionChangeListenerEx
 	{
 		[NotNull]
-		private static readonly Key<IT4OutputExtensionChangeListener> T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY =
-			new Key<IT4OutputExtensionChangeListener>("T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY");
+		private static readonly Key<T4OutputExtensionChangeListener> T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY =
+			new Key<T4OutputExtensionChangeListener>("T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY");
 
 		public static void CreateListener(
 			[NotNull] this IDocument thіs,
 			Lifetime lifetime,
-			[NotNull] IT4OutputExtensionChangeListener listener
+			[NotNull] T4OutputExtensionChangeListener listener
 		) => lifetime.Bracket(
 			() => thіs.PutData(T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY, listener),
 			() => thіs.PutData(T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY, null)
 		);
 
 		[CanBeNull]
-		public static IT4OutputExtensionChangeListener GetListener([NotNull] this IDocument thіs) =>
+		public static T4OutputExtensionChangeListener GetListener([NotNull] this IDocument thіs) =>
 			thіs.GetData(T4_OUTPUT_EXTENSION_CHANGE_LISTENER_KEY);
 	}
 }
