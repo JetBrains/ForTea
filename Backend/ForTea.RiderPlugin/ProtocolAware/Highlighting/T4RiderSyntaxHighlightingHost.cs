@@ -1,12 +1,13 @@
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
-using JetBrains.Collections.Viewable;
+using JetBrains.DocumentModel;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features.Daemon;
+using JetBrains.ReSharper.Host.Features.Documents;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
@@ -14,7 +15,7 @@ using JetBrains.Util;
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 {
 	[SolutionComponent]
-	public sealed class T4RiderRawTextHighlightingManager
+	public sealed class T4RiderSyntaxHighlightingHost
 	{
 		private Lifetime Lifetime { get; }
 
@@ -31,16 +32,19 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 		private IPsiCachesState State { get; }
 
 		[NotNull]
-		private readonly Key<T4MarkupModelExtension> T4_MARKUP_MODEL_EXTENSION_KEY =
-			new Key<T4MarkupModelExtension>("T4_MARKUP_MODEL_EXTENSION_KEY");
+		private IPsiFiles Files { get; }
 
-		public T4RiderRawTextHighlightingManager(
+		[NotNull]
+		private DocumentHost Host { get; }
+
+		public T4RiderSyntaxHighlightingHost(
 			Lifetime lifetime,
 			[NotNull] ILogger logger,
-			[NotNull] RiderMarkupHost markupHost,
 			[NotNull] T4OutputExtensionFrontendNotifier notifier,
 			[NotNull] ISolution solution,
-			[NotNull] IPsiCachesState state
+			[NotNull] IPsiCachesState state,
+			[NotNull] IPsiFiles files,
+			[NotNull] DocumentHost host
 		)
 		{
 			Lifetime = lifetime;
@@ -48,34 +52,45 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			Notifier = notifier;
 			Solution = solution;
 			State = state;
-			markupHost.MarkupAdapters.View(lifetime, CreateHandler);
+			Files = files;
+			Host = host;
+			host.ViewHostDocuments(lifetime, CreateHandler);
 		}
 
-		private void CreateHandler(Lifetime adapterLifetime, [NotNull] IRiderMarkupModelAdapter adapter)
+		private void CreateHandler(
+			Lifetime editableEntityLifetime,
+			[NotNull] EditableEntityId editableEntityId,
+			[NotNull] RiderDocument document
+		)
 		{
-			var t4MarkupExtension = adapter.GetExtension(T4_MARKUP_MODEL_EXTENSION_KEY);
-			if (t4MarkupExtension == null)
+			var editableEntity = Host.TryGetEditableEntity(editableEntityId);
+			if (editableEntity == null)
 			{
-				// TODO: debug wtf
-				Logger.Error("Markup model extension {0} wasn't found!", T4_MARKUP_MODEL_EXTENSION_KEY);
+				Logger.Error("Editable entity not found in a document!");
 				return;
 			}
 
-			var targetDocument = adapter.DocumentMarkup.Document;
-			targetDocument.CreateListener(
-				adapterLifetime,
-				new T4OutputExtensionChangeListener(t4MarkupExtension.RawTextExtension)
+			var t4EditableEntityModel = editableEntity.GetT4EditableEntityModel();
+			document.CreateListener(
+				editableEntityLifetime,
+				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)
 			);
 
+			SubscribeToNotification(editableEntityLifetime, document);
+		}
+
+		private void SubscribeToNotification(Lifetime lifetime, [NotNull] IDocument targetDocument)
+		{
 			var file = targetDocument.GetPsiSourceFile(Solution);
 			if (file == null) return;
 			if (State.IsInitialUpdateFinished.Value)
 			{
-				Notifier.NotifyFrontend(file);
+				Files.ExecuteAfterCommitAllDocuments(() => Notifier.NotifyFrontend(file));
 			}
 			else
 			{
-				var initialUpdateLifetime = adapterLifetime.CreateNested();
+				var initialUpdateLifetime = lifetime.CreateNested();
+				initialUpdateLifetime.AllowTerminationUnderExecution = true;
 				State.IsInitialUpdateFinished.Change.Advise(initialUpdateLifetime.Lifetime, current =>
 				{
 					if (!current.HasNew || !current.New) return;

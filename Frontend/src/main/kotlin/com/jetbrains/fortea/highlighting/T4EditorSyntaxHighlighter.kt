@@ -12,13 +12,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.rd.createNestedDisposable
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
-import com.jetbrains.fortea.highlighting.T4ProtocolRawTextHighlightingExtension.Companion.T4_MARKUP_MODEL_EXTENSION_KEY
+import com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost.Companion.getT4EditableEntityModel
 import com.jetbrains.fortea.psi.T4ElementTypes
 import com.jetbrains.rd.platform.util.lifetime
-import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
 import com.jetbrains.rider.document.getFirstEditor
 import com.jetbrains.rider.ideaInterop.fileTypes.csharp.CSharpFileType
-import com.jetbrains.rider.model.T4MarkupModelExtension
 
 class T4EditorSyntaxHighlighter(
   private val project: Project,
@@ -27,8 +25,6 @@ class T4EditorSyntaxHighlighter(
 ) : LayeredLexerEditorHighlighter(T4SyntaxHighlighter, colors) {
   private val highlighterLifetime = project.lifetime.createNested()
   private val rawTextLayerExtension = virtualFile.t4OutputExtension
-
-  private var t4MarkupModel: T4MarkupModelExtension? = null
 
   init {
     registerLayers()
@@ -50,12 +46,6 @@ class T4EditorSyntaxHighlighter(
     // Since we're in a highlighting a document, it most likely is opened in the editor and has a document
     val document = FileDocumentManager.getInstance().getDocument(virtualFile) ?: return
 
-    // TODO: create a custom extension to EditableEntity instead of plugging into markup
-    t4MarkupModel = FrontendMarkupHost
-      .getMarkupContributor(project, document)
-      ?.markupAdapter
-      ?.getExtension(T4_MARKUP_MODEL_EXTENSION_KEY)
-
     val editor = document.getFirstEditor(project)
     if (editor !is EditorEx) return
     val highlighterDisposable = highlighterLifetime.lifetime.createNestedDisposable()
@@ -65,7 +55,7 @@ class T4EditorSyntaxHighlighter(
     // project.lifetime is quite a long-lived lifetime,
     // but it's not a big deal here, because the markup model
     // gets disposed as soon as the editor closes anyway
-    t4MarkupModel?.rawTextExtension?.advise(highlighterLifetime) { extension ->
+    document.getT4EditableEntityModel(project)?.rawTextExtension?.advise(highlighterLifetime) { extension ->
       if (extension == rawTextLayerExtension) return@advise
       virtualFile.t4OutputExtension = extension
       val updater = EditorHighlighterUpdater(project, highlighterDisposable, editor, virtualFile)
