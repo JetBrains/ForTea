@@ -91,7 +91,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			// It would be logical to check the file type here and return if it's not T4.
 			// However, this is impossible because calculating file type
 			// requires the file to be attached to a project hierarchy,
-			// which sometimes doesn't hold.
+			// which sometimes isn't true.
 			_shellLocks.AssertWriteAccessAllowed();
 			ModuleWrapper moduleWrapper;
 			switch (changeType)
@@ -101,10 +101,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 						// We only handle T4 files and do not affect other project files.
 						break;
 					if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
-						// Otherwise, this is a new preprocessed file.
+						// This is a new preprocessed file.
 						// We don't create modules for preprocessed files
 						// so that to let R# add them into the project,
-						// so that the template will have access to the current project types.
+						// so that the template will have access
+						// to the types defined in the current project.
 						break;
 					// This is a new executable file, so we need to create a module for it.
 					AddFile(projectFile, changeBuilder);
