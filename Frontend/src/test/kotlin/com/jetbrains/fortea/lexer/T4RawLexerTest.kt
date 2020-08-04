@@ -3,7 +3,7 @@ package com.jetbrains.fortea.lexer
 import com.intellij.testFramework.LexerTestCase
 import org.testng.annotations.Test
 
-class LexerTest : LexerTestCase() {
+class T4RawLexerTest : LexerTestCase() {
   override fun createLexer() = T4Lexer()
   override fun getDirPath(): String? = null
 
