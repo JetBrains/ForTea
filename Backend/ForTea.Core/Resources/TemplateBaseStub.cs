@@ -91,7 +91,7 @@
             /// Gets or sets format provider to be used by ToStringWithCulture method.
             /// </summary>
             [__ReSharperSynthetic]
-            public System.IFormatProvider FormatProvider => null
+            public System.IFormatProvider FormatProvider => null;
 
             /// <summary>
             /// This is called from the compile/run appdomain to convert objects within an expression block to a string

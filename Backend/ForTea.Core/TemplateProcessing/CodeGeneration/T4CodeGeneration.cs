@@ -31,8 +31,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 				сonverter = new T4CSharpCodeBehindIntermediateConverter(file, provider);
 			}
 			else сonverter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
-			var сollector = new T4CSharpCodeBehindGenerationInfoCollector(solution);
-			return сonverter.Convert(сollector.Collect(file));
+			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution);
+			return сonverter.Convert(collector.Collect(file));
 		}
 	}
 }
