@@ -1,0 +1,5 @@
+<#@ template language="C#" #>
+<#
+    TemplateBase b = this;
+    b.<ERROR_UNRESOLVED>TransformText</ERROR_UNRESOLVED>();
+#>

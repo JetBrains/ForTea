@@ -1,0 +1,6 @@
+<#@ template language="C#" #>
+<#
+    using (<ERROR_UNDERLINED>TemplateBase</ERROR_UNDERLINED> b = this)
+    {
+    }
+#>

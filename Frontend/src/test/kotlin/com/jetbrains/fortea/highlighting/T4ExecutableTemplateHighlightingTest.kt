@@ -9,4 +9,6 @@ class T4ExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
   @Test fun testGutterMarks() = doTest(T4RunMarkerAttributeIds.RUN_T4_FILE_MARKER_ID)
   @Test fun testClass() = doTestErrors()
   @Test fun testIncompleteMacro() = doTestErrors()
+  @Test fun `test that default base class has TransformText`() = doTestErrors()
+  @Test fun `test that default base class implements IDisposable`() = doTestErrors()
 }
