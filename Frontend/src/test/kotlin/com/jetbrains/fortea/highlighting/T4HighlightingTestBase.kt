@@ -21,10 +21,7 @@ abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
     dumpHighlightersTree(severity)
   }
 
-  fun doTestErrors() = doTestWithMarkupModel {
-    waitForDaemon()
-    dumpHighlightersTree(HighlightSeverity.ERROR)
-  }
+  fun doTestErrors() = doTest(HighlightSeverity.ERROR)
 
   private fun doTestWithMarkupModel(testAction: EditorImpl.() -> Unit) =
     doTestWithMarkupModel(fileName, testFilePath, goldFileName, testAction)
