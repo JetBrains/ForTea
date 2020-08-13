@@ -33,7 +33,7 @@ namespace JetBrains.ForTea.Tests.Mock
 		{
 		}
 
-		protected override void AfterCommit()
+		protected override void QueueAfterCommit()
 		{
 			if (CommitStage == T4CommitStage.DependencyInvalidation) return;
 			CommitStage = T4CommitStage.DependencyInvalidation;

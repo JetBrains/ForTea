@@ -7,12 +7,14 @@ using JetBrains.DocumentManagers;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 {
 	[SolutionComponent]
-	public sealed class T4OutputExtensionFrontendNotifier
+	public sealed class T4OutputExtensionFrontendNotifier : T4IndirectFileChangeObserverBase
 	{
 		[NotNull]
 		private DocumentManager DocumentManager { get; }
@@ -20,25 +22,45 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 		[NotNull]
 		private IT4FileDependencyGraph Graph { get; }
 
+		[NotNull]
+		private IPsiFiles PsiFiles { get; }
+
 		public T4OutputExtensionFrontendNotifier(
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
 			[NotNull] DocumentManager documentManager,
-			[NotNull] IT4FileDependencyGraph graph
-		)
+			[NotNull] IT4FileDependencyGraph graph,
+			[NotNull] IPsiServices services,
+			[NotNull] IPsiCachesState state,
+			[NotNull] IPsiFiles psiFiles
+		) : base(lifetime, notifier, services, state)
 		{
 			DocumentManager = documentManager;
 			Graph = graph;
-			notifier.OnFilesIndirectlyAffected.Advise(lifetime, NotifyFrontend);
+			PsiFiles = psiFiles;
 		}
 
-		private void NotifyFrontend(T4FileInvalidationData data)
+		protected override string ActivityName => "T4 frontend notification about file output extension";
+
+		protected override void AfterCommit()
 		{
-			NotifyFrontend(data.DirectlyAffectedFile);
-			foreach (var file in data.IndirectlyAffectedFiles)
+			using var outerCookie = ReadLockCookie.Create();
+			// Cache them in a closure, because they are lost otherwise
+			var indirectDependencies = IndirectDependencies;
+			PsiFiles.ExecuteAfterCommitAllDocuments(() =>
 			{
-				NotifyFrontend(file);
-			}
+				using var cookie = ReadLockCookie.Create();
+				foreach (var file in indirectDependencies)
+				{
+					NotifyFrontend(file);
+				}
+			});
+		}
+
+		protected override void OnFilesIndirectlyAffected(T4FileInvalidationData data)
+		{
+			base.OnFilesIndirectlyAffected(data);
+			IndirectDependencies.Add(data.DirectlyAffectedFile);
 		}
 
 		public void NotifyFrontend([NotNull] IPsiSourceFile file)
