@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities;
@@ -14,34 +13,74 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.NuGet.NuGetTasks;
 
 [CheckBuildProjectConfigurations]
-internal class Build : NukeBuild
+internal class ForTeaBuild : NukeBuild
 {
-	[Parameter]
-	public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-
+	[Parameter] public Configuration Configuration;
+	[Parameter] public string WaveVersion;
 	[Parameter] public readonly string NuGetSource = "https://plugins.jetbrains.com/";
-	[Parameter] public readonly string WaveVersion;
 	[Parameter] public readonly string NuGetApiKey;
 	[Solution] private readonly Solution Solution;
 	private const string MainProjectName = "ForTea.ReSharperPlugin";
 	private AbsolutePath OutputDirectory => RootDirectory / "artifacts" / Configuration;
 
 	[NotNull]
+	public Target InitializeConfiguration => target => target.Executes(() =>
+	{
+		if (Configuration != null) return;
+		// Configuration can be provided like this:
+		// .\build.ps1 --configuration Release
+		Console.WriteLine("Please, select configuration:");
+		Console.WriteLine("  1: Release");
+		Console.WriteLine("  2: Debug");
+		Console.Write("Enter selection (default: Release) [1..2]:");
+		string line = Console.ReadLine();
+		if (string.IsNullOrEmpty(line))
+		{
+			Configuration = Configuration.Release;
+			return;
+		}
+
+		int number = int.Parse(line);
+		Configuration = number switch
+		{
+			1 => Configuration.Release,
+			2 => Configuration.Debug,
+			_ => throw new ArgumentOutOfRangeException()
+		};
+	});
+
+	[NotNull]
+	public Target InitializeWave => target => target.Executes(() =>
+	{
+		if (WaveVersion != null)
+		{
+			Console.WriteLine($"Building for given wave version: {WaveVersion}");
+			return;
+		}
+
+		// Wave version can be provided like this:
+		// .\build.ps1 --waveVersion 202.0
+		Console.WriteLine("Please, enter wave version: ");
+		WaveVersion = Console.ReadLine();
+	});
+
+	[NotNull]
 	public Target Compile => target => target
+		.DependsOn(InitializeConfiguration)
 		.Executes(() => DotNetTasks.DotNetBuild(settings => settings
 			.SetConfiguration(Configuration)
 			.SetProjectFile(Solution)));
 
 	[NotNull]
 	public Target Pack => target => target
-		.DependsOn(Compile)
+		.DependsOn(Compile, InitializeWave)
 		.Executes(() => NuGetPack(settings => settings
 			.SetTargetPath(RootDirectory / "ForTea.nuspec")
 			.SetOutputDirectory(OutputDirectory)
 			.SetProperty("jetBrainsYearSpan", GetJetBrainsYearSpan())
 			.SetProperty("releaseNotes", GetLatestReleaseNotes())
 			.SetProperty("configuration", Configuration.ToString())
-			.SetProperty("wave", GetOrSelectWaveVersion())
+			.SetProperty("wave", WaveVersion)
 			.EnableNoPackageAnalysis()));
 
 	[NotNull]
@@ -75,27 +114,5 @@ internal class Build : NukeBuild
 		.Select(x => $"\u2022{x.TrimStart('-')}")
 		.JoinNewLine();
 
-	[NotNull]
-	private string GetOrSelectWaveVersion()
-	{
-		if (WaveVersion != null)
-		{
-			Console.WriteLine($"Building for given wave version: {WaveVersion}");
-			return WaveVersion;
-		}
-
-		string selected = NuGetPackageResolver
-			.GetLocalInstalledPackages(RootDirectory / MainProjectName / (MainProjectName + ".csproj"))
-			.Where(x => x.Id == "Wave")
-			.OrderByDescending(x => x.Version.Version)
-			.FirstOrDefault()
-			.NotNull("There's no R# installed and no wave version is given. Please, pass wave version as an argument: '--waveVersion 193.0'")
-			.Version
-			.Version
-			.ToString(2);
-		Console.WriteLine($"No WaveVersion is given. Auto-detected version:{selected}");
-		return selected;
-	}
-
-	public static int Main() => Execute<Build>(x => x.Compile);
+	public static int Main() => Execute<ForTeaBuild>(x => x.Compile);
 }
