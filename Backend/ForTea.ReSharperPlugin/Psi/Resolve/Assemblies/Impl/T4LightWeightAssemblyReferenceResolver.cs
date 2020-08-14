@@ -1,9 +1,7 @@
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
@@ -20,8 +18,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		public override FileSystemPath TryResolve(T4ResolvedPath path)
 		{
 			FileSystemPath result = null;
-			Cache.Map.TryGetValue(path.ProjectFile.ToSourceFile().NotNull())?.ResolvedAssemblies
-				.TryGetValue(path.ResolvedPath, out result);
+			Cache.Map.TryGetValue(path.SourceFile)?.ResolvedAssemblies.TryGetValue(path.ResolvedPath, out result);
 			return result;
 		}
 	}
