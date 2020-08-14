@@ -1,5 +1,6 @@
 package com.jetbrains.fortea.lexer
 
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.util.TextRange
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.base.EditorTestBase
@@ -10,22 +11,23 @@ import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import java.io.File
 
 abstract class T4OutputDependentLexerTestBase : EditorTestBase() {
-  protected fun doTest(fileName : String = "Template.tt") {
-    withOpenedEditor(fileName, fileName) {
-      val editor = this
-      val goldFile = File(testCaseGoldDirectory, "$fileName.gold").apply { if (!exists()) { parentFile.mkdirs(); } }
-      executeWithGold(goldFile) { stream ->
-        waitForDaemonAndCaches(project!!)
-        waitBackend()
-        waitForDaemon()
-        waitBackend()
-        val iterator = editor.highlighter.createIterator(0)
-        while (!iterator.atEnd()) {
-          val tokenName = iterator.tokenType.toString().extendLength(40)
-          val tokenText = editor.document.getText(TextRange(iterator.start, iterator.end)).replace("\n", "\\n")
-          stream.println("$tokenName| $tokenText")
-          iterator.advance()
-        }
+  protected fun doTest(fileName: String = "Template.tt", goldFileName: String? = null) =
+    withOpenedEditor(fileName, fileName) { doTest(this, goldFileName ?: "$fileName.gold") }
+
+  protected fun doTest(editor: EditorImpl, goldFileName: String) {
+    val goldFile = File(testCaseGoldDirectory, goldFileName)
+    if (!goldFile.exists()) goldFile.parentFile.mkdirs()
+    executeWithGold(goldFile) { stream ->
+      waitForDaemonAndCaches(editor.project!!)
+      waitBackend()
+      editor.waitForDaemon()
+      waitBackend()
+      val iterator = editor.highlighter.createIterator(0)
+      while (!iterator.atEnd()) {
+        val tokenName = iterator.tokenType.toString().extendLength(40)
+        val tokenText = editor.document.getText(TextRange(iterator.start, iterator.end)).replace("\n", "\\n")
+        stream.println("$tokenName| $tokenText")
+        iterator.advance()
       }
     }
   }

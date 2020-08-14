@@ -1,0 +1,30 @@
+T4TokenType.DIRECTIVE_START             | <#@
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | include
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | file
+T4TokenType.EQUAL                       | =
+T4TokenType.QUOTE                       | "
+T4TokenType.RAW_ATTRIBUTE_VALUE         | Template.tt
+T4TokenType.QUOTE                       | "
+WHITE_SPACE                             |  
+T4TokenType.BLOCK_END                   | #>
+T4TokenType.NEW_LINE                    | \n
+USING_KEYWORD                           | using
+WHITE_SPACE                             |  
+INT_KEYWORD                             | int
+WHITE_SPACE                             |  
+AS_KEYWORD                              | as
+WHITE_SPACE                             |  
+DOUBLE_KEYWORD                          | double
+SEMICOLON                               | ;
+T4TokenType.NEW_LINE                    | \n
+LT                                      | <
+IDENTIFIER                              | html
+GT                                      | >
+T4TokenType.NEW_LINE                    | \n
+LT                                      | <
+DIV                                     | /
+IDENTIFIER                              | html
+GT                                      | >
+T4TokenType.NEW_LINE                    | \n

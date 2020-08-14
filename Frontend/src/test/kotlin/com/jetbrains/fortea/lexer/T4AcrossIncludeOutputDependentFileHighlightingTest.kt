@@ -5,8 +5,6 @@ import org.testng.annotations.Test
 
 class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexerTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4AndIncluder"
-  private val includeName = "Template.tt"
-  private val includerName = "Includer.tt"
 
   @Test
   fun `test that extension in include defines highlighting in includer`() {
@@ -20,7 +18,27 @@ class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexe
     doTest(includeName)
   }
 
-  private fun setText(fileName: String) {
-    withOpenedEditor(fileName, fileName) {}
+  @Test
+  fun `test that a change in includer can trigger include invalidation`() {
+    setText(includerName, "$includerName.before")
+    val includeEditor = doTest(includeName, "$includeName.before.gold")
+    setText(includerName, "$includerName.after")
+    doTest(includeEditor, "$includeName.after.gold")
+  }
+
+  @Test
+  fun `test that a change in include can trigger includer invalidation`() {
+    setText(includeName, "$includeName.before")
+    val includerEditor = doTest(includerName, "$includerName.before.gold")
+    setText(includeName, "$includeName.after")
+    doTest(includerEditor, "$includerName.after.gold")
+  }
+
+  private fun setText(fileName: String, sourceFileName: String? = null) =
+    withOpenedEditor(fileName, sourceFileName ?: fileName) {}
+
+  companion object {
+    private const val includeName = "Template.tt"
+    private const val includerName = "Includer.tt"
   }
 }

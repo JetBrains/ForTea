@@ -1,0 +1,21 @@
+LT                                      | <
+IDENTIFIER                              | html
+GT                                      | >
+T4TokenType.NEW_LINE                    | \n
+LT                                      | <
+DIV                                     | /
+IDENTIFIER                              | html
+GT                                      | >
+T4TokenType.NEW_LINE                    | \n
+USING_KEYWORD                           | using
+WHITE_SPACE                             |  
+INT_KEYWORD                             | int
+WHITE_SPACE                             |  
+AS_KEYWORD                              | as
+WHITE_SPACE                             |  
+DOUBLE_KEYWORD                          | double
+WHITE_SPACE                             |  
+EQ                                      | =
+WHITE_SPACE                             |  
+STRING_LITERAL_REGULAR                  | "hello, world"
+T4TokenType.NEW_LINE                    | \n
