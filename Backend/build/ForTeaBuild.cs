@@ -26,7 +26,11 @@ internal class ForTeaBuild : NukeBuild
 	[NotNull]
 	public Target InitializeConfiguration => target => target.Executes(() =>
 	{
-		if (Configuration != null) return;
+		if (Configuration != null)
+		{
+			Console.WriteLine($"Building for given configuration: {Configuration}");
+			return;
+		}
 		// Configuration can be provided like this:
 		// .\build.ps1 --configuration Release
 		Console.WriteLine("Please, select configuration:");
