@@ -1,0 +1,4 @@
+<#@ template language="C#" hostspecific="true" #>
+<# string resolvedPath = Host.ResolvePath(string.Empty); #>
+<#= resolvedPath.Contains("test that host resolves an empty string") #>
+<#= resolvedPath.EndsWith("Project", StringComparison.Ordinal) #>
