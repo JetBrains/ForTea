@@ -51,5 +51,5 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test that Program_tt can be executed 2`() = doTest(dumpCsproj = false)
   @Test fun `test access to ValueTuple`() = doTest(dumpCsproj = false)
   @Test fun `test access to ValueTuple in old framework`() = testExecutionFailure(".txt")
-  @Test fun `test that TextTransformation is line in VS`() = doTest(dumpCsproj = false)
+  @Test fun `test that TextTransformation is like in VS`() = doTest(dumpCsproj = false)
 }
