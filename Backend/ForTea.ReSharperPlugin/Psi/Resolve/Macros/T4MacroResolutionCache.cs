@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -23,15 +24,14 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 	[PsiComponent]
 	public sealed class T4MacroResolutionCache : T4PsiAwareCacheBase<T4MacroResolutionRequest, T4MacroResolutionData>
 	{
-		[NotNull]
-		private ILogger Logger { get; }
-
 		public T4MacroResolutionCache(
 			Lifetime lifetime,
-			IPersistentIndexManager persistentIndexManager,
-			[NotNull] ILogger logger
-		) : base(lifetime, persistentIndexManager, T4MacroResolutionDataMarshaller.Instance) => Logger = logger;
+			IPersistentIndexManager persistentIndexManager
+		) : base(lifetime, persistentIndexManager, T4MacroResolutionDataMarshaller.Instance)
+		{
+		}
 
+		[NotNull]
 		protected override T4MacroResolutionRequest Build(IT4File file)
 		{
 			var macros = file
@@ -56,22 +56,16 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 		)
 		{
 			var result = new Dictionary<string, string>();
-			IVsBuildMacroInfo vsBuildMacroInfo = null;
+			Lazy<IVsBuildMacroInfo> vsBuildMacroInfo = Lazy.Of(() => TryGetVsBuildMacroInfo(file), false);
 			foreach (string macro in macros)
 			{
-				if (vsBuildMacroInfo == null)
+				bool succeeded = false;
+				string value = null;
+				if (vsBuildMacroInfo.Value != null)
 				{
-					vsBuildMacroInfo = TryGetVsBuildMacroInfo(file);
-					if (vsBuildMacroInfo == null)
-					{
-						Logger.Error("Couldn't get IVsBuildMacroInfo");
-						break;
-					}
+					succeeded = HResultHelpers.SUCCEEDED(vsBuildMacroInfo.Value.GetBuildMacroValue(macro, out value)) &&
+					            !string.IsNullOrEmpty(value);
 				}
-
-				bool succeeded =
-					HResultHelpers.SUCCEEDED(vsBuildMacroInfo.GetBuildMacroValue(macro, out string value))
-					&& !string.IsNullOrEmpty(value);
 				if (!succeeded)
 				{
 					value = MSBuildExtensions.GetStringValue(T4ResolutionUtils.TryGetVsHierarchy(file), macro, null);

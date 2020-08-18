@@ -1,6 +1,8 @@
+using System;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -19,13 +21,22 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	public sealed class T4DeclaredAssembliesManager
 	{
 		[NotNull]
+		private IPsiFiles PsiFiles { get; }
+
+		[NotNull]
+		private IShellLocks Locks { get; }
+
+		[NotNull]
 		public Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>> FileDataChanged { get; }
 
 		public T4DeclaredAssembliesManager(
 			Lifetime lifetime,
-			[NotNull] IPsiFiles psiFiles
+			[NotNull] IPsiFiles psiFiles,
+			[NotNull] IShellLocks locks
 		)
 		{
+			PsiFiles = psiFiles;
+			Locks = locks;
 			FileDataChanged = new Signal<Pair<IPsiSourceFile, T4DeclaredAssembliesDiff>>(
 				lifetime,
 				"T4DeclaredAssembliesCache.FileDataChanged"
@@ -58,16 +69,22 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			OnPsiFileChanged(treeNode.GetContainingFile());
 		}
 
+		// Omitting CommitAllDocuments causes races between caches and assembly resolver
 		private void CreateOrUpdateData([NotNull] IT4File t4File)
 		{
-			var sourceFile = t4File.PhysicalPsiSourceFile;
-			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
-			var newData = new T4DeclaredAssembliesInfo(t4File);
-			var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
-			sourceFile.SetDeclaredAssembliesInfo(newData);
-			var diff = newData.DiffWith(existingDeclaredAssembliesInfo);
-			if (diff == null) return;
-			FileDataChanged.Fire(Pair.Of(sourceFile, diff));
+			Locks.ExecuteOrQueue("T4 assembly reference invalidation",
+				() => PsiFiles.ExecuteAfterCommitAllDocuments(() =>
+				{
+					var sourceFile = t4File.PhysicalPsiSourceFile;
+					if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
+					var newData = new T4DeclaredAssembliesInfo(t4File);
+					var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
+					sourceFile.SetDeclaredAssembliesInfo(newData);
+					var diff = newData.DiffWith(existingDeclaredAssembliesInfo);
+					if (diff == null) return;
+					FileDataChanged.Fire(Pair.Of(sourceFile, diff));
+				})
+			);
 		}
 	}
 }
