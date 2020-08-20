@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
@@ -20,12 +21,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			"RedundantNameQualifier"
 		};
 
+		private bool ShouldGenerateBaseClass { get; }
+
 		public T4CSharpCodeBehindIntermediateConverter(
 			[NotNull] IT4File file,
-			[NotNull] IT4GeneratedClassNameProvider classNameProvider
-		) : base(file, classNameProvider)
-		{
-		}
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
+			bool shouldGenerateBaseClass = true
+		) : base(file, classNameProvider) => ShouldGenerateBaseClass = shouldGenerateBaseClass;
 
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
 
@@ -56,6 +58,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			Result.Append("        // ReSharper disable ");
 			Result.AppendLine(inspection);
+		}
+
+		protected override void AppendBaseClass(T4CSharpCodeGenerationIntermediateResult intermediateResult)
+		{
+			if (!ShouldGenerateBaseClass) return;
+			base.AppendBaseClass(intermediateResult);
 		}
 
 		protected override void AppendHost()

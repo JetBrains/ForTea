@@ -207,7 +207,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			else Result.Append(ClassNameProvider.GeneratedBaseClassFQN);
 		}
 
-		private void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+		protected virtual void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			if (intermediateResult.HasBaseClass) return;
 			Result.AppendLine(BaseClassDescription);

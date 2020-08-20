@@ -33,11 +33,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 			if (rootTemplateKind == T4TemplateKind.Preprocessed)
 			{
 				var nameProvider = new T4PreprocessedClassNameProvider(root);
-				converter = new T4CSharpCodeBehindIntermediateConverter(file, nameProvider);
+				bool shouldGenerateBaseClass = root == file.PhysicalPsiSourceFile;
+				converter = new T4CSharpCodeBehindIntermediateConverter(file, nameProvider, shouldGenerateBaseClass);
 			}
 			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
 			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution, rootTemplateKind);
-			// todo: do not generate base class for includes
 			// TODO: store files incuded into preprocessed files in the project PSI module
 			return converter.Convert(collector.Collect(file));
 		}
