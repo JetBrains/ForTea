@@ -18,6 +18,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 	/// in T4 source file.
 	/// That code is not intended to be compiled and run.
 	/// </summary>
+	// TODO: make it a component
 	public static class T4CodeGeneration
 	{
 		[NotNull]
@@ -36,6 +37,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 			}
 			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
 			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution, rootTemplateKind);
+			// todo: do not generate base class for includes
+			// TODO: store files incuded into preprocessed files in the project PSI module
 			return converter.Convert(collector.Collect(file));
 		}
 	}
