@@ -247,11 +247,11 @@ namespace GammaJul.ForTea.Core.Tree
 			}
 		}
 
-		private static bool ContainsIncludeContext([NotNull] this IT4File file) =>
+		private static bool ContainsNoIncludeContext([NotNull] this IT4File file) =>
 			file.LogicalPsiSourceFile == file.PhysicalPsiSourceFile;
 
 		public static void AssertContainsNoIncludeContext([NotNull] this IT4File file) =>
-			Assertion.Assert(file.ContainsIncludeContext(), "PSI file should not contain any include context");
+			Assertion.Assert(file.ContainsNoIncludeContext(), "PSI file should not contain any include context");
 
 		/// <summary>
 		/// Some nodes in T4 tree constitute include context.
