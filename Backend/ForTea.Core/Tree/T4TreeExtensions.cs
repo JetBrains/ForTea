@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using JetBrains.Annotations;
@@ -261,6 +262,17 @@ namespace GammaJul.ForTea.Core.Tree
 		{
 			var file = node.GetContainingFile().NotNull();
 			var nodeDocument = node.GetDocumentRange().Document;
+			var visibleDocument = file.GetSourceFile()?.Document;
+			return nodeDocument == visibleDocument;
+		}
+
+		/// <summary>
+		/// Same as <see cref="IsVisibleInDocument(ITreeNode)"/>, but works during secondary PSI generation
+		/// </summary>
+		public static bool IsVisibleInDocumentUnsafe([NotNull] this ITreeNode node)
+		{
+			var file = node.GetContainingFile().NotNull();
+			var nodeDocument = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node).Document;
 			var visibleDocument = file.GetSourceFile()?.Document;
 			return nodeDocument == visibleDocument;
 		}

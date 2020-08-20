@@ -1,4 +1,6 @@
+using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
+using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
@@ -17,5 +19,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (Result.FeatureStarted) Result.AppendFeature(message);
 			else Result.AppendTransformation(message);
 		}
+
+		protected override void AppendFeature(IT4Code code, IT4AppendableElementDescription description) =>
+			Result.AppendFeature(description);
 	}
 }

@@ -165,7 +165,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			var code = expressionBlockParam.Code;
 			if (code == null) return;
-			if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
+			if (Result.FeatureStarted) AppendFeature(code, new T4ExpressionDescription(code));
 			else Result.AppendTransformation(new T4ExpressionDescription(code));
 		}
 
@@ -173,7 +173,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			var code = featureBlockParam.Code;
 			if (code == null) return;
-			Result.AppendFeature(new T4CodeDescription(code));
+			AppendFeature(code, new T4CodeDescription(code));
 		}
 
 		public override void VisitStatementBlockNode(IT4StatementBlock statementBlockParam)
@@ -193,6 +193,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		}
 
 		protected abstract void AppendTransformation([NotNull] string message);
+
+		protected abstract void AppendFeature(
+			[NotNull] IT4Code code,
+			[NotNull] IT4AppendableElementDescription description
+		);
+
 		protected abstract IT4CodeGenerationInterrupter Interrupter { get; }
 	}
 }

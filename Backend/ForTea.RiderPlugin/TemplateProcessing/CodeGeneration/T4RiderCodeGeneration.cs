@@ -7,6 +7,7 @@ using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration
 {
@@ -32,7 +33,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration
 		{
 			var solution = file.GetSolution();
 			var collector = new T4CSharpCodeGenerationInfoCollector(solution);
-			var nameProvider = new T4PreprocessedClassNameProvider(file);
+			file.AssertContainsNoIncludeContext();
+			var nameProvider = new T4PreprocessedClassNameProvider(file.PhysicalPsiSourceFile.NotNull());
 			var converter = new T4CSharpRealIntermediateConverter(file, nameProvider);
 			return converter.Convert(collector.Collect(file));
 		}

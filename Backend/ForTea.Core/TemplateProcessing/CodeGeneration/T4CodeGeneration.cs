@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
@@ -23,16 +24,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 		public static T4CSharpCodeGenerationResult GenerateCodeBehind([NotNull] IT4File file)
 		{
 			var solution = file.GetSolution();
-			var rootTemplateKindProvider = solution.GetComponent<IT4RootTemplateKindProvider>();
-			T4CSharpCodeBehindIntermediateConverter сonverter;
-			if (rootTemplateKindProvider.IsRootPreprocessedTemplate(file.PhysicalPsiSourceFile.NotNull()))
+			var rootTemplateKindProvider = solution.GetComponent<IT4TemplateKindProvider>();
+			var graph = solution.GetComponent<IT4FileDependencyGraph>();
+			var root = graph.FindBestRoot(file.PhysicalPsiSourceFile.NotNull());
+			T4CSharpCodeBehindIntermediateConverter converter;
+			var rootTemplateKind = rootTemplateKindProvider.GetTemplateKind(root);
+			if (rootTemplateKind == T4TemplateKind.Preprocessed)
 			{
-				var provider = new T4PreprocessedClassNameProvider(file);
-				сonverter = new T4CSharpCodeBehindIntermediateConverter(file, provider);
+				var nameProvider = new T4PreprocessedClassNameProvider(root);
+				converter = new T4CSharpCodeBehindIntermediateConverter(file, nameProvider);
 			}
-			else сonverter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
-			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution);
-			return сonverter.Convert(collector.Collect(file));
+			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
+			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution, rootTemplateKind);
+			return converter.Convert(collector.Collect(file));
 		}
 	}
 }
