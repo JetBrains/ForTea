@@ -36,9 +36,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		[CanBeNull]
 		private TargetFrameworkId PrimaryTargetFrameworkId { get; }
 
-		[NotNull]
-		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4PsiModuleProvider>();
-
 		private readonly struct ModuleWrapper {
 
 			[NotNull] public readonly T4FilePsiModule Module;
@@ -148,7 +145,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 						// This is the ordinary change in an executable T4 file.
 						// We can handle it.
-						ModifyFile(projectFile, changeBuilder, moduleWrapper);
+						ModifyFile(changeBuilder, moduleWrapper);
 						// Since we've handled the change, no need to delegate it to R#.
 						return null;
 					}
@@ -176,7 +173,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		}
 
 		private void AddFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder) {
-			Logger.Verbose($"Adding file: {projectFile.Location}");
 			ISolution solution = projectFile.GetSolution();
 
 			// creates a new T4PsiModule for the file
@@ -205,18 +201,14 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		}
 
 		private void RemoveFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper) {
-			Logger.Verbose($"Removing file: {projectFile.Location}");
 			_modules.Remove(projectFile);
 			changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Removed);
 			changeBuilder.AddModuleChange(moduleWrapper.Module, PsiModuleChange.ChangeType.Removed);
 			moduleWrapper.LifetimeDefinition.Terminate();
 		}
 
-		private void ModifyFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)
-		{
-			Logger.Verbose($"Modifying file: {projectFile.Location}");
-			changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Modified);
-		}
+		private static void ModifyFile([NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)
+			=> changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Modified);
 
 		public void Dispose() {
 			using (WriteLockCookie.Create()) {
