@@ -4,7 +4,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
@@ -15,8 +15,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 	{
 		public T4CSharpRealIntermediateConverter(
 			[NotNull] IT4File file,
-			[NotNull] IT4TemplateKindDependentDataProvider nameProvider
-		) : base(file, nameProvider)
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider
+		) : base(file, classNameProvider)
 		{
 		}
 

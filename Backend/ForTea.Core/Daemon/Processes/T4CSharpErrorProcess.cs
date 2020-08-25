@@ -40,12 +40,12 @@ namespace GammaJul.ForTea.Core.Daemon.Processes {
 
 		private static bool HasTransformTextMethod([NotNull] ITypeElement typeElement)
 			=> typeElement
-				.GetAllClassMembers(T4CSharpIntermediateConverterBase.TransformTextMethodName)
+				.GetAllClassMembers(T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName)
 				.SelectNotNull(instance => instance.Member as IMethod)
 				.Any(IsTransformTextMethod);
 
 		private static bool IsTransformTextMethod([NotNull] IMethod method)
-			=> method.ShortName == T4CSharpIntermediateConverterBase.TransformTextMethodName
+			=> method.ShortName == T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName
 			&& (method.IsVirtual || method.IsOverride || method.IsAbstract)
 			&& !method.IsSealed
 			&& method.GetAccessRights() == AccessRights.PUBLIC

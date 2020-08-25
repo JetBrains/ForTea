@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	{
 		[NotNull] public const string GeneratedClassNameString = "GeneratedTextTransformation";
 		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
-		[NotNull] internal const string TransformTextMethodName = "TransformText";
+		[NotNull] internal const string DefaultTransformTextMethodName = "TransformText";
 		[NotNull] protected const string OverrideKeyword = "override";
 		[NotNull] protected const string VirtualKeyword = "virtual";
 
@@ -28,11 +28,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected T4CSharpIntermediateConverterBase(
 			[NotNull] IT4File file,
-			[NotNull] IT4TemplateKindDependentDataProvider nameProvider
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider
 		)
 		{
 			File = file;
-			NameProvider = nameProvider;
+			ClassNameProvider = classNameProvider;
 			Result = new T4CSharpCodeGenerationResult(File);
 		}
 
@@ -110,7 +110,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendIndent();
 			Result.Append(intermediateResult.AccessRightsText);
-			Result.Append($" partial class {NameProvider.GeneratedClassName} : ");
+			Result.Append($" partial class {ClassNameProvider.GeneratedClassName} : ");
 			AppendBaseClassName(intermediateResult);
 			Result.AppendLine();
 			AppendIndent();
@@ -180,15 +180,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
 		)
 		{
-			if (!NameProvider.TransformTextAttributes.IsNullOrEmpty())
+			if (!TransformTextAttributes.IsNullOrEmpty())
 			{
 				AppendIndent();
-				Result.AppendLine(NameProvider.TransformTextAttributes);
+				Result.AppendLine(TransformTextAttributes);
 			}
 			AppendIndent();
 			Result.Append("public ");
 			Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
-			Result.AppendLine($" string {NameProvider.TransformTextMethodName}()");
+			Result.AppendLine($" string {TransformTextMethodName}()");
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
@@ -209,7 +209,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendBaseClassName([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			if (intermediateResult.HasBaseClass) Result.Append(intermediateResult.CollectedBaseClass);
-			else Result.Append(NameProvider.GeneratedBaseClassFQN);
+			else Result.Append(ClassNameProvider.GeneratedBaseClassFQN);
 		}
 
 		protected virtual void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
@@ -219,11 +219,17 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.Append(intermediateResult.AccessRightsText);
 			Result.Append(" class ");
-			Result.AppendLine(NameProvider.GeneratedBaseClassName);
+			Result.AppendLine(ClassNameProvider.GeneratedBaseClassName);
 			string resource = BaseClassResourceName;
 			var provider = new T4TemplateResourceProvider(resource);
 			Result.Append(provider.Template);
 		}
+
+		[NotNull]
+		protected virtual string TransformTextMethodName => DefaultTransformTextMethodName;
+
+		[NotNull]
+		protected virtual string TransformTextAttributes => "";
 
 		protected abstract void AppendHost();
 		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
@@ -235,7 +241,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract string BaseClassResourceName { get; }
 
 		[NotNull]
-		protected IT4TemplateKindDependentDataProvider NameProvider { get; }
+		protected IT4GeneratedClassNameProvider ClassNameProvider { get; }
 
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);

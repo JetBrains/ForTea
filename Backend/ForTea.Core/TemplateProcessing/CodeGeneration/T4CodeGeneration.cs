@@ -1,8 +1,7 @@
-using System;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -28,24 +27,22 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 			var rootTemplateKindProvider = solution.GetComponent<IT4TemplateKindProvider>();
 			var graph = solution.GetComponent<IT4FileDependencyGraph>();
 			var root = graph.FindBestRoot(file.PhysicalPsiSourceFile.NotNull());
+			T4CSharpCodeBehindGenerationInfoCollector collector;
 			T4CSharpCodeBehindIntermediateConverter converter;
 			var rootTemplateKind = rootTemplateKindProvider.GetTemplateKind(root);
 			if (rootTemplateKind == T4TemplateKind.Preprocessed)
 			{
-				bool isRootFile = root == file.PhysicalPsiSourceFile;
-				T4PreprocessedTemplateDataProvider templateDataProvider;
-				if (isRootFile)
-				{
-					templateDataProvider = new T4PreprocessedTemplateDataProvider(root, string.Empty);
-				}
-				else
-				{
-					templateDataProvider = new T4PreprocessedTemplateDataProvider(root, Guid.NewGuid().ToString("N"));
-				}
-				converter = new T4CSharpCodeBehindIntermediateConverter(file, templateDataProvider, isRootFile);
+				bool isRoot = root == file.PhysicalPsiSourceFile;
+				collector = new T4PreprocessedCSharpCodeBehindGenerationInfoCollector(solution, root, graph, isRoot);
+				var templateDataProvider = new T4PreprocessedClassNameProvider(root);
+				converter = new T4CSharpCodeBehindIntermediateConverter(file, templateDataProvider, isRoot);
 			}
-			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
-			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution, rootTemplateKind);
+			else
+			{
+				converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
+				collector = new T4CSharpCodeBehindGenerationInfoCollector(solution);
+			}
+
 			return converter.Convert(collector.Collect(file));
 		}
 	}

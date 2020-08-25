@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 
@@ -21,13 +22,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			"RedundantNameQualifier"
 		};
 
-		private bool ShouldGenerateBaseClass { get; }
+		private bool IsRoot { get; }
 
 		public T4CSharpCodeBehindIntermediateConverter(
 			[NotNull] IT4File file,
-			[NotNull] IT4TemplateKindDependentDataProvider nameProvider,
-			bool shouldGenerateBaseClass = true
-		) : base(file, nameProvider) => ShouldGenerateBaseClass = shouldGenerateBaseClass;
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
+			bool isRoot = true
+		) : base(file, classNameProvider)
+		{
+			IsRoot = isRoot;
+			if (IsRoot)
+			{
+				TransformTextMethodName = DefaultTransformTextMethodName;
+				TransformTextAttributes = "";
+			}
+			else
+			{
+				TransformTextMethodName = DefaultTransformTextMethodName + Guid.NewGuid().ToString("N");
+				TransformTextAttributes = "[__ReSharperSynthetic]";
+			}
+		}
 
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
 
@@ -62,7 +76,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected override void AppendBaseClass(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			if (!ShouldGenerateBaseClass) return;
+			if (!IsRoot) return;
 			base.AppendBaseClass(intermediateResult);
 		}
 
@@ -88,6 +102,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			if (!hasCustomBaseClass) return VirtualKeyword;
 			return base.GetTransformTextOverridabilityModifier(true);
 		}
+
+		protected override string TransformTextMethodName { get; }
+		protected override string TransformTextAttributes { get; }
 
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => CodeCommentStartText;

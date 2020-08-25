@@ -1,6 +1,6 @@
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters;
@@ -34,7 +34,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration
 			var solution = file.GetSolution();
 			var collector = new T4CSharpCodeGenerationInfoCollector(solution);
 			file.AssertContainsNoIncludeContext();
-			var nameProvider = new T4PreprocessedTemplateDataProvider(file.PhysicalPsiSourceFile.NotNull(), string.Empty);
+			var nameProvider = new T4PreprocessedClassNameProvider(file.PhysicalPsiSourceFile.NotNull());
 			var converter = new T4CSharpRealIntermediateConverter(file, nameProvider);
 			return converter.Convert(collector.Collect(file));
 		}
