@@ -34,7 +34,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration
 			var solution = file.GetSolution();
 			var collector = new T4CSharpCodeGenerationInfoCollector(solution);
 			file.AssertContainsNoIncludeContext();
-			var nameProvider = new T4PreprocessedClassNameProvider(file.PhysicalPsiSourceFile.NotNull());
+			var nameProvider = new T4PreprocessedNameProvider(file.PhysicalPsiSourceFile.NotNull(), string.Empty);
 			var converter = new T4CSharpRealIntermediateConverter(file, nameProvider);
 			return converter.Convert(collector.Collect(file));
 		}

@@ -13,7 +13,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	{
 		public T4CSharpExecutableCodeBehindIntermediateConverter([NotNull] IT4File file) : base(
 			file,
-			new T4ExecutableClassNameProvider()
+			new T4ExecutableNameProvider()
 		)
 		{
 		}

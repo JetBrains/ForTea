@@ -10,4 +10,7 @@ class T4IncludedPreprocessedTemplatePartialTest : T4HighlightingTestBase() {
 
   @Test
   fun `test partial class resolution in preprocessed include`() = doTestErrors()
+
+  @Test
+  fun `test that TransformText is resolved in preprocessed include`() = doTestErrors()
 }

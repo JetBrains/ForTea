@@ -34,7 +34,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		public T4CSharpExecutableIntermediateConverter(
 			[NotNull] IT4File file,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
-		) : base(file, new T4ExecutableClassNameProvider())
+		) : base(file, new T4ExecutableNameProvider())
 		{
 			file.AssertContainsNoIncludeContext();
 			ReferenceExtractionManager = referenceExtractionManager;
@@ -115,7 +115,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			string resource = intermediateResult.HasHost ? HostspecificSuffixResource : SuffixResource;
 			var provider = new T4TemplateResourceProvider(resource);
 			string encoding = intermediateResult.Encoding ?? T4EncodingsManager.GetEncoding(File);
-			string suffix = provider.ProcessResource(ClassNameProvider.GeneratedClassName, encoding);
+			string suffix = provider.ProcessResource(NameProvider.GeneratedClassName, encoding);
 			Result.Append(suffix);
 			AppendAssemblyRegistering();
 			// assembly registration code is part of main class,

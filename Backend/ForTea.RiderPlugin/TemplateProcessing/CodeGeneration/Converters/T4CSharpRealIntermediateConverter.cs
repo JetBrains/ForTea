@@ -15,8 +15,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 	{
 		public T4CSharpRealIntermediateConverter(
 			[NotNull] IT4File file,
-			[NotNull] IT4GeneratedClassNameProvider classNameProvider
-		) : base(file, classNameProvider)
+			[NotNull] IT4GeneratedNameProvider nameProvider
+		) : base(file, nameProvider)
 		{
 		}
 

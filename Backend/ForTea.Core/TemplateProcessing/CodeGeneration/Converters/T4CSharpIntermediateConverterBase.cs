@@ -28,11 +28,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected T4CSharpIntermediateConverterBase(
 			[NotNull] IT4File file,
-			[NotNull] IT4GeneratedClassNameProvider classNameProvider
+			[NotNull] IT4GeneratedNameProvider nameProvider
 		)
 		{
 			File = file;
-			ClassNameProvider = classNameProvider;
+			NameProvider = nameProvider;
 			Result = new T4CSharpCodeGenerationResult(File);
 		}
 
@@ -110,7 +110,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		{
 			AppendIndent();
 			Result.Append(intermediateResult.AccessRightsText);
-			Result.Append($" partial class {ClassNameProvider.GeneratedClassName} : ");
+			Result.Append($" partial class {NameProvider.GeneratedClassName} : ");
 			AppendBaseClassName(intermediateResult);
 			Result.AppendLine();
 			AppendIndent();
@@ -183,7 +183,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.Append("public ");
 			Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
-			Result.AppendLine($" string {TransformTextMethodName}()");
+			Result.AppendLine($" string {NameProvider.TransformTextMethodName}()");
 			AppendIndent();
 			Result.AppendLine("{");
 			PushIndent();
@@ -204,7 +204,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		private void AppendBaseClassName([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			if (intermediateResult.HasBaseClass) Result.Append(intermediateResult.CollectedBaseClass);
-			else Result.Append(ClassNameProvider.GeneratedBaseClassFQN);
+			else Result.Append(NameProvider.GeneratedBaseClassFQN);
 		}
 
 		protected virtual void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
@@ -214,7 +214,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			AppendIndent();
 			Result.Append(intermediateResult.AccessRightsText);
 			Result.Append(" class ");
-			Result.AppendLine(ClassNameProvider.GeneratedBaseClassName);
+			Result.AppendLine(NameProvider.GeneratedBaseClassName);
 			string resource = BaseClassResourceName;
 			var provider = new T4TemplateResourceProvider(resource);
 			Result.Append(provider.Template);
@@ -230,7 +230,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract string BaseClassResourceName { get; }
 
 		[NotNull]
-		protected IT4GeneratedClassNameProvider ClassNameProvider { get; }
+		protected IT4GeneratedNameProvider NameProvider { get; }
 
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);

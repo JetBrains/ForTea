@@ -25,9 +25,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		public T4CSharpCodeBehindIntermediateConverter(
 			[NotNull] IT4File file,
-			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
+			[NotNull] IT4GeneratedNameProvider nameProvider,
 			bool shouldGenerateBaseClass = true
-		) : base(file, classNameProvider) => ShouldGenerateBaseClass = shouldGenerateBaseClass;
+		) : base(file, nameProvider) => ShouldGenerateBaseClass = shouldGenerateBaseClass;
 
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
 

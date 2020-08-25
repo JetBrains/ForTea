@@ -3,9 +3,13 @@ using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName
 {
-	public sealed class T4PreprocessedClassNameProvider : IT4GeneratedClassNameProvider
+	public sealed class T4PreprocessedNameProvider : IT4GeneratedNameProvider
 	{
-		public T4PreprocessedClassNameProvider([NotNull] IPsiSourceFile file) => File = file;
+		public T4PreprocessedNameProvider([NotNull] IPsiSourceFile file, [NotNull] string transformTextSuffix)
+		{
+			File = file;
+			TransformTextMethodName = T4CSharpIntermediateConverterBase.TransformTextMethodName + transformTextSuffix;
+		}
 
 		[NotNull]
 		private IPsiSourceFile File { get; }
@@ -13,5 +17,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.Clas
 		public string GeneratedClassName => File.CreateGeneratedClassName();
 		public string GeneratedBaseClassName => GeneratedClassName + "Base";
 		public string GeneratedBaseClassFQN => GeneratedBaseClassName;
+		public string TransformTextMethodName { get; }
 	}
 }

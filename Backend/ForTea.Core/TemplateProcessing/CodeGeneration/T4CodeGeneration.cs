@@ -1,3 +1,4 @@
+using System;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
@@ -18,7 +19,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 	/// in T4 source file.
 	/// That code is not intended to be compiled and run.
 	/// </summary>
-	// TODO: make it a component
 	public static class T4CodeGeneration
 	{
 		[NotNull]
@@ -32,9 +32,17 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 			var rootTemplateKind = rootTemplateKindProvider.GetTemplateKind(root);
 			if (rootTemplateKind == T4TemplateKind.Preprocessed)
 			{
-				var nameProvider = new T4PreprocessedClassNameProvider(root);
-				bool shouldGenerateBaseClass = root == file.PhysicalPsiSourceFile;
-				converter = new T4CSharpCodeBehindIntermediateConverter(file, nameProvider, shouldGenerateBaseClass);
+				bool isRootFile = root == file.PhysicalPsiSourceFile;
+				T4PreprocessedNameProvider nameProvider;
+				if (isRootFile)
+				{
+					nameProvider = new T4PreprocessedNameProvider(root, string.Empty);
+				}
+				else
+				{
+					nameProvider = new T4PreprocessedNameProvider(root, Guid.NewGuid().ToString("N"));
+				}
+				converter = new T4CSharpCodeBehindIntermediateConverter(file, nameProvider, isRootFile);
 			}
 			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
 			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution, rootTemplateKind);
