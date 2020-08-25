@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -28,7 +28,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		protected T4CSharpIntermediateConverterBase(
 			[NotNull] IT4File file,
-			[NotNull] IT4GeneratedNameProvider nameProvider
+			[NotNull] IT4TemplateKindDependentDataProvider nameProvider
 		)
 		{
 			File = file;
@@ -180,6 +180,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
 		)
 		{
+			if (!NameProvider.TransformTextAttributes.IsNullOrEmpty())
+			{
+				AppendIndent();
+				Result.AppendLine(NameProvider.TransformTextAttributes);
+			}
 			AppendIndent();
 			Result.Append("public ");
 			Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
@@ -230,7 +235,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected abstract string BaseClassResourceName { get; }
 
 		[NotNull]
-		protected IT4GeneratedNameProvider NameProvider { get; }
+		protected IT4TemplateKindDependentDataProvider NameProvider { get; }
 
 		protected abstract void AppendParameterInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);

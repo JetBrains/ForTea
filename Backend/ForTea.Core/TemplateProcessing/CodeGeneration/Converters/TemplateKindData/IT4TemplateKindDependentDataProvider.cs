@@ -1,8 +1,8 @@
 using JetBrains.Annotations;
 
-namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName
+namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData
 {
-	public interface IT4GeneratedNameProvider
+	public interface IT4TemplateKindDependentDataProvider
 	{
 		[NotNull]
 		string GeneratedClassName { get; }
@@ -15,5 +15,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.Clas
 
 		[NotNull]
 		string TransformTextMethodName { get; }
+
+		[NotNull]
+		string TransformTextAttributes { get; }
 	}
 }

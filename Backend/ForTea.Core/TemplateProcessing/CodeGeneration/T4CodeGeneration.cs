@@ -2,7 +2,7 @@ using System;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
-using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.TemplateKindData;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -33,16 +33,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 			if (rootTemplateKind == T4TemplateKind.Preprocessed)
 			{
 				bool isRootFile = root == file.PhysicalPsiSourceFile;
-				T4PreprocessedNameProvider nameProvider;
+				T4PreprocessedTemplateDataProvider templateDataProvider;
 				if (isRootFile)
 				{
-					nameProvider = new T4PreprocessedNameProvider(root, string.Empty);
+					templateDataProvider = new T4PreprocessedTemplateDataProvider(root, string.Empty);
 				}
 				else
 				{
-					nameProvider = new T4PreprocessedNameProvider(root, Guid.NewGuid().ToString("N"));
+					templateDataProvider = new T4PreprocessedTemplateDataProvider(root, Guid.NewGuid().ToString("N"));
 				}
-				converter = new T4CSharpCodeBehindIntermediateConverter(file, nameProvider, isRootFile);
+				converter = new T4CSharpCodeBehindIntermediateConverter(file, templateDataProvider, isRootFile);
 			}
 			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
 			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution, rootTemplateKind);
