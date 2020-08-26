@@ -226,7 +226,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		{
 			// Calculate them here, because following actions
 			// will disturb the graph and change the dependencies
-			var includePaths = Map[sourceFile];
+			var includePaths = Map.TryGetValue(sourceFile);
 			var indirectDependencies = FindIndirectIncludesTransitiveClosure(sourceFile);
 
 			// First of all, this file itself should be removed from Map and ReversedMap
@@ -239,9 +239,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			// If this drop was caused by moving the file between PSI modules,
 			// it will be re-added into lists of includers by the Merge method.
 			var location = sourceFile.GetLocation();
-			var includes = includePaths.Includes
+			var includes = includePaths?.Includes
 				.Select(includePath => PsiFileSelector.FindMostSuitableFile(includePath, sourceFile))
-				.WhereNotNull();
+				.WhereNotNull() ?? EmptyList<IPsiSourceFile>.InstanceList;
 			foreach (var include in includes)
 			{
 				ReversedMap.TryGetValue(include)?.Includers.Remove(location);
