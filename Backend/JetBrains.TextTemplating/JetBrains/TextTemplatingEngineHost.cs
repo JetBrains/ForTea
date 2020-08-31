@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 
 		public string ResolvePath(string path)
 		{
-			if (path == null) return null;
+			if (path == null) throw new ArgumentNullException(nameof(path));
 			if (path == string.Empty) return Path.GetDirectoryName(TemplateFile);
 			if (Path.IsPathRooted(path)) return path;
 			string directoryName = Path.GetDirectoryName(TemplateFile);
