@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Text;
 
+[assembly: CLSCompliant(true)]
 namespace Microsoft.VisualStudio.TextTemplating
 {
 	[CLSCompliant(true)]
