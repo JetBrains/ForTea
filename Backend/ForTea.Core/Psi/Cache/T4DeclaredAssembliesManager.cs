@@ -1,4 +1,3 @@
-using System;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -9,6 +8,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
@@ -18,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	/// It cannot be implemented like ordinary cache because it needs PSI to build.
 	/// </summary>
 	[PsiComponent]
-	public sealed class T4DeclaredAssembliesManager
+	public class T4DeclaredAssembliesManager
 	{
 		[NotNull]
 		private IPsiFiles PsiFiles { get; }
@@ -70,21 +70,25 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		}
 
 		// Omitting CommitAllDocuments causes races between caches and assembly resolver
-		private void CreateOrUpdateData([NotNull] IT4File t4File)
+		protected virtual void CreateOrUpdateData([NotNull] IT4File t4File)
 		{
-			Locks.ExecuteOrQueue("T4 assembly reference invalidation",
-				() => PsiFiles.ExecuteAfterCommitAllDocuments(() =>
-				{
-					var sourceFile = t4File.PhysicalPsiSourceFile;
-					if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
-					var newData = new T4DeclaredAssembliesInfo(t4File);
-					var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
-					sourceFile.SetDeclaredAssembliesInfo(newData);
-					var diff = newData.DiffWith(existingDeclaredAssembliesInfo);
-					if (diff == null) return;
-					FileDataChanged.Fire(Pair.Of(sourceFile, diff));
-				})
-			);
+			Locks.ExecuteOrQueueEx("T4 assembly reference invalidation", () =>
+			{
+				using var cookie = ReadLockCookie.Create();
+				PsiFiles.ExecuteAfterCommitAllDocuments(() => DoInvalidateAssemblies(t4File));
+			});
+		}
+
+		protected void DoInvalidateAssemblies([NotNull] IT4File t4File)
+		{
+			var sourceFile = t4File.PhysicalPsiSourceFile;
+			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
+			var newData = new T4DeclaredAssembliesInfo(t4File);
+			var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
+			sourceFile.SetDeclaredAssembliesInfo(newData);
+			var diff = newData.DiffWith(existingDeclaredAssembliesInfo);
+			if (diff == null) return;
+			FileDataChanged.Fire(Pair.Of(sourceFile, diff));
 		}
 	}
 }
