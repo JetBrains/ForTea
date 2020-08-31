@@ -1,0 +1,4 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ output extension="txt" #>
+<# string resolvedPath = Host.ResolvePath(null); #>
+<#= resolvedPath == null #>
