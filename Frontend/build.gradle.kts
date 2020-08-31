@@ -189,6 +189,7 @@ tasks {
     dependsOn(generateT4Lexer)
     useTestNG()
     environment("LOCAL_ENV_RUN", "true")
+    environment("NO_FS_ROOTS_ACCESS_CHECK", true)
     testLogging {
       showStandardStreams = true
       exceptionFormat = TestExceptionFormat.FULL

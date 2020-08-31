@@ -117,12 +117,6 @@ open class T4RunFileTestBase : BaseTestWithSolution(), Disposable {
 
   override fun dispose() = Unit
 
-  @BeforeSuite(dependsOnMethods = ["initApplication"])
-  fun postSetupSolution() {
-    VfsRootAccess.allowRootAccess(this, PrepareTestEnvironment.dotnetCoreCliPath)
-    VfsRootAccess.allowRootAccess(this, PrepareTestEnvironment.msbuildPath)
-  }
-
   @AfterSuite
   fun postCloseSolution() = Disposer.dispose(this)
 }
