@@ -110,6 +110,22 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			if (builtPart == null) {
 				// Indirect dependency invalidation
 				RemoveFromDirty(sourceFile);
+				// Merge can happen when a current file is an indirect dependency
+				// of a file that was moved between PSI modules.
+				// In that case we need to set set up includers for all the includes
+				var includes = new JetHashSet<IPsiSourceFile>(GetIncludes(sourceFile) ?? EmptyList<IPsiSourceFile>.Instance);
+				if (UpdateIncluders(ReversedMap, sourceFile, includes, JetHashSet<IPsiSourceFile>.Empty))
+				{
+					// This means that the file was updated because its indirect dependency
+					// was moved from one PSI module to another.
+					// This means that that dependency should now be updated.
+					// We'll update all of them just in case.
+					var invalidationData = new T4FileInvalidationData(
+						includes.Except(sourceFile),
+						sourceFile
+					);
+					OnFilesIndirectlyAffected.Fire(invalidationData);
+				}
 				return;
 			}
 			var data = (T4IncludeData) builtPart.NotNull();
@@ -168,33 +184,79 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			ReversedMap = (IDictionary<IPsiSourceFile, T4ReversedFileDependencyData>) data;
 		}
 
-		private void UpdateIncluders(
+		/// <returns>
+		/// whether an includer was added in a cache entry for some include
+		/// </returns>
+		private bool UpdateIncluders(
 			[NotNull] IDictionary<IPsiSourceFile, T4ReversedFileDependencyData> map,
 			[NotNull] IPsiSourceFile includer,
-			[NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> addedIncludes,
+			[NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> allNewIncludes,
 			[NotNull, ItemNotNull] IEnumerable<IPsiSourceFile> removedIncludes
 		)
 		{
+			var includerLocation = includer.GetLocation();
 			foreach (var removedInclude in removedIncludes.WhereNotNull())
 			{
 				var existingData = map.TryGetValue(removedInclude);
-				existingData?.Includers.Remove(includer.GetLocation());
+				existingData?.Includers.Remove(includerLocation);
 				if (existingData?.Includers.Count == 0) map.Remove(removedInclude);
 			}
 
-			foreach (var addedInclude in addedIncludes.WhereNotNull())
+			bool handChange = false;
+			foreach (var addedInclude in allNewIncludes.WhereNotNull())
 			{
 				var existingData = map.TryGetValue(addedInclude);
 				if (existingData == null)
 				{
-					var includers = new List<FileSystemPath> {includer.GetLocation()};
+					handChange = true;
+					var includers = new List<FileSystemPath> {includerLocation};
 					map[addedInclude] = new T4ReversedFileDependencyData(includers);
 				}
-				else
+				else if (!existingData.Includers.Contains(includerLocation))
 				{
-					existingData.Includers.Add(includer.GetLocation());
+					handChange = true;
+					existingData.Includers.Add(includerLocation);
 				}
 			}
+
+			return handChange;
+		}
+
+		public override void Drop(IPsiSourceFile sourceFile)
+		{
+			// Calculate them here, because following actions
+			// will disturb the graph and change the dependencies
+			var includePaths = Map[sourceFile];
+			var indirectDependencies = FindIndirectIncludesTransitiveClosure(sourceFile);
+
+			// First of all, this file itself should be removed from Map and ReversedMap
+			base.Drop(sourceFile);
+			ReversedMap.Remove(sourceFile);
+
+			// Then, all its includes should no longer view this file as an includer.
+			// This deletion might be a genuine deletion of the file from the file system,
+			// and nonexistent files obviously don't include anything.
+			// If this drop was caused by moving the file between PSI modules,
+			// it will be re-added into lists of includers by the Merge method.
+			var location = sourceFile.GetLocation();
+			var includes = includePaths.Includes
+				.Select(includePath => PsiFileSelector.FindMostSuitableFile(includePath, sourceFile))
+				.WhereNotNull();
+			foreach (var include in includes)
+			{
+				ReversedMap.TryGetValue(include)?.Includers.Remove(location);
+			}
+
+			// Finally, we trigger indirect include invalidation.
+			// Deletion can happen either when the file is genuinely deleted,
+			// or when it is transferred between PSI modules
+			// (e.g. a file that used to be preprocessed becomes executable).
+			// In either case, we need to update its indirect dependencies.
+			// However, that cannot be done in Merge,
+			// because Merge happens on the new PSI file.
+			// That's why we update dependencies here.
+			var data = new T4FileInvalidationData(indirectDependencies.Except(sourceFile), sourceFile);
+			OnFilesIndirectlyAffected.Fire(data);
 		}
 	}
 }

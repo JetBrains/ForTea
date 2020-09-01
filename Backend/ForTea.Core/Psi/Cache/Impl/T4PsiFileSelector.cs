@@ -17,13 +17,18 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		private ILogger Logger { get; }
 
+		[NotNull]
+		private ISolution Solution { get; }
+
 		public T4PsiFileSelector(
 			[NotNull] T4OutsideSolutionSourceFileManager outsideSolutionManager,
-			[NotNull] ILogger logger
+			[NotNull] ILogger logger,
+			[NotNull] ISolution solution
 		)
 		{
 			OutsideSolutionManager = outsideSolutionManager;
 			Logger = logger;
+			Solution = solution;
 		}
 
 		public IPsiSourceFile FindMostSuitableFile(FileSystemPath path, IPsiSourceFile requester)
@@ -38,8 +43,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		private IPsiSourceFile TryFindFileInSolution([NotNull] FileSystemPath path, [NotNull] IPsiSourceFile requester)
 		{
 			if (path.IsEmpty) return null;
-			var potentialProjectFiles = requester
-				.GetSolution()
+			var potentialProjectFiles = Solution
 				.FindProjectItemsByLocation(path)
 				.OfType<IProjectFile>()
 				.AsList();

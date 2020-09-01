@@ -1,15 +1,14 @@
-using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
-using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Transaction;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
-using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
@@ -22,17 +21,22 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		[NotNull]
 		private ChangeManager ChangeManager { get; }
 
+		[NotNull]
+		private ISolution Solution { get; }
+
 		public T4PreprocessedTemplateFlagInvalidator(
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
 			[NotNull] IPsiServices services,
 			[NotNull] IPsiCachesState state,
 			[NotNull] IT4RootTemplateKindProvider rootTemplateKindProvider,
-			[NotNull] ChangeManager changeManager
+			[NotNull] ChangeManager changeManager,
+			[NotNull] ISolution solution
 		) : base(lifetime, notifier, services, state)
 		{
 			RootTemplateKindProvider = rootTemplateKindProvider;
 			ChangeManager = changeManager;
+			Solution = solution;
 		}
 
 		protected override void AfterCommit()
@@ -59,29 +63,20 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		private void UpdateFile([NotNull] IPsiSourceFile file)
 		{
-			var changeBuilder = new PsiModuleChangeBuilder();
-			changeBuilder.AddModuleChange(file.PsiModule, PsiModuleChange.ChangeType.Modified);
-			var ShellLocks = file.GetSolution().Locks;
-			var provider = SelectChangeProvider(file);
-			if (provider == null) return;
-			ShellLocks.ExecuteOrQueueEx(Lifetime.Eternal, "todo write reason", () =>
-				ChangeManager.ExecuteAfterChange(
-					() => ShellLocks.ExecuteWithWriteLock(
-						() => ChangeManager.OnProviderChanged(
-							provider,
-							changeBuilder.Result,
-							SimpleTaskExecutor.Instance
-						)
-					)
-				));
-		}
-
-		[CanBeNull]
-		private static IChangeProvider SelectChangeProvider([NotNull] IPsiSourceFile file)
-		{
-			// todo find a better change provider
-			if (!(file.PsiModule is T4FilePsiModule t4Module)) return null;
-			return t4Module.ChangeProvider;
+			var locks = Solution.Locks;
+			var lifetime = Solution.GetLifetime();
+			const string reason = "T4 file that turned out to be preprocessed invalidation task";
+			locks.ExecuteOrQueueEx(lifetime, reason, () => ChangeManager.ExecuteAfterChange(() =>
+			{
+				using var cookie = WriteLockCookie.Create();
+				var oldParentItem = file.GetProject();
+				var projectFile = file.ToProjectFile().NotNull();
+				var changeDelta = new ProjectItemChange(
+					ProjectModelChange.EMPTY_DELTAS, projectFile, oldParentItem,
+					ProjectModelChangeType.UNKNOWN, projectFile.Location,
+					ExternalChangeType.NONE, projectFile.GetPersistentID()).Propagate();
+				ProjectModelChangeUtil.OnChange(Solution.BatchChangeManager, changeDelta);
+			}));
 		}
 
 		protected override void OnFilesIndirectlyAffected(T4FileInvalidationData data)

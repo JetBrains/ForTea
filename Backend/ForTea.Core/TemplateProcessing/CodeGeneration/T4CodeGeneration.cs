@@ -38,7 +38,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 			}
 			else converter = new T4CSharpExecutableCodeBehindIntermediateConverter(file);
 			var collector = new T4CSharpCodeBehindGenerationInfoCollector(solution, rootTemplateKind);
-			// TODO: store files incuded into preprocessed files in the project PSI module
 			return converter.Convert(collector.Collect(file));
 		}
 	}
