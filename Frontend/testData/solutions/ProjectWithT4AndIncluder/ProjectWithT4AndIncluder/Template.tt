@@ -1,0 +1,4 @@
+this is some random text to occupy this file. This text gets overridden anyway.
+LineIndex.FindLineByOffset seems to misbehave;
+it seems that a corrupted state with the file being already updated
+while segment array isn't is still reachable
