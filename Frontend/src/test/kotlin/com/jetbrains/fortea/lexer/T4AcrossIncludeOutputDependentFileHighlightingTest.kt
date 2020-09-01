@@ -1,5 +1,9 @@
 package com.jetbrains.fortea.lexer
 
+import com.intellij.openapi.editor.impl.EditorImpl
+import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.framework.waitBackend
+import com.jetbrains.rider.test.scriptingApi.waitForDaemonAndCaches
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
@@ -23,7 +27,7 @@ class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexe
     setText(includerName, "$includerName.before")
     val includeEditor = doTest(includeName, "$includeName.before.gold")
     setText(includerName, "$includerName.after")
-    doTest(includeEditor, "$includeName.after.gold")
+    doTestLast(includeEditor, "$includeName.after.gold")
   }
 
   @Test
@@ -31,11 +35,16 @@ class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexe
     setText(includeName, "$includeName.before")
     val includerEditor = doTest(includerName, "$includerName.before.gold")
     setText(includeName, "$includeName.after")
-    doTest(includerEditor, "$includerName.after.gold")
+    doTestLast(includerEditor, "$includerName.after.gold")
+  }
+
+  private fun doTestLast(editor: EditorImpl, goldFileName: String) = doTest(editor, goldFileName) {
+    waitForDaemonAndCaches(it.project!!)
+    waitBackend()
   }
 
   private fun setText(fileName: String, sourceFileName: String? = null) =
-    withOpenedEditor(fileName, sourceFileName ?: fileName) {}
+    withOpenedEditor(fileName, sourceFileName ?: fileName) { waitForDaemon() }
 
   companion object {
     private const val includeName = "Template.tt"

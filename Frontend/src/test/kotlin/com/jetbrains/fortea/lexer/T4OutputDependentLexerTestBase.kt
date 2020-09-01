@@ -14,14 +14,17 @@ abstract class T4OutputDependentLexerTestBase : EditorTestBase() {
   protected fun doTest(fileName: String = "Template.tt", goldFileName: String? = null) =
     withOpenedEditor(fileName, fileName) { doTest(this, goldFileName ?: "$fileName.gold") }
 
-  protected fun doTest(editor: EditorImpl, goldFileName: String) {
-    val goldFile = File(testCaseGoldDirectory, goldFileName)
-    if (!goldFile.exists()) goldFile.parentFile.mkdirs()
-    executeWithGold(goldFile) { stream ->
+  protected fun doTest(editor: EditorImpl, goldFileName: String, defaultWait: ((editor: EditorImpl) -> Unit)? = null) {
+    val wait = defaultWait ?: {
       waitForDaemonAndCaches(editor.project!!)
       waitBackend()
       editor.waitForDaemon()
       waitBackend()
+    }
+    val goldFile = File(testCaseGoldDirectory, goldFileName)
+    if (!goldFile.exists()) goldFile.parentFile.mkdirs()
+    executeWithGold(goldFile) { stream ->
+      wait(editor)
       val iterator = editor.highlighter.createIterator(0)
       while (!iterator.atEnd()) {
         val tokenName = iterator.tokenType.toString().extendLength(40)
