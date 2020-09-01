@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
@@ -39,10 +40,10 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			Solution = solution;
 		}
 
-		protected override void AfterCommit()
+		protected override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
 		{
 			using var cookie = ReadLockCookie.Create();
-			foreach (var sourceFile in IndirectDependencies)
+			foreach (var sourceFile in indirectDependencies)
 			{
 				var projectFile = sourceFile.ToProjectFile();
 				if (projectFile == null) continue;
@@ -79,13 +80,16 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			}));
 		}
 
-		protected override void OnFilesIndirectlyAffected(T4FileInvalidationData data)
+		protected override void OnFilesIndirectlyAffected(
+			T4FileInvalidationData data,
+			ISet<IPsiSourceFile> indirectDependencies
+		)
 		{
-			IndirectDependencies.Add(data.DirectlyAffectedFile);
+			indirectDependencies.Add(data.DirectlyAffectedFile);
 			Services.Locks.AssertMainThread();
 			foreach (var file in data.IndirectlyAffectedFiles)
 			{
-				IndirectDependencies.Add(file);
+				indirectDependencies.Add(file);
 			}
 		}
 

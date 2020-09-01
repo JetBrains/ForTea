@@ -58,7 +58,10 @@ namespace JetBrains.ForTea.Tests.Mock
 			}
 		}
 
-		protected override void OnFilesIndirectlyAffected(T4FileInvalidationData data)
+		protected override void OnFilesIndirectlyAffected(
+			T4FileInvalidationData data,
+			ISet<IPsiSourceFile> indirectDependencies
+		)
 		{
 			if (CommitStage == T4CommitStage.DependencyInvalidation) return;
 			// We want all files that were included before the update

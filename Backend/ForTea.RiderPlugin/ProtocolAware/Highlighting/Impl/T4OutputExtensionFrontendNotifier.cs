@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
@@ -42,11 +43,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 
 		protected override string ActivityName => "T4 frontend notification about file output extension";
 
-		protected override void AfterCommit()
+		protected override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
 		{
 			using var outerCookie = ReadLockCookie.Create();
 			// Cache them in a closure, because they are lost otherwise
-			var indirectDependencies = IndirectDependencies;
 			PsiFiles.ExecuteAfterCommitAllDocuments(() =>
 			{
 				using var cookie = ReadLockCookie.Create();
@@ -57,10 +57,13 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 			});
 		}
 
-		protected override void OnFilesIndirectlyAffected(T4FileInvalidationData data)
+		protected override void OnFilesIndirectlyAffected(
+			T4FileInvalidationData data,
+			ISet<IPsiSourceFile> indirectDependencies
+		)
 		{
-			base.OnFilesIndirectlyAffected(data);
-			IndirectDependencies.Add(data.DirectlyAffectedFile);
+			base.OnFilesIndirectlyAffected(data, indirectDependencies);
+			indirectDependencies.Add(data.DirectlyAffectedFile);
 		}
 
 		public void NotifyFrontend([NotNull] IPsiSourceFile file)

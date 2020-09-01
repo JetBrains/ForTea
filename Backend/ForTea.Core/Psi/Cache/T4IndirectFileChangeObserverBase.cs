@@ -10,7 +10,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	public abstract class T4IndirectFileChangeObserverBase
 	{
 		[NotNull, ItemNotNull]
-		protected ISet<IPsiSourceFile> IndirectDependencies { get; private set; } = new HashSet<IPsiSourceFile>();
+		private ISet<IPsiSourceFile> IndirectDependencies { get; set; } = new HashSet<IPsiSourceFile>();
 
 		[NotNull]
 		protected IPsiServices Services { get; }
@@ -32,16 +32,19 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 				if (!args.HasNew || !args.New) return;
 				QueueAfterCommit();
 			});
-			notifier.OnFilesIndirectlyAffected.Advise(lifetime, OnFilesIndirectlyAffected);
+			notifier.OnFilesIndirectlyAffected.Advise(lifetime, data => OnFilesIndirectlyAffected(data, IndirectDependencies));
 		}
 
 		protected virtual void QueueAfterCommit() => Services.Locks.ExecuteOrQueue(Lifetime, ActivityName, () =>
 		{
-			AfterCommit();
+			AfterCommitSync(IndirectDependencies);
 			IndirectDependencies = new HashSet<IPsiSourceFile>();
 		});
 
-		protected virtual void OnFilesIndirectlyAffected(T4FileInvalidationData data)
+		protected virtual void OnFilesIndirectlyAffected(
+			T4FileInvalidationData data,
+			[NotNull] ISet<IPsiSourceFile> indirectDependencies
+		)
 		{
 			Services.Locks.AssertMainThread();
 			foreach (var file in data.IndirectlyAffectedFiles)
@@ -53,6 +56,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		[NotNull]
 		protected abstract string ActivityName { get; }
 
-		protected abstract void AfterCommit();
+		protected abstract void AfterCommitSync([NotNull] ISet<IPsiSourceFile> indirectDependencies);
 	}
 }

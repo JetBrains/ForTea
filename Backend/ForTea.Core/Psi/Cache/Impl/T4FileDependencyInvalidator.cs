@@ -30,22 +30,22 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		{
 		}
 
-		protected sealed override void AfterCommit()
+		protected sealed override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
 		{
 			using var cookie = WriteLockCookie.Create();
-			foreach (var file in IndirectDependencies)
+			foreach (var file in indirectDependencies)
 			{
 				file.SetBeingIndirectlyUpdated(true);
 				Services.Caches.MarkAsDirty(file);
 				Services.Files.MarkAsDirty(file);
 			}
 
-			foreach (var file in PreviousIterationIndirectDependencies.Except(IndirectDependencies))
+			foreach (var file in PreviousIterationIndirectDependencies.Except(indirectDependencies))
 			{
 				file.SetBeingIndirectlyUpdated(false);
 			}
 
-			PreviousIterationIndirectDependencies = IndirectDependencies;
+			PreviousIterationIndirectDependencies = indirectDependencies;
 		}
 
 		protected override string ActivityName => "T4 indirect dependencies invalidation";
