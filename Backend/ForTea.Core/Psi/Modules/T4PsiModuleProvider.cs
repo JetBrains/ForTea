@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache.Impl;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
@@ -34,6 +35,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 		[CanBeNull]
 		private TargetFrameworkId PrimaryTargetFrameworkId { get; }
+
+		[NotNull]
+		private ILogger Logger { get; } = JetBrains.Util.Logging.Logger.GetLogger<T4PsiModuleProvider>();
 
 		private readonly struct ModuleWrapper {
 
@@ -107,6 +111,10 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 						// so that the template will have access
 						// to the types defined in the current project.
 						break;
+					if (projectFile.IsFlaggedAsPreprocessed())
+					{
+						throw new InvalidOperationException("Did not expect preprocessed flag to appear this early");
+					}
 					// This is a new executable file, so we need to create a module for it.
 					AddFile(projectFile, changeBuilder);
 					// After the module is created, the request to add the file has been handled,
@@ -125,7 +133,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				case PsiModuleChange.ChangeType.Modified:
 					if (_modules.TryGetValue(projectFile, out moduleWrapper))
 					{
-						if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
+						if (TemplateDataManager.IsPreprocessedTemplate(projectFile) ||
+						    projectFile.IsFlaggedAsPreprocessed())
 						{
 							// The T4 file has a module but it shouldn't because it's preprocessed.
 							// This can happen when an executable file becomes preprocessed.
@@ -139,7 +148,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 						// This is the ordinary change in an executable T4 file.
 						// We can handle it.
-						ModifyFile(changeBuilder, moduleWrapper);
+						ModifyFile(projectFile, changeBuilder, moduleWrapper);
 						// Since we've handled the change, no need to delegate it to R#.
 						return null;
 					}
@@ -148,7 +157,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					if (!projectFile.LanguageType.Is<T4ProjectFileType>())
 						// No it's not.
 						break;
-					if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
+					if (TemplateDataManager.IsPreprocessedTemplate(projectFile) || projectFile.IsFlaggedAsPreprocessed())
 						// It is still a preprocessed file, we still don't want a module for it.
 						// Let R# continue managing this file.
 						break;
@@ -167,6 +176,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		}
 
 		private void AddFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder) {
+			Logger.Verbose($"Adding file: {projectFile.Location}");
 			ISolution solution = projectFile.GetSolution();
 
 			// creates a new T4PsiModule for the file
@@ -195,14 +205,18 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 		}
 
 		private void RemoveFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper) {
+			Logger.Verbose($"Removing file: {projectFile.Location}");
 			_modules.Remove(projectFile);
 			changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Removed);
 			changeBuilder.AddModuleChange(moduleWrapper.Module, PsiModuleChange.ChangeType.Removed);
 			moduleWrapper.LifetimeDefinition.Terminate();
 		}
 
-		private static void ModifyFile([NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)
-			=> changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Modified);
+		private void ModifyFile([NotNull] IProjectFile projectFile, [NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)
+		{
+			Logger.Verbose($"Modifying file: {projectFile.Location}");
+			changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Modified);
+		}
 
 		public void Dispose() {
 			using (WriteLockCookie.Create()) {

@@ -54,7 +54,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		[NotNull]
 		private string PersistentId { get; }
 
-		private IChangeProvider ChangeProvider { get; }
+		public IChangeProvider ChangeProvider { get; }
 		private ISolution Solution { get; }
 		public IPsiSourceFile SourceFile { get; }
 		public string Name => Prefix + SourceFile.Name;
