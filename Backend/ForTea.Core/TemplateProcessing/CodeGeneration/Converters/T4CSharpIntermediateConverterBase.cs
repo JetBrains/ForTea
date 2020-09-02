@@ -191,9 +191,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine($" string {TransformTextMethodName}()");
 			AppendIndent();
 			Result.AppendLine("{");
-			PushIndent();
-			AppendIndent();
-			Result.AppendLine();
 			foreach (var description in intermediateResult.TransformationDescriptions)
 			{
 				description.AppendContent(Result, this);
