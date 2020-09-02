@@ -34,9 +34,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		private IT4AssemblyReferenceManager AssemblyReferenceManager { get; }
 
 		[NotNull]
-		private T4ProjectReferenceManager ProjectReferenceManager { get; }
-
-		[NotNull]
 		private IPsiModules PsiModules { get; }
 
 		[NotNull]
@@ -104,7 +101,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				resolveContext,
 				shellLocks
 			);
-			ProjectReferenceManager = new T4ProjectReferenceManager(SourceFile, Solution);
 
 			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
 			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
@@ -167,7 +163,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				.SelectNotNull(assembly => PsiModules.GetPrimaryPsiModule(assembly, TargetFrameworkId))
 				.Select(it => new PsiModuleReference(it));
 			references.AddRange(moduleReferences);
-			references.AddRange(ProjectReferenceManager.GetProjectReference());
 			return references.GetReferences();
 		}
 
