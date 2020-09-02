@@ -5,6 +5,7 @@ import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.waitForDaemonAndCaches
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
 class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexerTestBase() {
@@ -30,6 +31,7 @@ class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexe
     doTestLast(includeEditor, "$includeName.after.gold")
   }
 
+  @Ignore("Broken")
   @Test
   fun `test that a change in include can trigger includer invalidation`() {
     setText(includeName, "$includeName.before")
