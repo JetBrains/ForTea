@@ -62,23 +62,17 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			}
 		}
 
-		private void UpdateFile([NotNull] IPsiSourceFile file)
+		private void UpdateFile([NotNull] IPsiSourceFile file) => ChangeManager.ExecuteAfterChange(() =>
 		{
-			var locks = Solution.Locks;
-			var lifetime = Solution.GetLifetime();
-			const string reason = "T4 file that turned out to be preprocessed invalidation task";
-			locks.ExecuteOrQueueEx(lifetime, reason, () => ChangeManager.ExecuteAfterChange(() =>
-			{
-				using var cookie = WriteLockCookie.Create();
-				var oldParentItem = file.GetProject();
-				var projectFile = file.ToProjectFile().NotNull();
-				var changeDelta = new ProjectItemChange(
-					ProjectModelChange.EMPTY_DELTAS, projectFile, oldParentItem,
-					ProjectModelChangeType.UNKNOWN, projectFile.Location,
-					ExternalChangeType.NONE, projectFile.GetPersistentID()).Propagate();
-				ProjectModelChangeUtil.OnChange(Solution.BatchChangeManager, changeDelta);
-			}));
-		}
+			using var cookie = WriteLockCookie.Create();
+			var oldParentItem = file.GetProject();
+			var projectFile = file.ToProjectFile().NotNull();
+			var changeDelta = new ProjectItemChange(
+				ProjectModelChange.EMPTY_DELTAS, projectFile, oldParentItem,
+				ProjectModelChangeType.UNKNOWN, projectFile.Location,
+				ExternalChangeType.NONE, projectFile.GetPersistentID()).Propagate();
+			ProjectModelChangeUtil.OnChange(Solution.BatchChangeManager, changeDelta);
+		});
 
 		protected override void OnFilesIndirectlyAffected(
 			T4FileInvalidationData data,
