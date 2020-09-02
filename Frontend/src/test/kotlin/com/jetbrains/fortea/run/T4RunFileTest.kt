@@ -9,7 +9,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatHostSpecificTemplateCanBeExecuted() = doTest()
   @Test fun testThatHostCanSetResultExtension() {
     doTest(".cshtml")
-    assertNoOutputWithExtension(".html")
+    helper.assertNoOutputWithExtension(".html")
   }
 
   @Test fun testThatTtincludeFileCanBeIncluded() = doTest()
