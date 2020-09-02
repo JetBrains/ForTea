@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl;
@@ -58,6 +59,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			[NotNull] RiderDocument document
 		)
 		{
+			var psiSourceFile = document.GetPsiSourceFile(Solution);
+			if (psiSourceFile == null) return;
+			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
 			var editableEntity = Host.TryGetEditableEntity(editableEntityId);
 			if (editableEntity == null)
 			{

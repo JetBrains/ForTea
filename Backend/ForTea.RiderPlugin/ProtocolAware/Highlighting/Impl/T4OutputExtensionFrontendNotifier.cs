@@ -89,6 +89,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 		{
 			var projectFile = file.ToProjectFile();
 			if (projectFile == null) return null;
+			if (!projectFile.IsValid()) return null;
 			var document = DocumentManager.TryGetDocument(projectFile);
 			return document?.GetOutputExtensionChangeListener();
 		}
