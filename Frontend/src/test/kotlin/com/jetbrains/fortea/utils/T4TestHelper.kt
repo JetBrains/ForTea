@@ -55,8 +55,9 @@ open class T4TestHelper(val project: Project) {
     }
   }
 
-  fun dumpExecutionResult(resultExtension: String? = null) = executeWithGold(t4File.path) {
-    it.print(findOutputFile(resultExtension).readText())
+  fun dumpExecutionResult(resultExtension: String? = null, printer: ((String) -> String)? = null) = executeWithGold(t4File.path) {
+    val text = findOutputFile(resultExtension).readText()
+    it.print(printer?.let { printer(text) } ?: text)
   }
 
   fun assertNoOutputWithExtension(extension: String) = assert(outputFileCandidates.none {

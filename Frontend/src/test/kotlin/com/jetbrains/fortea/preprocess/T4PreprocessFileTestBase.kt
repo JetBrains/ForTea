@@ -9,9 +9,7 @@ import com.jetbrains.rider.model.T4FileLocation
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import org.testng.annotations.AfterClass
 import org.testng.annotations.AfterMethod
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeMethod
 
 abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
@@ -21,7 +19,17 @@ abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
   protected fun doTest(dumpCsproj: Boolean = false) {
     preprocessT4File()
     helper!!.saveSolution(project)
-    helper!!.dumpExecutionResult()
+    val runtimeVersionRegex = "// {5}Runtime Version: .*".toRegex()
+    val generatedAttributeRegex =
+      """\[global::System\.CodeDom\.Compiler\.GeneratedCodeAttribute\("Microsoft\.VisualStudio\.TextTemplating", ".*"\)\]""".toRegex()
+    helper!!.dumpExecutionResult(printer = {
+      it.replace(runtimeVersionRegex, "//     Runtime Version: ...")
+        .replace(generatedAttributeRegex,
+          "[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Microsoft.VisualStudio.TextTemplating\", \"...\")]")
+        .replace("""#line (?<lineNumber>\d+) ".*[/\\](?<fileName>[^\\/\"]+)"""".toRegex()) {
+          match -> "#line ${match.groups["lineNumber"]!!.value} \".../${match.groups["fileName"]!!.value}\""
+        }
+    })
     if (dumpCsproj) helper!!.dumpCsprojContents()
   }
 
