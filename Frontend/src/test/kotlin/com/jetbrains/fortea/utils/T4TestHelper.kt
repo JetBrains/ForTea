@@ -1,6 +1,7 @@
 package com.jetbrains.fortea.utils
 
 import com.intellij.openapi.project.Project
+import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
@@ -9,8 +10,7 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.flushQueues
 import com.jetbrains.rider.test.scriptingApi.waitAllCommandsFinished
 import com.jetbrains.rider.test.scriptingApi.waitForProjectModelReady
-import com.jetbrains.rider.util.idea.application
-import com.jetbrains.rider.util.idea.getComponent
+import com.jetbrains.rd.platform.util.application
 import java.io.File
 
 open class T4TestHelper(val project: Project) {
