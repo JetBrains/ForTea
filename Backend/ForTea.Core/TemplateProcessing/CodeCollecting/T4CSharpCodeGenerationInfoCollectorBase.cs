@@ -53,7 +53,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			Guard.StartProcessing(file.LogicalPsiSourceFile.GetLocation());
 			file.ProcessDescendants(this);
 			string suffix = Result.State.ProduceBeforeEof();
-			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
+			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix, Result.State.FirstNode);
 			Guard.EndProcessing();
 			return Results.Pop();
 		}
@@ -114,7 +114,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public override void VisitIncludeDirectiveNode(IT4IncludeDirective includeDirectiveParam)
 		{
 			string suffix = Result.State.ProduceBeforeEof();
-			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
+			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix, Result.State.FirstNode);
 			Guard.TryEndProcessing(IncludeResolver.Resolve(includeDirectiveParam.ResolvedPath).GetLocation());
 			var intermediateResults = Results.Pop();
 			Result.Append(intermediateResults);
@@ -122,7 +122,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
 		public override void VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam)
 		{
-			var description = T4ImportDescription.FromDirective(importDirectiveParam);
+			var description = T4ImportWithLineDescription.FromDirective(importDirectiveParam);
 			if (description == null) return;
 			Result.Append(description);
 		}
@@ -189,10 +189,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (lookahead is IT4Token) return;
 			string produced = Result.State.Produce(lookahead);
 			if (string.IsNullOrEmpty(produced)) return;
-			AppendTransformation(produced);
+			AppendTransformation(produced, Result.State.FirstNode);
 		}
 
-		protected abstract void AppendTransformation([NotNull] string message);
+		protected abstract void AppendTransformation([NotNull] string message, [CanBeNull] IT4TreeNode firstNode);
 
 		protected abstract void AppendFeature(
 			[NotNull] IT4Code code,

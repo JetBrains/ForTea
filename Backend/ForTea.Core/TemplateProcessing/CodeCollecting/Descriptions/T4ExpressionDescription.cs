@@ -61,7 +61,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			destination.AppendLine("#line hidden");
 		}
 
-		private static void AppendContentSuffix(
+		protected  virtual void AppendContentSuffix(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4ElementAppendFormatProvider provider
 		)

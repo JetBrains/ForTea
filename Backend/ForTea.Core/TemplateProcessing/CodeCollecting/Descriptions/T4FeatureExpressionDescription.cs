@@ -19,5 +19,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			destination.Append(provider.ExpressionWritingPrefix);
 			destination.Append(provider.ToStringConversionPrefix);
 		}
+
+		protected override void AppendContentSuffix(
+			T4CSharpCodeGenerationResult destination,
+			IT4ElementAppendFormatProvider provider
+		)
+		{
+			destination.Append(provider.ToStringConversionSuffix);
+			destination.AppendLine(provider.ExpressionWritingSuffix);
+			destination.AppendLine();
+		}
 	}
 }

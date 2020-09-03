@@ -15,7 +15,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		}
 
 		// There's no way tokens can code blocks, so there's no need to insert them into code behind
-		protected override void AppendTransformation(string message)
+		protected override void AppendTransformation(string message, IT4TreeNode firstNode)
 		{
 		}
 

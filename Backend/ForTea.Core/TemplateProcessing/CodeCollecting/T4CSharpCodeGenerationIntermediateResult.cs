@@ -67,7 +67,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			}
 		}
 
-		public void AdvanceState([NotNull] ITreeNode element) => State = State.GetNextState(element);
+		public void AdvanceState([NotNull] IT4TreeNode element) => State = State.GetNextState(element);
 		public void RequireHost() => HasHost = true;
 		public bool HasBaseClass => !CollectedBaseClass.IsEmpty;
 
@@ -91,8 +91,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public void AppendFeature([NotNull] IT4AppendableElementDescription description) =>
 			MyFeatureDescriptions.Add(description);
 
-		public void AppendFeature([NotNull] string message) =>
-			MyFeatureDescriptions.Add(new T4TextDescription(message));
+		public void AppendFeature([NotNull] string message, [NotNull] IT4TreeNode firstNode) =>
+			MyFeatureDescriptions.Add(new T4TextDescription(message, firstNode));
 
 		public void AppendTransformation([NotNull] IT4AppendableElementDescription description) =>
 			MyTransformationDescriptions.Add(description);

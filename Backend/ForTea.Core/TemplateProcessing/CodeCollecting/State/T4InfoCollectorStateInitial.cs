@@ -21,7 +21,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 			[NotNull] IT4CodeGenerationInterrupter interrupter
 		) : base(interrupter) => Builder = builder;
 
-		public override IT4InfoCollectorState GetNextState(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(IT4TreeNode element)
 		{
 			switch (element)
 			{

@@ -32,7 +32,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration
 		public static T4CSharpCodeGenerationResult GeneratePreprocessedCode([NotNull] IT4File file)
 		{
 			var solution = file.GetSolution();
-			var collector = new T4CSharpCodeGenerationInfoCollector(solution);
+			var collector = new T4CSharpPreprocessedCodeGenerationInfoCollector(solution);
 			file.AssertContainsNoIncludeContext();
 			var nameProvider = new T4PreprocessedClassNameProvider(file.PhysicalPsiSourceFile.NotNull());
 			var converter = new T4CSharpRealIntermediateConverter(file, nameProvider);

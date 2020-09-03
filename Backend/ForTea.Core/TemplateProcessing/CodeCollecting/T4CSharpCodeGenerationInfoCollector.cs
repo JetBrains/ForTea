@@ -3,10 +3,11 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
-	public sealed class T4CSharpCodeGenerationInfoCollector : T4CSharpCodeGenerationInfoCollectorBase
+	public class T4CSharpCodeGenerationInfoCollector : T4CSharpCodeGenerationInfoCollectorBase
 	{
 		protected override IT4CodeGenerationInterrupter Interrupter { get; } = new T4CodeGenerationInterrupter();
 
@@ -14,9 +15,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 		}
 
-		protected override void AppendTransformation(string message)
+		protected override void AppendTransformation(string message, IT4TreeNode firstNode)
 		{
-			if (Result.FeatureStarted) Result.AppendFeature(message);
+			if (Result.FeatureStarted) Result.AppendFeature(message, firstNode.NotNull());
 			else Result.AppendTransformation(message);
 		}
 

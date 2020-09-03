@@ -12,8 +12,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		[CanBeNull]
 		string ProduceBeforeEof();
 
+		[CanBeNull]
+		IT4TreeNode FirstNode { get; }
+
 		[NotNull]
-		IT4InfoCollectorState GetNextState([NotNull] ITreeNode element);
+		IT4InfoCollectorState GetNextState([NotNull] IT4TreeNode element);
 
 		bool FeatureStarted { get; }
 		void ConsumeToken([NotNull] IT4Token token);
