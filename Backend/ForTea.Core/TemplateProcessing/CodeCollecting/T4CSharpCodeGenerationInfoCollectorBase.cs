@@ -165,7 +165,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			var code = expressionBlockParam.Code;
 			if (code == null) return;
-			if (Result.FeatureStarted) AppendFeature(code, new T4ExpressionDescription(code));
+			if (Result.FeatureStarted) AppendFeature(code, new T4FeatureExpressionDescription(code));
 			else Result.AppendTransformation(new T4ExpressionDescription(code));
 		}
 
