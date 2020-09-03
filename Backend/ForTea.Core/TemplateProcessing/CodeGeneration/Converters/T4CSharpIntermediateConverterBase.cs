@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
@@ -80,6 +81,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 		private void AppendImports([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
+			foreach (var description in intermediateResult.ImportDescriptions)
+			{
+				description.AppendContent(Result, this);
+			}
+
 			if (ShouldAppendPragmaDirectives)
 			{
 				AppendIndent();
@@ -99,11 +105,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				AppendIndent();
 				Result.AppendLine("#pragma warning restore 8019");
 			}
-
-			foreach (var description in intermediateResult.ImportDescriptions)
-			{
-				description.AppendContent(Result, this);
-			}
 		}
 
 		protected virtual void AppendClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
@@ -115,18 +116,19 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine();
 			AppendIndent();
 			Result.AppendLine("{");
-			PushIndent();
-			AppendProperties(intermediateResult);
-			AppendConstructor(intermediateResult);
-			AppendTransformMethod(intermediateResult);
-			AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
-			AppendTemplateInitialization(intermediateResult.ParameterDescriptions);
-			PopIndent();
+			using (new IndentCookie(this))
+			{
+				AppendConstructor(intermediateResult);
+				AppendTransformMethod(intermediateResult);
+				AppendFeatures(intermediateResult);
+				AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
+				AppendTemplateInitialization(intermediateResult.ParameterDescriptions);
+			}
 			AppendIndent();
 			Result.AppendLine("}");
 		}
 
-		private void AppendProperties([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+		private void AppendFeatures([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
 			if (intermediateResult.HasHost) AppendHost();
 			foreach (var description in intermediateResult.FeatureDescriptions)
@@ -191,15 +193,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine($" string {TransformTextMethodName}()");
 			AppendIndent();
 			Result.AppendLine("{");
-			PushIndent();
-			foreach (var description in intermediateResult.TransformationDescriptions)
+			using (new IndentCookie(this))
 			{
-				description.AppendContent(Result, this);
-			}
+				foreach (var description in intermediateResult.TransformationDescriptions)
+				{
+					description.AppendContent(Result, this);
+				}
 
-			AppendIndent();
-			Result.AppendLine("return this.GenerationEnvironment.ToString();");
-			PopIndent();
+				AppendIndent();
+				Result.AppendLine("return this.GenerationEnvironment.ToString();");
+			}
 			AppendIndent();
 			Result.AppendLine("}");
 		}
@@ -255,6 +258,21 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected void PopIndent() => CurrentIndent -= 1;
 		protected void AppendIndent() => AppendIndent(CurrentIndent);
 		protected abstract void AppendIndent(int size);
+
+		private sealed class IndentCookie : IDisposable
+		{
+			[NotNull]
+			private T4CSharpIntermediateConverterBase Converter { get; }
+
+			public IndentCookie([NotNull] T4CSharpIntermediateConverterBase converter)
+			{
+				Converter = converter;
+				Converter.PushIndent();
+			}
+
+			public void Dispose() => Converter.PopIndent();
+		}
+
 		#endregion Indentation
 
 		#region IT4ElementAppendFormatProvider
