@@ -19,5 +19,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 
 		[NotNull] public const string ToStringHelper =
 			"global::Microsoft.VisualStudio.TextTemplating.ToStringHelper";
+
+		[NotNull]
+		public const string GeneratedAttribute = "global::System.CodeDom.Compiler.GeneratedCodeAttribute";
+
+		[NotNull]
+		public const string TextTemplating = "Microsoft.VisualStudio.TextTemplating";
+
+		[NotNull]
+		public const string RuntimeVersion = "2020.3";
 	}
 }
