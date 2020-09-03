@@ -121,8 +121,24 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				AppendConstructor(intermediateResult);
 				AppendTransformMethod(intermediateResult);
 				AppendFeatures(intermediateResult);
-				AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
-				AppendTemplateInitialization(intermediateResult.ParameterDescriptions);
+				AppendIndent();
+				Result.AppendLine();
+				AppendIndent();
+				Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
+				Result.AppendLine();
+				using (new UnindentCookie(this))
+				{
+					AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
+					AppendTemplateInitialization(intermediateResult.ParameterDescriptions);
+				}
+				Result.AppendLine();
+				Result.AppendLine();
+				AppendIndent();
+				Result.AppendLine();
+				AppendIndent();
+				Result.AppendLine("#line default");
+				AppendIndent();
+				Result.AppendLine("#line hidden");
 			}
 			AppendIndent();
 			Result.AppendLine("}");
@@ -160,16 +176,20 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.Append(" ");
 			Result.Append(description.FieldNameString);
 			Result.AppendLine(";");
+			Result.AppendLine();
 		}
 
 		protected virtual void AppendTemplateInitialization(
 			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions
 		)
 		{
+			using var unindent = new UnindentCookie(this);
 			if (descriptions.IsEmpty()) return;
-			AppendIndent();
-			Result.AppendLine("public void Initialize()");
-			AppendIndent();
+			Result.AppendLine(@"
+/// <summary>
+/// Initialize the template
+/// </summary>
+public virtual void Initialize()");
 			Result.AppendLine("{");
 			PushIndent();
 			AppendParameterInitialization(descriptions);
@@ -259,7 +279,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected void AppendIndent() => AppendIndent(CurrentIndent);
 		protected abstract void AppendIndent(int size);
 
-		private sealed class IndentCookie : IDisposable
+		protected sealed class IndentCookie : IDisposable
 		{
 			[NotNull]
 			private T4CSharpIntermediateConverterBase Converter { get; }
@@ -271,6 +291,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 
 			public void Dispose() => Converter.PopIndent();
+		}
+
+		protected sealed class UnindentCookie : IDisposable
+		{
+			[NotNull]
+			private T4CSharpIntermediateConverterBase Converter { get; }
+
+			private int SavedIndent { get; }
+
+			public UnindentCookie([NotNull] T4CSharpIntermediateConverterBase converter)
+			{
+				Converter = converter;
+				SavedIndent = Converter.CurrentIndent;
+				Converter.CurrentIndent = 0;
+			}
+
+			public void Dispose()
+			{
+				Converter.CurrentIndent = SavedIndent;
+			}
 		}
 
 		#endregion Indentation

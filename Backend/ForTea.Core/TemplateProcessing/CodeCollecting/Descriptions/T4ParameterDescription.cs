@@ -2,6 +2,8 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -18,6 +20,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		[NotNull]
 		public string FieldNameString { get; }
 
+		[NotNull]
+		public string PropertyNameString { get; }
+
 		private T4ParameterDescription(
 			[NotNull] ITreeNode typeToken,
 			[NotNull] ITreeNode nameToken,
@@ -27,6 +32,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			TypeToken = typeToken;
 			NameToken = nameToken;
 			FieldNameString = $"_{nameString}Field";
+			PropertyNameString = nameString;
 		}
 
 		public void AppendName([NotNull] T4CSharpCodeGenerationResult result)
@@ -37,16 +43,32 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 
 		public void AppendTypeMapped([NotNull] T4CSharpCodeGenerationResult result)
 		{
+			string typeText = TypeToken.GetText();
+			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(typeText));
+			if (keyword != null)
+			{
+				result.Append(keyword);
+				return;
+			}
+
 			result.Append("global::");
-			if (CSharpLexer.IsKeyword(TypeToken.GetText())) result.Append("@");
+			if (CSharpLexer.IsKeyword(typeText)) result.Append("@");
 			result.AppendMapped(TypeToken);
 		}
 
 		public void AppendType([NotNull] T4CSharpCodeGenerationResult result)
 		{
+			string typeText = TypeToken.GetText();
+			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(typeText));
+			if (keyword != null)
+			{
+				result.Append(keyword);
+				return;
+			}
+
 			result.Append("global::");
-			if (CSharpLexer.IsKeyword(TypeToken.GetText())) result.Append("@");
-			result.Append(TypeToken.GetText());
+			if (CSharpLexer.IsKeyword(typeText)) result.Append("@");
+			result.Append(typeText);
 		}
 
 		[CanBeNull]

@@ -28,53 +28,62 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		)
 		{
 			AppendIndent();
-			Result.AppendLine("if (Errors.HasErrors) return;");
-			foreach (var description in descriptions)
+			Result.AppendLine("if ((this.Errors.HasErrors == false))");
+			AppendIndent();
+			Result.AppendLine("{");
+			using (new UnindentCookie(this))
 			{
-				AppendIndent();
-				Result.Append("if (Session.ContainsKey(nameof(");
-				Result.Append(description.FieldNameString);
-				Result.AppendLine(")))");
-				AppendIndent();
-				Result.AppendLine("{");
-				PushIndent();
-				AppendIndent();
-				Result.Append(description.FieldNameString);
-				Result.Append(" = (");
-				description.AppendType(Result);
-				Result.Append(") Session[nameof(");
-				Result.Append(description.FieldNameString);
-				Result.AppendLine(")];");
-				PopIndent();
-				AppendIndent();
-				Result.AppendLine("}");
-				AppendIndent();
-				Result.AppendLine("else");
-				AppendIndent();
-				Result.AppendLine("{");
-				PushIndent();
-				AppendIndent();
-				Result.Append(
-					"object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData(nameof(");
-				Result.Append(description.FieldNameString);
-				Result.AppendLine("));");
-				AppendIndent();
-				Result.AppendLine("if (data != null)");
-				AppendIndent();
-				Result.AppendLine("{");
-				PushIndent();
-				AppendIndent();
-				Result.Append(description.FieldNameString);
-				Result.Append(" = (");
-				description.AppendType(Result);
-				Result.AppendLine(") data;");
-				PopIndent();
-				AppendIndent();
-				Result.AppendLine("}");
-				PopIndent();
-				AppendIndent();
-				Result.AppendLine("}");
+				foreach (var description in descriptions)
+				{
+					AppendIndent();
+					Result.AppendLine($"bool {description.PropertyNameString}ValueAcquired = false;");
+					AppendIndent();
+					Result.AppendLine($@"if (this.Session.ContainsKey(""{description.PropertyNameString}""))");
+					AppendIndent();
+					Result.AppendLine("{");
+					using (new IndentCookie(this))
+					{
+						AppendIndent();
+						Result.Append($"this.{description.FieldNameString} = ((");
+						description.AppendType(Result);
+						Result.AppendLine($@")(this.Session[""{description.PropertyNameString}""]));");
+						AppendIndent();
+						Result.AppendLine($"{description.PropertyNameString}ValueAcquired = true;");
+					}
+					AppendIndent();
+					Result.AppendLine("}");
+
+					AppendIndent();
+					Result.AppendLine($"if (({description.PropertyNameString}ValueAcquired == false))");
+					AppendIndent();
+					Result.AppendLine("{");
+					using (new IndentCookie(this))
+					{
+						AppendIndent();
+						Result.AppendLine(
+							$@"object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData(""{description.PropertyNameString}"");");
+						AppendIndent();
+						Result.AppendLine("if ((data != null))");
+						AppendIndent();
+						Result.AppendLine("{");
+						using (new IndentCookie(this))
+						{
+							AppendIndent();
+							Result.Append($"this.{description.FieldNameString} = ((");
+							description.AppendType(Result);
+							Result.AppendLine(")(data));");
+						}
+						AppendIndent();
+						Result.AppendLine("}");
+					}
+					AppendIndent();
+					Result.AppendLine("}");
+				}
 			}
+			Result.AppendLine();
+			Result.AppendLine();
+			AppendIndent();
+			Result.AppendLine("}");
 		}
 
 		protected override void AppendClass(T4CSharpCodeGenerationIntermediateResult intermediateResult)
@@ -133,14 +142,34 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		protected override void AppendParameterDeclaration(T4ParameterDescription description)
 		{
 			// Range maps of this converter are ignored, so it's safe to use Append instead of AppendMapped
+			Result.AppendLine($@"/// <summary>
+/// Access the {description.PropertyNameString} parameter of the template.
+/// </summary>");
 			AppendIndent();
 			Result.Append("private ");
 			description.AppendTypeMapped(Result);
 			Result.Append(" ");
 			description.AppendName(Result);
-			Result.Append(" => ");
-			Result.Append(description.FieldNameString);
-			Result.AppendLine(";");
+			Result.AppendLine();
+			AppendIndent();
+			Result.AppendLine("{");
+			using (new IndentCookie(this))
+			{
+				AppendIndent();
+				Result.AppendLine("get");
+				AppendIndent();
+				Result.AppendLine("{");
+				using (new IndentCookie(this))
+				{
+					AppendIndent();
+					Result.AppendLine($"return this.{description.FieldNameString};");
+				}
+				AppendIndent();
+				Result.AppendLine("}");
+			}
+			AppendIndent();
+			Result.AppendLine("}");
+			Result.AppendLine();
 		}
 
 		protected override void AppendHost()
