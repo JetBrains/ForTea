@@ -121,24 +121,32 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				AppendConstructor(intermediateResult);
 				AppendTransformMethod(intermediateResult);
 				AppendFeatures(intermediateResult);
-				AppendIndent();
-				Result.AppendLine();
-				AppendIndent();
-				Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
-				Result.AppendLine();
+				if (!intermediateResult.ParameterDescriptions.IsEmpty())
+				{
+					AppendIndent();
+					Result.AppendLine();
+					AppendIndent();
+					Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
+					Result.AppendLine();
+				}
+
 				using (new UnindentCookie(this))
 				{
 					AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
 					AppendTemplateInitialization(intermediateResult.ParameterDescriptions);
 				}
-				Result.AppendLine();
-				Result.AppendLine();
-				AppendIndent();
-				Result.AppendLine();
-				AppendIndent();
-				Result.AppendLine("#line default");
-				AppendIndent();
-				Result.AppendLine("#line hidden");
+
+				if (!intermediateResult.ParameterDescriptions.IsEmpty())
+				{
+					Result.AppendLine();
+					Result.AppendLine();
+					AppendIndent();
+					Result.AppendLine();
+					AppendIndent();
+					Result.AppendLine("#line default");
+					AppendIndent();
+					Result.AppendLine("#line hidden");
+				}
 			}
 			AppendIndent();
 			Result.AppendLine("}");
