@@ -1,0 +1,27 @@
+File start
+<#@ template language="C#" #>
+After template directive
+<#@ import namespace="System.Text" #>
+After import directive
+<#@ import namespace="System.Collections.Generic" #>
+Before statement
+<#
+    int meaning = GetMeaning();
+#>
+After statement
+Before expression
+<#= meaning #>
+After expression
+Before feature
+<#+
+    private static int GetMeaning()
+    {
+#>
+<#= 42 #>
+<#+
+        return 42;
+    }
+#>
+
+
+

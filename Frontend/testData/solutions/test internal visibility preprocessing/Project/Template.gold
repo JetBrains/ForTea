@@ -17,7 +17,7 @@ namespace Project
     
     #line 1 ".../Template.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class Template : TemplateBase
+    internal partial class Template : TemplateBase
     {
 #line hidden
         /// <summary>
@@ -36,7 +36,7 @@ namespace Project
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class TemplateBase
+    internal class TemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

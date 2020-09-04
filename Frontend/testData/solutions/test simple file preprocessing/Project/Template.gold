@@ -9,6 +9,8 @@
 // ------------------------------------------------------------------------------
 namespace Project
 {
+    using System.Text;
+    using System.Collections.Generic;
     using System;
     
     /// <summary>
@@ -25,8 +27,60 @@ namespace Project
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("File start\r\n");
+            this.Write("After template directive\r\n");
+            this.Write("After import directive\r\n");
+            this.Write("Before statement\r\n");
+            
+            #line 8 ".../Template.tt"
+
+    int meaning = GetMeaning();
+
+            
+            #line default
+            #line hidden
+            this.Write("After statement\r\nBefore expression\r\n");
+            
+            #line 13 ".../Template.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(meaning));
+            
+            #line default
+            #line hidden
+            this.Write("\r\nAfter expression\r\nBefore feature\r\n");
             return this.GenerationEnvironment.ToString();
         }
+        
+        #line 16 ".../Template.tt"
+
+    private static int GetMeaning()
+    {
+
+        
+        #line default
+        #line hidden
+        
+        #line 20 ".../Template.tt"
+this.Write(this.ToStringHelper.ToStringWithCulture(42));
+
+        
+        #line default
+        #line hidden
+        
+        #line 20 ".../Template.tt"
+this.Write("\r\n");
+
+        
+        #line default
+        #line hidden
+        
+        #line 21 ".../Template.tt"
+
+        return 42;
+    }
+
+        
+        #line default
+        #line hidden
     }
     
     #line default

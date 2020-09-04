@@ -19,16 +19,10 @@ abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
   protected fun doTest(dumpCsproj: Boolean = false) {
     preprocessT4File()
     helper!!.saveSolution(project)
-    val runtimeVersionRegex = "// {5}Runtime Version: .*".toRegex()
-    val generatedAttributeRegex =
-      """\[global::System\.CodeDom\.Compiler\.GeneratedCodeAttribute\("Microsoft\.VisualStudio\.TextTemplating", ".*"\)\]""".toRegex()
     helper!!.dumpExecutionResult(printer = {
-      it.replace(runtimeVersionRegex, "//     Runtime Version: ...")
-        .replace(generatedAttributeRegex,
-          "[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Microsoft.VisualStudio.TextTemplating\", \"...\")]")
-        .replace("""#line (?<lineNumber>\d+) ".*[/\\](?<fileName>[^\\/\"]+)"""".toRegex()) {
-          match -> "#line ${match.groups["lineNumber"]!!.value} \".../${match.groups["fileName"]!!.value}\""
-        }
+      it.replace("""#line (?<lineNumber>\d+) ".*[/\\](?<fileName>[^\\/\"]+)"""".toRegex()) { match ->
+        "#line ${match.groups["lineNumber"]!!.value} \".../${match.groups["fileName"]!!.value}\""
+      }
     })
     if (dumpCsproj) helper!!.dumpCsprojContents()
   }

@@ -9,6 +9,8 @@
 // ------------------------------------------------------------------------------
 namespace Project
 {
+    using System.Text;
+    using System.Collections.Generic;
     using System;
     
     /// <summary>
@@ -25,8 +27,164 @@ namespace Project
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("File start\r\n");
+            this.Write("After template directive\r\n");
+            this.Write("After import directive\r\n");
+            this.Write("Before parameter\r\n");
+            this.Write("After parameter\r\nBefore parameter 2\r\n");
+            this.Write("After parameter 2\r\n");
+            this.Write("Before statement\r\n");
+            
+            #line 15 ".../Template.tt"
+
+    int meaning = GetMeaning();
+
+            
+            #line default
+            #line hidden
+            this.Write("After statement\r\nBefore expression\r\n");
+            
+            #line 20 ".../Template.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(meaning));
+            
+            #line default
+            #line hidden
+            this.Write("\r\nAfter expression\r\nBefore feature\r\n");
             return this.GenerationEnvironment.ToString();
         }
+        
+        #line 23 ".../Template.tt"
+
+    private static int GetMeaning()
+    {
+
+        
+        #line default
+        #line hidden
+        
+        #line 27 ".../Template.tt"
+this.Write(this.ToStringHelper.ToStringWithCulture(42));
+
+        
+        #line default
+        #line hidden
+        
+        #line 27 ".../Template.tt"
+this.Write("\r\n");
+
+        
+        #line default
+        #line hidden
+        
+        #line 28 ".../Template.tt"
+
+        return 42;
+    }
+
+        
+        #line default
+        #line hidden
+        
+        #line 1 ".../Template.tt"
+
+private int _FooField;
+
+/// <summary>
+/// Access the Foo parameter of the template.
+/// </summary>
+private int Foo
+{
+    get
+    {
+        return this._FooField;
+    }
+}
+
+private global::System.Text.StringBuilder _BarField;
+
+/// <summary>
+/// Access the Bar parameter of the template.
+/// </summary>
+private global::System.Text.StringBuilder Bar
+{
+    get
+    {
+        return this._BarField;
+    }
+}
+
+private string _intField;
+
+/// <summary>
+/// Access the int parameter of the template.
+/// </summary>
+private string @int
+{
+    get
+    {
+        return this._intField;
+    }
+}
+
+
+/// <summary>
+/// Initialize the template
+/// </summary>
+public virtual void Initialize()
+{
+    if ((this.Errors.HasErrors == false))
+    {
+bool FooValueAcquired = false;
+if (this.Session.ContainsKey("Foo"))
+{
+    this._FooField = ((int)(this.Session["Foo"]));
+    FooValueAcquired = true;
+}
+if ((FooValueAcquired == false))
+{
+    object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData("Foo");
+    if ((data != null))
+    {
+        this._FooField = ((int)(data));
+    }
+}
+bool BarValueAcquired = false;
+if (this.Session.ContainsKey("Bar"))
+{
+    this._BarField = ((global::System.Text.StringBuilder)(this.Session["Bar"]));
+    BarValueAcquired = true;
+}
+if ((BarValueAcquired == false))
+{
+    object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData("Bar");
+    if ((data != null))
+    {
+        this._BarField = ((global::System.Text.StringBuilder)(data));
+    }
+}
+bool intValueAcquired = false;
+if (this.Session.ContainsKey("int"))
+{
+    this._intField = ((string)(this.Session["int"]));
+    intValueAcquired = true;
+}
+if ((intValueAcquired == false))
+{
+    object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData("int");
+    if ((data != null))
+    {
+        this._intField = ((string)(data));
+    }
+}
+
+
+    }
+}
+
+
+        
+        #line default
+        #line hidden
     }
     
     #line default
