@@ -16,7 +16,7 @@
             var encoding = host.Encoding;
             string extension = host.FileExtension;
             if (extension != null) destination = destination.WithExtension__Generated(extension);
-            foreach (CompilerError error in transformation.Errors)
+            foreach (global::System.CodeDom.Compiler.CompilerError error in transformation.Errors)
             {
                 global::System.Console.Error.WriteLine(error);
             }
