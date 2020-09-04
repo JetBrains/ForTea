@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
@@ -7,13 +8,14 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters
 {
 	public class T4CSharpRealIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
+		const int indentSize = 4;
+
 		public T4CSharpRealIntermediateConverter(
 			[NotNull] IT4File file,
 			[NotNull] IT4GeneratedClassNameProvider classNameProvider
@@ -24,7 +26,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		protected sealed override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
 
 		protected sealed override void AppendParameterInitialization(
-			IReadOnlyCollection<T4ParameterDescription> descriptions
+			IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
 		)
 		{
 			AppendIndent();
@@ -35,55 +38,133 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			{
 				foreach (var description in descriptions)
 				{
-					AppendIndent();
-					Result.AppendLine($"bool {description.PropertyNameString}ValueAcquired = false;");
-					AppendIndent();
-					Result.AppendLine($@"if (this.Session.ContainsKey(""{description.PropertyNameString}""))");
-					AppendIndent();
-					Result.AppendLine("{");
-					using (new IndentCookie(this))
-					{
-						AppendIndent();
-						Result.Append($"this.{description.FieldNameString} = ((");
-						description.AppendType(Result);
-						Result.AppendLine($@")(this.Session[""{description.PropertyNameString}""]));");
-						AppendIndent();
-						Result.AppendLine($"{description.PropertyNameString}ValueAcquired = true;");
-					}
-					AppendIndent();
-					Result.AppendLine("}");
-
-					AppendIndent();
-					Result.AppendLine($"if (({description.PropertyNameString}ValueAcquired == false))");
-					AppendIndent();
-					Result.AppendLine("{");
-					using (new IndentCookie(this))
-					{
-						AppendIndent();
-						Result.AppendLine(
-							$@"object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData(""{description.PropertyNameString}"");");
-						AppendIndent();
-						Result.AppendLine("if ((data != null))");
-						AppendIndent();
-						Result.AppendLine("{");
-						using (new IndentCookie(this))
-						{
-							AppendIndent();
-							Result.Append($"this.{description.FieldNameString} = ((");
-							description.AppendType(Result);
-							Result.AppendLine(")(data));");
-						}
-						AppendIndent();
-						Result.AppendLine("}");
-					}
-					AppendIndent();
-					Result.AppendLine("}");
+					AppendPropertyInitializationFromSession(description);
+					AppendPropertyInitializationFromHost(hasHost, description);
+					AppendPropertyInitializationFromContext(description);
 				}
 			}
 			Result.AppendLine();
 			Result.AppendLine();
 			AppendIndent();
 			Result.AppendLine("}");
+		}
+
+		private void AppendPropertyInitializationFromSession([NotNull] T4ParameterDescription description)
+		{
+			AppendIndent();
+			Result.AppendLine($"bool {description.PropertyNameString}ValueAcquired = false;");
+			AppendIndent();
+			Result.AppendLine($@"if (this.Session.ContainsKey(""{description.PropertyNameString}""))");
+			using (new CodeBlockCookie(this))
+			{
+				AppendIndent();
+				Result.Append($"this.{description.FieldNameString} = ((");
+				description.AppendType(Result);
+				Result.AppendLine($@")(this.Session[""{description.PropertyNameString}""]));");
+				AppendIndent();
+				Result.AppendLine($"{description.PropertyNameString}ValueAcquired = true;");
+			}
+		}
+
+		private void AppendPropertyInitializationFromHost(bool hasHost, T4ParameterDescription description)
+		{
+			if (!hasHost) return;
+			AppendIndent();
+			Result.AppendLine($"if (({description.PropertyNameString}ValueAcquired == false))");
+			using (new CodeBlockCookie(this))
+			{
+				AppendIndent();
+				Result.AppendLine(
+					"string parameterValue = this.Host.ResolveParameterValue(\"Property\"," +
+					$" \"PropertyDirectiveProcessor\", \"{description.PropertyNameString}\");");
+				AppendIndent();
+				Result.AppendLine("if ((string.IsNullOrEmpty(parameterValue) == false))");
+				using (new CodeBlockCookie(this))
+				{
+					AppendIndent();
+					Result.Append(
+						$"{T4TextTemplatingFQNs.TypeConverter} tc = {T4TextTemplatingFQNs.GetConverter}(typeof(");
+					description.AppendType(Result);
+					Result.AppendLine("));");
+					AppendIndent();
+					Result.AppendLine("if (((tc != null) ");
+					AppendIndent();
+					Result.Append(new string(' ', indentSize * 3));
+					Result.AppendLine("&& tc.CanConvertFrom(typeof(string))))");
+					using (new CodeBlockCookie(this))
+					{
+						AppendIndent();
+						Result.Append($"this.{description.FieldNameString} = ((");
+						description.AppendType(Result);
+						Result.AppendLine(")(tc.ConvertFrom(parameterValue)));");
+						AppendIndent();
+						Result.AppendLine($"{description.PropertyNameString}ValueAcquired = true;");
+					}
+
+					AppendIndent();
+					Result.AppendLine("else");
+					using (new CodeBlockCookie(this))
+					{
+						AppendTypeErrorMessage(description);
+					}
+				}
+			}
+		}
+
+		private void AppendTypeErrorMessage([NotNull] T4ParameterDescription description)
+		{
+			AppendIndent();
+			Result.Append("this.Error(");
+			string message =
+				$"The type \\'{description.TypeFqnString}\\' of the parameter " +
+				$"\\'{description.PropertyNameString}\\' did not match" +
+				" the type of the data passed to the template.";
+			const int messageChunkSize = 85;
+			int index = 0;
+			foreach (string chunk in SplitStringIntoChunks(message, messageChunkSize))
+			{
+				if (index != 0)
+				{
+					Result.AppendLine(" +");
+					AppendIndent();
+					Result.Append(new string(' ', indentSize * 2));
+				}
+
+				Result.Append($"\"{chunk}\"");
+				index += 1;
+			}
+
+			Result.AppendLine(");");
+		}
+
+		private void AppendPropertyInitializationFromContext([NotNull] T4ParameterDescription description)
+		{
+			AppendIndent();
+			Result.AppendLine($"if (({description.PropertyNameString}ValueAcquired == false))");
+			using (new CodeBlockCookie(this))
+			{
+				AppendIndent();
+				Result.AppendLine(
+					$@"object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData(""{description.PropertyNameString}"");");
+				AppendIndent();
+				Result.AppendLine("if ((data != null))");
+				using (new CodeBlockCookie(this))
+				{
+					AppendIndent();
+					Result.Append($"this.{description.FieldNameString} = ((");
+					description.AppendType(Result);
+					Result.AppendLine(")(data));");
+				}
+			}
+		}
+
+		[NotNull, ItemNotNull]
+		private static IEnumerable<string> SplitStringIntoChunks([NotNull] string source, int chunkSize)
+		{
+			for (int index = 0; index <= source.Length / chunkSize; index += 1)
+			{
+				yield return source.Substring(index * chunkSize, Math.Min(chunkSize, source.Length - index * chunkSize));
+			}
 		}
 
 		protected override void AppendClass(T4CSharpCodeGenerationIntermediateResult intermediateResult)
@@ -151,30 +232,49 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			Result.Append(" ");
 			description.AppendName(Result);
 			Result.AppendLine();
-			AppendIndent();
-			Result.AppendLine("{");
-			using (new IndentCookie(this))
+			using (new CodeBlockCookie(this))
 			{
 				AppendIndent();
 				Result.AppendLine("get");
-				AppendIndent();
-				Result.AppendLine("{");
-				using (new IndentCookie(this))
+				using (new CodeBlockCookie(this))
 				{
 					AppendIndent();
 					Result.AppendLine($"return this.{description.FieldNameString};");
 				}
-				AppendIndent();
-				Result.AppendLine("}");
 			}
-			AppendIndent();
-			Result.AppendLine("}");
 			Result.AppendLine();
 		}
 
 		protected override void AppendHost()
 		{
-			// Host directive does not work for runtime templates
+			AppendIndent();
+			Result.AppendLine($"private {T4TextTemplatingFQNs.HostInterface} hostValue;");
+			AppendIndent();
+			Result.AppendLine("/// <summary>");
+			AppendIndent();
+			Result.AppendLine("/// The current host for the text templating engine");
+			AppendIndent();
+			Result.AppendLine("/// </summary>");
+			AppendIndent();
+			Result.AppendLine($"public virtual {T4TextTemplatingFQNs.HostInterface} Host");
+			using (new CodeBlockCookie(this))
+			{
+				AppendIndent();
+				Result.AppendLine("get");
+				using (new CodeBlockCookie(this))
+				{
+					AppendIndent();
+					Result.AppendLine("return this.hostValue;");
+				}
+
+				AppendIndent();
+				Result.AppendLine("set");
+				using (new CodeBlockCookie(this))
+				{
+					AppendIndent();
+					Result.AppendLine("this.hostValue = value;");
+				}
+			}
 		}
 
 		protected override void AppendIndent(int size)

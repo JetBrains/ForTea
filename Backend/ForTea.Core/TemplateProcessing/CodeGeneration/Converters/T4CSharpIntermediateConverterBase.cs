@@ -94,11 +94,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			AppendIndent();
 			Result.AppendLine("using System;");
-			if (intermediateResult.HasHost)
-			{
-				AppendIndent();
-				Result.AppendLine("using System.CodeDom.Compiler;");
-			}
 
 			if (ShouldAppendPragmaDirectives)
 			{
@@ -114,12 +109,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.Append($" partial class {ClassNameProvider.GeneratedClassName} : ");
 			AppendBaseClassName(intermediateResult);
 			Result.AppendLine();
-			AppendIndent();
-			Result.AppendLine("{");
-			using (new IndentCookie(this))
+			using (new CodeBlockCookie(this))
 			{
 				AppendConstructor(intermediateResult);
 				AppendTransformMethod(intermediateResult);
+				
 				AppendFeatures(intermediateResult);
 				if (!intermediateResult.ParameterDescriptions.IsEmpty())
 				{
@@ -133,7 +127,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				using (new UnindentCookie(this))
 				{
 					AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
-					AppendTemplateInitialization(intermediateResult.ParameterDescriptions);
+					AppendTemplateInitialization(intermediateResult.ParameterDescriptions, intermediateResult.HasHost);
 				}
 
 				if (!intermediateResult.ParameterDescriptions.IsEmpty())
@@ -148,8 +142,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 					Result.AppendLine("#line hidden");
 				}
 			}
-			AppendIndent();
-			Result.AppendLine("}");
 		}
 
 		private void AppendFeatures([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
@@ -188,7 +180,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		}
 
 		protected virtual void AppendTemplateInitialization(
-			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions
+			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
 		)
 		{
 			using var unindent = new UnindentCookie(this);
@@ -200,7 +193,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 public virtual void Initialize()");
 			Result.AppendLine("{");
 			PushIndent();
-			AppendParameterInitialization(descriptions);
+			AppendParameterInitialization(descriptions, hasHost);
 			PopIndent();
 			AppendIndent();
 			Result.AppendLine("}");
@@ -219,9 +212,7 @@ public virtual void Initialize()");
 			Result.Append("public ");
 			Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
 			Result.AppendLine($" string {TransformTextMethodName}()");
-			AppendIndent();
-			Result.AppendLine("{");
-			using (new IndentCookie(this))
+			using (new CodeBlockCookie(this))
 			{
 				foreach (var description in intermediateResult.TransformationDescriptions)
 				{
@@ -231,8 +222,6 @@ public virtual void Initialize()");
 				AppendIndent();
 				Result.AppendLine("return this.GenerationEnvironment.ToString();");
 			}
-			AppendIndent();
-			Result.AppendLine("}");
 		}
 
 		private void AppendBaseClassName([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
@@ -273,7 +262,9 @@ public virtual void Initialize()");
 		protected IT4GeneratedClassNameProvider ClassNameProvider { get; }
 
 		protected abstract void AppendParameterInitialization(
-			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
+			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
+		);
 
 		protected virtual bool ShouldAppendPragmaDirectives => false;
 
@@ -287,18 +278,25 @@ public virtual void Initialize()");
 		protected void AppendIndent() => AppendIndent(CurrentIndent);
 		protected abstract void AppendIndent(int size);
 
-		protected sealed class IndentCookie : IDisposable
+		protected sealed class CodeBlockCookie : IDisposable
 		{
 			[NotNull]
 			private T4CSharpIntermediateConverterBase Converter { get; }
 
-			public IndentCookie([NotNull] T4CSharpIntermediateConverterBase converter)
+			public CodeBlockCookie([NotNull] T4CSharpIntermediateConverterBase converter)
 			{
 				Converter = converter;
+				Converter.AppendIndent();
+				Converter.Result.AppendLine("{");
 				Converter.PushIndent();
 			}
 
-			public void Dispose() => Converter.PopIndent();
+			public void Dispose()
+			{
+				Converter.PopIndent();
+				Converter.AppendIndent();
+				Converter.Result.AppendLine("}");
+			}
 		}
 
 		protected sealed class UnindentCookie : IDisposable

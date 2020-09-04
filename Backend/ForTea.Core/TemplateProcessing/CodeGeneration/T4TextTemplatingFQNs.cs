@@ -28,5 +28,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 
 		[NotNull]
 		public const string RuntimeVersion = "16.0.0.0";
+
+		[NotNull]
+		public const string TypeConverter = "global::System.ComponentModel.TypeConverter";
+
+		[NotNull]
+		public const string GetConverter = "global::System.ComponentModel.TypeDescriptor.GetConverter";
 	}
 }
