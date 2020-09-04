@@ -49,7 +49,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		[CanBeNull]
 		private T4ReversedFileDependencyData TryGetIncluders([NotNull] IPsiSourceFile file) =>
-			ReversedMap.TryGetValue(file);
+			ReversedMap?.TryGetValue(file);
 
 		public T4FileDependencyCache(
 			Lifetime lifetime,
