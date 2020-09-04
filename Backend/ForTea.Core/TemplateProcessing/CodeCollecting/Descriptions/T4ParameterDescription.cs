@@ -23,6 +23,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		[NotNull]
 		public string PropertyNameString { get; }
 
+		[NotNull]
+		public string TypeString { get; }
+
+		[NotNull]
+		public string TypeFqnString { get; }
+
 		private T4ParameterDescription(
 			[NotNull] ITreeNode typeToken,
 			[NotNull] ITreeNode nameToken,
@@ -33,6 +39,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			NameToken = nameToken;
 			FieldNameString = $"_{nameString}Field";
 			PropertyNameString = nameString;
+			TypeString = GetTypeString();
+			TypeFqnString = GetTypeFqnString();
 		}
 
 		public void AppendName([NotNull] T4CSharpCodeGenerationResult result)
@@ -56,20 +64,27 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			result.AppendMapped(TypeToken);
 		}
 
-		public void AppendType([NotNull] T4CSharpCodeGenerationResult result)
+		[NotNull]
+		private string GetTypeString()
 		{
-			string typeText = TypeToken.GetText();
-			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(typeText));
+			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(TypeToken.GetText()));
 			if (keyword != null)
 			{
-				result.Append(keyword);
-				return;
+				return keyword;
 			}
 
-			result.Append("global::");
-			if (CSharpLexer.IsKeyword(typeText)) result.Append("@");
-			result.Append(typeText);
+			return "global::" + GetTypeFqnString();
 		}
+
+		[NotNull]
+		private string GetTypeFqnString()
+		{
+			string typeText = TypeToken.GetText();
+			if (CSharpLexer.IsKeyword(typeText)) return $"@{typeText}";
+			return typeText;
+		}
+
+		public void AppendType([NotNull] T4CSharpCodeGenerationResult result) => result.Append(TypeString);
 
 		[CanBeNull]
 		public static T4ParameterDescription FromDirective([NotNull] IT4Directive directive)

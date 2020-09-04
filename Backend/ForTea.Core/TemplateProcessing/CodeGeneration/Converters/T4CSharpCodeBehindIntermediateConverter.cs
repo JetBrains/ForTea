@@ -46,7 +46,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
 
 		protected override void AppendParameterInitialization(
-			IReadOnlyCollection<T4ParameterDescription> descriptions
+			IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
 		)
 		{
 			// There's no need to initialize parameters in code-behind since this code is never displayed anyway 

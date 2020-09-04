@@ -49,11 +49,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			base.AppendTransformMethod(intermediateResult);
 		}
 
-		protected override void AppendTemplateInitialization(IReadOnlyCollection<T4ParameterDescription> descriptions)
+		protected override void AppendTemplateInitialization(
+			IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
+		)
 		{
 			if (descriptions.IsEmpty()) return;
 			AppendSyntheticAttribute();
-			base.AppendTemplateInitialization(descriptions);
+			base.AppendTemplateInitialization(descriptions, hasHost);
 		}
 		#endregion
 	}
