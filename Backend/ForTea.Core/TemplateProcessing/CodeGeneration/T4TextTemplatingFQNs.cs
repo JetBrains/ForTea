@@ -27,6 +27,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration
 		public const string TextTemplating = "Microsoft.VisualStudio.TextTemplating";
 
 		[NotNull]
-		public const string RuntimeVersion = "2020.3";
+		public const string RuntimeVersion = "16.0.0.0";
 	}
 }
