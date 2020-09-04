@@ -10,5 +10,5 @@ class T4PreprocessFileTest : T4PreprocessFileTestBase() {
   @Test fun `test internal visibility preprocessing`() = doTest()
   @Test fun `test hostspecific template preprocessing`() = doTest()
   // https://youtrack.jetbrains.com/issue/RIDER-47615
-  // @Test fun `test file with include preprocessing`() = doTest()
+  @Test fun `test file with include preprocessing`() = doTest()
 }
