@@ -86,6 +86,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
 			ChangeProvider = new T4WriteOnlyChangeProvider();
+			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
+			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
 			TargetFrameworkId = t4Environment.SelectTargetFrameworkId(primaryTargetFrameworkId, projectFile);
 			Project = ProjectFile.GetProject().NotNull();
 			var resolveContext = Project.IsMiscFilesProject()
@@ -102,8 +104,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				shellLocks
 			);
 
-			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
-			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
 			PersistentId = BuildPersistentId(primaryTargetFrameworkId);
 			OriginalTargetFrameworkId = primaryTargetFrameworkId;
@@ -144,12 +144,15 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				"T4PsiModuleChange",
 				() => ChangeManager.ExecuteAfterChange(
 					() => ShellLocks.ExecuteWithWriteLock(
-						() => ChangeManager.OnProviderChanged(
-							ChangeProvider,
-							changeBuilder.Result,
-							SimpleTaskExecutor.Instance
-						)
-					)
+						() =>
+						{
+							if (!IsValid()) return;
+							ChangeManager.OnProviderChanged(
+								ChangeProvider,
+								changeBuilder.Result,
+								SimpleTaskExecutor.Instance
+							);
+						})
 				)
 			);
 		}
