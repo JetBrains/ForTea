@@ -21,6 +21,12 @@ class T4TestHost(protocolHost: IProtocolHost) : ProtocolComponent(protocolHost) 
     frameworkLogger.info("Complete template preprocessing")
   }
 
+  fun waitForIndirectInvalidation() {
+    if (ProtocolManager.isResharperBackendDisabled()) throw IllegalStateException("ReSharper backend is disabled")
+    model.waitForIndirectInvalidation.callSynchronously(Unit, protocol, lifetime)
+    frameworkLogger.info("Complete waitForIndirectInvalidation")
+  }
+
   companion object {
     fun getInstance(protocolHost: IProtocolHost) = protocolHost.components.filterIsInstance<T4TestHost>().single()
   }

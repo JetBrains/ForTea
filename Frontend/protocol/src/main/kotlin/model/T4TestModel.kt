@@ -8,5 +8,6 @@ import model.T4ProtocolModel.T4FileLocation
 object T4TestModel : Ext(IdeRoot) {
   init {
     call("preprocessFile", T4FileLocation, void)
+    call("waitForIndirectInvalidation", void, void)
   }
 }
