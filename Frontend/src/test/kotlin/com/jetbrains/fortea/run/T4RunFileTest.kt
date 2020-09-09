@@ -54,4 +54,5 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test that TextTransformation is like in VS`() = doTest(dumpCsproj = false)
   @Test fun `test that host resolves an empty string`() = doTest(dumpCsproj = false)
   @Test fun `test how host resolves null`() = testExecutionFailure(".txt")
+  @Test fun `test file with a macro twice`() = doTest(dumpCsproj = false)
 }

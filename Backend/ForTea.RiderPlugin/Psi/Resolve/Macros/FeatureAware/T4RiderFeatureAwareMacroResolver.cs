@@ -62,7 +62,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 			{
 				string value = msBuildSession.GetProjectProperty(mark, heavyMacro, currentTargetFrameworkId);
 				if (value.IsNullOrEmpty()) continue;
-				result.Add(heavyMacro, value);
+				result[heavyMacro] = value;
 			}
 
 			return result;
