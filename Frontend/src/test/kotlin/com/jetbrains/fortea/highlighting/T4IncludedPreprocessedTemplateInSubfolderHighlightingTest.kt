@@ -1,5 +1,6 @@
 package com.jetbrains.fortea.highlighting
 
+import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
 class T4IncludedPreprocessedTemplateInSubfolderHighlightingTest : T4HighlightingTestBase() {
@@ -7,5 +8,7 @@ class T4IncludedPreprocessedTemplateInSubfolderHighlightingTest : T4Highlighting
   override val testFilePath: String
     get() = "${getSolutionDirectoryName()}/Folder/$fileName"
 
-  @Test fun testClassName() = doTestErrors()
+  @Ignore("FIXME")
+  @Test
+  fun testClassName() = doTestErrors()
 }
