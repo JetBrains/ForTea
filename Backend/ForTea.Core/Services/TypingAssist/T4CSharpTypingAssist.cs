@@ -7,6 +7,7 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CSharp.TypingAssist;
+using JetBrains.ReSharper.Feature.Services.StructuralRemove;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Feature.Services.Web.TypingAssist;
 using JetBrains.ReSharper.Psi;
@@ -58,7 +59,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 			[NotNull] ITypingAssistManager typingAssistManager,
 			[NotNull] IPsiServices psiServices,
 			[NotNull] IExternalIntellisenseHost externalIntellisenseHost,
-			[NotNull] LastTypingAssistAction lastTypingAssistAction
+			[NotNull] LastTypingAction lastTypingAction,
+			[NotNull] StructuralRemoveManager structuralRemoveManager
 		) : base(
 			lifetime,
 			solution,
@@ -69,7 +71,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 			typingAssistManager,
 			psiServices,
 			externalIntellisenseHost,
-			lastTypingAssistAction
+			lastTypingAction,
+			structuralRemoveManager
 		)
 		{
 		}

@@ -11,6 +11,7 @@ using JetBrains.Application.UI.ActionSystem.Text;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
+using JetBrains.ReSharper.Feature.Services.StructuralRemove;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CachingLexers;
@@ -355,7 +356,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			[NotNull] SkippingTypingAssist skippingTypingAssist,
 			[NotNull] ITypingAssistManager typingAssistManager,
 			[NotNull] ICodeCompletionSessionManager codeCompletionSessionManager,
-			[NotNull] LastTypingAssistAction lastTypingAssistAction
+			[NotNull] LastTypingAction lastTypingAction,
+			[NotNull] StructuralRemoveManager structuralRemoveManager
 		) : base(
 			solution,
 			settingsStore,
@@ -364,7 +366,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			psiServices,
 			externalIntellisenseHost,
 			skippingTypingAssist,
-			lastTypingAssistAction
+			lastTypingAction,
+			structuralRemoveManager
 		) {
 			_codeCompletionSessionManager = codeCompletionSessionManager;
 
