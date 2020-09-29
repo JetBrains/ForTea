@@ -6,6 +6,7 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon;
 using JetBrains.ReSharper.Feature.Services.Descriptions;
+using JetBrains.ReSharper.Feature.Services.UI;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
@@ -18,8 +19,9 @@ namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 		protected T4ExpandableElementTooltipProviderBase(
 			Lifetime lifetime,
 			ISolution solution,
-			IDeclaredElementDescriptionPresenter presenter
-		) : base(lifetime, solution, presenter)
+			IDeclaredElementDescriptionPresenter presenter,
+			[NotNull] DeclaredElementPresenterTextStylesService service
+		) : base(lifetime, solution, presenter, service)
 		{
 		}
 

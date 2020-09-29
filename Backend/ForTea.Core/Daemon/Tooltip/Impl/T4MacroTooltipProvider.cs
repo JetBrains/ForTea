@@ -5,6 +5,7 @@ using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Descriptions;
+using JetBrains.ReSharper.Feature.Services.UI;
 using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
@@ -19,8 +20,9 @@ namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 			Lifetime lifetime,
 			ISolution solution,
 			IDeclaredElementDescriptionPresenter presenter,
+			[NotNull] DeclaredElementPresenterTextStylesService service,
 			[NotNull] IT4MacroResolver resolver
-		) : base(lifetime, solution, presenter) => Resolver = resolver;
+		) : base(lifetime, solution, presenter, service) => Resolver = resolver;
 
 		protected override string Expand(IT4Macro macro)
 		{
