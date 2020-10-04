@@ -10,6 +10,7 @@ using JetBrains.ReSharper.Feature.Services.UI;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
+using JetBrains.UI.RichText;
 
 namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 {
@@ -26,7 +27,11 @@ namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 		}
 
 		[NotNull]
-		public override string GetTooltip([NotNull] IHighlighter highlighter)
+		protected override RichTextBlock GetRichTooltip(IHighlighter highlighter) =>
+			new RichTextBlock(GetTooltip(highlighter));
+
+		[NotNull]
+		private string GetTooltip([NotNull] IHighlighter highlighter)
 		{
 			if (!highlighter.IsValid) return string.Empty;
 			var psiServices = Solution.GetPsiServices();

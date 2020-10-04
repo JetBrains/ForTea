@@ -16,7 +16,7 @@ using JetBrains.UI.ThemedIcons;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 {
-	public sealed class T4FileRunMarkerGutterMark : IconGutterMark
+	public sealed class T4FileRunMarkerGutterMark : IconGutterMarkType
 	{
 		public T4FileRunMarkerGutterMark() : base(RunMarkersThemedIcons.RunActions.Id)
 		{
