@@ -5,6 +5,7 @@ using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
 {
@@ -38,7 +39,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		protected virtual void QueueAfterCommit() => Services.Locks.ExecuteOrQueue(Lifetime, ActivityName, () =>
 		{
-			AfterCommitSync(IndirectDependencies.Where(it => it.IsValid()).ToSet());
+			AfterCommitSync(IndirectDependencies.WhereNotNull().Where(it => it.IsValid()).ToSet());
 			IndirectDependencies = new HashSet<IPsiSourceFile>();
 		});
 
