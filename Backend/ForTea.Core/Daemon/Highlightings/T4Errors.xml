@@ -1,6 +1,5 @@
 <Errors language="C#" implementationLanguage="T4">
     <Usings>
-        JetBrains.ReSharper.Psi;
         JetBrains.ReSharper.Psi.CSharp.Tree;
         GammaJul.ForTea.Core.Daemon.Highlightings;
         GammaJul.ForTea.Core.Tree;

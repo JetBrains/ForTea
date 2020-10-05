@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
@@ -36,9 +37,12 @@ namespace GammaJul.ForTea.Core.Tree
 		[NotNull, ItemNotNull]
 		IEnumerable<IT4IncludedFile> Includes { get; }
 
-		[CanBeNull, Pure, Obsolete("You should state explicitly which source file you are interested in")]
+		[Pure]
+		[CanBeNull]
+		[SuppressMessage("ReSharper", "UnusedMember.Global")]
+		[Obsolete("You should state explicitly which source file you are interested in", true)]
 		new IPsiSourceFile GetSourceFile();
-		
+
 		TreeNodeCollection<IT4Block> Blocks { get; }
 	}
 }

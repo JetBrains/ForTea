@@ -39,7 +39,6 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			ITreeNode node = context.BasicContext.File.FindNodeAt(context.BasicContext.SelectedTreeRange);
 			Assertion.AssertNotNull(node, "node == null");
 			var ranges = context.BasicContext.GetRanges(node);
-			collector.AddRanges(ranges);
 
 			foreach (string directiveName in T4DirectiveInfoManager.AllDirectives.Select(di => di.Name)) {
 				var item = new TextLookupItem(directiveName, T4Entity.Id);

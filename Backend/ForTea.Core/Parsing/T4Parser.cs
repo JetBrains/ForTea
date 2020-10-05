@@ -191,7 +191,9 @@ namespace GammaJul.ForTea.Core.Parsing
 			return IncludedFile.FromOtherNode(parser.ParseFileWithoutCleanup());
 		}
 
+		#pragma warning disable CS0809
 		[Obsolete("This method should never be called", true)]
 		public override TreeElement ParseIncludedFile() => throw new InvalidOperationException();
+		#pragma warning restore CS0809
 	}
 }

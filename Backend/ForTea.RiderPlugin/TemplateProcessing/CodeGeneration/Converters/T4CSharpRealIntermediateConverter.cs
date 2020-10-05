@@ -175,7 +175,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 			AppendIndent();
 			Result.AppendLine();
 			AppendIndent();
-			Result.AppendLine($"#line 1 \"{File.GetSourceFile().GetLocation()}\"");
+			File.AssertContainsNoIncludeContext();
+			Result.AppendLine($"#line 1 \"{File.PhysicalPsiSourceFile.GetLocation()}\"");
 			AppendIndent();
 			Result.AppendLine(GeneratedCodeAttribute);
 			base.AppendClass(intermediateResult);

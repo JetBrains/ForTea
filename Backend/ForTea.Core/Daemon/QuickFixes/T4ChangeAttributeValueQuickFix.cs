@@ -35,7 +35,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 						textControl,
 						LiveTemplatesManager.EscapeAction.LeaveTextAndCaret,
 						HotspotHelper.CreateBasicCompletionHotspotInfo(text, range))
-					.Execute();
+					.ExecuteAndForget();
 		}
 
 		public override string Text => "Change value";

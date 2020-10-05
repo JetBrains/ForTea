@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.FileType;
+using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Debugger;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Debugger
 {
@@ -13,7 +14,8 @@ namespace JetBrains.ForTea.RiderPlugin.Debugger
 	public class T4BreakpointVariantsProvider : IBreakpointVariantsProvider
 	{
 		// TODO: delegate to C# provider
-		public List<string> GetSupportedFileExtensions() => T4ProjectFileType.AllExtensions.AsList();
+		[NotNull]
+		public List<string> GetSupportedFileExtensions() => T4ProjectFileType.AllExtensions.ToList();
 
 		public List<IBreakpoint> GetBreakpointVariants(IProjectFile file, int line, ISolution solution)
 		{
