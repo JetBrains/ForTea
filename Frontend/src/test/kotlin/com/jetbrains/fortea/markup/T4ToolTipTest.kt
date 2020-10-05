@@ -23,17 +23,6 @@ class T4ToolTipTest : BaseTestWithMarkup() {
     })
   }
 
-  @Test
-  fun testCSharpVarToolTip() = doTest {
-    dumpHighlightersTree(
-      {
-        it `is` ReSharperAttributesIds.CSHARP_KEYWORD &&
-          !(it.errorStripeTooltip as? HighlightInfo)?.description.isNullOrEmpty()
-      },
-      { (it.errorStripeTooltip as HighlightInfo).description }
-    )
-  }
-
   private fun doTest(block: EditorImpl.() -> Unit) = withSynchronousTooltips {
     doTestWithMarkupModel("Template.tt", "Template.tt") {
       waitForDaemon()
