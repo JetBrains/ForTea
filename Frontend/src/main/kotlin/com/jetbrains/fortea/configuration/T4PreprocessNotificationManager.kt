@@ -1,14 +1,13 @@
 package com.jetbrains.fortea.configuration
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.fortea.configuration.impl.T4BuildSessionViewImpl
+import com.jetbrains.rd.platform.util.getComponent
+import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rd.util.reactive.advise
 import com.jetbrains.rider.model.T4PreprocessingResult
 import com.jetbrains.rider.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.getComponent
-import com.jetbrains.rider.util.idea.lifetime
 
 class T4PreprocessNotificationManager(
   private val project: Project,

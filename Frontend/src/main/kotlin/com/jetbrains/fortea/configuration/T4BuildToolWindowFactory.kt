@@ -11,8 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
-import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rdclient.util.idea.LifetimedProjectService
+import com.jetbrains.rd.platform.util.idea.LifetimedProjectService
 import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.BuildToolWindowFactory
 import com.jetbrains.rider.build.ui.BuildResultPanel
