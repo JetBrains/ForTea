@@ -14,267 +14,259 @@ import com.intellij.lang.LightPsiParser;
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class T4Parser implements PsiParser, LightPsiParser {
 
-  public ASTNode parse(IElementType root_, PsiBuilder builder_) {
-    parseLight(root_, builder_);
-    return builder_.getTreeBuilt();
+  public ASTNode parse(IElementType t, PsiBuilder b) {
+    parseLight(t, b);
+    return b.getTreeBuilt();
   }
 
-  public void parseLight(IElementType root_, PsiBuilder builder_) {
-    boolean result_;
-    builder_ = adapt_builder_(root_, builder_, this, null);
-    Marker marker_ = enter_section_(builder_, 0, _COLLAPSE_, null);
-    if (root_ == ATTRIBUTE) {
-      result_ = attribute(builder_, 0);
-    }
-    else if (root_ == ATTRIBUTE_NAME) {
-      result_ = attribute_name(builder_, 0);
-    }
-    else if (root_ == BLOCK) {
-      result_ = block(builder_, 0);
-    }
-    else if (root_ == CODE_BLOCK) {
-      result_ = code_block(builder_, 0);
-    }
-    else if (root_ == DIRECTIVE) {
-      result_ = directive(builder_, 0);
-    }
-    else if (root_ == DIRECTIVE_NAME) {
-      result_ = directive_name(builder_, 0);
-    }
-    else if (root_ == EXPRESSION_BLOCK) {
-      result_ = expression_block(builder_, 0);
-    }
-    else if (root_ == FEATURE_BLOCK) {
-      result_ = feature_block(builder_, 0);
-    }
-    else if (root_ == STATEMENT_BLOCK) {
-      result_ = statement_block(builder_, 0);
-    }
-    else {
-      result_ = parse_root_(root_, builder_, 0);
-    }
-    exit_section_(builder_, 0, marker_, root_, result_, true, TRUE_CONDITION);
+  public void parseLight(IElementType t, PsiBuilder b) {
+    boolean r;
+    b = adapt_builder_(t, b, this, null);
+    Marker m = enter_section_(b, 0, _COLLAPSE_, null);
+    r = parse_root_(t, b);
+    exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
   }
 
-  protected boolean parse_root_(IElementType root_, PsiBuilder builder_, int level_) {
-    return t4File(builder_, level_ + 1);
+  protected boolean parse_root_(IElementType t, PsiBuilder b) {
+    return parse_root_(t, b, 0);
+  }
+
+  static boolean parse_root_(IElementType t, PsiBuilder b, int l) {
+    return t4File(b, l + 1);
   }
 
   /* ********************************************************** */
-  // attribute_name EQUAL QUOTE RAW_ATTRIBUTE_VALUE? QUOTE
-  public static boolean attribute(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "attribute")) return false;
-    if (!nextTokenIs(builder_, TOKEN)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = attribute_name(builder_, level_ + 1);
-    result_ = result_ && consumeTokens(builder_, 0, EQUAL, QUOTE);
-    result_ = result_ && attribute_3(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, QUOTE);
-    exit_section_(builder_, marker_, ATTRIBUTE, result_);
-    return result_;
-  }
-
-  // RAW_ATTRIBUTE_VALUE?
-  private static boolean attribute_3(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "attribute_3")) return false;
-    consumeToken(builder_, RAW_ATTRIBUTE_VALUE);
-    return true;
+  // attribute_name EQUAL QUOTE raw_attribute_value QUOTE
+  public static boolean attribute(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "attribute")) return false;
+    if (!nextTokenIs(b, TOKEN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = attribute_name(b, l + 1);
+    r = r && consumeTokens(b, 0, EQUAL, QUOTE);
+    r = r && raw_attribute_value(b, l + 1);
+    r = r && consumeToken(b, QUOTE);
+    exit_section_(b, m, ATTRIBUTE, r);
+    return r;
   }
 
   /* ********************************************************** */
   // TOKEN
-  public static boolean attribute_name(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "attribute_name")) return false;
-    if (!nextTokenIs(builder_, TOKEN)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, TOKEN);
-    exit_section_(builder_, marker_, ATTRIBUTE_NAME, result_);
-    return result_;
+  public static boolean attribute_name(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "attribute_name")) return false;
+    if (!nextTokenIs(b, TOKEN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN);
+    exit_section_(b, m, ATTRIBUTE_NAME, r);
+    return r;
   }
 
   /* ********************************************************** */
   // directive | code_block
-  public static boolean block(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "block")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, BLOCK, "<block>");
-    result_ = directive(builder_, level_ + 1);
-    if (!result_) result_ = code_block(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
+  public static boolean block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "block")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, BLOCK, "<block>");
+    r = directive(b, l + 1);
+    if (!r) r = code_block(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */
   // statement_block|expression_block|feature_block
-  public static boolean code_block(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "code_block")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, CODE_BLOCK, "<code block>");
-    result_ = statement_block(builder_, level_ + 1);
-    if (!result_) result_ = expression_block(builder_, level_ + 1);
-    if (!result_) result_ = feature_block(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
+  public static boolean code_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "code_block")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, CODE_BLOCK, "<code block>");
+    r = statement_block(b, l + 1);
+    if (!r) r = expression_block(b, l + 1);
+    if (!r) r = feature_block(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */
   // directive_main BLOCK_END
-  public static boolean directive(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "directive")) return false;
-    if (!nextTokenIs(builder_, DIRECTIVE_START)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = directive_main(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, BLOCK_END);
-    exit_section_(builder_, marker_, DIRECTIVE, result_);
-    return result_;
+  public static boolean directive(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive")) return false;
+    if (!nextTokenIs(b, DIRECTIVE_START)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = directive_main(b, l + 1);
+    r = r && consumeToken(b, BLOCK_END);
+    exit_section_(b, m, DIRECTIVE, r);
+    return r;
   }
 
   /* ********************************************************** */
   // DIRECTIVE_START directive_name? attribute*
-  static boolean directive_main(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "directive_main")) return false;
-    boolean result_, pinned_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_);
-    result_ = consumeToken(builder_, DIRECTIVE_START);
-    pinned_ = result_; // pin = 1
-    result_ = result_ && report_error_(builder_, directive_main_1(builder_, level_ + 1));
-    result_ = pinned_ && directive_main_2(builder_, level_ + 1) && result_;
-    exit_section_(builder_, level_, marker_, result_, pinned_, not_block_end_or_block_start_parser_);
-    return result_ || pinned_;
+  static boolean directive_main(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_main")) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, DIRECTIVE_START);
+    p = r; // pin = 1
+    r = r && report_error_(b, directive_main_1(b, l + 1));
+    r = p && directive_main_2(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, not_block_end_or_block_start_parser_);
+    return r || p;
   }
 
   // directive_name?
-  private static boolean directive_main_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "directive_main_1")) return false;
-    directive_name(builder_, level_ + 1);
+  private static boolean directive_main_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_main_1")) return false;
+    directive_name(b, l + 1);
     return true;
   }
 
   // attribute*
-  private static boolean directive_main_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "directive_main_2")) return false;
+  private static boolean directive_main_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_main_2")) return false;
     while (true) {
-      int pos_ = current_position_(builder_);
-      if (!attribute(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "directive_main_2", pos_)) break;
+      int c = current_position_(b);
+      if (!attribute(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "directive_main_2", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
   // TOKEN
-  public static boolean directive_name(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "directive_name")) return false;
-    if (!nextTokenIs(builder_, TOKEN)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, TOKEN);
-    exit_section_(builder_, marker_, DIRECTIVE_NAME, result_);
-    return result_;
+  public static boolean directive_name(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_name")) return false;
+    if (!nextTokenIs(b, TOKEN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN);
+    exit_section_(b, m, DIRECTIVE_NAME, r);
+    return r;
   }
 
   /* ********************************************************** */
   // EXPRESSION_BLOCK_START RAW_CODE? BLOCK_END
-  public static boolean expression_block(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "expression_block")) return false;
-    if (!nextTokenIs(builder_, EXPRESSION_BLOCK_START)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, EXPRESSION_BLOCK_START);
-    result_ = result_ && expression_block_1(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, BLOCK_END);
-    exit_section_(builder_, marker_, EXPRESSION_BLOCK, result_);
-    return result_;
+  public static boolean expression_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expression_block")) return false;
+    if (!nextTokenIs(b, EXPRESSION_BLOCK_START)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EXPRESSION_BLOCK_START);
+    r = r && expression_block_1(b, l + 1);
+    r = r && consumeToken(b, BLOCK_END);
+    exit_section_(b, m, EXPRESSION_BLOCK, r);
+    return r;
   }
 
   // RAW_CODE?
-  private static boolean expression_block_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "expression_block_1")) return false;
-    consumeToken(builder_, RAW_CODE);
+  private static boolean expression_block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expression_block_1")) return false;
+    consumeToken(b, RAW_CODE);
     return true;
   }
 
   /* ********************************************************** */
   // FEATURE_BLOCK_START RAW_CODE? BLOCK_END
-  public static boolean feature_block(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "feature_block")) return false;
-    if (!nextTokenIs(builder_, FEATURE_BLOCK_START)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, FEATURE_BLOCK_START);
-    result_ = result_ && feature_block_1(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, BLOCK_END);
-    exit_section_(builder_, marker_, FEATURE_BLOCK, result_);
-    return result_;
+  public static boolean feature_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "feature_block")) return false;
+    if (!nextTokenIs(b, FEATURE_BLOCK_START)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, FEATURE_BLOCK_START);
+    r = r && feature_block_1(b, l + 1);
+    r = r && consumeToken(b, BLOCK_END);
+    exit_section_(b, m, FEATURE_BLOCK, r);
+    return r;
   }
 
   // RAW_CODE?
-  private static boolean feature_block_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "feature_block_1")) return false;
-    consumeToken(builder_, RAW_CODE);
+  private static boolean feature_block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "feature_block_1")) return false;
+    consumeToken(b, RAW_CODE);
     return true;
   }
 
   /* ********************************************************** */
   // !BLOCK_END
-  static boolean not_block_end_or_block_start(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "not_block_end_or_block_start")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NOT_);
-    result_ = !consumeToken(builder_, BLOCK_END);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
+  static boolean not_block_end_or_block_start(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "not_block_end_or_block_start")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !consumeToken(b, BLOCK_END);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // (RAW_ATTRIBUTE_VALUE | PERCENT | DOLLAR | LEFT_PARENTHESIS | RIGHT_PARENTHESIS)*
+  static boolean raw_attribute_value(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "raw_attribute_value")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!raw_attribute_value_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "raw_attribute_value", c)) break;
+    }
+    return true;
+  }
+
+  // RAW_ATTRIBUTE_VALUE | PERCENT | DOLLAR | LEFT_PARENTHESIS | RIGHT_PARENTHESIS
+  private static boolean raw_attribute_value_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "raw_attribute_value_0")) return false;
+    boolean r;
+    r = consumeToken(b, RAW_ATTRIBUTE_VALUE);
+    if (!r) r = consumeToken(b, PERCENT);
+    if (!r) r = consumeToken(b, DOLLAR);
+    if (!r) r = consumeToken(b, LEFT_PARENTHESIS);
+    if (!r) r = consumeToken(b, RIGHT_PARENTHESIS);
+    return r;
   }
 
   /* ********************************************************** */
   // STATEMENT_BLOCK_START RAW_CODE? BLOCK_END
-  public static boolean statement_block(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "statement_block")) return false;
-    if (!nextTokenIs(builder_, STATEMENT_BLOCK_START)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, STATEMENT_BLOCK_START);
-    result_ = result_ && statement_block_1(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, BLOCK_END);
-    exit_section_(builder_, marker_, STATEMENT_BLOCK, result_);
-    return result_;
+  public static boolean statement_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "statement_block")) return false;
+    if (!nextTokenIs(b, STATEMENT_BLOCK_START)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STATEMENT_BLOCK_START);
+    r = r && statement_block_1(b, l + 1);
+    r = r && consumeToken(b, BLOCK_END);
+    exit_section_(b, m, STATEMENT_BLOCK, r);
+    return r;
   }
 
   // RAW_CODE?
-  private static boolean statement_block_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "statement_block_1")) return false;
-    consumeToken(builder_, RAW_CODE);
+  private static boolean statement_block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "statement_block_1")) return false;
+    consumeToken(b, RAW_CODE);
     return true;
   }
 
   /* ********************************************************** */
   // (RAW_TEXT|NEW_LINE|block)*
-  static boolean t4File(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "t4File")) return false;
+  static boolean t4File(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "t4File")) return false;
     while (true) {
-      int pos_ = current_position_(builder_);
-      if (!t4File_0(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "t4File", pos_)) break;
+      int c = current_position_(b);
+      if (!t4File_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "t4File", c)) break;
     }
     return true;
   }
 
   // RAW_TEXT|NEW_LINE|block
-  private static boolean t4File_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "t4File_0")) return false;
-    boolean result_;
-    result_ = consumeToken(builder_, RAW_TEXT);
-    if (!result_) result_ = consumeToken(builder_, NEW_LINE);
-    if (!result_) result_ = block(builder_, level_ + 1);
-    return result_;
+  private static boolean t4File_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "t4File_0")) return false;
+    boolean r;
+    r = consumeToken(b, RAW_TEXT);
+    if (!r) r = consumeToken(b, NEW_LINE);
+    if (!r) r = block(b, l + 1);
+    return r;
   }
 
-  final static Parser not_block_end_or_block_start_parser_ = new Parser() {
-    public boolean parse(PsiBuilder builder_, int level_) {
-      return not_block_end_or_block_start(builder_, level_ + 1);
+  static final Parser not_block_end_or_block_start_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return not_block_end_or_block_start(b, l + 1);
     }
   };
 }
