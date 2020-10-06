@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
   <name>ForTea</name>
   <id>org.jetbrains.fortea</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
