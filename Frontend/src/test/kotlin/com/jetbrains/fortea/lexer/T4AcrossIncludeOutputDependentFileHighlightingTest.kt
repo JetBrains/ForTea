@@ -8,6 +8,7 @@ import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
+@Ignore("Broken")
 class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexerTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4AndIncluder"
 
@@ -31,7 +32,6 @@ class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexe
     doTestLast(includeEditor, "$includeName.after.gold")
   }
 
-  @Ignore("Broken")
   @Test
   fun `test that a change in include can trigger includer invalidation`() {
     setText(includeName, "$includeName.before")

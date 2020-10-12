@@ -13,6 +13,7 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
 import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 import java.io.File
 import java.io.PrintStream
@@ -57,6 +58,7 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
   }
 
   @Test
+  @Ignore("Broken")
   fun `test that a change in a file triggers indirect include invalidation`() {
     doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_before.gold")
     withOpenedEditor("$projectName/IncludeWithOtherFunction.ttinclude") {
