@@ -8,8 +8,8 @@ import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rdclient.document.FrontendDocumentHost
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
-import com.jetbrains.rider.model.T4EditableEntityModel
-import com.jetbrains.rider.model.t4EditableEntityModel
+import com.jetbrains.fortea.model.T4EditableEntityModel
+import com.jetbrains.fortea.model.t4EditableEntityModel
 
 class T4SyntaxHighlightingHost(project: Project) : LifetimedProjectComponent(project) {
   companion object {
@@ -26,8 +26,8 @@ class T4SyntaxHighlightingHost(project: Project) : LifetimedProjectComponent(pro
 
   init {
     val documentHost = FrontendDocumentHost.getInstance(project)
-    documentHost.openedDocuments.view(componentLifetime) { lifetime, entityId, document ->
-      val protocolEditableEntity = documentHost.getEditableEntityOrThrow(entityId)
+    documentHost.openedDocuments.view(componentLifetime) { lifetime, documentId, document ->
+      val protocolEditableEntity = documentHost.getDocumentModelOrThrow(documentId)
       putT4EditableEntityModel(lifetime, project, document, protocolEditableEntity.t4EditableEntityModel)
     }
   }

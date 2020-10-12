@@ -16,7 +16,7 @@ import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters
 import com.jetbrains.rider.model.BuildResultKind
 import com.jetbrains.rider.model.BuildTarget
-import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.solution

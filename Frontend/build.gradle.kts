@@ -102,8 +102,8 @@ fun File.writeTextIfChanged(content: String) {
 }
 
 configure<RdgenParams> {
-  val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Protocol")
-  val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/protocol")
+  val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
+  val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
 
   verbose = true
   hashFolder = "build/rdgen"

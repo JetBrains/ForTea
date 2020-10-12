@@ -3,6 +3,8 @@ package model
 import com.jetbrains.rd.generator.nova.*
 import com.jetbrains.rd.generator.nova.PredefinedType.*
 import com.jetbrains.rider.model.nova.ide.SolutionModel
+import com.jetbrains.rd.generator.nova.csharp.CSharp50Generator
+import com.jetbrains.rd.generator.nova.kotlin.Kotlin11Generator
 
 @Suppress("unused")
 object T4ProtocolModel : Ext(SolutionModel.Solution) {
@@ -59,6 +61,9 @@ object T4ProtocolModel : Ext(SolutionModel.Solution) {
   }
 
   init {
+    setting(Kotlin11Generator.Namespace, "com.jetbrains.fortea.model")
+    setting(CSharp50Generator.Namespace, "JetBrains.ForTea.RiderPlugin.Model")
+
     // Backend calls these to create and run new configurations
     val requestExecution = call("requestExecution", T4ExecutionRequest, void).async
     requestExecution.flow = FlowKind.Sink

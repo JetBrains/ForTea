@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Rider.Model;
 using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing

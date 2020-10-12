@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
+using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
-using JetBrains.Rider.Model;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 {

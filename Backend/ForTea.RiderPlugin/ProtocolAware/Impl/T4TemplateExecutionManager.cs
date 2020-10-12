@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -13,7 +14,6 @@ using JetBrains.ReSharper.Host.Features.BackgroundTasks;
 using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
-using JetBrains.Rider.Model;
 using JetBrains.Rider.Model.Notifications;
 using JetBrains.Util;
 

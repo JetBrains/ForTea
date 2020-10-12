@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -55,21 +56,21 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 
 		private void CreateHandler(
 			Lifetime editableEntityLifetime,
-			[NotNull] EditableEntityId editableEntityId,
+			[NotNull] RdDocumentId rdDocumentId,
 			[NotNull] RiderDocument document
 		)
 		{
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			var editableEntity = Host.TryGetEditableEntity(editableEntityId);
+			var editableEntity = Host.TryGetDocumentModel(rdDocumentId);
 			if (editableEntity == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
 				return;
 			}
 
-			var t4EditableEntityModel = editableEntity.GetT4EditableEntityModel();
+			var t4EditableEntityModel = editableEntity.GetT4RdDocumentModel();
 			document.CreateOutputExtensionChangeListener(
 				editableEntityLifetime,
 				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)

@@ -11,7 +11,7 @@ import com.jetbrains.fortea.configuration.isSuccess
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.utils.handleEndOfExecution
 import com.jetbrains.rd.platform.util.getComponent
-import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rd.platform.util.lifetime

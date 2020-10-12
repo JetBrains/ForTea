@@ -1,6 +1,6 @@
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Rider.Model;
+using JetBrains.ForTea.RiderPlugin.Model;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
 {

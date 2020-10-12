@@ -5,15 +5,16 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.T4BuildToolWindowFactory
 import com.jetbrains.fortea.configuration.toBuildResultKind
+import com.jetbrains.fortea.model.T4BuildMessage
+import com.jetbrains.fortea.model.T4BuildMessageKind
+import com.jetbrains.fortea.model.T4BuildResult
+import com.jetbrains.fortea.model.T4PreprocessingResult
 import com.jetbrains.rd.platform.util.idea.LifetimedProjectService
-import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rd.util.lifetime.SequentialLifetimes
 import com.jetbrains.rd.util.reactive.ViewableMap
 import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.Diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.Diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*
-import com.jetbrains.rider.util.idea.lifetime
 
 class T4BuildSessionViewImpl(
   project: Project,

@@ -1,6 +1,6 @@
 package com.jetbrains.fortea.configuration.run
 
-import com.jetbrains.rider.model.T4ExecutionRequest
+import com.jetbrains.fortea.model.T4ExecutionRequest
 import com.jetbrains.rider.run.configurations.exe.ExeConfigurationParameters
 import com.jetbrains.rider.runtime.DotNetExecutable
 

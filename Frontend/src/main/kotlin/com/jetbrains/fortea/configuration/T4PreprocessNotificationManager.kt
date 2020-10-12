@@ -4,8 +4,8 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rd.util.reactive.advise
-import com.jetbrains.rider.model.T4PreprocessingResult
-import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.fortea.model.T4PreprocessingResult
+import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
 

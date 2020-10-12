@@ -1,15 +1,16 @@
+using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.UI.Controls.BulbMenu.Anchors;
 using JetBrains.Application.UI.Controls.BulbMenu.Items;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Rider.Model;
 using JetBrains.TextControl.DocumentMarkup;
 using JetBrains.UI.RichText;
 using JetBrains.UI.ThemedIcons;
@@ -67,7 +68,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 		[NotNull]
 		private static ExecutableItem CreateRunFileExecutableItem(
 			[NotNull] IT4TemplateDirective directive,
-			[NotNull] System.Action<IT4TemplateExecutionManager, IT4File> execute,
+			[NotNull] Action<IT4TemplateExecutionManager, IT4File> execute,
 			[NotNull] string statisticId
 		) => new ExecutableItem(() =>
 		{

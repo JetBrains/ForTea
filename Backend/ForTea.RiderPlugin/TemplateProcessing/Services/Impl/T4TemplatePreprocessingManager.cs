@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
+using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
@@ -13,7 +14,6 @@ using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Rider.Model;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 

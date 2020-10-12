@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.configuration
 
-import com.jetbrains.rider.model.T4BuildResult
-import com.jetbrains.rider.model.T4PreprocessingResult
+import com.jetbrains.fortea.model.T4BuildResult
+import com.jetbrains.fortea.model.T4PreprocessingResult
 
 interface T4BuildSessionView {
   fun openWindow(message: String)

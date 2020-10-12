@@ -4,8 +4,8 @@ import com.jetbrains.rdclient.protocol.IProtocolHost
 import com.jetbrains.rdclient.protocol.ProtocolComponent
 import com.jetbrains.rdclient.util.idea.callSynchronously
 import com.jetbrains.rider.inTests.InTestsConstants
-import com.jetbrains.rider.model.T4FileLocation
-import com.jetbrains.rider.model.T4TestModel
+import com.jetbrains.fortea.model.T4FileLocation
+import com.jetbrains.fortea.model.T4TestModel
 import com.jetbrains.rider.protocol.ProtocolManager
 import org.apache.commons.logging.LogFactory
 
