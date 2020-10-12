@@ -5,7 +5,7 @@ import com.jetbrains.fortea.utils.T4TestHelper
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rdclient.protocol.protocolHost
 import com.jetbrains.rdclient.util.idea.toVirtualFile
-import com.jetbrains.rider.model.T4FileLocation
+import com.jetbrains.fortea.model.T4FileLocation
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution

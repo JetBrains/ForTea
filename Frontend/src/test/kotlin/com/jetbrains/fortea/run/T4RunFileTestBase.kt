@@ -6,14 +6,14 @@ import com.intellij.openapi.components.ServiceManager
 import com.jetbrains.fortea.configuration.execution.impl.T4SynchronousRunConfigurationExecutor
 import com.jetbrains.fortea.utils.T4TestHelper
 import com.jetbrains.rdclient.util.idea.toVirtualFile
-import com.jetbrains.rider.model.T4ExecutionRequest
-import com.jetbrains.rider.model.T4FileLocation
-import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.fortea.model.T4ExecutionRequest
+import com.jetbrains.fortea.model.T4FileLocation
+import com.jetbrains.fortea.model.t4ProtocolModel
+import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.util.idea.getComponent
 import org.testng.annotations.BeforeMethod
 
 open class T4RunFileTestBase : BaseTestWithSolution() {
