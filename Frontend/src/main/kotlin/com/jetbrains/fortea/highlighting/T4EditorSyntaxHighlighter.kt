@@ -12,7 +12,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.rd.createNestedDisposable
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
-import com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost.Companion.getT4EditableEntityModel
+import com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost.Companion.getT4RdDocumentModel
 import com.jetbrains.fortea.psi.T4ElementTypes
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.document.getFirstEditor
@@ -55,7 +55,7 @@ class T4EditorSyntaxHighlighter(
     // project.lifetime is quite a long-lived lifetime,
     // but it's not a big deal here, because the editable entity
     // gets disposed properly anyway
-    document.getT4EditableEntityModel(project)?.rawTextExtension?.advise(highlighterLifetime) { extension ->
+    document.getT4RdDocumentModel(project)?.rawTextExtension?.advise(highlighterLifetime) { extension ->
       if (extension == rawTextLayerExtension) return@advise
       virtualFile.t4OutputExtension = extension
       val updater = EditorHighlighterUpdater(project, highlighterDisposable, editor, virtualFile)
