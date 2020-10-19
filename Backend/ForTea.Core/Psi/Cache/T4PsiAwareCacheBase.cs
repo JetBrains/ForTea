@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
@@ -18,10 +19,12 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		protected T4PsiAwareCacheBase(
 			Lifetime lifetime,
-			IPersistentIndexManager persistentIndexManager,
-			IUnsafeMarshaller<TResponse> valueMarshaller
+			[NotNull] IShellLocks locks,
+			[NotNull] IPersistentIndexManager persistentIndexManager,
+			[NotNull] IUnsafeMarshaller<TResponse> valueMarshaller
 		) : base(
 			lifetime,
+			locks,
 			persistentIndexManager,
 			valueMarshaller
 		)

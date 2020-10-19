@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
+using JetBrains.Application.Threading;
 using JetBrains.Collections;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
@@ -53,13 +54,14 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
 		public T4FileDependencyCache(
 			Lifetime lifetime,
+			[NotNull] IShellLocks locks,
 			[NotNull] IPersistentIndexManager persistentIndexManager,
 			[NotNull] T4GraphSinkSearcher graphSinkSearcher,
 			[NotNull] T4IndirectIncludeTransitiveClosureSearcher transitiveClosureSearcher,
 			[NotNull] IT4PsiFileSelector psiFileSelector,
 			[NotNull] IT4IncludeResolver includeResolver,
 			[NotNull] ILogger logger
-		) : base(lifetime, persistentIndexManager, T4FileDependencyDataMarshaller.Instance)
+		) : base(lifetime, locks, persistentIndexManager, T4FileDependencyDataMarshaller.Instance)
 		{
 			GraphSinkSearcher = graphSinkSearcher;
 			TransitiveClosureSearcher = transitiveClosureSearcher;
