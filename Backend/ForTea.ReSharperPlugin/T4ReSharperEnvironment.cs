@@ -18,7 +18,7 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 	[ShellComponent]
 	public sealed class T4ReSharperEnvironment : T4DefaultEnvironment
 	{
-		[NotNull] private readonly IVsEnvironmentInformation _vsEnvironmentInformation;
+		[NotNull] private readonly IVsEnvironmentStaticInformation _vsEnvironmentInformation;
 		[NotNull] private readonly string[] _textTemplatingAssemblyNames;
 		[CanBeNull] private readonly TargetFrameworkId _targetFrameworkId;
 		[CanBeNull] private IList<FileSystemPath> _includePaths;
@@ -101,13 +101,13 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 
 		[NotNull]
 		[Pure]
-		private static string CreateDevEnvPublicAssemblyName([NotNull] IVsEnvironmentInformation vsEnvironmentInformation, [NotNull] string name)
+		private static string CreateDevEnvPublicAssemblyName([NotNull] IVsEnvironmentStaticInformation vsEnvironmentInformation, [NotNull] string name)
 			=> vsEnvironmentInformation
 				.DevEnvInstallDir
 				.Combine(RelativePath.Parse("PublicAssemblies\\" + name + ".dll"))
 				.FullPath;
 
-		public T4ReSharperEnvironment([NotNull] IVsEnvironmentInformation vsEnvironmentInformation)
+		public T4ReSharperEnvironment([NotNull] IVsEnvironmentStaticInformation vsEnvironmentInformation)
 		{
 			_vsEnvironmentInformation = vsEnvironmentInformation;
 
