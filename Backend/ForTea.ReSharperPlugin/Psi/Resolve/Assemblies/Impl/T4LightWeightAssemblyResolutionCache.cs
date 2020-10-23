@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
+using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
@@ -29,9 +30,11 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		[NotNull] private readonly Lazy<Optional<ITextTemplatingComponents>> Components;
 
 		public T4LightWeightAssemblyResolutionCache(
-			Lifetime lifetime, IPersistentIndexManager persistentIndexManager,
+			Lifetime lifetime,
+			[NotNull] IShellLocks locks,
+			[NotNull] IPersistentIndexManager persistentIndexManager,
 			[NotNull] RawVsServiceProvider provider
-		) : base(lifetime, persistentIndexManager, T4LightWeightAssemblyResolutionDataMarshaller.Instance) =>
+		) : base(lifetime, locks, persistentIndexManager, T4LightWeightAssemblyResolutionDataMarshaller.Instance) =>
 			Components = Lazy.Of(() => new Optional<ITextTemplatingComponents>(
 				provider.Value.GetService<STextTemplating, ITextTemplatingComponents>()
 			), true);

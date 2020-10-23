@@ -5,6 +5,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.Interop.WinApi;
 using JetBrains.Lifetimes;
@@ -26,8 +27,9 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 	{
 		public T4MacroResolutionCache(
 			Lifetime lifetime,
-			IPersistentIndexManager persistentIndexManager
-		) : base(lifetime, persistentIndexManager, T4MacroResolutionDataMarshaller.Instance)
+			[NotNull] IShellLocks locks,
+			[NotNull] IPersistentIndexManager persistentIndexManager
+		) : base(lifetime, locks, persistentIndexManager, T4MacroResolutionDataMarshaller.Instance)
 		{
 		}
 
