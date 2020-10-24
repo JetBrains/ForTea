@@ -36,7 +36,8 @@ right-click it and select `Debug Frontend [runIde]`.
 Debugging Rider plugin backend
 ----
 To debug Rider plugin backend,
-run Rider plugin, then open `Backend/ForTea.Backend.sln` in [Rider](https://www.jetbrains.com/rider/),
+run Rider plugin, then open `Backend/ForTea.Backend.sln` in a .NET IDE
+([Rider](https://www.jetbrains.com/rider/) is strongly recommended),
 invoke `Attach to process` action and select `ReSharperHost` process.
 
 Debugging Rider plugin frontend and backend simultaneously
