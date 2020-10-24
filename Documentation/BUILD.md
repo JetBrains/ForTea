@@ -35,3 +35,8 @@ It is defined as two last digits of the version before the first dot + one digit
 For example, ReSharper 2020.2.1 would have a wave value of 202.  
 
 Build outputs will be placed at `Backend/artifacts/Debug/`
+
+Running/debugging the plugin
+----
+Run/debug instructions for Rider plugin can be found [here](RUN_RIDER.md).  
+Run/debug instructions for ReSharper plugin can be found [here](RUN_RESHARPER.md).
