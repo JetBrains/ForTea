@@ -25,8 +25,8 @@ Debugging ReSharper plugin
 To debug ReSharper plugin,
 build and run the plugin,
 then open `Backend/ForTea.ReSharper.sln` in a .NET IDE
-([Rider](https://www.jetbrains.com/rider/) is strongly recommended)
-and invoke `Attach to process` action and select `devenv` process.
+([Rider](https://www.jetbrains.com/rider/) is strongly recommended),
+invoke `Attach to process` action and select `devenv` process.
 
 Running/debugging Rider plugin
 ----
