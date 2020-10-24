@@ -3,7 +3,9 @@
 Prerequirements:
 ----
 Same as for building the plugin.  
-Additionally, you'll need an instance of Visual Studio with ReSharper.  
+Additionally, you'll need an instance of
+[Visual Studio](https://visualstudio.microsoft.com/)
+with [ReSharper](https://www.jetbrains.com/resharper/).  
 To debug the plugin, it is strongly recommended to also have
 [Rider](https://www.jetbrains.com/rider/) installed.
 
