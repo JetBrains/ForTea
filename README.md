@@ -31,9 +31,11 @@ License
 Licensed under [Apache License 2.0](LICENSE).  
 This plugin is a successor to [the original plugin by MrJul](https://github.com/MrJul/ForTea), to whom we are very thankful.
 
-Building plugin
+Building, running and debugging the plugin
 ----
-Build instructions can be found [here](BUILD.md).  
+Build instructions can be found [here](Documentation/BUILD.md).  
+Run/debug instructions for Rider plugin can be found [here](Documentation/RUN_RIDER.md).  
+Run/debug instructions for ReSharper plugin can be found [here](Documentation/RUN_RESHARPER.md).  
 
 Things to know about this ReSharper plugin
 ----
