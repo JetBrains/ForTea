@@ -16,7 +16,7 @@ cd ../Frontent
 gradlew :runIde
 ```
 
-Debugging Rider plugin
+Debugging Rider plugin frontend
 ----
 To debug Rider plugin frontend, run
 ```bash
@@ -29,6 +29,8 @@ then open `Frontend` in [IntelliJ IDEA](https://www.jetbrains.com/idea/),
 open `Gradle` window, find `runIde` task in `ForTea > Tasks > intellij`,
 right-click it and select `Debug Frontend [runIde]`.  
 
+Debugging Rider plugin backend
+----
 To debug Rider plugin backend,
 run Rider plugin, then open `Backend/ForTea.Backend.sln` in [Rider](https://www.jetbrains.com/rider/),
 invoke `Attach to process` action and select `ReSharperHost` process.
