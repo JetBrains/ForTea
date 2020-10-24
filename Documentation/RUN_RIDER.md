@@ -2,7 +2,11 @@
 ====
 Prerequirements:
 ----
-Same as for building the plugin
+Same as for building the plugin.  
+To debug the plugin, you'll also need to have
+[IntelliJ IDEA](https://www.jetbrains.com/idea/)
+and a .NET IDE installed
+([Rider](https://www.jetbrains.com/rider/) is strongly recommended as the latter).
 
 Running Rider plugin
 ----

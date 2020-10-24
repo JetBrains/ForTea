@@ -4,6 +4,8 @@ Prerequirements:
 ----
 Same as for building the plugin.  
 Additionally, you'll need an instance of Visual Studio with ReSharper.  
+To debug the plugin, it is strongly recommended to also have
+[Rider](https://www.jetbrains.com/rider/) installed.
 
 Running ReSharper plugin
 ----
@@ -20,8 +22,9 @@ Debugging ReSharper plugin
 ----
 To debug ReSharper plugin,
 build and run the plugin,
-then open `Backend/ForTea.ReSharper.sln` in [Rider](https://www.jetbrains.com/rider/),
-invoke `Attach to process` action and select `devenv` process.
+then open `Backend/ForTea.ReSharper.sln` in a .NET IDE
+([Rider](https://www.jetbrains.com/rider/) is strongly recommended)
+and invoke `Attach to process` action and select `devenv` process.
 
 Running/debugging Rider plugin
 ----
