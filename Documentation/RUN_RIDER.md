@@ -24,7 +24,6 @@ cd Frontend
 gradlew :prepare
 cd ../Backend
 dotnet build ForTea.Backend.sln
-cd ../Frontent
 ```
 then open `Frontend` in [IntelliJ IDEA](https://www.jetbrains.com/idea/),
 open 'Gradle' window, find 'runIde task',
