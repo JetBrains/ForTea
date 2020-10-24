@@ -5,13 +5,13 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Generators;
+using JetBrains.ForTea.RiderPlugin.Model;
+using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Rider.Model;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -22,9 +22,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 	[SolutionComponent]
 	public sealed class T4TemplateCompiler : IT4TemplateCompiler
 	{
-		[NotNull]
-		private ISolution Solution { get; }
-
 		[NotNull]
 		private IShellLocks Locks { get; }
 
@@ -44,7 +41,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			[NotNull] IShellLocks locks,
 			[NotNull] IT4TargetFileManager targetManager,
 			[NotNull] IT4BuildMessageConverter converter,
-			[NotNull] ISolution solution,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager,
 			[NotNull] ILogger logger
 		)
@@ -52,7 +48,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			Locks = locks;
 			TargetManager = targetManager;
 			Converter = converter;
-			Solution = solution;
 			ReferenceExtractionManager = referenceExtractionManager;
 			Logger = logger;
 		}
@@ -72,14 +67,23 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 				try
 				{
 					// Prepare the code
-					var references = ReferenceExtractionManager.ExtractPortableReferencesTransitive(lifetime, file);
+					var references = ReferenceExtractionManager.ExtractPortableReferences(lifetime, file);
 					string code = GenerateCode(file);
 
 					// Prepare the paths
 					var executablePath = TargetManager.GetTemporaryExecutableLocation(file);
 					var compilation = CreateCompilation(code, references, executablePath);
-					executablePath.Parent.CreateDirectory();
-					var pdbPath = executablePath.Parent.Combine(executablePath.Name.WithOtherExtension("pdb"));
+					var location = executablePath.Parent;
+					switch (location.Exists)
+					{
+						case FileSystemPath.Existence.File:
+							location.DeleteFile();
+							goto case FileSystemPath.Existence.Missing;
+						case FileSystemPath.Existence.Missing:
+							location.CreateDirectory();
+							break;
+					}
+					var pdbPath = location.Combine(executablePath.Name.WithOtherExtension("pdb"));
 
 					// Delegate to Roslyn
 					var emitOptions = new EmitOptions(
@@ -108,9 +112,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private string GenerateCode([NotNull] IT4File file)
 		{
 			Locks.AssertReadAccessAllowed();
-			var generator = new T4CSharpExecutableCodeGenerator(file, Solution);
-			string code = generator.Generate().RawText;
-			return code;
+			return T4RiderCodeGeneration.GenerateExecutableCode(file).RawText;
 		}
 
 		private static CSharpCompilation CreateCompilation(

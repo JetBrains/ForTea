@@ -20,21 +20,25 @@ public interface T4ElementTypes {
 
   IElementType BLOCK_END = new T4TokenType("BLOCK_END");
   IElementType DIRECTIVE_START = new T4TokenType("DIRECTIVE_START");
+  IElementType DOLLAR = new T4TokenType("DOLLAR");
   IElementType EQUAL = new T4TokenType("EQUAL");
   IElementType EXPRESSION_BLOCK_START = new T4TokenType("EXPRESSION_BLOCK_START");
   IElementType FEATURE_BLOCK_START = new T4TokenType("FEATURE_BLOCK_START");
+  IElementType LEFT_PARENTHESIS = new T4TokenType("LEFT_PARENTHESIS");
   IElementType NEW_LINE = new T4TokenType("NEW_LINE");
+  IElementType PERCENT = new T4TokenType("PERCENT");
   IElementType QUOTE = new T4TokenType("QUOTE");
   IElementType RAW_ATTRIBUTE_VALUE = new T4TokenType("RAW_ATTRIBUTE_VALUE");
   IElementType RAW_CODE = new T4TokenType("RAW_CODE");
   IElementType RAW_TEXT = new T4TokenType("RAW_TEXT");
+  IElementType RIGHT_PARENTHESIS = new T4TokenType("RIGHT_PARENTHESIS");
   IElementType STATEMENT_BLOCK_START = new T4TokenType("STATEMENT_BLOCK_START");
   IElementType TOKEN = new T4TokenType("TOKEN");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ATTRIBUTE) {
+      if (type == ATTRIBUTE) {
         return new T4AttributeImpl(node);
       }
       else if (type == ATTRIBUTE_NAME) {

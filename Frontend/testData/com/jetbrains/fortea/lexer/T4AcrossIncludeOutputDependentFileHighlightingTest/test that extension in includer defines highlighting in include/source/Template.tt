@@ -1,0 +1,3 @@
+using int as double;
+Hello();
+<#= name + 2.ToString() #>

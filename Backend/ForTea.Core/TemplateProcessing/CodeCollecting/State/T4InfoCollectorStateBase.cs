@@ -10,6 +10,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 {
 	public abstract class T4InfoCollectorStateBase : IT4InfoCollectorState
 	{
+		public virtual IT4TreeNode FirstNode => null;
+
 		[NotNull]
 		protected IT4CodeGenerationInterrupter Interrupter { get; }
 
@@ -19,7 +21,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 
 		public abstract string Produce(ITreeNode lookahead);
 		public abstract string ProduceBeforeEof();
-		public abstract IT4InfoCollectorState GetNextState(ITreeNode element);
+		public abstract IT4InfoCollectorState GetNextState(IT4TreeNode element);
 		public abstract bool FeatureStarted { get; }
 		public abstract void ConsumeToken(IT4Token token);
 

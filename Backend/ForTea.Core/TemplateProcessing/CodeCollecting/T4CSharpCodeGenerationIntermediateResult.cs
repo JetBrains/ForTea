@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
@@ -45,7 +48,26 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public IT4InfoCollectorState State { get; private set; }
 		public bool FeatureStarted => State.FeatureStarted;
 		public bool HasHost { get; private set; }
-		public void AdvanceState([NotNull] ITreeNode element) => State = State.GetNextState(element);
+		private AccessRights AccessRights { get; set; }
+
+		[NotNull]
+		public string AccessRightsText
+		{
+			get => AccessRights switch
+			{
+				AccessRights.INTERNAL => T4VisibilityDirectiveAttributeInfo.Internal,
+				_ => T4VisibilityDirectiveAttributeInfo.Public
+			};
+			set
+			{
+				if (T4VisibilityDirectiveAttributeInfo.Internal.Equals(value, StringComparison.OrdinalIgnoreCase))
+					AccessRights = AccessRights.INTERNAL;
+				else
+					AccessRights = AccessRights.PUBLIC;
+			}
+		}
+
+		public void AdvanceState([NotNull] IT4TreeNode element) => State = State.GetNextState(element);
 		public void RequireHost() => HasHost = true;
 		public bool HasBaseClass => !CollectedBaseClass.IsEmpty;
 
@@ -69,8 +91,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public void AppendFeature([NotNull] IT4AppendableElementDescription description) =>
 			MyFeatureDescriptions.Add(description);
 
-		public void AppendFeature([NotNull] string message) =>
-			MyFeatureDescriptions.Add(new T4TextDescription(message));
+		public void AppendFeature([NotNull] string message, [NotNull] IT4TreeNode firstNode) =>
+			MyFeatureDescriptions.Add(new T4TextDescription(message, firstNode));
 
 		public void AppendTransformation([NotNull] IT4AppendableElementDescription description) =>
 			MyTransformationDescriptions.Add(description);

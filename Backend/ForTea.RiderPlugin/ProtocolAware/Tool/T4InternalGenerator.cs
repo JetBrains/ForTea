@@ -80,7 +80,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 		{
 			Statistics.TrackAction(T4StatisticIdBundle.RunSilently);
 			var manager = solution.GetComponent<IT4TemplateExecutionManager>();
-			if (manager.IsExecutionRunning(file.GetSourceFile().NotNull())) return;
+			if (manager.IsExecutionRunning(file.PhysicalPsiSourceFile.NotNull())) return;
 			manager.ExecuteSilently(file);
 		}
 

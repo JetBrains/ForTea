@@ -23,6 +23,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 			bool showMarkerOnEntryPoint = settings.GetValue((RunMarkerSettings s) => s.ShowMarkerOnEntryPoint);
 			if (!showMarkerOnStaticMethods && !showMarkerOnEntryPoint) return;
 			if (!(file is IT4File t4File)) return;
+			if (t4File.PhysicalPsiSourceFile.ToProjectFile() == null) return;
 			var directive = t4File.BlocksEnumerable.OfType<IT4TemplateDirective>().FirstOrDefault();
 			if (directive == null) return;
 			consumer.AddHighlighting(new T4RunMarkerHighlighting(directive));

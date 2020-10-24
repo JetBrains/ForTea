@@ -16,7 +16,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		{
 		}
 
-		public override IT4InfoCollectorState GetNextState(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(IT4TreeNode element)
 		{
 			switch (element)
 			{

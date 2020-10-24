@@ -41,7 +41,6 @@ namespace GammaJul.ForTea.Core.Services.CodeCompletion {
 			ITreeNode node = context.BasicContext.File.FindNodeAt(context.BasicContext.SelectedTreeRange);
 			Assertion.AssertNotNull(node, "node == null");
 			var ranges = context.BasicContext.GetRanges(node);
-			collector.AddRanges(ranges);
 
 			var attribute = node.GetContainingNode<IT4DirectiveAttribute>();
 			Assertion.AssertNotNull(attribute, "attribute != null");

@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4ExpressionDescription : IT4AppendableElementDescription
+	public class T4ExpressionDescription : IT4AppendableElementDescription
 	{
 		[NotNull]
 		private IT4Code Source { get; }
@@ -61,7 +61,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			destination.AppendLine("#line hidden");
 		}
 
-		private static void AppendContentSuffix(
+		protected  virtual void AppendContentSuffix(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4ElementAppendFormatProvider provider
 		)
@@ -90,7 +90,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 			provider.AppendLineDirective(destination, Source);
 		}
 
-		private static void AppendContentPrefix(
+		protected virtual void AppendContentPrefix(
 			[NotNull] T4CSharpCodeGenerationResult destination,
 			[NotNull] IT4ElementAppendFormatProvider provider
 		)

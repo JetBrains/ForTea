@@ -1,0 +1,27 @@
+USING_KEYWORD                           | using
+WHITE_SPACE                             |  
+INT_KEYWORD                             | int
+WHITE_SPACE                             |  
+AS_KEYWORD                              | as
+WHITE_SPACE                             |  
+DOUBLE_KEYWORD                          | double
+SEMICOLON                               | ;
+T4TokenType.NEW_LINE                    | \n
+IDENTIFIER                              | Hello
+LPARENTH                                | (
+RPARENTH                                | )
+SEMICOLON                               | ;
+T4TokenType.NEW_LINE                    | \n
+T4TokenType.EXPRESSION_BLOCK_START      | <#=
+WHITE_SPACE                             |  
+IDENTIFIER                              | name
+WHITE_SPACE                             |  
+PLUS                                    | +
+WHITE_SPACE                             |  
+INTEGER_LITERAL                         | 2
+DOT                                     | .
+IDENTIFIER                              | ToString
+LPARENTH                                | (
+RPARENTH                                | )
+WHITE_SPACE                             |  
+T4TokenType.BLOCK_END                   | #>

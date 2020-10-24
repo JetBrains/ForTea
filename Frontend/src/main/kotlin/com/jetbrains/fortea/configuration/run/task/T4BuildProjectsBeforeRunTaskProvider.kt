@@ -10,16 +10,16 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.utils.handleEndOfExecution
+import com.jetbrains.rd.platform.util.application
+import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters
 import com.jetbrains.rider.model.BuildResultKind
 import com.jetbrains.rider.model.BuildTarget
-import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.application
-import com.jetbrains.rider.util.idea.getComponent
 import javax.swing.Icon
 
 class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjectsBeforeRunTask>() {

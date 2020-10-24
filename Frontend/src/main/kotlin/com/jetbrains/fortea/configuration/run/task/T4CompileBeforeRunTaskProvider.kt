@@ -10,11 +10,11 @@ import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.isSuccess
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.utils.handleEndOfExecution
-import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.rd.platform.util.getComponent
+import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.getComponent
-import com.jetbrains.rider.util.idea.lifetime
+import com.jetbrains.rd.platform.util.lifetime
 
 class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunTask>() {
   override fun getName() = "Compile T4 File"
@@ -50,8 +50,7 @@ class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunT
     val path = item.getVirtualFile()?.path ?: return false
     val model = project.solution.t4ProtocolModel
 
-    val request = model.requestCompilation.start(location).result
-    request.advise(project.lifetime) { rdTaskResult ->
+    model.requestCompilation.start(project.lifetime, location).result.advise(project.lifetime) { rdTaskResult ->
       try {
         val result = rdTaskResult.unwrap()
         successful = result.buildResultKind.isSuccess

@@ -9,7 +9,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing
 	public class T4TemplateResourceProvider
 	{
 		[NotNull]
-		private string Template { get; }
+		public string Template { get; }
 
 		[NotNull]
 		private static string ReadTemplate([NotNull] string resourceName)

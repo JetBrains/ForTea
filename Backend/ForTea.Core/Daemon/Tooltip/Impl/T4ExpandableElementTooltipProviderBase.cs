@@ -6,9 +6,11 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon;
 using JetBrains.ReSharper.Feature.Services.Descriptions;
+using JetBrains.ReSharper.Feature.Services.UI;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
+using JetBrains.UI.RichText;
 
 namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 {
@@ -18,13 +20,18 @@ namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 		protected T4ExpandableElementTooltipProviderBase(
 			Lifetime lifetime,
 			ISolution solution,
-			IDeclaredElementDescriptionPresenter presenter
-		) : base(lifetime, solution, presenter)
+			IDeclaredElementDescriptionPresenter presenter,
+			[NotNull] DeclaredElementPresenterTextStylesService service
+		) : base(lifetime, solution, presenter, service)
 		{
 		}
 
 		[NotNull]
-		public override string GetTooltip([NotNull] IHighlighter highlighter)
+		protected override RichTextBlock GetRichTooltip(IHighlighter highlighter) =>
+			new RichTextBlock(GetTooltip(highlighter));
+
+		[NotNull]
+		private string GetTooltip([NotNull] IHighlighter highlighter)
 		{
 			if (!highlighter.IsValid) return string.Empty;
 			var psiServices = Solution.GetPsiServices();

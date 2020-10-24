@@ -1,4 +1,3 @@
-using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Tree;
@@ -19,8 +18,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		public override void VisitMacroNode(IT4Macro macroParam)
 		{
 			((IT4TreeNode) macroParam.Dollar).Accept(this);
-			((IT4TreeNode) macroParam.LeftParenthesis).Accept(this);
-			((IT4TreeNode) macroParam.RightParenthesis).Accept(this);
+			((IT4TreeNode) macroParam.LeftParenthesis)?.Accept(this);
+			((IT4TreeNode) macroParam.RightParenthesis)?.Accept(this);
 			var value = macroParam.RawAttributeValue;
 			if (value == null) return;
 			var range = value.GetDocumentRange();
@@ -29,10 +28,8 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 
 		public override void VisitEnvironmentVariableNode(IT4EnvironmentVariable environmentVariableParam)
 		{
-			foreach (var node in environmentVariableParam.StartPercentEnumerable.Cast<IT4Token>())
-			{
-				node.Accept(this);
-			}
+			(environmentVariableParam.StartPercent as IT4Token)?.Accept(this);
+			(environmentVariableParam.EndPercent as IT4Token)?.Accept(this);
 
 			var value = environmentVariableParam.RawAttributeValue;
 			if (value == null) return;
@@ -45,6 +42,9 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			if (!IsAttributeValue(node)) return;
 			AddHighlighting(T4HighlightingAttributeIds.ATTRIBUTE_VALUE, node);
 		}
+
+		public override void VisitCodeBlockNode(IT4CodeBlock codeBlockParam) =>
+			AddHighlighting(T4HighlightingAttributeIds.CODE_BLOCK, codeBlockParam);
 
 		private static bool IsAttributeValue([NotNull] ITreeNode node) =>
 			node.GetParentOfType<IT4AttributeValue>() != null;

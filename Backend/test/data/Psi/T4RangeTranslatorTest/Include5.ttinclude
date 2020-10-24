@@ -1,0 +1,7 @@
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#+
+	public void FuncFromInclude5()
+	{
+	}
+#>

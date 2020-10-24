@@ -1,0 +1,4 @@
+﻿<#
+        var DefaultNamespace = "DebugMode";
+        var root = string.Empty;
+#>

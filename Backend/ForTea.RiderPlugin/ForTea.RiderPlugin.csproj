@@ -9,38 +9,9 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
+    <ProjectReference Include="..\JetBrains.TextTemplating\JetBrains.TextTemplating.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="Features\Folding\T4CodeFoldingAttributes.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4CodeFoldingAttributes.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Features\Folding\T4CodeFoldingAttributes.cs">
-      <DependentUpon>T4CodeFoldingAttributes.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <Target Name="EnsureRiderSdkPresence" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Rider SDK not set up. Please, run gradlew :prepare on the frontend first.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="$(RiderSDKVersion)==''" Text="$(ErrorText)" />
-  </Target>
-
-  <Target Name="ReportRiderPluginProjectSdk" BeforeTargets="PrepareForBuild" AfterTargets="EnsureRiderSdkPresence">
-    <PropertyGroup>
-      <CoreProjectSdkMessage>
-        Will use JetBrains.Rider.SDK with version $(RiderSDKVersion) to compile $(MSBuildProjectName).
-      </CoreProjectSdkMessage>
-    </PropertyGroup>
-    <Message Importance="high" Text="$(CoreProjectSdkMessage)" />
-  </Target>
 </Project>

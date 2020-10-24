@@ -1,0 +1,14 @@
+<#@ template language="C#" #>
+using System;
+
+<#
+    int meaning = 42;
+#>
+
+namespace ProjectWithT4
+{
+    public static class MeaningProvider
+    {
+        public static int Meaning => <#= meaning #>;
+    }
+}

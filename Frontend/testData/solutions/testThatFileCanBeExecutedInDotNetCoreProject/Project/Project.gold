@@ -4,11 +4,14 @@
         <TargetFramework>netcoreapp2.2</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-      <None Update="Template.tt">
-        <LastGenOutput>Template.txt</LastGenOutput>
-      </None>
       <None Update="Template.txt">
+        <AutoGen>True</AutoGen>
+        <DesignTime>True</DesignTime>
         <DependentUpon>Template.tt</DependentUpon>
+      </None>
+      <None Update="Template.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>Template.txt</LastGenOutput>
       </None>
     </ItemGroup>
 </Project>

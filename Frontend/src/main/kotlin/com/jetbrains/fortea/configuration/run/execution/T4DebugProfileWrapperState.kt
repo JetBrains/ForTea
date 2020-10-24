@@ -6,7 +6,7 @@ import com.intellij.execution.runners.ProgramRunner
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rider.debugger.DebuggerWorkerProcessHandler
-import com.jetbrains.rider.model.T4ProtocolModel
+import com.jetbrains.fortea.model.T4ProtocolModel
 import com.jetbrains.rider.run.IDotNetDebugProfileState
 
 class T4DebugProfileWrapperState(

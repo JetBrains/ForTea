@@ -5,12 +5,11 @@ import com.intellij.lang.ParserDefinition
 import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
-import com.intellij.psi.TokenType;
-import com.intellij.psi.tree.IFileElementType
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.TokenSet
-import com.jetbrains.fortea.language.T4Language
 import com.jetbrains.fortea.lexer.T4Lexer
 import com.jetbrains.fortea.psi.T4ElementTypes
+import com.jetbrains.fortea.psi.T4FileElementTypes
 import com.jetbrains.fortea.psi.T4PsiFile
 
 class T4ParserDefinition : ParserDefinition {
@@ -23,11 +22,10 @@ class T4ParserDefinition : ParserDefinition {
   override fun getWhitespaceTokens(): TokenSet = WHITE_SPACES
   override fun getStringLiteralElements(): TokenSet = TokenSet.EMPTY
   override fun getCommentTokens(): TokenSet = TokenSet.EMPTY
-  override fun getFileNodeType() = FILE
+  override fun getFileNodeType() = T4FileElementTypes.FILE
 
 
   private companion object {
-    val FILE = IFileElementType(T4Language)
     val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
   }
 }

@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.VsIntegration.ProjectDocuments.Projects.Builder;
@@ -10,10 +11,13 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve
 	{
 		/// Can only be called from the UI thread
 		[CanBeNull]
-		public static IVsHierarchy TryGetVsHierarchy([NotNull] IProjectFile file) => file
-			.GetSolution()
-			.TryGetComponent<ProjectModelSynchronizer>()
-			?.TryGetHierarchyItemByProjectItem(file.GetProject().NotNull().ToProjectSearchDescriptor(), false)
-			?.Hierarchy;
+		public static IVsHierarchy TryGetVsHierarchy([NotNull] IProjectFile file)
+		{
+			var solution = file.GetSolution();
+			solution.Locks.AssertMainThread();
+			return solution.TryGetComponent<ProjectModelSynchronizer>()
+				?.TryGetHierarchyItemByProjectItem(file.GetProject().NotNull().ToProjectSearchDescriptor(), false)
+				?.Hierarchy;
+		}
 	}
 }

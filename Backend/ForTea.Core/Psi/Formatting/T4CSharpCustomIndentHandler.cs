@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		public string Indent(
 			[NotNull] ITreeNode node,
 			CustomIndentType indentType,
-			[NotNull] FmtSettings<CSharpFormatSettingsKey> settings
+			[NotNull] FmtSettingsClassic<CSharpFormatSettingsKey> settings
 		)
 		{
 			if (node == null) throw new ArgumentNullException(nameof(node));
@@ -47,7 +47,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 
 		[Pure]
 		[CanBeNull]
-		private string IndentFeatureBlockMember([NotNull] ITreeNode node, FmtSettings<CSharpFormatSettingsKey> settings)
+		private string IndentFeatureBlockMember([NotNull] ITreeNode node, FmtSettingsClassic<CSharpFormatSettingsKey> settings)
 		{
 			// In feature blocks, there are class features declared
 			if (!IsClassFeature(node)) return null;
@@ -65,7 +65,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 		private string IndentTransformTextMember(
 			[NotNull] ITreeNode node,
 			CustomIndentType indentType,
-			FmtSettings<CSharpFormatSettingsKey> settings
+			FmtSettingsClassic<CSharpFormatSettingsKey> settings
 		)
 		{
 			var rangeTranslator = GetRangeTranslator(node);
@@ -133,19 +133,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
 			.Select(rangeTranslator.GeneratedToOriginal)
 			.Where(originalRange => originalRange.IsValid())
 			.SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
-			.Any(IsInStatement);
-
-		private static bool IsInStatement([NotNull] ITreeNode node)
-		{
-			switch (node.GetParentOfType<IT4CodeBlock>())
-			{
-				case null:
-				case IT4ExpressionBlock _:
-					return false;
-				default:
-					return true;
-			}
-		}
+			.Any(it => it.GetParentOfType<IT4StatementBlock>() != null);
 
 		[Pure]
 		private static bool HasLineBreak([NotNull] IT4CodeBlock codeBlock, int nodeStart, TreeOffset blockStart) =>

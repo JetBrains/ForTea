@@ -7,8 +7,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	public sealed class T4FileDependencyData
 	{
 		[NotNull, ItemNotNull]
-		public IList<FileSystemPath> Paths { get; }
+		public IList<FileSystemPath> Includes { get; }
 
-		public T4FileDependencyData([NotNull, ItemNotNull] IList<FileSystemPath> includes) => Paths = includes;
+		public T4FileDependencyData([NotNull, ItemNotNull] IList<FileSystemPath> includes) => Includes = includes;
 	}
 }

@@ -1,0 +1,6 @@
+ReSharper textControls:
+TextControl #1:
+template.tt
+Model id: ProjectModelElementId != 0, FilePath - projectwithpreprocessedt4/template.tt
+Current caret: (0, 11)
+Current selection:  startPosition = (0, 11) endPosition = (0, 11)

@@ -1,0 +1,28 @@
+T4TokenType.DIRECTIVE_START             | <#@
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | include
+WHITE_SPACE                             |  
+T4TokenType.TOKEN                       | file
+T4TokenType.EQUAL                       | =
+T4TokenType.QUOTE                       | "
+T4TokenType.RAW_ATTRIBUTE_VALUE         | Template.tt
+T4TokenType.QUOTE                       | "
+WHITE_SPACE                             |  
+T4TokenType.BLOCK_END                   | #>
+T4TokenType.NEW_LINE                    | \n
+XML_DATA_CHARACTERS                     | using
+XML_WHITE_SPACE                         |  
+XML_DATA_CHARACTERS                     | int
+XML_WHITE_SPACE                         |  
+XML_DATA_CHARACTERS                     | as
+XML_WHITE_SPACE                         |  
+XML_DATA_CHARACTERS                     | double;
+T4TokenType.NEW_LINE                    | \n
+XML_START_TAG_START                     | <
+XML_TAG_NAME                            | html
+XML_TAG_END                             | >
+T4TokenType.NEW_LINE                    | \n
+XML_END_TAG_START                       | </
+XML_TAG_NAME                            | html
+XML_TAG_END                             | >
+T4TokenType.NEW_LINE                    | \n

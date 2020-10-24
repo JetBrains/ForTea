@@ -8,9 +8,9 @@ import com.jetbrains.fortea.configuration.execution.T4RunConfigurationExecutor
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationFactory
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
-import com.jetbrains.rider.model.T4ExecutionRequest
-import com.jetbrains.rider.model.T4FileLocation
-import com.jetbrains.rider.model.t4ProtocolModel
+import com.jetbrains.fortea.model.T4ExecutionRequest
+import com.jetbrains.fortea.model.T4FileLocation
+import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
 
@@ -35,7 +35,7 @@ abstract class T4RunConfigurationExecutorBase(
     val parameters = T4RunConfigurationParameters(
       request,
       protocolConfiguration.executablePath,
-      protocolConfiguration.outputPath,
+      "\"${protocolConfiguration.outputPath}\"",
       PathUtil.getParentPath(t4Path)
     )
     return T4RunConfiguration(virtualFile.name, project, parameters)

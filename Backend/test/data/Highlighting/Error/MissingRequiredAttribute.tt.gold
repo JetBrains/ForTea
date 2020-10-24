@@ -1,4 +1,4 @@
 ﻿<#@ |include|(0) once="true" #>
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: "Missing required attribute: file"
+(0): ReSharper Underlined Error Highlighting: Missing required attribute: file

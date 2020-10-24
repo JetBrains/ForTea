@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## 2020.2
+- Fixed a lot of assembly resolution issues
+- Improved plugin stability and performance
+
 ## 2019.3
 - Plugin forked by JetBrains
 - Greatly improved support for text includes

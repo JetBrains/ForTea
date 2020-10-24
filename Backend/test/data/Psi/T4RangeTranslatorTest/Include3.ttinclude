@@ -1,0 +1,5 @@
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+hello from include 3
+<#@ include file="Include4.ttinclude" #>
+<#@ include file="Include5.ttinclude" #>

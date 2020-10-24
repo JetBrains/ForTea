@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.Services.Impl
 {
@@ -22,7 +23,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.Services.Impl
 			Graph = graph;
 		}
 
-		public T4TemplateKind GetRootTemplateKind(IProjectFile file) =>
+		public T4TemplateKind GetRootTemplateKind(IPsiSourceFile file) =>
 			TemplateKindProvider.GetTemplateKind(Graph.FindBestRoot(file));
 	}
 }

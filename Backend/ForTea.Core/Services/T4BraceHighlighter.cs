@@ -46,13 +46,13 @@ namespace GammaJul.ForTea.Core.Services
 			TryConsumeHighlighting<IT4EnvironmentVariable>(
 				psiView,
 				consumer,
-				variable => variable.StartPercent.SingleItem,
-				variable => variable.EndPercent.SingleItem);
+				variable => variable.StartPercent,
+				variable => variable.EndPercent);
 			TryConsumeHighlighting<IT4DirectiveAttribute>(
 				psiView,
 				consumer,
-				attribute => attribute.OpeningQuote.SingleItem,
-				attribute => attribute.ClosingQuote.SingleItem);
+				attribute => attribute.OpeningQuote,
+				attribute => attribute.ClosingQuote);
 		}
 	}
 }

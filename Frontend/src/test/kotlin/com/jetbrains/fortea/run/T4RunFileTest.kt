@@ -2,16 +2,14 @@ package com.jetbrains.fortea.run
 
 import org.testng.annotations.Test
 
-// Important note:
-//   method names will at some point be parsed as program arguments,
-//   so they cannot contain spaces!
-
+// Note: due to Windows path length restriction
+// test method name cannot be longer than 60 symbols
 class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatFileCanBeExecuted() = doTest()
   @Test fun testThatHostSpecificTemplateCanBeExecuted() = doTest()
   @Test fun testThatHostCanSetResultExtension() {
     doTest(".cshtml")
-    assertNoOutputWithExtension(".html")
+    helper.assertNoOutputWithExtension(".html")
   }
 
   @Test fun testThatTtincludeFileCanBeIncluded() = doTest()
@@ -19,8 +17,9 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatVsMacrosAreResolved() = doTest()
   @Test fun testThatMsBuildPropertiesAreResolved() = doTest()
   @Test fun testThatAssemblyCanBeReferenced() = doTest()
-  @Test fun testThatTransitiveDependenciesAreCollected() = doTest()
-//  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
+  @Test fun testTransitiveReferencesInRuntime() = doTest()
+  @Test fun testTransitiveReferencesInCompilation() = testExecutionFailure(".cs")
+  @Test fun testThatFileCanBeExecutedInDotNetCoreProject() = doTest()
   @Test fun testThatTemplateCanProduceBigXml() = doTest()
   @Test fun testThatTemplateIsCaseInsensitive() = doTest()
 //  @Test fun testThatFileExtensionCanBeUpdatedCorrectly() {
@@ -43,14 +42,17 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testHowTextInFeatureIsHandled() = doTest()
 //  @Test fun testThatOutputOfUnbuiltProjectCanBeReferenced() = doTest()
   @Test fun testHostInHostSpecificTemplate() = doTest()
-  @Test fun testHostInNonHostSpecificTemplate() {
-    executeT4File()
-    saveSolution()
-    assertNoOutputWithExtension(".txt")
-    dumpCsproj()
-  }
-
+  @Test fun testHostInNonHostSpecificTemplate() = testExecutionFailure(".txt", true)
   @Test fun testInProjectTransitiveIncludeResolution() = doTest()
   @Test fun testOutOfProjectTransitiveIncludeResolution() = doTest()
   @Test fun testInProjectNonTrivialIncludeResolution() = doTest()
+  @Test fun `test execution with spaces in path`() = doTest(dumpCsproj = false)
+  @Test fun `test that Program_tt can be executed`() = doTest(dumpCsproj = false)
+  @Test fun `test that Program_tt can be executed 2`() = doTest(dumpCsproj = false)
+  @Test fun `test access to ValueTuple`() = doTest(dumpCsproj = false)
+  @Test fun `test access to ValueTuple in old framework`() = testExecutionFailure(".txt")
+  @Test fun `test that TextTransformation is like in VS`() = doTest(dumpCsproj = false)
+  @Test fun `test that host resolves an empty string`() = doTest(dumpCsproj = false)
+  @Test fun `test how host resolves null`() = testExecutionFailure(".txt")
+  @Test fun `test file with a macro twice`() = doTest(dumpCsproj = false)
 }

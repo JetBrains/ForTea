@@ -21,14 +21,6 @@
                 <Title>Redundant include</Title>
                 <Description/>
             </Tag>
-            <Tag name="UnresolvedInclude" default="WARNING">
-                <Title>Unresolved include</Title>
-                <Description/>
-            </Tag>
-            <Tag name="UnresolvedAssembly" default="WARNING">
-                <Title>Unresolved assembly</Title>
-                <Description/>
-            </Tag>
             <Tag name="UnexpectedDirective" default="WARNING">
                 <Title>The directive is unknown and will be ignored</Title>
                 <Description/>
@@ -66,16 +58,6 @@
         <Message value="Assembly already referenced"/>
         <Range>Assembly.GetHighlightingRange()</Range>
         <Behavour attributeID="HINT" overlapResolvePolicy="DEADCODE"/>
-    </Warning>
-    <Warning name="UnresolvedInclude" configurableSeverity="UnresolvedInclude">
-        <Parameter type="ITokenNode" name="node"/>
-        <Message value="Unresolved include path"/>
-        <Range>Node.GetHighlightingRange()</Range>
-    </Warning>
-    <Warning name="UnresolvedAssembly" configurableSeverity="UnresolvedAssembly">
-        <Parameter type="ITokenNode" name="node"/>
-        <Message value="Unresolved assembly"/>
-        <Range>Node.GetNavigationRange()</Range>
     </Warning>
     <Warning name="UnexpectedDirective" configurableSeverity="UnexpectedDirective">
         <Parameter type="ITokenNode" name="name"/>

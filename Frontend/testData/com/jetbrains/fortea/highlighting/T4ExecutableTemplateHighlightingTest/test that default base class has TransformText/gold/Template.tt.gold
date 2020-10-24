@@ -1,0 +1,6 @@
+<#@ template language="C#" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#
+    TextTransformation b = this;
+    b.TransformText();
+#>

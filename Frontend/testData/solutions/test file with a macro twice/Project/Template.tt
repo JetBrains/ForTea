@@ -1,0 +1,2 @@
+﻿<#@ include file="$(IncludeFolderTemplates)Model.ttinclude" #>
+<#@ include file="$(IncludeFolderTemplates)Author.ttinclude" #>

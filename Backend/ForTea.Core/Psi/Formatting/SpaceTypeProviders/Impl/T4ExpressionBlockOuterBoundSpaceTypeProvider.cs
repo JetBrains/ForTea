@@ -1,11 +1,13 @@
+using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
-using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.CSharp.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders.Impl
 {
+	[ProjectFileType(typeof(T4ProjectFileType))]
 	internal sealed class T4ExpressionBlockOuterBoundSpaceTypeProvider : T4BlockSpaceTypeProviderBase
 	{
 		protected override bool IsApplicable(CSharpFmtStageContext ctx) =>

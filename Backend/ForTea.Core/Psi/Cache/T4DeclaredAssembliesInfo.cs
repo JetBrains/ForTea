@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -10,13 +9,14 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	public sealed class T4DeclaredAssembliesInfo
 	{
 		[NotNull, ItemNotNull]
-		private readonly JetHashSet<IT4PathWithMacros> ReferencedAssemblies = new JetHashSet<IT4PathWithMacros>();
+		private readonly JetHashSet<T4ResolvedPath> ReferencedAssemblies = new JetHashSet<T4ResolvedPath>();
 
 		private void HandleAssemblyDirective([NotNull] IT4AssemblyDirective directive)
 		{
 			// i.e. non-empty
-			if (!(directive.Path is T4PathWithMacros path)) return;
-			ReferencedAssemblies.Add(path);
+			var existingPath = directive.ResolvedPath;
+			if (!existingPath.ResolvedPath.IsNotEmpty()) return;
+			ReferencedAssemblies.Add(existingPath);
 		}
 
 		/// <summary>Computes a difference between this data and another one.</summary>
@@ -31,13 +31,13 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			if (oldDeclaredAssembliesInfo == null)
 			{
 				if (ReferencedAssemblies.Count == 0) return null;
-				return new T4DeclaredAssembliesDiff(ReferencedAssemblies, EmptyList<IT4PathWithMacros>.InstanceList);
+				return new T4DeclaredAssembliesDiff(ReferencedAssemblies, EmptyList<T4ResolvedPath>.InstanceList);
 			}
 
 			oldDeclaredAssembliesInfo.ReferencedAssemblies.Compare(
 				ReferencedAssemblies,
-				out JetHashSet<IT4PathWithMacros> addedAssemblies,
-				out JetHashSet<IT4PathWithMacros> removedAssemblies
+				out JetHashSet<T4ResolvedPath> addedAssemblies,
+				out JetHashSet<T4ResolvedPath> removedAssemblies
 			);
 
 			if (addedAssemblies.Count == 0 && removedAssemblies.Count == 0) return null;

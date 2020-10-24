@@ -1,11 +1,11 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
   <name>ForTea</name>
   <id>org.jetbrains.fortea</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
-  <description>Support for Microsoft T4 template language</description>
+  <description>Support for T4 (Text Template Transformation Toolkit) template language</description>
 
   <version>0.01</version>
-  <idea-version since-build="191"/>
+  <idea-version since-build="201"/>
 
   <depends>com.intellij.modules.rider</depends>
 
@@ -19,6 +19,9 @@
     <lang.parserDefinition
         language="T4"
         implementationClass="com.jetbrains.fortea.parser.T4ParserDefinition"/>
+    <lang.fileViewProviderFactory
+        language="T4"
+        implementationClass="com.jetbrains.fortea.psi.T4FileViewProviderFactory"/>
     <lang.syntaxHighlighterFactory
         language="T4"
         implementationClass="com.jetbrains.fortea.highlighting.T4SyntaxHighlighterProvider"/>
@@ -65,6 +68,7 @@
         language="T4"
         implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperBulbMenuModelFactory"/>
     <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
+    <protocolComponentFactory implementation="com.jetbrains.fortea.inTests.T4TestHostFactory" />
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
     <projectService serviceImplementation="com.jetbrains.fortea.configuration.T4BuildToolWindowFactory"/>
 
@@ -104,6 +108,9 @@
     </component>
     <component>
       <implementation-class>com.jetbrains.fortea.configuration.T4PreprocessNotificationManager</implementation-class>
+    </component>
+    <component>
+      <implementation-class>com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost</implementation-class>
     </component>
   </project-components>
 </idea-plugin>

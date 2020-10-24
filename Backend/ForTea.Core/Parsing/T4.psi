@@ -144,7 +144,7 @@ errorhandling outputDirective:
     BLOCK_END<BLOCK_END, End>
 ;
 
-errorhandling assemblyDirective:
+errorhandling assemblyDirective options { stubBase="T4DirectiveWithPathBase"; }:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     ASSEMBLY<ASSEMBLY, Name>
     directiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
@@ -158,7 +158,7 @@ errorhandling importDirective:
     BLOCK_END<BLOCK_END, End>
 ;
 
-errorhandling includeDirective:
+errorhandling includeDirective options { stubBase="T4DirectiveWithPathBase"; }:
     DIRECTIVE_START<DIRECTIVE_START, Start>
     INCLUDE<INCLUDE, Name>
     directiveAttribute<DIRECTIVE_ATTRIBUTE, Attributes>*
@@ -182,9 +182,9 @@ errorhandling unknownDirective:
 directiveAttribute:
     attributeName<AttributeName, Name>
     EQUAL<EQUAL, Equal>
-    QUOTE<QUOTE, OpeningQuote>
+    QUOTE<OPENING_QUOTE, OpeningQuote>
     attributeValue<DIRECTIVE_ATTRIBUTE_VALUE, Value>
-    QUOTE<QUOTE, ClosingQuote>
+    QUOTE<CLOSING_QUOTE, ClosingQuote>
 ;
 
 attributeName:
@@ -222,7 +222,7 @@ errorhandling macro:
 ;
 
 errorhandling environmentVariable:
-    PERCENT<PERCENT, StartPercent>
+    PERCENT<START_PERCENT, StartPercent>
     RAW_ATTRIBUTE_VALUE<RAW_ATTRIBUTE_VALUE, RawAttributeValue>?
-    PERCENT<PERCENT, EndPercent>
+    PERCENT<END_PERCENT, EndPercent>
 ;

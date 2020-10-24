@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>Project_with_spaces_in_name</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Update="Template.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>Template.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+</Project>

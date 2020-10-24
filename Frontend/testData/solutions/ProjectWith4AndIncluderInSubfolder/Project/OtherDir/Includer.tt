@@ -1,0 +1,3 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ include file="$(ProjectDir)Folder\Template.tt" #>
+<#@ import namespace="System.Collections.Generic" #>

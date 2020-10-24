@@ -29,7 +29,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 			=> GetTargetTypeDeclaration(_highlighting.BaseClass) != null;
 
 		public override string Text
-			=> string.Format(CultureInfo.InvariantCulture, "Create method '{0}'", T4CSharpIntermediateConverterBase.TransformTextMethodName);
+			=> string.Format(CultureInfo.InvariantCulture, "Create method '{0}'", T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName);
 
 		[CanBeNull]
 		private static ITypeDeclaration GetTargetTypeDeclaration([NotNull] ITypeElement baseClass) {
@@ -58,7 +58,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 				IsAbstract = true,
 				IsStatic = false,
 				MethodSignatures = new[] { signature },
-				MethodName = T4CSharpIntermediateConverterBase.TransformTextMethodName,
+				MethodName = T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName,
 				SourceReferenceExpressionReference = null,
 				Target = target,
 			};

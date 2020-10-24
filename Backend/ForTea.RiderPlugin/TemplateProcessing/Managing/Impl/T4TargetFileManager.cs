@@ -46,7 +46,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 
 		public FileSystemPath GetTemporaryExecutableLocation(IT4File file)
 		{
-			var projectFile = file.GetSourceFile().ToProjectFile();
+			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile();
 			var project = projectFile?.GetProject();
 			if (project == null) return FileSystemPath.Empty;
 			var relativePath = projectFile.Location.MakeRelativeTo(project.Location.Parent);
@@ -63,9 +63,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private string GetExpectedTargetFileName([NotNull] IT4File file)
 		{
 			Locks.AssertReadAccessAllowed();
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			string name = sourceFile.Name;
-			string targetExtension = file.GetTargetExtension();
+			string targetExtension = file.GetTargetExtension() ?? T4CSharpCodeGenerationUtils.DefaultTargetExtension;
 			return name.WithOtherExtension(targetExtension);
 		}
 
@@ -76,7 +76,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[CanBeNull]
 		private FileSystemPath TryFindTemporaryTargetFile([NotNull] IT4File file)
 		{
-			string name = file.GetSourceFile().NotNull().Name.WithOtherExtension(".*");
+			string name = file.PhysicalPsiSourceFile.NotNull().Name.WithOtherExtension(".*");
 			var candidates = GetTemporaryTargetFileFolder(file).GetChildFiles(name);
 			return candidates.FirstOrDefault();
 		}
@@ -85,7 +85,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private string GetPreprocessingTargetFileName([NotNull] IT4File file)
 		{
 			Locks.AssertReadAccessAllowed();
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			string name = sourceFile.Name;
 			return name.WithOtherExtension("cs");
 		}
@@ -118,7 +118,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		)
 		{
 			Locks.AssertWriteAccessAllowed();
-			var projectFile = file.GetSourceFile().ToProjectFile().NotNull();
+			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile().NotNull();
 			var folder = projectFile.ParentFolder.NotNull();
 			var targetLocation = folder.Location.Combine(destinationName);
 			var parameters = T4MSBuildProjectUtil.CreateTemplateMetadata(projectFile);
@@ -129,7 +129,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IProjectFile GetSameDestinationFile([NotNull] IT4File file, [NotNull] string temporaryName)
 		{
 			Locks.AssertWriteAccessAllowed();
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			var candidates = sourceFile
 				.ToProjectFile()
 				?.ParentFolder
@@ -146,7 +146,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private FileSystemPath GetDestinationLocation([NotNull] IT4File file, [NotNull] string temporaryName)
 		{
 			Locks.AssertReadAccessAllowed();
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			return sourceFile.ToProjectFile().NotNull().Location.Parent.Combine(temporaryName);
 		}
 
@@ -159,7 +159,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var destinationLocation = GetDestinationLocation(file, temporary.Name);
 			destinationLocation.DeleteFile();
 			File.Move(temporary.FullPath, destinationLocation.FullPath);
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			IProjectFile destination = null;
 			Solution.InvokeUnderTransaction(cookie =>
@@ -183,7 +183,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			[NotNull] FileSystemPath destinationLocation
 		)
 		{
-			var projectFile = file.GetSourceFile()?.ToProjectFile();
+			var projectFile = file.PhysicalPsiSourceFile?.ToProjectFile();
 			if (projectFile == null) return;
 			foreach (var suspect in TemplateMetadataManager
 				.FindLastGenOutput(projectFile)
@@ -210,7 +210,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		public void SavePreprocessResults(IT4File file, string text)
 		{
 			Locks.AssertReadAccessAllowed();
-			var sourceFile = file.GetSourceFile().NotNull();
+			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			Locks.AssertWriteAccessAllowed();
 			FileSystemPath destinationLocation = null;

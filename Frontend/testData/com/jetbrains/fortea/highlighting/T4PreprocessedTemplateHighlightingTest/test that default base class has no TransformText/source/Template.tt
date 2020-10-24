@@ -1,0 +1,5 @@
+<#@ template language="C#" #>
+<#
+    TemplateBase b = this;
+    b.TransformText();
+#>

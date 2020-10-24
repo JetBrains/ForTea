@@ -8,11 +8,12 @@ using JetBrains.ReSharper.Psi.CSharp;
 namespace GammaJul.ForTea.Core
 {
 	[ZoneMarker]
-	public class ZoneMarker : IPsiLanguageZone,
+	public class ZoneMarker : IZone,
 		IRequire<ILanguageCSharpZone>,
 		IRequire<ICodeEditingZone>,
 		IRequire<DaemonZone>,
-		IRequire<NavigationZone>
+		IRequire<NavigationZone>,
+		IRequire<IPsiLanguageZone>
 	{
 	}
 }

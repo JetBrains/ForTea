@@ -48,8 +48,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 			CultureAttribute = new CultureDirectiveAttributeInfo("culture", DirectiveAttributeOptions.None);
 			CompilerOptionsAttribute = new DirectiveAttributeInfo("compilerOptions", DirectiveAttributeOptions.None);
 			LinePragmasAttribute = new BooleanDirectiveAttributeInfo("linePragmas", DirectiveAttributeOptions.None);
-			VisibilityAttribute =
-				new EnumDirectiveAttributeInfo("visibility", DirectiveAttributeOptions.None, "public", "internal");
+			VisibilityAttribute = new T4VisibilityDirectiveAttributeInfo(DirectiveAttributeOptions.None);
 
 
 			SupportedAttributes = new List<DirectiveAttributeInfo>(8)

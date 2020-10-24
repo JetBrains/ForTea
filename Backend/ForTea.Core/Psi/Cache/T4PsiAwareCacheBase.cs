@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
@@ -13,12 +14,17 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	/// <typeparam name="TResponse">The result of handling the request on the main thread</typeparam>
 	public abstract class T4PsiAwareCacheBase<TRequest, TResponse> : SimpleICache<TResponse> where TRequest : class
 	{
+		[NotNull]
+		public override string Version => "24";
+
 		protected T4PsiAwareCacheBase(
 			Lifetime lifetime,
-			IPersistentIndexManager persistentIndexManager,
-			IUnsafeMarshaller<TResponse> valueMarshaller
+			[NotNull] IShellLocks locks,
+			[NotNull] IPersistentIndexManager persistentIndexManager,
+			[NotNull] IUnsafeMarshaller<TResponse> valueMarshaller
 		) : base(
 			lifetime,
+			locks,
 			persistentIndexManager,
 			valueMarshaller
 		)
@@ -36,7 +42,6 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			return sf.LanguageType is T4ProjectFileType;
 		}
 
-		[NotNull]
 		public sealed override object Build(IPsiSourceFile sourceFile, bool isStartup)
 		{
 			// It is safe to access the PSI here.
@@ -47,7 +52,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 			return Build(t4File.NotNull());
 		}
 
-		[NotNull]
+		[CanBeNull]
 		protected abstract TRequest Build([NotNull] IT4File file);
 	}
 }

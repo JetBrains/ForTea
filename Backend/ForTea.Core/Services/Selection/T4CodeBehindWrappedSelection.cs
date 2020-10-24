@@ -2,6 +2,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.SelectEmbracingConstruct;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Services.Selection {
@@ -31,6 +32,7 @@ namespace GammaJul.ForTea.Core.Services.Selection {
 			_codeBehindRange = codeBehindRange;
 		}
 
+		public ITreeRange TryGetTreeRange() => null;
 	}
 
 }

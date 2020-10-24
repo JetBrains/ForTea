@@ -90,7 +90,7 @@ namespace JetBrains.ForTea.RiderPlugin.Features.Folding
 			[NotNull] string replacement
 		)
 		{
-			if (!node.IsVisibleInDocument()) return;
+			if (!node.IsValid() || !node.IsVisibleInDocument()) return;
 			context.AddDefaultPriorityFolding(id, node.GetDocumentRange(), replacement);
 		}
 	}

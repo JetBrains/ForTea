@@ -27,11 +27,12 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		[NotNull]
 		public static string GetEncoding([NotNull] IT4File file)
 		{
-			var sourceFile = file.GetSourceFile();
+			file.AssertContainsNoIncludeContext();
+			var sourceFile = file.PhysicalPsiSourceFile;
 			if (sourceFile == null) return Encoding.UTF8.CodePage.ToString();
 			return sourceFile.Document.Encoding.CodePage.ToString();
 		}
-		
+
 		public static bool IsCodePage([NotNull] string rawEncoding)
 		{
 			if (!int.TryParse(rawEncoding, out int codePage)) return false;

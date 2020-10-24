@@ -1,0 +1,2 @@
+<#@ template language="C#" #>
+<#@ include file="$(<ERROR_UNRESOLVED>SolutionDi</ERROR_UNRESOLVED>" #>

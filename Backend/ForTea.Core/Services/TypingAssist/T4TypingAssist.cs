@@ -11,9 +11,11 @@ using JetBrains.Application.UI.ActionSystem.Text;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
+using JetBrains.ReSharper.Feature.Services.StructuralRemove;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CachingLexers;
+using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.TextControl;
 
@@ -81,46 +83,36 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			return true;
 		}
 
-		/// <summary>When a " is typed, insert another ".</summary>
-		private bool OnQuoteTyped(ITypingContext context) {
-			ITextControl textControl = context.TextControl;
-
-			// get the token type after "
-			CachingLexer cachingLexer = GetCachingLexer(textControl);
+		private bool OnQuoteTyped([NotNull] ITypingContext context) {
+			var textControl = context.TextControl;
+			var cachingLexer = GetCachingLexer(textControl);
 			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
-			if (cachingLexer == null || offset <= 0 || !cachingLexer.FindTokenAt(offset))
-				return false;
+			if (cachingLexer == null || offset <= 0 || !cachingLexer.FindTokenAt(offset)) return false;
+			var tokenType = cachingLexer.TokenType;
 
-			// there is already another quote after the ", swallow the typing
-			TokenNodeType tokenType = cachingLexer.TokenType;
-			if (tokenType == T4TokenNodeTypes.QUOTE) {
+			// C# is handled by T4CSharpTypingAssist. Text tokens are handled by the platform
+			if (tokenType is ICSharpTokenNodeType || tokenType == T4TokenNodeTypes.RAW_TEXT) return false;
+
+			// The second quote has already been inserted. Over-type it
+			if (tokenType == T4TokenNodeTypes.QUOTE)
+			{
 				textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
 				return true;
 			}
 
-			// we're inside or after an attribute value, simply do nothing and let the " be typed
-			if (tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE)
-				return false;
-
-			// insert the first "
+			// insert the first quote
 			textControl.Selection.Delete();
 			textControl.FillVirtualSpaceUntilCaret();
 			textControl.Document.InsertText(offset, "\"");
 
-			// insert the second "
-			context.QueueCommand(() => {
-				using (CommandProcessor.UsingCommand("Inserting \"")) {
-					textControl.Document.InsertText(offset + 1, "\"");
-					textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
-				}
+			// insert the second quote
+			using (CommandProcessor.UsingCommand("Smart quote in T4"))
+			{
+				textControl.Document.InsertText(offset + 1, "\"");
+				textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+			}
 
-				// ignore if a subsequent " is typed by the user
-				SkippingTypingAssist.SetCharsToSkip(textControl.Document, "\"");
-
-				// popup auto completion
-				_codeCompletionSessionManager.ExecuteAutoCompletion<T4AutopopupSettingsKey>(textControl, Solution, key => key.InDirectives);
-			});
-
+			_codeCompletionSessionManager.ExecuteAutoCompletion<T4AutopopupSettingsKey>(textControl, Solution, key => key.InDirectives);
 			return true;
 		}
 
@@ -334,6 +326,25 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			return true;
 		}
 
+		private bool OnClosingParenthesisTyped([NotNull] ITypingContext context)
+		{
+			var textControl = context.TextControl;
+			if (!IsInAttributeValue(textControl)) return false;
+
+			// Get the token type after caret
+			var lexer = GetCachingLexer(textControl);
+			int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
+			if (lexer == null || offset <= 0 || !lexer.FindTokenAt(offset)) return false;
+			var tokenType = lexer.TokenType;
+
+			// If it's not a parenthesis, we don't care, so let the IDE handle it
+			if (tokenType != T4TokenNodeTypes.RIGHT_PARENTHESIS) return false;
+
+			// If it is, over-type it
+			textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
+			return true;
+		}
+
 		public T4TypingAssist(
 			Lifetime lifetime,
 			[NotNull] ISolution solution,
@@ -344,10 +355,20 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			[NotNull] IExternalIntellisenseHost externalIntellisenseHost,
 			[NotNull] SkippingTypingAssist skippingTypingAssist,
 			[NotNull] ITypingAssistManager typingAssistManager,
-			[NotNull] ICodeCompletionSessionManager codeCompletionSessionManager
-		)
-			: base(solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost, skippingTypingAssist) {
-			
+			[NotNull] ICodeCompletionSessionManager codeCompletionSessionManager,
+			[NotNull] LastTypingAction lastTypingAction,
+			[NotNull] StructuralRemoveManager structuralRemoveManager
+		) : base(
+			solution,
+			settingsStore,
+			cachingLexerService,
+			commandProcessor,
+			psiServices,
+			externalIntellisenseHost,
+			skippingTypingAssist,
+			lastTypingAction,
+			structuralRemoveManager
+		) {
 			_codeCompletionSessionManager = codeCompletionSessionManager;
 
 			typingAssistManager.AddTypingHandler(lifetime, '=', this, OnEqualTyped, IsTypingSmartParenthesisHandlerAvailable);
@@ -356,6 +377,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			typingAssistManager.AddTypingHandler(lifetime, '$', this, OnDollarTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddTypingHandler(lifetime, '%', this, OnPercentTyped, IsTypingSmartParenthesisHandlerAvailable);
 			typingAssistManager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, OnEnterPressed, IsActionHandlerAvailable);
+			typingAssistManager.AddTypingHandler(lifetime, ')', this, OnClosingParenthesisTyped, IsTypingSmartParenthesisHandlerAvailable);
 		}
 	}
 

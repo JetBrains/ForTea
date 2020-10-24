@@ -1,0 +1,5 @@
+<#@ template language="C#" #>
+<#@ include file="Template.tt" #>
+using int as double;
+Hello();
+<#= name + 2.ToString() #>

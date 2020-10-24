@@ -1,0 +1,7 @@
+<#@ template language="C#" #>
+<#@ output extension=".txt" #>
+<#
+    var x = (1, 2);
+#>
+Type: <#= x.GetType() #>
+Assembly: <#= x.GetType().Assembly #>

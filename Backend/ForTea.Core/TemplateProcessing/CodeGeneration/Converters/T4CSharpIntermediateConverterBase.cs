@@ -1,8 +1,14 @@
+using System;
 using System.Collections.Generic;
+using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -11,13 +17,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	{
 		[NotNull] public const string GeneratedClassNameString = "GeneratedTextTransformation";
 		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
-		[NotNull] internal const string TransformTextMethodName = "TransformText";
-
-		[NotNull] private const string ToStringInstanceHelperResource =
-			"GammaJul.ForTea.Core.Resources.ToStringInstanceHelper.cs";
-
-		[NotNull]
-		protected T4CSharpCodeGenerationIntermediateResult IntermediateResult { get; }
+		[NotNull] internal const string DefaultTransformTextMethodName = "TransformText";
+		[NotNull] protected const string OverrideKeyword = "override";
+		[NotNull] protected const string VirtualKeyword = "virtual";
 
 		[NotNull]
 		protected T4CSharpCodeGenerationResult Result { get; }
@@ -26,62 +28,64 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected IT4File File { get; }
 
 		protected T4CSharpIntermediateConverterBase(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
+			[NotNull] IT4File file,
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider
 		)
 		{
-			IntermediateResult = intermediateResult;
 			File = file;
+			ClassNameProvider = classNameProvider;
 			Result = new T4CSharpCodeGenerationResult(File);
 		}
 
 		[NotNull]
-		public T4CSharpCodeGenerationResult Convert()
+		public virtual T4CSharpCodeGenerationResult Convert(
+			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
+		)
 		{
-			AppendGeneratedMessage();
-			string ns = GetNamespace();
-			AppendNamespacePrefix();
+			string ns = File
+				.LogicalPsiSourceFile
+				.ToProjectFile()
+				.NotNull()
+				.CalculateExpectedNamespace(T4Language.Instance);
 			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
 			{
 				Result.AppendLine($"namespace {ns}");
 				Result.AppendLine("{");
 				PushIndent();
-				AppendNamespaceContents();
+				AppendNamespaceContents(intermediateResult);
 				PopIndent();
 				Result.AppendLine("}");
 			}
 			else
 			{
-				AppendNamespaceContents();
+				AppendNamespaceContents(intermediateResult);
 			}
 
 			return Result;
 		}
 
-		protected virtual void AppendNamespacePrefix()
+		private void AppendNamespaceContents([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
+			AppendImports(intermediateResult);
+			AppendClasses(intermediateResult);
 		}
 
-		private void AppendNamespaceContents()
+		protected virtual void AppendClasses([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			AppendImports();
-			AppendClasses();
-		}
-
-		protected virtual void AppendClasses()
-		{
-			AppendClass();
+			AppendClass(intermediateResult);
 			AppendIndent();
 			Result.AppendLine();
-			AppendBaseClass();
+			AppendBaseClass(intermediateResult);
 		}
 
-		[CanBeNull]
-		protected string GetNamespace() => File.GetSourceFile()?.Properties.GetDefaultNamespace();
-
-		private void AppendImports()
+		private void AppendImports([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
+			foreach (var description in intermediateResult.ImportDescriptions)
+			{
+				description.AppendContent(Result, this);
+			}
+
 			if (ShouldAppendPragmaDirectives)
 			{
 				AppendIndent();
@@ -90,46 +94,67 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 
 			AppendIndent();
 			Result.AppendLine("using System;");
-			if (IntermediateResult.HasHost)
-			{
-				AppendIndent();
-				Result.AppendLine("using System.CodeDom.Compiler;");
-			}
 
 			if (ShouldAppendPragmaDirectives)
 			{
 				AppendIndent();
 				Result.AppendLine("#pragma warning restore 8019");
 			}
+		}
 
-			foreach (var description in IntermediateResult.ImportDescriptions)
+		protected virtual void AppendClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+		{
+			AppendIndent();
+			Result.Append(intermediateResult.AccessRightsText);
+			Result.Append($" partial class {ClassNameProvider.GeneratedClassName} : ");
+			AppendBaseClassName(intermediateResult);
+			Result.AppendLine();
+			using (new CodeBlockCookie(this))
+			{
+				AppendConstructor(intermediateResult);
+				AppendTransformMethod(intermediateResult);
+				
+				AppendFeatures(intermediateResult);
+				if (!intermediateResult.ParameterDescriptions.IsEmpty())
+				{
+					AppendIndent();
+					Result.AppendLine();
+					AppendIndent();
+					Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
+					Result.AppendLine();
+				}
+
+				using (new UnindentCookie(this))
+				{
+					AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
+					AppendTemplateInitialization(intermediateResult.ParameterDescriptions, intermediateResult.HasHost);
+				}
+
+				if (!intermediateResult.ParameterDescriptions.IsEmpty())
+				{
+					Result.AppendLine();
+					Result.AppendLine();
+					AppendIndent();
+					Result.AppendLine();
+					AppendIndent();
+					Result.AppendLine("#line default");
+					AppendIndent();
+					Result.AppendLine("#line hidden");
+				}
+			}
+		}
+
+		private void AppendFeatures([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+		{
+			if (intermediateResult.HasHost) AppendHost();
+			foreach (var description in intermediateResult.FeatureDescriptions)
 			{
 				description.AppendContent(Result, this);
 			}
 		}
 
-		protected virtual void AppendClass()
+		protected virtual void AppendConstructor([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			AppendSyntheticAttribute();
-			AppendIndent();
-			Result.Append($"public partial class {GeneratedClassName} : ");
-			AppendBaseClassName();
-			Result.AppendLine();
-			AppendIndent();
-			Result.AppendLine("{");
-			PushIndent();
-			if (IntermediateResult.HasHost) AppendHost();
-			AppendTransformMethod();
-			foreach (var description in IntermediateResult.FeatureDescriptions)
-			{
-				description.AppendContent(Result, this);
-			}
-
-			AppendParameterDeclarations(IntermediateResult.ParameterDescriptions);
-			AppendTemplateInitialization(IntermediateResult.ParameterDescriptions);
-			PopIndent();
-			AppendIndent();
-			Result.AppendLine("}");
 		}
 
 		private void AppendParameterDeclarations(
@@ -143,93 +168,108 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			}
 		}
 
-		private void AppendFieldDeclaration([NotNull] T4ParameterDescription description)
+		protected virtual void AppendFieldDeclaration([NotNull] T4ParameterDescription description)
 		{
-			AppendSyntheticAttribute();
 			AppendIndent();
-			Result.Append("private global::");
-			Result.Append(description.TypeString);
+			Result.Append("private ");
+			description.AppendType(Result);
 			Result.Append(" ");
 			Result.Append(description.FieldNameString);
 			Result.AppendLine(";");
+			Result.AppendLine();
 		}
 
-		private void AppendTemplateInitialization(
-			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions
+		protected virtual void AppendTemplateInitialization(
+			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
 		)
 		{
+			using var unindent = new UnindentCookie(this);
 			if (descriptions.IsEmpty()) return;
-			AppendSyntheticAttribute();
-			AppendIndent();
-			Result.AppendLine("public void Initialize()");
-			AppendIndent();
+			Result.AppendLine(@"
+/// <summary>
+/// Initialize the template
+/// </summary>
+public virtual void Initialize()");
 			Result.AppendLine("{");
 			PushIndent();
-			AppendParameterInitialization(descriptions);
+			AppendParameterInitialization(descriptions, hasHost);
 			PopIndent();
 			AppendIndent();
 			Result.AppendLine("}");
 		}
 
-		protected virtual void AppendTransformMethod()
+		protected virtual void AppendTransformMethod(
+			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
+		)
 		{
-			AppendSyntheticAttribute();
+			if (!TransformTextAttributes.IsNullOrEmpty())
+			{
+				AppendIndent();
+				Result.AppendLine(TransformTextAttributes);
+			}
 			AppendIndent();
 			Result.Append("public ");
-			Result.Append(IntermediateResult.HasBaseClass ? "override" : "virtual");
+			Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
 			Result.AppendLine($" string {TransformTextMethodName}()");
-			AppendIndent();
-			Result.AppendLine("{");
-			PushIndent();
-			AppendIndent();
-			Result.AppendLine();
-			foreach (var description in IntermediateResult.TransformationDescriptions)
+			using (new CodeBlockCookie(this))
 			{
-				description.AppendContent(Result, this);
+				foreach (var description in intermediateResult.TransformationDescriptions)
+				{
+					description.AppendContent(Result, this);
+				}
+
+				AppendIndent();
+				Result.AppendLine("return this.GenerationEnvironment.ToString();");
 			}
-
-			AppendIndent();
-			Result.AppendLine("return this.GenerationEnvironment.ToString();");
-			PopIndent();
-			AppendIndent();
-			Result.AppendLine("}");
 		}
 
-		private void AppendBaseClassName()
+		private void AppendBaseClassName([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			if (IntermediateResult.HasBaseClass) Result.Append(IntermediateResult.CollectedBaseClass);
-			else Result.Append(GeneratedBaseClassName);
+			if (intermediateResult.HasBaseClass) Result.Append(intermediateResult.CollectedBaseClass);
+			else Result.Append(ClassNameProvider.GeneratedBaseClassFQN);
 		}
 
-		protected void AppendBaseClass()
+		protected virtual void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			string resource = !IntermediateResult.HasBaseClass ? BaseClassResourceName : ToStringInstanceHelperResource;
+			if (intermediateResult.HasBaseClass) return;
+			Result.AppendLine(BaseClassDescription);
+			AppendIndent();
+			Result.Append(intermediateResult.AccessRightsText);
+			Result.Append(" class ");
+			Result.AppendLine(ClassNameProvider.GeneratedBaseClassName);
+			string resource = BaseClassResourceName;
 			var provider = new T4TemplateResourceProvider(resource);
-			Result.Append(provider.ProcessResource(GeneratedBaseClassName));
+			Result.Append(provider.Template);
 		}
+
+		[NotNull]
+		protected virtual string TransformTextMethodName => DefaultTransformTextMethodName;
+
+		[NotNull]
+		protected virtual string TransformTextAttributes => "";
 
 		protected abstract void AppendHost();
 		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
 
 		[NotNull]
+		protected abstract string BaseClassDescription { get; }
+
+		[NotNull]
 		protected abstract string BaseClassResourceName { get; }
 
 		[NotNull]
-		protected virtual string GeneratedClassName => GeneratedClassNameString;
-
-		[NotNull]
-		protected virtual string GeneratedBaseClassName => GeneratedBaseClassNameString;
-
-		protected abstract void AppendSyntheticAttribute();
+		protected IT4GeneratedClassNameProvider ClassNameProvider { get; }
 
 		protected abstract void AppendParameterInitialization(
-			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions);
-
-		protected virtual void AppendGeneratedMessage()
-		{
-		}
+			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
+		);
 
 		protected virtual bool ShouldAppendPragmaDirectives => false;
+
+		[NotNull]
+		protected virtual string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass) => OverrideKeyword;
 
 		#region Indentation
 		protected int CurrentIndent { get; private set; }
@@ -237,6 +277,48 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		protected void PopIndent() => CurrentIndent -= 1;
 		protected void AppendIndent() => AppendIndent(CurrentIndent);
 		protected abstract void AppendIndent(int size);
+
+		protected sealed class CodeBlockCookie : IDisposable
+		{
+			[NotNull]
+			private T4CSharpIntermediateConverterBase Converter { get; }
+
+			public CodeBlockCookie([NotNull] T4CSharpIntermediateConverterBase converter)
+			{
+				Converter = converter;
+				Converter.AppendIndent();
+				Converter.Result.AppendLine("{");
+				Converter.PushIndent();
+			}
+
+			public void Dispose()
+			{
+				Converter.PopIndent();
+				Converter.AppendIndent();
+				Converter.Result.AppendLine("}");
+			}
+		}
+
+		protected sealed class UnindentCookie : IDisposable
+		{
+			[NotNull]
+			private T4CSharpIntermediateConverterBase Converter { get; }
+
+			private int SavedIndent { get; }
+
+			public UnindentCookie([NotNull] T4CSharpIntermediateConverterBase converter)
+			{
+				Converter = converter;
+				SavedIndent = Converter.CurrentIndent;
+				Converter.CurrentIndent = 0;
+			}
+
+			public void Dispose()
+			{
+				Converter.CurrentIndent = SavedIndent;
+			}
+		}
+
 		#endregion Indentation
 
 		#region IT4ElementAppendFormatProvider

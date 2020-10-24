@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.Psi.Resolve.Macros;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
@@ -12,7 +12,10 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 		FileSystemPath Resolve([NotNull] IT4AssemblyDirective directive);
 
 		[CanBeNull]
-		FileSystemPath Resolve(IT4PathWithMacros path);
+		FileSystemPath Resolve([NotNull] T4ResolvedPath path);
+
+		[CanBeNull]
+		FileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path);
 
 		/// <note>
 		/// assemblyName is assumed to NOT contain macros

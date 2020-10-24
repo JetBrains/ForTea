@@ -13,9 +13,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 			[NotNull] IProjectFile file
 		);
 
-		[NotNull]
-		IReadOnlyDictionary<string, string> ResolveAllLightMacros([NotNull] IProjectFile file);
-
 		bool IsSupported([NotNull] IT4Macro macro);
 	}
 }

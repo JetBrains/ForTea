@@ -1,0 +1,3 @@
+<#+
+	public static int Foo() => <ERROR_UNRESOLVED>Bas</ERROR_UNRESOLVED>();
+#>

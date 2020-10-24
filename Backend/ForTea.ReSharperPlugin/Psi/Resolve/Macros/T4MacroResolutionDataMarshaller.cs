@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using GammaJul.ForTea.Core.Utils.PersistentMap;
 using JetBrains.Annotations;
+using JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Utils;
 using JetBrains.Serialization;
 using JetBrains.Util.PersistentMap;
 

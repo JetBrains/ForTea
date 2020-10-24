@@ -6,7 +6,7 @@ import com.intellij.execution.Executor
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ProgramRunner
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
-import com.jetbrains.rider.model.T4ProtocolModel
+import com.jetbrains.fortea.model.T4ProtocolModel
 
 class T4RunProfileWrapperState(
   private val wrappee: RunProfileState,

@@ -1,0 +1,33 @@
+﻿<#@ assembly name="System.Core" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#+
+    public class Configuration
+    {
+        public void GenerateModel(TextTransformation t, ITextTemplatingEngineHost host, StringBuilder generationEnvironment)
+        {
+            using (var writer = new CustomWriter())
+               t.WriteLine(writer.TransformText());
+        }
+    }
+
+    public class CustomWriter : TextTransformation
+    {
+
+            public override string TransformText()
+        {
+        #>
+
+  Test some inline stuff
+<#+
+           Write("And also use the Write method");
+
+
+
+                  return GenerationEnvironment.ToString();
+
+        }
+
+    }
+
+
+#>

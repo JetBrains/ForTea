@@ -1,0 +1,4 @@
+<#@ include file="Template.tt" #>
+using int as double;
+<html>
+</html>

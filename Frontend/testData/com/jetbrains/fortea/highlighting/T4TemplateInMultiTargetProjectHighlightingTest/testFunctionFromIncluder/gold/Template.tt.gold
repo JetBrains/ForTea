@@ -1,0 +1,2 @@
+<# FunctionFromIncluder(); #>
+<# <ERROR_UNRESOLVED>UnknownFunction</ERROR_UNRESOLVED>(); #>

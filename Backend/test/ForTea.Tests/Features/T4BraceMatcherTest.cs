@@ -14,6 +14,9 @@ namespace JetBrains.ForTea.Tests.Features
 
 		[TestCase("T4BlockEndMatching")]
 		[TestCase("CSharpBraceMatching")]
+		[TestCase("Macro")]
+		[TestCase("EnvironmentVariable")]
+		[TestCase("DirectiveAttribute")]
 		public void TestBraceMatcher([NotNull] string name) => DoOneTest(name);
 	}
 }

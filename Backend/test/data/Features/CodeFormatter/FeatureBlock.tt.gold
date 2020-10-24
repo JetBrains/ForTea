@@ -1,5 +1,5 @@
 ﻿<#+
-  public static int Whatever(int arg)
+  public static void Whatever(int arg)
   {
   }
 #>

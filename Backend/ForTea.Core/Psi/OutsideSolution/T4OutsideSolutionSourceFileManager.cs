@@ -18,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 {
 	/// <summary>A component that manages <see cref="IDocument"/>s for files outside the solution.</summary>
 	[SolutionComponent]
-	internal sealed class T4OutsideSolutionSourceFileManager : IPsiModuleFactory, IDisposable
+	public sealed class T4OutsideSolutionSourceFileManager : IPsiModuleFactory, IDisposable
 	{
 		// This might cause some memory leaks on IPsiSourceFile.
 		// Can be replaced with reference counting if that issue turns out to be important

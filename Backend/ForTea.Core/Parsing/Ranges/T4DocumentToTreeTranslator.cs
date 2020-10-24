@@ -40,25 +40,25 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
 			if (!Includes.Any())
 				return new TreeTextRange(rootStartOffset + documentStartOffset, rootStartOffset + documentEndOffset);
 
-			var treeStartOffset = Translate(documentStartOffset);
+			var treeStartOffset = Translate(rootStartOffset + documentStartOffset);
 			if (!treeStartOffset.IsValid()) return TreeTextRange.InvalidRange;
 			return TreeTextRange.FromLength(treeStartOffset, documentRange.Length);
 		}
 
-		private TreeOffset Translate(int documentOffset)
+		private TreeOffset Translate(TreeOffset offsetInCurrentDocument)
 		{
 			int offset = 0;
 			foreach (var include in Includes)
 			{
 				var includeRange = include.GetTreeTextRange();
-				var finalOffset = new TreeOffset(documentOffset + offset);
+				var finalOffset = offsetInCurrentDocument + offset;
 				// The matching file offset starts before the current include, we got it
 				if (finalOffset < includeRange.StartOffset) return finalOffset;
 				offset += includeRange.Length;
 			}
 
 			// The offset is in the file, after the last include
-			return new TreeOffset(documentOffset + offset);
+			return offsetInCurrentDocument + offset;
 		}
 	}
 }

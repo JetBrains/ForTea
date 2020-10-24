@@ -19,19 +19,22 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 
 		[NotNull]
 		// Suspect for syntax error
-		private ITreeNode FirstElement { get; }
+		private IT4TreeNode FirstElement { get; }
+
+		[NotNull]
+		public override IT4TreeNode FirstNode => FirstElement;
 
 		public T4InfoCollectorStateSeenFeatureAndText(
 			[NotNull] StringBuilder builder,
 			[NotNull] IT4CodeGenerationInterrupter interrupter,
-			[NotNull] ITreeNode firstElement
+			[NotNull] IT4TreeNode firstElement
 		) : base(interrupter)
 		{
 			Builder = builder;
 			FirstElement = firstElement;
 		}
 
-		public override IT4InfoCollectorState GetNextState(ITreeNode element)
+		public override IT4InfoCollectorState GetNextState(IT4TreeNode element)
 		{
 			switch (element)
 			{

@@ -1,0 +1,3 @@
+<#@ include file="$(<.../EditorTest>SolutionDir</.../EditorTest>)Include.ttinclude" #>
+<#@ assembly name="$(Foo)" #>
+<#@ assembly hello="$(<.../EditorTest>SolutionDir</.../EditorTest>)" #>

@@ -17,14 +17,14 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 	internal abstract class T4CodeStructureElement<T> : CodeStructureElement, IFileStructureAspect, IMemberNavigationAspect
 	where T : class, ITreeNode {
 
-		private readonly TextRange _textRange;
+		private readonly DocumentRange _textRange;
 		[NotNull] private readonly ITreeNodePointer<T> _pointer;
 		
 		[CanBeNull]
 		protected T GetTreeNode()
 			=> _pointer.GetTreeNode();
 
-		public override TextRange GetTextRange()
+		public override DocumentRange GetTextRange()
 			=> _textRange;
 
 		public override ITreeNode TreeNode
@@ -85,7 +85,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 		protected T4CodeStructureElement([NotNull] CodeStructureElement parent, [NotNull] T treeNode)
 			: base(parent) {
-			_textRange = treeNode.GetDocumentRange().TextRange;
+			_textRange = treeNode.GetDocumentRange();
 			_pointer = treeNode.CreateTreeElementPointer();
 		}
 

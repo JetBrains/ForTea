@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Directives;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Psi.Utils;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -17,10 +19,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 	{
 		#region Properties
 		[NotNull]
-		private IT4File File { get; }
+		private T4EncodingsManager EncodingsManager { get; }
 
 		[NotNull]
-		private T4EncodingsManager EncodingsManager { get; }
+		private IT4IncludeResolver IncludeResolver { get; }
 
 		[NotNull]
 		private T4IncludeGuard Guard { get; }
@@ -34,27 +36,24 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		protected T4CSharpCodeGenerationIntermediateResult Result => Results.Peek();
 		#endregion Properties
 
-		protected T4CSharpCodeGenerationInfoCollectorBase(
-			[NotNull] IT4File file,
-			[NotNull] ISolution solution
-		)
+		protected T4CSharpCodeGenerationInfoCollectorBase([NotNull] ISolution solution)
 		{
-			File = file;
 			Results = new Stack<T4CSharpCodeGenerationIntermediateResult>();
 			Guard = new T4IncludeGuard();
 			EncodingsManager = solution.GetComponent<T4EncodingsManager>();
+			IncludeResolver = solution.GetComponent<IT4IncludeResolver>();
 		}
 
 		[NotNull]
-		public T4CSharpCodeGenerationIntermediateResult Collect()
+		public T4CSharpCodeGenerationIntermediateResult Collect([NotNull] IT4File file)
 		{
-			var projectFile = File.PhysicalPsiSourceFile.ToProjectFile();
-			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(File, Interrupter);
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			Guard.StartProcessing(File.LogicalPsiSourceFile.GetLocation());
-			File.ProcessDescendants(this);
+			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile();
+			if (projectFile == null) return new T4CSharpCodeGenerationIntermediateResult(file, Interrupter);
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(file, Interrupter));
+			Guard.StartProcessing(file.LogicalPsiSourceFile.GetLocation());
+			file.ProcessDescendants(this);
 			string suffix = Result.State.ProduceBeforeEof();
-			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
+			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix, Result.State.FirstNode);
 			Guard.EndProcessing();
 			return Results.Pop();
 		}
@@ -66,14 +65,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			AppendRemainingMessage(element);
 			if (!(element is IT4IncludeDirective include)) return;
-			Results.Push(new T4CSharpCodeGenerationIntermediateResult(File, Interrupter));
-			var sourceFile = include.Path.Resolve();
+			var file = (IT4File) element.GetContainingFile().NotNull();
+			Results.Push(new T4CSharpCodeGenerationIntermediateResult(file, Interrupter));
+			var sourceFile = IncludeResolver.Resolve(include.ResolvedPath);
 			if (sourceFile == null)
 			{
 				var target = include.GetFirstAttribute(T4DirectiveInfoManager.Include.FileAttribute)?.Value ?? element;
 				var data = T4FailureRawData.FromElement(target, $"Unresolved include: {target.GetText()}");
 				Interrupter.InterruptAfterProblem(data);
-				Guard.StartProcessing(File.LogicalPsiSourceFile.GetLocation());
+				Guard.StartProcessing(file.LogicalPsiSourceFile.GetLocation());
 				return;
 			}
 
@@ -114,15 +114,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		public override void VisitIncludeDirectiveNode(IT4IncludeDirective includeDirectiveParam)
 		{
 			string suffix = Result.State.ProduceBeforeEof();
-			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix);
-			Guard.TryEndProcessing(includeDirectiveParam.Path.Resolve().GetLocation());
+			if (!string.IsNullOrEmpty(suffix)) AppendTransformation(suffix, Result.State.FirstNode);
+			Guard.TryEndProcessing(IncludeResolver.Resolve(includeDirectiveParam.ResolvedPath).GetLocation());
 			var intermediateResults = Results.Pop();
 			Result.Append(intermediateResults);
 		}
 
 		public override void VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam)
 		{
-			var description = T4ImportDescription.FromDirective(importDirectiveParam);
+			var description = T4ImportWithLineDescription.FromDirective(importDirectiveParam);
 			if (description == null) return;
 			Result.Append(description);
 		}
@@ -145,6 +145,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 				.GetAttributeValueByName(T4DirectiveInfoManager.Template.HostSpecificAttribute.Name);
 			if (bool.TrueString.Equals(hostSpecific, StringComparison.OrdinalIgnoreCase)) Result.RequireHost();
 
+			string access = templateDirectiveParam
+				.GetAttributeValueByName(T4DirectiveInfoManager.Template.VisibilityAttribute.Name);
+			if (access != null) Result.AccessRightsText = access;
+
 			(ITreeNode classNameToken, string className) = templateDirectiveParam
 				.GetAttributeValueIgnoreOnlyWhitespace(T4DirectiveInfoManager.Template.InheritsAttribute.Name);
 			if (classNameToken != null && className != null)
@@ -161,7 +165,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			var code = expressionBlockParam.Code;
 			if (code == null) return;
-			if (Result.FeatureStarted) Result.AppendFeature(new T4ExpressionDescription(code));
+			if (Result.FeatureStarted) AppendFeature(code, new T4FeatureExpressionDescription(code));
 			else Result.AppendTransformation(new T4ExpressionDescription(code));
 		}
 
@@ -169,7 +173,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			var code = featureBlockParam.Code;
 			if (code == null) return;
-			Result.AppendFeature(new T4CodeDescription(code));
+			AppendFeature(code, new T4CodeDescription(code));
 		}
 
 		public override void VisitStatementBlockNode(IT4StatementBlock statementBlockParam)
@@ -185,10 +189,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 			if (lookahead is IT4Token) return;
 			string produced = Result.State.Produce(lookahead);
 			if (string.IsNullOrEmpty(produced)) return;
-			AppendTransformation(produced);
+			AppendTransformation(produced, Result.State.FirstNode);
 		}
 
-		protected abstract void AppendTransformation([NotNull] string message);
+		protected abstract void AppendTransformation([NotNull] string message, [CanBeNull] IT4TreeNode firstNode);
+
+		protected abstract void AppendFeature(
+			[NotNull] IT4Code code,
+			[NotNull] IT4AppendableElementDescription description
+		);
+
 		protected abstract IT4CodeGenerationInterrupter Interrupter { get; }
 	}
 }

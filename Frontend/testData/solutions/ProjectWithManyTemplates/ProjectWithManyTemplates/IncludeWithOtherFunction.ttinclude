@@ -1,0 +1,3 @@
+<#+
+	public static int Bar() => 42;
+#>

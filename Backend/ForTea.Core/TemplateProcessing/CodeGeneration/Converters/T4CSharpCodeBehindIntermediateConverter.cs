@@ -1,20 +1,15 @@
+using System;
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
-using GammaJul.ForTea.Core.TemplateProcessing.Services;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CSharp.Parsing;
-using JetBrains.ReSharper.Psi.CSharp.Util;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
-	public sealed class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
+	public class T4CSharpCodeBehindIntermediateConverter : T4CSharpIntermediateConverterBase
 	{
-		[NotNull] private const string HostStubResourceName = "GammaJul.ForTea.Core.Resources.HostStub.cs";
 		[NotNull] public const string CodeCommentStartText = "/*_T4\x200CCodeStart_*/";
 		[NotNull] public const string CodeCommentEndText = "/*_T4\x200CCodeEnd_*/";
 		[NotNull] public const string ExpressionCommentStartText = "/*_T4\x200CExpressionStart*/";
@@ -27,23 +22,32 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			"RedundantNameQualifier"
 		};
 
+		private bool IsRoot { get; }
+
 		public T4CSharpCodeBehindIntermediateConverter(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult,
-			[NotNull] IT4File file
-		) : base(intermediateResult, file)
+			[NotNull] IT4File file,
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
+			bool isRoot = true
+		) : base(file, classNameProvider)
 		{
+			IsRoot = isRoot;
+			if (IsRoot)
+			{
+				TransformTextMethodName = DefaultTransformTextMethodName;
+				TransformTextAttributes = "";
+			}
+			else
+			{
+				TransformTextMethodName = DefaultTransformTextMethodName + Guid.NewGuid().ToString("N");
+				TransformTextAttributes = "[__ReSharperSynthetic]";
+			}
 		}
 
 		protected override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseStub.cs";
 
-		protected override void AppendSyntheticAttribute()
-		{
-			AppendIndent();
-			Result.AppendLine($"[{SyntheticAttribute.Name}]");
-		}
-
 		protected override void AppendParameterInitialization(
-			IReadOnlyCollection<T4ParameterDescription> descriptions
+			IReadOnlyCollection<T4ParameterDescription> descriptions,
+			bool hasHost
 		)
 		{
 			// There's no need to initialize parameters in code-behind since this code is never displayed anyway 
@@ -56,16 +60,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				AppendDisabledInspections(inspection);
 			}
 
-			Result.Append("        private global::");
-			var type = description.TypeToken;
-			if (CSharpLexer.IsKeyword(type.GetText())) Result.Append("@");
-			Result.AppendMapped(type);
-
+			Result.Append("        private ");
+			description.AppendTypeMapped(Result);
 			Result.Append(" ");
-			var name = description.NameToken;
-			if (CSharpLexer.IsKeyword(name.GetText())) Result.Append("@");
-			Result.AppendMapped(name);
-
+			description.AppendName(Result);
 			Result.Append(" => ");
 			Result.Append(description.FieldNameString);
 			Result.AppendLine(";");
@@ -77,10 +75,10 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			Result.AppendLine(inspection);
 		}
 
-		protected override void AppendNamespacePrefix()
+		protected override void AppendBaseClass(T4CSharpCodeGenerationIntermediateResult intermediateResult)
 		{
-			if (!IntermediateResult.HasHost) return;
-			Result.AppendLine(new T4TemplateResourceProvider(HostStubResourceName).ProcessResource());
+			if (!IsRoot) return;
+			base.AppendBaseClass(intermediateResult);
 		}
 
 		protected override void AppendHost()
@@ -90,35 +88,24 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 				"public virtual Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost Host { get; set; }");
 		}
 
-		[CanBeNull]
-		private string TryGetGeneratedClassNameFromFile()
-		{
-			var projectFile = File.GetSourceFile()?.ToProjectFile();
-			if (projectFile == null) return null;
-			var dataManager = File.GetSolution().GetComponent<IT4TemplateKindProvider>();
-			if (!dataManager.IsPreprocessedTemplate(projectFile)) return null;
-			string fileName = File.GetSourceFile()?.Name.WithoutExtension();
-			if (fileName == null) return null;
-			if (!ValidityChecker.IsValidIdentifier(fileName)) return null;
-			return fileName;
-		}
-
-		protected override string GeneratedClassName
-		{
-			get
-			{
-				string name = TryGetGeneratedClassNameFromFile();
-				if (name == null) return GeneratedClassNameString;
-				return name;
-			}
-		}
-
 		// No indents should be inserted in code-behind file in order to avoid indenting code in code blocks
 		protected override void AppendIndent(int size)
 		{
 		}
 
+		protected override string BaseClassDescription =>
+			"    /// <summary>\n    /// Base class for this transformation\n    /// </summary>";
+
 		protected override bool ShouldAppendPragmaDirectives => true;
+
+		protected override string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass)
+		{
+			if (!hasCustomBaseClass) return VirtualKeyword;
+			return base.GetTransformTextOverridabilityModifier(true);
+		}
+
+		protected override string TransformTextMethodName { get; }
+		protected override string TransformTextAttributes { get; }
 
 		#region IT4ElementAppendFormatProvider
 		public override string CodeCommentStart => CodeCommentStartText;

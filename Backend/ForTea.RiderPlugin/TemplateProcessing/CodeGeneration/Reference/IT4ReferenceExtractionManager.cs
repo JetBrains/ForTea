@@ -12,9 +12,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 	{
 		/// Fails if there are unresolved assembly references by throwing <see cref="T4OutputGenerationException"/>
 		[NotNull, ItemNotNull]
-		IEnumerable<MetadataReference> ExtractPortableReferencesTransitive(
-			Lifetime lifetime,
-			[NotNull] IT4File file);
+		IEnumerable<MetadataReference> ExtractPortableReferences(Lifetime lifetime, [NotNull] IT4File file);
 
 		/// Fails if there are unresolved assembly references by throwing <see cref="T4OutputGenerationException"/>
 		[NotNull]

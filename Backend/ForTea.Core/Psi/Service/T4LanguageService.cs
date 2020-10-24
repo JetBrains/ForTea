@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -46,15 +47,15 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 			if (sourceFile == null)
 			{
 				Logger.Warn("Creating parser for null sourceFile");
-				return new T4Parser(lexer, null, null);
+				return new T4Parser(lexer, null, null, T4DocumentLexerSelector.Instance);
 			}
 
-			var projectFile = sourceFile.ToProjectFile();
 			var solution = sourceFile.GetSolution();
 			var graph = solution.GetComponent<IT4FileDependencyGraph>();
-			var rootSourceFile = graph.FindBestRoot(projectFile).ToSourceFile().NotNull();
-			var rootLexer = GetPrimaryLexerFactory().CreateLexer(rootSourceFile.Document.Buffer);
-			return new T4Parser(rootLexer, rootSourceFile, sourceFile);
+			var rootSourceFile = graph.FindBestRoot(sourceFile).NotNull();
+			var selector = new T4DelegatingLexerSelector(lexer, sourceFile, T4DocumentLexerSelector.Instance);
+			var rootLexer = selector.SelectLexer(rootSourceFile);
+			return new T4Parser(rootLexer, rootSourceFile, sourceFile, selector);
 		}
 
 		/// <summary>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GammaJul.ForTea.Core.Psi.Cache.Impl;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
@@ -13,6 +14,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
+using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core.Psi.Modules {
 
@@ -30,6 +32,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 
 		[NotNull]
 		private IT4TemplateKindProvider TemplateDataManager { get; }
+
+		[CanBeNull]
+		private TargetFrameworkId PrimaryTargetFrameworkId { get; }
 
 		private readonly struct ModuleWrapper {
 
@@ -87,7 +92,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			// It would be logical to check the file type here and return if it's not T4.
 			// However, this is impossible because calculating file type
 			// requires the file to be attached to a project hierarchy,
-			// which sometimes doesn't hold.
+			// which sometimes isn't true.
 			_shellLocks.AssertWriteAccessAllowed();
 			ModuleWrapper moduleWrapper;
 			switch (changeType)
@@ -97,11 +102,16 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 						// We only handle T4 files and do not affect other project files.
 						break;
 					if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
-						// Otherwise, this is a new preprocessed file.
+						// This is a new preprocessed file.
 						// We don't create modules for preprocessed files
 						// so that to let R# add them into the project,
-						// so that the template will have access to the current project types.
+						// so that the template will have access
+						// to the types defined in the current project.
 						break;
+					if (projectFile.IsFlaggedAsPreprocessed())
+					{
+						throw new InvalidOperationException("Did not expect preprocessed flag to appear this early");
+					}
 					// This is a new executable file, so we need to create a module for it.
 					AddFile(projectFile, changeBuilder);
 					// After the module is created, the request to add the file has been handled,
@@ -120,7 +130,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 				case PsiModuleChange.ChangeType.Modified:
 					if (_modules.TryGetValue(projectFile, out moduleWrapper))
 					{
-						if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
+						if (TemplateDataManager.IsPreprocessedTemplate(projectFile) ||
+						    projectFile.IsFlaggedAsPreprocessed())
 						{
 							// The T4 file has a module but it shouldn't because it's preprocessed.
 							// This can happen when an executable file becomes preprocessed.
@@ -143,7 +154,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 					if (!projectFile.LanguageType.Is<T4ProjectFileType>())
 						// No it's not.
 						break;
-					if (TemplateDataManager.IsPreprocessedTemplate(projectFile))
+					if (TemplateDataManager.IsPreprocessedTemplate(projectFile) || projectFile.IsFlaggedAsPreprocessed())
 						// It is still a preprocessed file, we still don't want a module for it.
 						// Let R# continue managing this file.
 						break;
@@ -165,15 +176,17 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			ISolution solution = projectFile.GetSolution();
 
 			// creates a new T4PsiModule for the file
-			LifetimeDefinition lifetimeDefinition = Lifetime.Define(_lifetime, "[T4]" + projectFile.Name);
+			var lifetimeDefinition = Lifetime.Define(_lifetime, T4FilePsiModule.Prefix + projectFile.Name);
 			var psiModule = new T4FilePsiModule(
 				lifetimeDefinition.Lifetime,
 				projectFile,
 				_changeManager,
 				_shellLocks,
-				_t4Environment
+				_t4Environment,
+				PrimaryTargetFrameworkId
 			);
 			_modules[projectFile] = new ModuleWrapper(psiModule, lifetimeDefinition);
+			psiModule.AddBaseReferences();
 			changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added);
 			changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Added);
 
@@ -210,7 +223,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			[NotNull] IShellLocks shellLocks,
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IT4Environment t4Environment,
-			[NotNull] IT4TemplateKindProvider templateDataManager
+			[NotNull] IT4TemplateKindProvider templateDataManager,
+			[CanBeNull] TargetFrameworkId primaryTargetFrameworkId = null
 		)
 		{
 			_lifetime = lifetime;
@@ -218,6 +232,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			_changeManager = changeManager;
 			_t4Environment = t4Environment;
 			TemplateDataManager = templateDataManager;
+			PrimaryTargetFrameworkId = primaryTargetFrameworkId;
 		}
 
 	}

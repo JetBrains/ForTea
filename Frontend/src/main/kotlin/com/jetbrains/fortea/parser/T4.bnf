@@ -38,7 +38,9 @@ private directive_main ::= DIRECTIVE_START directive_name? attribute* {
 
 directive_name ::= TOKEN
 
-attribute ::= attribute_name EQUAL QUOTE RAW_ATTRIBUTE_VALUE? QUOTE
+attribute ::= attribute_name EQUAL QUOTE raw_attribute_value QUOTE
+
+private raw_attribute_value ::= (RAW_ATTRIBUTE_VALUE | PERCENT | DOLLAR | LEFT_PARENTHESIS | RIGHT_PARENTHESIS)*
 
 attribute_name ::= TOKEN
 

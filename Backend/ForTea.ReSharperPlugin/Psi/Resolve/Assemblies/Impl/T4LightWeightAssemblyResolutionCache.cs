@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
+using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Feature.Services.EditorConfig;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.Util;
@@ -29,19 +30,21 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		[NotNull] private readonly Lazy<Optional<ITextTemplatingComponents>> Components;
 
 		public T4LightWeightAssemblyResolutionCache(
-			Lifetime lifetime, IPersistentIndexManager persistentIndexManager,
+			Lifetime lifetime,
+			[NotNull] IShellLocks locks,
+			[NotNull] IPersistentIndexManager persistentIndexManager,
 			[NotNull] RawVsServiceProvider provider
-		) : base(lifetime, persistentIndexManager, T4LightWeightAssemblyResolutionDataMarshaller.Instance) =>
+		) : base(lifetime, locks, persistentIndexManager, T4LightWeightAssemblyResolutionDataMarshaller.Instance) =>
 			Components = Lazy.Of(() => new Optional<ITextTemplatingComponents>(
 				provider.Value.GetService<STextTemplating, ITextTemplatingComponents>()
 			), true);
 
+		[NotNull]
 		protected override T4LightWeightAssemblyResolutionRequest Build(IT4File file)
 		{
 			var assembliesToResolve = file
 				.GetThisAndChildrenOfType<IT4AssemblyDirective>()
-				.Select(directive => directive.Path)
-				.Select(path => path.ResolveString())
+				.Select(directive => directive.ResolvedPath)
 				.Distinct();
 			return new T4LightWeightAssemblyResolutionRequest(assembliesToResolve);
 		}
@@ -51,20 +54,30 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 			var request = (T4LightWeightAssemblyResolutionRequest) builtPart;
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			using var _ = Prepare(projectFile);
-			var response = request
-				.NotNull()
-				.AssembliesToResolve
-				.Select(s => new KeyValuePair<string, FileSystemPath>(s, TryResolve(s)))
-				.Where(pair => pair.Value != null)
-				.ToDictionary();
+			var response = new Dictionary<string, FileSystemPath>();
+			foreach (var path in request.NotNull().AssembliesToResolve)
+			{
+				var resolved = TryResolve(path);
+				if (resolved == null) continue;
+				response[path.ResolvedPath] = resolved;
+			}
 			var data = new T4LightWeightAssemblyResolutionData(response);
 			base.Merge(sourceFile, data);
 		}
 
 		[CanBeNull]
-		private FileSystemPath TryResolve([NotNull] string assemblyName)
+		public FileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path)
 		{
-			string resolved = Components.Value.CanBeNull?.Host?.ResolveAssemblyReference(assemblyName);
+			using var _ = Prepare(path.ProjectFile);
+			return TryResolve(path);
+		}
+
+		[CanBeNull]
+		private FileSystemPath TryResolve([NotNull] T4ResolvedPath resolvedPath)
+		{
+			var asAbsolute = resolvedPath.TryResolveAbsolutePath();
+			if (asAbsolute != null) return asAbsolute;
+			string resolved = Components.Value.CanBeNull?.Host?.ResolveAssemblyReference(resolvedPath.ResolvedPath);
 			if (resolved == null) return null;
 			var path = FileSystemPath.Parse(resolved);
 			if (path.IsAbsolute) return path;

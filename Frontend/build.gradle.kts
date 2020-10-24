@@ -14,7 +14,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath("com.jetbrains.rd:rd-gen:0.193.100")
+    classpath("com.jetbrains.rd:rd-gen:0.201.57")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
   }
 }
@@ -22,6 +22,7 @@ buildscript {
 plugins {
   id("org.jetbrains.intellij") version "0.4.13"
   id("org.jetbrains.grammarkit") version "2019.3"
+  id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
 }
 
 apply {
@@ -39,7 +40,7 @@ grammarKit {
   grammarKitRelease = "2019.3"
 }
 
-val baseVersion = "2020.1"
+val baseVersion = "2020.3"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
@@ -74,36 +75,20 @@ val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
-  "output/ForTea.RiderPlugin/$buildConfiguration/ForTea.RiderPlugin"
+  "output/ForTea.RiderPlugin/$buildConfiguration/ForTea.RiderPlugin",
+  "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.TextTemplating"
 )
 
-val nugetPackagesPath by lazy {
-  val sdkPath = intellij.ideaDependency.classes
+val dotNetSdkPath by lazy {
+  val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
+  if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
 
   println("SDK path: $sdkPath")
-  val path = File(sdkPath, "lib/ReSharperHostSdk")
-
-  println("NuGet packages: $path")
-  if (!path.isDirectory) error("$path does not exist or not a directory")
-
-  return@lazy path
-}
-
-val riderSdkPackageVersion by lazy {
-  val sdkPackageName = "JetBrains.Rider.SDK"
-
-  val regex = Regex("${Regex.escape(sdkPackageName)}\\.([\\d\\.]+.*)\\.nupkg")
-  val version = nugetPackagesPath
-    .listFiles()
-    ?.mapNotNull { regex.matchEntire(it.name)?.groupValues?.drop(1)?.first() }
-    ?.singleOrNull() ?: error("$sdkPackageName package is not found in $nugetPackagesPath (or multiple matches)")
-  println("$sdkPackageName version is $version")
-
-  return@lazy version
+  return@lazy sdkPath
 }
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
-val riderSdkVersionPropsPath = File(backendPluginPath, "RiderSdkPackageVersion.props")
+val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 
 val riderForTeaTargetsGroup = "T4"
 
@@ -117,8 +102,8 @@ fun File.writeTextIfChanged(content: String) {
 }
 
 configure<RdgenParams> {
-  val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Protocol")
-  val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/protocol")
+  val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
+  val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
 
   verbose = true
   hashFolder = "build/rdgen"
@@ -196,28 +181,29 @@ tasks {
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+    this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
     dependsOn(generateT4Lexer)
   }
 
   withType<Test> {
     dependsOn(generateT4Lexer)
     useTestNG()
+    environment("LOCAL_ENV_RUN", "true")
+    environment("NO_FS_ROOTS_ACCESS_CHECK", true)
     testLogging {
       showStandardStreams = true
       exceptionFormat = TestExceptionFormat.FULL
     }
-    val rerunSuccessfulTests = false
-    outputs.upToDateWhen { !rerunSuccessfulTests }
+    outputs.upToDateWhen { false }
     ignoreFailures = true
   }
 
-  create("writeRiderSdkVersionProps") {
+  create("writeDotNetSdkPathProps") {
     group = riderForTeaTargetsGroup
     doLast {
-      riderSdkVersionPropsPath.writeTextIfChanged(
-        """<Project>
+      dotNetSdkPathPropsPath.writeTextIfChanged("""<Project>
   <PropertyGroup>
-    <RiderSDKVersion>[$riderSdkPackageVersion]</RiderSDKVersion>
+    <DotNetSdkPath>$dotNetSdkPath</DotNetSdkPath>
   </PropertyGroup>
 </Project>
 """
@@ -232,7 +218,7 @@ tasks {
         """<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="resharper-sdk" value="$nugetPackagesPath" />
+    <add key="resharper-sdk" value="$dotNetSdkPath" />
   </packageSources>
 </configuration>
 """
@@ -249,22 +235,7 @@ tasks {
 
   create("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgen", "writeNuGetConfig", "writeRiderSdkVersionProps")
-  }
-
-  create("buildBackend") {
-    group = riderForTeaTargetsGroup
-    dependsOn("prepare")
-    doLast {
-      exec {
-        executable = "dotnet"
-        args = listOf("build", backendPluginSolutionPath.canonicalPath)
-      }
-    }
-  }
-
-  getByName("runIde") {
-    dependsOn("buildBackend")
+    dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps")
   }
 
   getByName("buildSearchableOptions") {
@@ -274,6 +245,10 @@ tasks {
     // Assumption: plugin is built in Release mode if and only if
     // it is built on the server as Ridier bundled plugin
     enabled = buildConfiguration == "Release"
+  }
+
+  getByName("buildPlugin") {
+    dependsOn("prepare")
   }
 }
 

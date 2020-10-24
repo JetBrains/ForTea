@@ -1,0 +1,6 @@
+<#@ template language="C#" #>
+<#@ include file="$|(|(0:caret)SolutionDir|)|(1:caret)" #>
+
+---------------------------------------------------------
+(0:caret): ReSharper Matched Brace
+(1:caret): ReSharper Matched Brace

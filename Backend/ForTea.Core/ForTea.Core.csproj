@@ -9,12 +9,8 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>GammaJul.ForTea.Core</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)targets\T4Targets.targets" />
-  <ItemGroup>
-    <PackageReference Include="$(CoreProjectSdk)" Version="$(CoreProjectSdkVersion)">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_Web_Core.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_Web_Core.Props')" />
 
   <ItemGroup>
     <Compile Remove="Resources\TemplateBaseStub.cs" />
@@ -30,10 +26,7 @@
     <EmbeddedResource Include="Resources\TemplateBaseFullExecutableSuffix.cs" />
     <EmbeddedResource Include="Resources\HostspecificTemplateBaseFullExecutableSuffix.cs" />
     <EmbeddedResource Include="Resources\TemplateBaseStub.cs" />
-    <EmbeddedResource Include="Resources\HostStub.cs" />
-    <EmbeddedResource Include="Resources\Host.cs" />
     <EmbeddedResource Include="Resources\AssemblyRegistering.cs" />
-    <EmbeddedResource Include="Resources\ToStringInstanceHelper.cs" />
 
     <None Remove="Parsing\T4.lex" />
 
@@ -92,12 +85,4 @@
       <SubType>Designer</SubType>
     </ErrorsGen>
   </ItemGroup>
-  <Target Name="ReportCoreProjectSdk" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <CoreProjectSdkMessage>
-        Will use $(CoreProjectSdk) with version $(CoreProjectSdkVersion) to compile $(MSBuildProjectName).
-      </CoreProjectSdkMessage>
-    </PropertyGroup>
-    <Message Importance="high" Text="$(CoreProjectSdkMessage)" />
-  </Target>
 </Project>

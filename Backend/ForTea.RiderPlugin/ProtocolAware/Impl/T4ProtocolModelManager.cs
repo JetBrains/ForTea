@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing;
 using JetBrains.ProjectModel;
 using JetBrains.Rd.Tasks;
@@ -12,7 +13,6 @@ using JetBrains.ReSharper.Host.Features.ProjectModel;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Rider.Model;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
@@ -53,7 +53,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			[NotNull] IT4TemplateExecutionManager executionManager,
 			[NotNull] ILogger logger,
 			[NotNull] ProjectModelViewHost host,
-			IT4ProjectReferenceResolver projectReferenceResolver
+			[NotNull] IT4ProjectReferenceResolver projectReferenceResolver
 		)
 		{
 			Solution = solution;

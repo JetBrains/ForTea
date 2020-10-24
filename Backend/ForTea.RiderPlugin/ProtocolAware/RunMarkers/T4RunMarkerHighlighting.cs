@@ -2,10 +2,15 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Host.Features.RunMarkers;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 {
-	[StaticSeverityHighlighting(Severity.INFO, "Run Markers", OverlapResolve = OverlapResolveKind.NONE)]
+	[StaticSeverityHighlighting(
+		Severity.INFO,
+		typeof(RunMarkerHighlighting.RunMarkers),
+		OverlapResolve = OverlapResolveKind.NONE
+	)]
 	public sealed class T4RunMarkerHighlighting : ICustomAttributeIdHighlighting
 	{
 		[NotNull] private const string Tooltip = "Run T4 File";

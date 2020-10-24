@@ -1,0 +1,6 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" or="System.Core2" #>
+should we really display usings, though?
+<#@ include file="location" once="true" #>
+<#@ parameter name="hello" type="world" #>

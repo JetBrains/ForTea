@@ -1,0 +1,25 @@
+<#@ template debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core.dll" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #> 
+// This is sample text
+
+<# var descriptions = new[] { new InterfaceDescription("Foo", "Oof", "Oops"), new InterfaceDescription("Boo", "Whatever", "Hey", "H") }; #>
+
+namespace Foo
+{
+<# foreach (var description in descriptions) { if (2 + 2 == 4) { #>
+    public partial interface I<#= description.InterfaceName #>
+    {
+<# foreach (var reference in description.InterfaceMembers) { if (Foo(reference).IsNormalized()) { #>
+        bool <#= Foo(reference) #> { get; set; }
+<# } } #>
+    }
+<# } } #>
+}
+
+<#+ private string Foo(string s) { if (s.Length > 4) return "ololo"; else return s; } internal class InterfaceDescription { public string InterfaceName { get; } public IEnumerable<string> InterfaceMembers { get; } public InterfaceDescription(string interfaceName, params string[] interfaceMembers) { InterfaceName = interfaceName; InterfaceMembers = interfaceMembers; } } #>

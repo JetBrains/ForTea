@@ -27,16 +27,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 	/// <summary>PSI module managing a single T4 file.</summary>
 	public sealed class T4FilePsiModule : ConcurrentUserDataHolder, IT4FilePsiModule, IDisposable
 	{
-		[NotNull]
-		private const string Prefix = "[T4]";
-
+		[NotNull] public const string Prefix = "[T4]";
 		private Lifetime Lifetime { get; }
 
 		[NotNull]
 		private IT4AssemblyReferenceManager AssemblyReferenceManager { get; }
-
-		[NotNull]
-		private T4ProjectReferenceManager ProjectReferenceManager { get; }
 
 		[NotNull]
 		private IPsiModules PsiModules { get; }
@@ -53,12 +48,16 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		[NotNull]
 		private IProjectFile ProjectFile { get; }
 
+		[NotNull]
+		private string PersistentId { get; }
+
 		private IChangeProvider ChangeProvider { get; }
 		private ISolution Solution { get; }
 		public IPsiSourceFile SourceFile { get; }
 		public string Name => Prefix + SourceFile.Name;
 		public string DisplayName => Prefix + SourceFile.DisplayName;
 		public TargetFrameworkId TargetFrameworkId { get; }
+		public TargetFrameworkId OriginalTargetFrameworkId { get; }
 		public PsiLanguageType PsiLanguage => T4Language.Instance;
 		public ProjectFileType ProjectFileType => T4ProjectFileType.Instance;
 		public IModule ContainingProjectModule => Project;
@@ -69,14 +68,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			get { yield return SourceFile; }
 		}
 
-		public IEnumerable<FileSystemPath> RawReferences => AssemblyReferenceManager.RawReferences;
-
 		public T4FilePsiModule(
 			Lifetime lifetime,
 			[NotNull] IProjectFile projectFile,
 			[NotNull] ChangeManager changeManager,
 			[NotNull] IShellLocks shellLocks,
-			[NotNull] IT4Environment t4Environment
+			[NotNull] IT4Environment t4Environment,
+			[CanBeNull] TargetFrameworkId primaryTargetFrameworkId
 		)
 		{
 			Lifetime = lifetime;
@@ -87,12 +85,17 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			PsiServices = Solution.GetComponent<IPsiServices>();
 			ChangeManager = changeManager;
 			ShellLocks = shellLocks;
-			ChangeProvider = new FakeChangeProvider();
-			TargetFrameworkId = ProjectFile.SelectTargetFrameworkId(t4Environment);
+			ChangeProvider = new T4WriteOnlyChangeProvider();
+			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
+			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
+			TargetFrameworkId = t4Environment.SelectTargetFrameworkId(primaryTargetFrameworkId, projectFile);
 			Project = ProjectFile.GetProject().NotNull();
 			var resolveContext = Project.IsMiscFilesProject()
 				? UniversalModuleReferenceContext.Instance
 				: this.GetResolveContextEx(ProjectFile);
+			Assertion.Assert(resolveContext.TargetFramework == TargetFrameworkId, "Failed to select TargetFrameworkId");
+			var documentManager = Solution.GetComponent<DocumentManager>();
+			SourceFile = CreateSourceFile(ProjectFile, documentManager, resolveContext);
 			AssemblyReferenceManager = new T4AssemblyReferenceManager(
 				Solution.GetComponent<IAssemblyFactory>(),
 				SourceFile,
@@ -100,20 +103,17 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				resolveContext,
 				shellLocks
 			);
-			ProjectReferenceManager = new T4ProjectReferenceManager(ProjectFile, Solution);
 
-			changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
-			changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
-
-			var documentManager = Solution.GetComponent<DocumentManager>();
-			SourceFile = CreateSourceFile(ProjectFile, documentManager);
 			Solution.GetComponent<T4DeclaredAssembliesManager>().FileDataChanged.Advise(lifetime, OnFileDataChanged);
-			ChangeManager.ExecuteAfterChange(() =>
-			{
-				AssemblyReferenceManager.AddBaseReferences();
-				NotifyModuleChange();
-			});
+			PersistentId = BuildPersistentId(primaryTargetFrameworkId);
+			OriginalTargetFrameworkId = primaryTargetFrameworkId;
 		}
+
+		public void AddBaseReferences() => AssemblyReferenceManager.AddBaseReferences();
+
+		[NotNull]
+		private string BuildPersistentId([CanBeNull] TargetFrameworkId primaryTargetFrameworkId) =>
+			$"{Prefix}(path: {ProjectFile.GetPersistentID()}, containing project target framework id: {primaryTargetFrameworkId?.UniqueString ?? "null"})";
 
 		private void OnFileDataChanged(Pair<IPsiSourceFile, T4DeclaredAssembliesDiff> pair)
 		{
@@ -137,11 +137,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		{
 			ShellLocks.AssertWriteAccessAllowed();
 			if (!AssemblyReferenceManager.ProcessDiff(dataDiff)) return;
-			NotifyModuleChange();
-		}
-
-		private void NotifyModuleChange()
-		{
 			var changeBuilder = new PsiModuleChangeBuilder();
 			changeBuilder.AddModuleChange(this, PsiModuleChange.ChangeType.Modified);
 			// TODO: get rid of this queuing?
@@ -149,12 +144,15 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				"T4PsiModuleChange",
 				() => ChangeManager.ExecuteAfterChange(
 					() => ShellLocks.ExecuteWithWriteLock(
-						() => ChangeManager.OnProviderChanged(
-							ChangeProvider,
-							changeBuilder.Result,
-							SimpleTaskExecutor.Instance
-						)
-					)
+						() =>
+						{
+							if (!IsValid()) return;
+							ChangeManager.OnProviderChanged(
+								ChangeProvider,
+								changeBuilder.Result,
+								SimpleTaskExecutor.Instance
+							);
+						})
 				)
 			);
 		}
@@ -168,21 +166,21 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 				.SelectNotNull(assembly => PsiModules.GetPrimaryPsiModule(assembly, TargetFrameworkId))
 				.Select(it => new PsiModuleReference(it));
 			references.AddRange(moduleReferences);
-			references.AddRange(ProjectReferenceManager.GetProjectReference());
 			return references.GetReferences();
 		}
 
 		[NotNull]
 		private PsiProjectFile CreateSourceFile(
 			[NotNull] IProjectFile projectFile,
-			[NotNull] DocumentManager documentManager
+			[NotNull] DocumentManager documentManager,
+			[NotNull] IModuleReferenceResolveContext resolveContext
 		) => new PsiProjectFile(
 			this,
 			projectFile,
 			(pf, sf) => new T4PsiProjectFileProperties(pf, sf, true),
 			JetFunc<IProjectFile, IPsiSourceFile>.True,
 			documentManager,
-			AssemblyReferenceManager.ResolveContext
+			resolveContext
 		);
 
 		public void Dispose() => AssemblyReferenceManager.Dispose();
@@ -190,6 +188,6 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 		public ISolution GetSolution() => Solution;
 		public ICollection<PreProcessingDirective> GetAllDefines() => EmptyList<PreProcessingDirective>.Instance;
 		public bool IsValid() => Project.IsValid() && PsiServices.Modules.HasModule(this);
-		public string GetPersistentID() => Prefix + ProjectFile.GetPersistentID();
+		public string GetPersistentID() => PersistentId;
 	}
 }
