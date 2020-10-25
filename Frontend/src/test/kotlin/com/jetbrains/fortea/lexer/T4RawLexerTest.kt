@@ -166,4 +166,8 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
     |T4TokenType.NEW_LINE ('\n')""".trimMargin()
   )
 
+  @BeforeClass
+  fun beforeClass() {
+    ProtocolLanguageManager.setCustomInstance(ProtocolLanguageManagerMock)
+  }
 }
