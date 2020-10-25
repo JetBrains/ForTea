@@ -31,7 +31,8 @@ dotnet build ForTea.Backend.sln
 ```
 then open `Frontend` in [IntelliJ IDEA](https://www.jetbrains.com/idea/),
 open `Gradle` window, find `runIde` task in `ForTea > Tasks > intellij`,
-right-click it and select `Debug Frontend [runIde]`.  
+right-click it and select `Debug 'Frontend [runIde]'`.  
+Note: the plugin can also be run this way.
 
 Debugging Rider plugin backend
 ----
