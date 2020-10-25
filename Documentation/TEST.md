@@ -15,7 +15,7 @@ To debug backend tests, open `Unit Tests` tool window (Alt+8 on Windows),
 select `Explorer` tab, right-click `ForTea.Tests` tree element
 and select `Debug Selected Unit tests`.
 
-Testing frontend.
+Testing frontend
 ----
 To run frontend tests from the command line,
 build the Rider plugin and run `gradlew :test` in the `Frontend` folder.
