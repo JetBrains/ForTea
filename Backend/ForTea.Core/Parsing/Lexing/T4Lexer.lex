@@ -23,6 +23,3 @@ using JetBrains.Util;
 %eofval}
 
 %include T4Rules.lex
-
-%%
-%include T4Transitions.lex
