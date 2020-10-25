@@ -1,11 +1,13 @@
 package com.jetbrains.fortea.lexer
 
-import com.intellij.testFramework.LexerTestCase
+import com.jetbrains.rdclient.lang.ProtocolLanguageManager
+import com.jetbrains.rider.test.ProtocolLanguageManagerMock
+import com.jetbrains.rider.test.RiderFrontendLexerTest
+import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-class T4RawLexerTest : LexerTestCase() {
+class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   override fun createLexer() = T4Lexer()
-  override fun getDirPath(): String? = null
 
   @Test
   fun `test assembly directive`() = doTest(
@@ -164,4 +166,8 @@ class T4RawLexerTest : LexerTestCase() {
     |T4TokenType.NEW_LINE ('\n')""".trimMargin()
   )
 
+  @BeforeClass
+  fun beforeClass() {
+    ProtocolLanguageManager.setCustomInstance(ProtocolLanguageManagerMock)
+  }
 }
