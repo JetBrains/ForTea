@@ -1,5 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <InternalBuild Condition="Exists('ManagedProject.Generated.Targets')">true</InternalBuild>
+    <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>JetBrains.ForTea.Tests</AssemblyName>
     <RootNamespace>JetBrains.ForTea.Tests</RootNamespace>
@@ -7,14 +10,16 @@
     <JetTestProject>true</JetTestProject>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ForTea.Core\ForTea.Core.csproj" />
-    <ProjectReference Include="..\..\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
+    <ProjectReference Include="..\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
     <PackageReference Include="NUnit.Console" Version="3.10.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_Sdk.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_Sdk.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_test_Framework.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_test_Framework.Props')" />
+
+  <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
 </Project>

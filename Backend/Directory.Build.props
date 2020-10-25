@@ -2,5 +2,5 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
   </ItemGroup>
-  <Import Project="$(MSBuildThisFileDirectory)..\Frontend\build\DotNetSdkPath.generated.props"/>
+  <Import Project="$(MSBuildThisFileDirectory)..\Frontend\build\DotNetSdkPath.generated.props" Condition="Exists('$(MSBuildThisFileDirectory)..\Frontend\build\DotNetSdkPath.generated.props')"/>
 </Project>

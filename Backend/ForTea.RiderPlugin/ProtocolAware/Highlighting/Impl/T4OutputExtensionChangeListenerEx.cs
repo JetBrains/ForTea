@@ -1,4 +1,4 @@
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
 using JetBrains.Util;

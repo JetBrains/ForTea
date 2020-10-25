@@ -1,21 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <InternalBuild Condition="Exists('ManagedProject.Generated.Targets')">true</InternalBuild>
+    <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <DefineConstants>$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
-    <OutputPath>..\output\ForTea.ReSharperPlugin\$(Configuration)</OutputPath>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <RootNamespace>JetBrains.ForTea.ReSharperPlugin</RootNamespace>
+    <AssemblyName>JetBrains.ForTea.ReSharperPlugin</AssemblyName>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Text.UI.Wpf" Version="10.0.189-g83e7c53a57" />
+    <PackageReference Include="JetBrains.Vs.SinceVs10.Text" Version="3.0.20201223.1" />
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" Version="10.0.30320" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" Version="8.0.50728" />
-    <Reference Include="PresentationCore" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" Version="8.0.50728" PrivateAssets="All"/>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props')" />
+
+  <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
 </Project>

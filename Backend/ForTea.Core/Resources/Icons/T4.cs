@@ -1,4 +1,4 @@
-#region T4
+﻿#region T4
 /// <summary>
 ///	<para>
 ///		<para>T4 Themed Icon generated identifiers:</para>

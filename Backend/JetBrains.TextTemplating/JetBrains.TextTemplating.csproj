@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <InternalBuild Condition="Exists('ManagedProject.Generated.Targets')">true</InternalBuild>
+    <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DefineConstants>$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
@@ -8,10 +10,17 @@
     <OutputPath>..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Microsoft.VisualStudio.TextTemplating</RootNamespace>
+    <AssemblyName>Microsoft.VisualStudio.TextTemplating</AssemblyName>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
   <Import Project="$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props" Condition="Exists('$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props')" />
   <ItemGroup>
     <PackageReference Include="JetBrains.EnvDTE.Client" Version="20210521.39.0" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
 </Project>
