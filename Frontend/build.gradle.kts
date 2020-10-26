@@ -19,7 +19,7 @@ buildscript {
 
 plugins {
   id("org.jetbrains.intellij") version "0.5.0"
-  id("org.jetbrains.grammarkit") version "2019.3"
+  id("org.jetbrains.grammarkit") version "2020.2.1"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   kotlin("jvm") version "1.4.10"
 }
@@ -33,10 +33,6 @@ apply {
 repositories {
   mavenCentral()
   maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
-}
-
-grammarKit {
-  grammarKitRelease = "2019.3"
 }
 
 val baseVersion = "2020.3"
@@ -170,18 +166,21 @@ tasks {
     purgeOldFiles = true
   }
 
-  task<GenerateParser>("generateT4Parser") {
+  val generateT4Parser = task<GenerateParser>("generateT4Parser") {
     source = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
     this.targetRoot = "src/main/java"
     purgeOldFiles = true
     this.pathToParser = "fakePathToParser" // I have no idea what should be inserted here, but this works
     this.pathToPsiRoot = "fakePathToPsiRoot" // same
+    doLast {
+      println("Parser generated!")
+    }
   }
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
-    dependsOn(generateT4Lexer)
+    dependsOn(generateT4Lexer, generateT4Parser)
   }
 
   withType<Test> {
