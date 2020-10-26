@@ -1,4 +1,4 @@
-import com.jetbrains.rd.generator.gradle.RdgenParams
+import com.jetbrains.rd.generator.gradle.RdGenExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
@@ -10,19 +10,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 buildscript {
   repositories {
     maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
-    maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
     mavenCentral()
   }
   dependencies {
-    classpath("com.jetbrains.rd:rd-gen:0.201.57")
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
+    classpath("com.jetbrains.rd:rd-gen:0.203.161")
   }
 }
 
 plugins {
-  id("org.jetbrains.intellij") version "0.4.13"
+  id("org.jetbrains.intellij") version "0.5.0"
   id("org.jetbrains.grammarkit") version "2019.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
+  kotlin("jvm") version "1.4.10"
 }
 
 apply {
@@ -101,7 +100,7 @@ fun File.writeTextIfChanged(content: String) {
   }
 }
 
-configure<RdgenParams> {
+configure<RdGenExtension> {
   val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
   val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
 
@@ -253,8 +252,3 @@ tasks {
 }
 
 defaultTasks("prepare")
-
-// workaround for https://youtrack.jetbrains.com/issue/RIDER-18697
-dependencies {
-  testCompile("xalan", "xalan", "2.7.2")
-}
