@@ -172,9 +172,6 @@ tasks {
     purgeOldFiles = true
     this.pathToParser = "fakePathToParser" // I have no idea what should be inserted here, but this works
     this.pathToPsiRoot = "fakePathToPsiRoot" // same
-    doLast {
-      println("Parser generated!")
-    }
   }
 
   withType<KotlinCompile> {
