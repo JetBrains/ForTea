@@ -35,7 +35,7 @@ class T4BuildToolWindowFactory(project: Project) : LifetimedProjectService(proje
     toolWindow.setIcon(AllIcons.Toolwindows.ToolWindowBuild)
     // Required for hiding window without content
     val projectModelViewHost = ProjectModelViewHost.getInstance(project)
-    val panel = BuildResultPanel(project, projectModelViewHost, componentLifetime)
+    val panel = BuildResultPanel(project, projectModelViewHost, projectServiceLifetime)
     val toolWindowContent = contentManager.factory.createContent(null, windowHeader, true).apply {
       StatusBarUtil.setStatusBarInfo(project, "")
       component = panel
