@@ -7,20 +7,11 @@ import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-  repositories {
-    maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
-    mavenCentral()
-  }
-  dependencies {
-    classpath("com.jetbrains.rd:rd-gen:0.203.161")
-  }
-}
-
 plugins {
-  id("org.jetbrains.intellij") version "0.5.0"
+  id("org.jetbrains.intellij") version "0.5.1"
   id("org.jetbrains.grammarkit") version "2019.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
+  id ("com.jetbrains.rdgen") version "0.203.161"
   kotlin("jvm") version "1.4.10"
 }
 
@@ -32,7 +23,6 @@ apply {
 
 repositories {
   mavenCentral()
-  maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
 }
 
 grammarKit {
