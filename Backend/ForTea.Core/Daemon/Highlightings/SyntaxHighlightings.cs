@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Daemon.Tooltip;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Daemon;
+using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Highlightings
@@ -53,5 +54,20 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 
 		[NotNull]
 		public string ErrorStripeToolTip => string.Empty;
+	}
+
+	[StaticSeverityHighlighting(
+		Severity.INFO,
+		typeof(ReSharperSyntaxHighlightings),
+		OverlapResolve = OverlapResolveKind.NONE,
+		ShowToolTipInStatusBar = false
+	)]
+	public sealed class T4CodeBlockHighlighting : ReSharperSyntaxHighlighting, ICustomFrontendSeverityHighlighting
+	{
+		public T4CodeBlockHighlighting(DocumentRange range) : base(T4HighlightingAttributeIds.CODE_BLOCK, null, range)
+		{
+		}
+
+		public string FrontendSeverity => FrontendHighlighterSeverities.BACKGROUND;
 	}
 }
