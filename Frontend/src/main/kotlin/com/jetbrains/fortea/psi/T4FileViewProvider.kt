@@ -25,7 +25,7 @@ class T4FileViewProvider(
   override fun getBaseLanguage() = language
   override fun getLanguages() = languages
   override fun cloneInner(fileCopy: VirtualFile) = T4FileViewProvider(fileCopy, manager, false, language)
-  override fun getTemplateDataLanguage()= CSharpLanguage
+  override fun getTemplateDataLanguage() = CSharpLanguage
 
   override fun createFile(lang: Language): PsiFile? {
     if (lang == CSharpLanguage) {

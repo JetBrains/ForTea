@@ -167,11 +167,9 @@ tasks {
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
-    dependsOn(generateT4Lexer, generateT4Parser)
   }
 
   withType<Test> {
-    dependsOn(generateT4Lexer)
     useTestNG()
     environment("LOCAL_ENV_RUN", "true")
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
@@ -220,16 +218,7 @@ tasks {
 
   create("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps")
-  }
-
-  getByName("buildSearchableOptions") {
-    // A kind of hack.
-    // The task is broken outside of Rider
-    // and cannot be performed when building standalone plugin
-    // Assumption: plugin is built in Release mode if and only if
-    // it is built on the server as Ridier bundled plugin
-    enabled = buildConfiguration == "Release"
+    dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", generateT4Lexer, generateT4Parser)
   }
 
   getByName("buildPlugin") {
