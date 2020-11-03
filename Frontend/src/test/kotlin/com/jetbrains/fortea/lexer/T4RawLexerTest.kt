@@ -1,9 +1,6 @@
 package com.jetbrains.fortea.lexer
 
-import com.jetbrains.rdclient.lang.ProtocolLanguageManager
-import com.jetbrains.rider.test.ProtocolLanguageManagerMock
 import com.jetbrains.rider.test.RiderFrontendLexerTest
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 class T4RawLexerTest : RiderFrontendLexerTest("tt") {
@@ -165,9 +162,4 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
     |T4TokenType.BLOCK_END ('#>')
     |T4TokenType.NEW_LINE ('\n')""".trimMargin()
   )
-
-  @BeforeClass
-  fun beforeClass() {
-    ProtocolLanguageManager.setCustomInstance(ProtocolLanguageManagerMock)
-  }
 }

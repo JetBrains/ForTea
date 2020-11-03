@@ -7,20 +7,11 @@ import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-  repositories {
-    maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
-    mavenCentral()
-  }
-  dependencies {
-    classpath("com.jetbrains.rd:rd-gen:0.203.161")
-  }
-}
-
 plugins {
-  id("org.jetbrains.intellij") version "0.5.0"
-  id("org.jetbrains.grammarkit") version "2019.3"
+  id("org.jetbrains.intellij") version "0.5.1"
+  id("org.jetbrains.grammarkit") version "2020.2.1"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
+  id ("com.jetbrains.rdgen") version "0.203.161"
   kotlin("jvm") version "1.4.10"
 }
 
@@ -32,11 +23,6 @@ apply {
 
 repositories {
   mavenCentral()
-  maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
-}
-
-grammarKit {
-  grammarKitRelease = "2019.3"
 }
 
 val baseVersion = "2020.3"
@@ -170,7 +156,7 @@ tasks {
     purgeOldFiles = true
   }
 
-  task<GenerateParser>("generateT4Parser") {
+  val generateT4Parser = task<GenerateParser>("generateT4Parser") {
     source = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
     this.targetRoot = "src/main/java"
     purgeOldFiles = true
@@ -181,11 +167,9 @@ tasks {
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
-    dependsOn(generateT4Lexer)
   }
 
   withType<Test> {
-    dependsOn(generateT4Lexer)
     useTestNG()
     environment("LOCAL_ENV_RUN", "true")
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
@@ -234,16 +218,7 @@ tasks {
 
   create("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps")
-  }
-
-  getByName("buildSearchableOptions") {
-    // A kind of hack.
-    // The task is broken outside of Rider
-    // and cannot be performed when building standalone plugin
-    // Assumption: plugin is built in Release mode if and only if
-    // it is built on the server as Ridier bundled plugin
-    enabled = buildConfiguration == "Release"
+    dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", generateT4Lexer, generateT4Parser)
   }
 
   getByName("buildPlugin") {
