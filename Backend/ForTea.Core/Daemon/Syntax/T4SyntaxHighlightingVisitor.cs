@@ -43,7 +43,7 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 			AddHighlighting(T4HighlightingAttributeIds.ATTRIBUTE_VALUE, node);
 		}
 
-		public override void VisitCodeBlockNode(IT4CodeBlock codeBlockParam)
+		public override void VisitBlockNode(IT4Block codeBlockParam)
 		{
 			if (!codeBlockParam.IsVisibleInDocument()) return;
 			var highlighting = new T4CodeBlockHighlighting(codeBlockParam.GetDocumentRange());
@@ -53,8 +53,11 @@ namespace GammaJul.ForTea.Core.Daemon.Syntax
 		private static bool IsAttributeValue([NotNull] ITreeNode node) =>
 			node.GetParentOfType<IT4AttributeValue>() != null;
 
-		public override void VisitDirectiveNode(IT4Directive directiveParam) =>
+		public override void VisitDirectiveNode(IT4Directive directiveParam)
+		{
 			AddHighlighting(T4HighlightingAttributeIds.DIRECTIVE, directiveParam.Name);
+			base.VisitDirectiveNode(directiveParam);
+		}
 
 		public override void VisitAttributeNameNode(IT4AttributeName attributeNameParam) =>
 			AddHighlighting(T4HighlightingAttributeIds.DIRECTIVE_ATTRIBUTE, attributeNameParam);
