@@ -82,7 +82,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		protected void DoInvalidateAssemblies([NotNull] IT4File t4File)
 		{
 			var sourceFile = t4File.PhysicalPsiSourceFile;
-			if (sourceFile?.LanguageType.Is<T4ProjectFileType>() != true) return;
+			if (sourceFile?.IsValid() != true) return;
+			if (!sourceFile.LanguageType.Is<T4ProjectFileType>()) return;
 			var newData = new T4DeclaredAssembliesInfo(t4File);
 			var existingDeclaredAssembliesInfo = sourceFile.GetDeclaredAssembliesInfo();
 			sourceFile.SetDeclaredAssembliesInfo(newData);
