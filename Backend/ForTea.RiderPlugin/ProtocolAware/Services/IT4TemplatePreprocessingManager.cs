@@ -2,7 +2,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.Model;
 
-namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
+namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Services
 {
 	public interface IT4TemplatePreprocessingManager
 	{

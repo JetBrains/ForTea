@@ -14,9 +14,7 @@ namespace JetBrains.ForTea.RiderPlugin
 		IRequire<ILanguageCSharpZone>,
 		IRequire<ICodeEditingZone>,
 		IRequire<DaemonZone>,
-		IRequire<NavigationZone>,
-		IRequire<IRiderProductEnvironmentZone>,
-		IRequire<IRiderFeatureZone>
+		IRequire<NavigationZone>
 	{
 	}
 }

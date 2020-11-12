@@ -3,8 +3,8 @@ using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.Model;
+using JetBrains.ForTea.RiderPlugin.ProtocolAware.Services;
 using JetBrains.ForTea.RiderPlugin.Resources;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Host.Features;
 

@@ -17,7 +17,7 @@ using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 
-namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
+namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Services.Impl
 {
 	[SolutionComponent]
 	public sealed class T4TemplatePreprocessingManager : IT4TemplatePreprocessingManager

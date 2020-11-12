@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.Model;
-using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
+using JetBrains.ForTea.RiderPlugin.ProtocolAware.Services;
 using JetBrains.ProjectModel;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Host.Features.ProjectModel.View;
