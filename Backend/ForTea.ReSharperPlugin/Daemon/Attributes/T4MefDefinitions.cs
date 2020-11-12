@@ -107,4 +107,54 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 		internal ClassificationTypeDefinition ClassificationTypeDefinition;
 	}
 	#endregion
+
+	#region macro
+	[ClassificationType(ClassificationTypeNames = Name)]
+	[Order(
+		After = VsSyntaxPriorityClassificationDefinition.Name,
+		Before = VsAnalysisPriorityClassificationDefinition.Name
+	)]
+	[Export(typeof(EditorFormatDefinition))]
+	[Name(Name)]
+	[System.ComponentModel.DisplayName(Name)]
+	[UserVisible(true)]
+	internal sealed class MacroClassificationFormatDefinition : ClassificationFormatDefinition
+	{
+		private const string Name = T4HighlightingAttributeIds.MACRO;
+
+		public MacroClassificationFormatDefinition()
+		{
+			DisplayName = Name;
+			ForegroundColor = Color.FromRgb(0x56, 0x9C, 0xD6);
+		}
+
+		[Export, Name(Name), BaseDefinition("formal language")]
+		internal ClassificationTypeDefinition ClassificationTypeDefinition;
+	}
+	#endregion
+
+	#region environment variable
+	[ClassificationType(ClassificationTypeNames = Name)]
+	[Order(
+		After = VsSyntaxPriorityClassificationDefinition.Name,
+		Before = VsAnalysisPriorityClassificationDefinition.Name
+	)]
+	[Export(typeof(EditorFormatDefinition))]
+	[Name(Name)]
+	[System.ComponentModel.DisplayName(Name)]
+	[UserVisible(true)]
+	internal sealed class EnvironmentVariableClassificationFormatDefinition : ClassificationFormatDefinition
+	{
+		private const string Name = T4HighlightingAttributeIds.ENVIRONMENT_VARIABLE;
+
+		public EnvironmentVariableClassificationFormatDefinition()
+		{
+			DisplayName = Name;
+			ForegroundColor = Color.FromRgb(0xB5, 0xCE, 0xA8);
+		}
+
+		[Export, Name(Name), BaseDefinition("formal language")]
+		internal ClassificationTypeDefinition ClassificationTypeDefinition;
+	}
+	#endregion
 }

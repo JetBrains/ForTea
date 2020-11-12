@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Attributes;
+using GammaJul.ForTea.Core.Daemon.Syntax;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -14,42 +14,47 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Processes
 {
 	/// <summary>Process that highlights block tags and missing token errors.</summary>
-	internal sealed class T4HighlightingProcess : IDaemonStageProcess, IRecursiveElementProcessor
+	internal sealed class T4HighlightingProcess : IDaemonStageProcess, IRecursiveElementProcessor<IHighlightingConsumer>
 	{
-		[NotNull, ItemNotNull] private readonly List<HighlightingInfo> _highlightings = new List<HighlightingInfo>();
 		public IDaemonProcess DaemonProcess { get; }
 
 		/// <summary>Gets the associated T4 file.</summary>
 		private IT4File File { get; }
 
-		public bool InteriorShouldBeProcessed(ITreeNode element) => !(element is IT4File);
+		public bool InteriorShouldBeProcessed(ITreeNode element, IHighlightingConsumer consumer) =>
+			!(element is IT4File);
 
-		public void ProcessAfterInterior(ITreeNode element)
+		public void ProcessAfterInterior(ITreeNode element, IHighlightingConsumer consumer)
 		{
 		}
 
-		public bool ProcessingIsFinished => false;
+		public bool IsProcessingFinished(IHighlightingConsumer consumer) => false;
 
 		public void Execute(Action<DaemonStageResult> commiter)
 		{
-			File.ProcessDescendants(this);
+			var sourceFile = File.PhysicalPsiSourceFile;
+			if (sourceFile == null) return;
+			var consumer = new DefaultHighlightingConsumer(sourceFile);
+			File.ProcessDescendants(this, consumer);
 			var solution = File.GetSolution();
-			var relevantHighlightings = _highlightings
-				.Where(info => info.Range.Document.GetPsiSourceFile(solution) == File.PhysicalPsiSourceFile);
+			var relevantHighlightings = consumer
+				.Highlightings
+				.Where(info => info.Range.Document.GetPsiSourceFile(solution) == sourceFile);
 			commiter(new DaemonStageResult(relevantHighlightings.ToArray()));
 		}
 
-		private void AddHighlighting(DocumentRange range, [NotNull] IHighlighting highlighting) =>
-			_highlightings.Add(new HighlightingInfo(range, highlighting));
-
-		public void ProcessBeforeInterior(ITreeNode element)
+		public void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer consumer)
 		{
 			string attributeId = GetHighlightingAttributeId(element);
 			if (attributeId != null)
 			{
 				DocumentRange range = element.GetHighlightingRange();
-				AddHighlighting(range, new ReSharperSyntaxHighlighting(attributeId, string.Empty, range));
+				consumer.AddHighlighting(new ReSharperSyntaxHighlighting(attributeId, string.Empty, range));
 			}
+
+			if (!(element is IT4TreeNode t4Element)) return;
+			var visitor = new T4SyntaxHighlightingVisitor(consumer);
+			t4Element.Accept(visitor);
 		}
 
 		[CanBeNull]
