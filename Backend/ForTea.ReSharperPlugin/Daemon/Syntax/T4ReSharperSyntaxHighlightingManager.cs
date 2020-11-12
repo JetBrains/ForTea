@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Syntax
 {
 	[Language(typeof(T4Language))]
-	public class T4ReSharperSyntaxHighlightProcessor : SyntaxHighlightingManager
+	public class T4ReSharperSyntaxHighlightingManager : SyntaxHighlightingManager
 	{
 		[NotNull]
 		public override SyntaxHighlightingStageProcess CreateProcess(
