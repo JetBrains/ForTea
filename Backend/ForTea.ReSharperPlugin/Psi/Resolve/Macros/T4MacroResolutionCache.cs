@@ -38,6 +38,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 		{
 			var macros = file
 				.GetThisAndChildrenOfType<IT4Macro>()
+				.Where(macro => macro.RawAttributeValue != null)
 				.Distinct(macro => macro.RawAttributeValue.GetText());
 			return new T4MacroResolutionRequest(macros.ToList());
 		}
