@@ -13,13 +13,16 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
+import com.jetbrains.rider.debugger.DebuggerHelperHost
 
 class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
+  private val debuggerHelperHost = DebuggerHelperHost.getInstance(project)
   override fun create(executorId: String, environment: ExecutionEnvironment): RunProfileState {
     val dotNetExecutable = parameters.toDotNetExecutable()
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
       riderDotNetActiveRuntimeHost,
+      debuggerHelperHost,
       dotNetExecutable.exePath,
       dotNetExecutable.useMonoRuntime
     )
