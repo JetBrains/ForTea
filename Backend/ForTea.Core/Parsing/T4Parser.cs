@@ -109,6 +109,7 @@ namespace GammaJul.ForTea.Core.Parsing
 						var file = (File) ParseFileInternal();
 						T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
 						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
+						if (!CanResolveMacros) return file;
 						ResolveMacros(file);
 						ResolveIncludes(file);
 						return file;
@@ -135,11 +136,13 @@ namespace GammaJul.ForTea.Core.Parsing
 			return HandleErrorInDirective(result, new UnexpectedToken("Missing directive name"));
 		}
 
+		private bool CanResolveMacros =>
+			LogicalSourceFile != null && Context.MostSuitableProjectFile != null && MacroResolver != null;
+
 		private void ResolveMacros([NotNull] IT4File file)
 		{
-			var context = Context.MostSuitableProjectFile;
-			var logicalSourceFile = LogicalSourceFile;
-			if (context == null || logicalSourceFile == null || MacroResolver == null) return;
+			var context = Context.MostSuitableProjectFile.NotNull();
+			var logicalSourceFile = LogicalSourceFile.NotNull();
 			var macros = new List<string>();
 			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
 			{
@@ -148,7 +151,7 @@ namespace GammaJul.ForTea.Core.Parsing
 
 			IReadOnlyDictionary<string, string> resolvedMacros;
 			if (macros.IsEmpty()) resolvedMacros = EmptyDictionary<string, string>.Instance;
-			else resolvedMacros = MacroResolver.ResolveHeavyMacros(macros, context);
+			else resolvedMacros = MacroResolver.NotNull().ResolveHeavyMacros(macros, context);
 			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
 			{
 				directive.InitializeResolvedPath(resolvedMacros, logicalSourceFile, context);

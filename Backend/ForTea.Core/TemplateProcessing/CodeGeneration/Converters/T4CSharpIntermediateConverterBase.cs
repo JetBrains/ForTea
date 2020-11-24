@@ -45,8 +45,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			string ns = File
 				.LogicalPsiSourceFile
 				.ToProjectFile()
-				.NotNull()
-				.CalculateExpectedNamespace(T4Language.Instance);
+				?.CalculateExpectedNamespace(T4Language.Instance);
 			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
 			{

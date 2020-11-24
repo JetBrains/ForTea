@@ -74,6 +74,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		{
 			Locks.ExecuteOrQueueEx("T4 assembly reference invalidation", () =>
 			{
+				if (!t4File.IsValid()) return;
 				using var cookie = ReadLockCookie.Create();
 				PsiFiles.ExecuteAfterCommitAllDocuments(() => DoInvalidateAssemblies(t4File));
 			});
