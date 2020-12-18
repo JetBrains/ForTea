@@ -25,7 +25,7 @@ repositories {
   mavenCentral()
 }
 
-val baseVersion = "2020.3"
+val baseVersion = "2021.1"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 

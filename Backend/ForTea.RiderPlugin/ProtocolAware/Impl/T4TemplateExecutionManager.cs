@@ -191,7 +191,8 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			"Could not execute T4 file",
 			"Execution is already running",
 			true,
-			RdNotificationEntryType.ERROR
+			RdNotificationEntryType.ERROR,
+			new List<NotificationHyperlink>()
 		));
 	}
 }

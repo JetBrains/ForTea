@@ -19,7 +19,7 @@ open class T4RunConfigurationParameters(
 ) {
   fun toDotNetExecutable() = DotNetExecutable(
     exePath,
-    "",
+    null,
     workingDirectory,
     programParameters,
     false,
