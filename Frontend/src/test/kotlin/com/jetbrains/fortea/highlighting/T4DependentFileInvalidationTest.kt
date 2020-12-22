@@ -27,6 +27,7 @@ import java.io.PrintStream
  * I made some changes in that API and will supposedly merge them into net202.
  * TODO: can I remove waitForDaemon() calls?
  */
+@Ignore("Broken")
 class T4DependentFileInvalidationTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithManyTemplates"
   private val projectName = "ProjectWithManyTemplates"
@@ -58,7 +59,6 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
   }
 
   @Test
-  @Ignore("Broken")
   fun `test that a change in a file triggers indirect include invalidation`() {
     doTestWithMarkupModel("$projectName/Directory/IncludeWithUsage.ttinclude", "IncludeWithUsage_before.gold")
     withOpenedEditor("$projectName/IncludeWithOtherFunction.ttinclude") {

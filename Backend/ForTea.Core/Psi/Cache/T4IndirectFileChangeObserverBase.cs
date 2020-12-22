@@ -5,6 +5,8 @@ using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache
@@ -39,8 +41,17 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 
 		protected virtual void QueueAfterCommit() => Services.Locks.ExecuteOrQueue(Lifetime, ActivityName, () =>
 		{
-			AfterCommitSync(IndirectDependencies.WhereNotNull().Where(it => it.IsValid()).ToSet());
-			IndirectDependencies = new HashSet<IPsiSourceFile>();
+			using var cookie = ReadLockCookie.Create();
+			// We need to have documents committed before we can do anything,
+			// because after PSI file creation/deletion/etc the graph might contain incorrect information on whether
+			// a certain file has a preprocessed root or not.
+			// Also, some implementations access the PSI files,
+			// which might become invalid after the simple queueing
+			Services.Files.ExecuteAfterCommitAllDocuments(() =>
+			{
+				AfterCommitSync(IndirectDependencies.WhereNotNull().Where(it => it.IsValid()).ToSet());
+				IndirectDependencies = new HashSet<IPsiSourceFile>();
+			});
 		});
 
 		protected virtual void OnFilesIndirectlyAffected(
