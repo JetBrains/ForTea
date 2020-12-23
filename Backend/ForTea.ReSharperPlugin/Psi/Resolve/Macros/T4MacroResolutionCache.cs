@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
+using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Interop.WinApi;
 using JetBrains.Lifetimes;
@@ -25,13 +26,16 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 	[PsiComponent]
 	public sealed class T4MacroResolutionCache : T4PsiAwareCacheBase<T4MacroResolutionRequest, T4MacroResolutionData>
 	{
+		[NotNull]
+		public Signal<IPsiSourceFile> OnFileMarkedForInvalidation { get; }
+
 		public T4MacroResolutionCache(
 			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
-			[NotNull] IPersistentIndexManager persistentIndexManager
-		) : base(lifetime, locks, persistentIndexManager, T4MacroResolutionDataMarshaller.Instance)
-		{
-		}
+			[NotNull] IPersistentIndexManager persistentIndexManager,
+			[NotNull] ISolution solution
+		) : base(lifetime, locks, persistentIndexManager, T4MacroResolutionDataMarshaller.Instance) =>
+			OnFileMarkedForInvalidation = new(lifetime, "Update from T4MacroResolutionCache");
 
 		[NotNull]
 		protected override T4MacroResolutionRequest Build(IT4File file)
@@ -48,8 +52,15 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 			var request = (T4MacroResolutionRequest) builtPart.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			var macroNames = request.MacrosToResolve.Select(macro => macro.RawAttributeValue.GetText());
+			var oldKeys = Map.TryGetValue(sourceFile)?.ResolvedMacros.Keys ?? EmptyList<string>.Instance;
 			var data = new T4MacroResolutionData(ResolveHeavyMacros(macroNames, projectFile));
+			var newKeys = data.ResolvedMacros.Keys;
 			base.Merge(sourceFile, data);
+
+			if (!newKeys.All(it => oldKeys.Contains(it)))
+			{
+				OnFileMarkedForInvalidation.Fire(sourceFile);
+			}
 		}
 
 		[NotNull]
@@ -69,6 +80,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 					succeeded = HResultHelpers.SUCCEEDED(vsBuildMacroInfo.Value.GetBuildMacroValue(macro, out value)) &&
 					            !string.IsNullOrEmpty(value);
 				}
+
 				if (!succeeded)
 				{
 					value = MSBuildExtensions.GetStringValue(T4ResolutionUtils.TryGetVsHierarchy(file), macro, null);
