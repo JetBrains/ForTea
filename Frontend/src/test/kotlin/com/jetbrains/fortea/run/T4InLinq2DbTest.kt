@@ -1,5 +1,7 @@
 package com.jetbrains.fortea.run
 
+import com.intellij.openapi.application.PathManager
+import com.jetbrains.rider.test.framework.combine
 import org.testng.annotations.Test
 import java.time.Duration
 
@@ -8,5 +10,12 @@ class T4InLinq2DbTest : T4RunFileTestBase() {
   override val backendLoadedTimeout: Duration = Duration.ofMinutes(10)
 
   @Test
-  fun testDefaultLinq2DbTemplate() = doTest(".generated.cs")
+  fun testDefaultLinq2DbTemplate() {
+    try {
+      doTest(".generated.cs")
+    }
+    finally {
+      java.io.File(project.basePath).copyRecursively(java.io.File(PathManager.getLogPath()).combine("testDefaultLinq2DbTemplate"))
+    }
+  }
 }
