@@ -12,6 +12,7 @@ import com.jetbrains.rider.test.scriptingApi.waitAllCommandsFinished
 import com.jetbrains.rider.test.scriptingApi.waitForProjectModelReady
 import com.jetbrains.rd.platform.util.application
 import java.io.File
+import java.nio.file.Files
 
 open class T4TestHelper(val project: Project) {
   open val t4File: File
@@ -56,7 +57,7 @@ open class T4TestHelper(val project: Project) {
   }
 
   fun dumpExecutionResult(resultExtension: String? = null, printer: ((String) -> String)? = null) = executeWithGold(t4File.path) {
-    val text = findOutputFile(resultExtension).readText()
+    val text = Files.readString(findOutputFile(resultExtension).toPath()).replace("\uFEFF", "")
     it.print(printer?.let { printer(text) } ?: text)
   }
 
