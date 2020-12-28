@@ -8,7 +8,7 @@
 
         private static int PostRegisterMain(string[] args)
         {
-            var transformation = new $(PARAMETER_0) ();
+            var transformation = new $(PARAMETER_0)();
             string result = transformation.TransformText();
             var encoding = global::System.Text.Encoding.GetEncoding($(PARAMETER_1));
             foreach (global::System.CodeDom.Compiler.CompilerError error in transformation.Errors)
