@@ -15,7 +15,9 @@ class T4InLinq2DbTest : T4RunFileTestBase() {
       doTest(".generated.cs")
     }
     finally {
-      java.io.File(project.basePath).copyRecursively(java.io.File(PathManager.getLogPath()).combine("testDefaultLinq2DbTemplate"))
+      val target = java.io.File(PathManager.getLogPath()).combine("testDefaultLinq2DbTemplate")
+      if (target.exists()) target.deleteRecursively()
+      java.io.File(project.basePath).copyRecursively(target)
     }
   }
 }
