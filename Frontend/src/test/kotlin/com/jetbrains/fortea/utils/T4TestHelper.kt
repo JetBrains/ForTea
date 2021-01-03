@@ -61,7 +61,13 @@ open class T4TestHelper(val project: Project) {
     it.print(printer?.let { printer(text) } ?: text)
   }
 
-  fun assertNoOutputWithExtension(extension: String) = assert(outputFileCandidates.none {
-    it.nameWithoutExtension == t4File.nameWithoutExtension && it.name.endsWith(extension)
-  })
+  fun assertNoOutputWithExtension(extension: String) {
+    val item = outputFileCandidates.firstOrNull {
+      it.nameWithoutExtension == t4File.nameWithoutExtension && it.name.endsWith(extension)
+    }
+    assert(item == null) {
+      "Execution should have failed, but seems to have succeeded. " +
+        "File name: $item; File contents: ${Files.readString(item!!.toPath())}"
+    }
+  }
 }
