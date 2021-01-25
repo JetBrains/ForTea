@@ -3,15 +3,16 @@ package com.jetbrains.fortea.run
 import com.intellij.execution.ExecutionManager
 import com.intellij.execution.impl.ExecutionManagerImpl
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.jetbrains.fortea.configuration.execution.impl.T4SynchronousRunConfigurationExecutor
 import com.jetbrains.fortea.utils.T4TestHelper
 import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.fortea.model.T4ExecutionRequest
 import com.jetbrains.fortea.model.T4FileLocation
 import com.jetbrains.fortea.model.t4ProtocolModel
-import com.jetbrains.rd.platform.util.getComponent
-import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.projectView.workspace.getId
+import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import org.testng.annotations.BeforeMethod
@@ -46,13 +47,13 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
   }
 
   private fun executeT4File() {
-    val host = project.getComponent<ProjectModelViewHost>()
     val virtualFile = helper.t4File.path.toVirtualFile(true).shouldNotBeNull()
-    val id = host.getItemsByVirtualFile(virtualFile).single().id
+    val projectModelEntity = WorkspaceModel.getInstance(project).getProjectModelEntities(virtualFile, project).single()
+    val id = projectModelEntity.getId(project)!!
     val location = T4FileLocation(id)
     project.solution.t4ProtocolModel.prepareExecution.sync(location)
     val request = T4ExecutionRequest(location, false)
-    T4SynchronousRunConfigurationExecutor(project, host) {
+    T4SynchronousRunConfigurationExecutor(project) {
       !T4SynchronousRunConfigurationExecutor.isExecutionRunning
     }.execute(request)
   }

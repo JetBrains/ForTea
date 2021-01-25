@@ -15,7 +15,6 @@ import com.jetbrains.rd.platform.util.idea.LifetimedProjectService
 import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.BuildToolWindowFactory
 import com.jetbrains.rider.build.ui.BuildResultPanel
-import com.jetbrains.rider.projectView.ProjectModelViewHost
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
@@ -34,8 +33,7 @@ class T4BuildToolWindowFactory(project: Project) : LifetimedProjectService(proje
     val contentManager = toolWindow.contentManager
     toolWindow.setIcon(AllIcons.Toolwindows.ToolWindowBuild)
     // Required for hiding window without content
-    val projectModelViewHost = ProjectModelViewHost.getInstance(project)
-    val panel = BuildResultPanel(project, projectModelViewHost, projectServiceLifetime)
+    val panel = BuildResultPanel(project, projectServiceLifetime)
     val toolWindowContent = contentManager.factory.createContent(null, windowHeader, true).apply {
       StatusBarUtil.setStatusBarInfo(project, "")
       component = panel
