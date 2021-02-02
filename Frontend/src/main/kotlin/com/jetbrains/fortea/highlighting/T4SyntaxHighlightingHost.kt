@@ -3,13 +3,13 @@ package com.jetbrains.fortea.highlighting
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
-import com.jetbrains.rd.platform.util.idea.getOrCreateUserData
-import com.jetbrains.rd.util.addUnique
-import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rdclient.document.FrontendDocumentHost
-import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 import com.jetbrains.fortea.model.T4RdDocumentModel
 import com.jetbrains.fortea.model.t4RdDocumentModel
+import com.jetbrains.rd.platform.util.idea.getOrCreateUserData
+import com.jetbrains.rd.util.lifetime.Lifetime
+import com.jetbrains.rd.util.put
+import com.jetbrains.rdclient.document.FrontendDocumentHost
+import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 
 class T4SyntaxHighlightingHost(project: Project) : LifetimedProjectComponent(project) {
   companion object {
@@ -20,7 +20,7 @@ class T4SyntaxHighlightingHost(project: Project) : LifetimedProjectComponent(pro
 
     private fun putT4RdDocumentModel(lifetime: Lifetime, project: Project, document: Document, model: T4RdDocumentModel) {
       val map = project.getOrCreateUserData(T4_DOCUMENT_EDITABLE_ENTRY_KEY) { mutableMapOf() }
-      map.addUnique(lifetime, document, model)
+      map.put(lifetime, document, model)
     }
   }
 
