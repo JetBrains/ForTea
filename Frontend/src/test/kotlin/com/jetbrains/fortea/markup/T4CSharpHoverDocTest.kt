@@ -10,9 +10,11 @@ import com.jetbrains.rider.daemon.generated.ReSharperAttributesIds
 import com.jetbrains.rider.test.base.HoverDocTestBase
 import com.jetbrains.rider.test.base.`is`
 import com.jetbrains.rider.test.framework.flushQueues
+import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 import kotlin.test.assertNotNull
 
+@Ignore
 class T4CSharpHoverDocTest : HoverDocTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4"
 
