@@ -23,6 +23,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		protected override void DoExecute(Action<IEnumerable<HighlightingInfo>> committer)
 		{
 			var psiSourceFile = File.LogicalPsiSourceFile;
+			if (!psiSourceFile.IsValid()) return;
 			var projectFile = psiSourceFile.ToProjectFile();
 			if (projectFile == null) return;
 			var visitor = new T4IncludeAwareDaemonProcessVisitor(psiSourceFile);
