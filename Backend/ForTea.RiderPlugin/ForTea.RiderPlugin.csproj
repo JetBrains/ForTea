@@ -13,7 +13,6 @@
   <Import Project="$(SolutionDir)targets\EnvDTETargets.targets" />
   <ItemGroup>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
-    <ProjectReference Include="..\JetBrains.TextTemplating\JetBrains.TextTemplating.csproj" />
     <PackageReference Include="JetBrains.EnvDTE.Host" Version="$(EnvDTEVersion)" />
   </ItemGroup>
 </Project>

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using GammaJul.ForTea.Core.Services;
 using JetBrains.Application;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
-using Microsoft.VisualStudio.TextTemplating;
 
 namespace JetBrains.ForTea.RiderPlugin
 {
@@ -27,7 +27,12 @@ namespace JetBrains.ForTea.RiderPlugin
 					yield return name;
 				}
 
-				yield return typeof(ITextTemplatingEngineHost).Assembly.Location;
+				yield return FileSystemPath.Parse(Assembly.GetExecutingAssembly().Location)
+					.Parent
+					.GetChildren("JetBrains.TextTemplating.dll")
+					.Select(child => child.GetAbsolutePath())
+					.Single()
+					.FullPath;
 			}
 		}
 

@@ -1,15 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using EnvDTE;
-using EnvDTE100;
-using EnvDTE80;
-using EnvDTE90;
-using EnvDTE90a;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.Util;
@@ -33,28 +28,14 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 			base.Resolve(pathWithMacros) ?? ResolveAsDte(pathWithMacros.ResolvedPath);
 
 		[CanBeNull]
-		private static FileSystemPath ResolveAsDte([NotNull] string assemblyName)
-		{
-			var assembly = NameToEnvDTEAssemblyMap.TryGetValue(assemblyName);
-			if (assembly == null) return null;
-			return FileSystemPath.Parse(assembly.Location);
-		}
+		private static FileSystemPath ResolveAsDte([NotNull] string assemblyName) =>
+			NameToEnvDTEAssemblyMap.TryGetValue(assemblyName);
 
-		[NotNull, ItemNotNull]
-		private static IEnumerable<Assembly> EnvDTEAssemblies { get; } = new[]
-		{
-			typeof(Solution).Assembly, // EnvDTE.dll
-			typeof(Solution2).Assembly, // EnvDTE80.dll
-			typeof(Solution3).Assembly, // EnvDTE90.dll
-			typeof(Debugger4).Assembly, // EnvDTE90a.dll
-			typeof(Solution4).Assembly // EnvDTE100.dll
-		};
-
-		private static IDictionary<string, Assembly> NameToEnvDTEAssemblyMap { get; } = EnvDTEAssemblies
-			.ToDictionary(assembly => assembly.FullName)
-			.Concat(EnvDTEAssemblies
-				.ToDictionary(assembly => assembly.FullName.Substring(0, assembly.FullName.IndexOf(',')))
-			)
-			.ToDictionary(pair => pair.Key, pair => pair.Value);
+		private static IDictionary<string, FileSystemPath> NameToEnvDTEAssemblyMap { get; } = FileSystemPath
+			.Parse(typeof(Lifetime).Assembly.Location)
+			.Parent
+			.GetChildren("*EnvDTE*.dll")
+			.Select(child => child.GetAbsolutePath())
+			.ToDictionary(assembly => assembly.NameWithoutExtension);
 	}
 }
