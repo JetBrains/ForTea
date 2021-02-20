@@ -64,13 +64,9 @@ val pluginFiles = listOf(
   "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.TextTemplating"
 )
 
+// We don't need to pack EnvDTE interface assemblies, because they are already referenced in ReSharperHost
 val libraryFiles = listOf(
   // A temporary fix. Remove this once EnvDTE nugets are part of the platform
-  "EnvDTE",
-  "EnvDTE80",
-  "EnvDTE90",
-  "EnvDTE90a",
-  "EnvDTE100",
   "JetBrains.EnvDTE.Client"
 ).map { "output/JetBrains.TextTemplating/$buildConfiguration/$it" } +
   "output/ForTea.RiderPlugin/$buildConfiguration/JetBrains.EnvDTE.Host"

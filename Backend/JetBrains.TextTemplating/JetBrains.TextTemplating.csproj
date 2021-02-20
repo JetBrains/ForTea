@@ -11,11 +11,7 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)targets\EnvDTETargets.targets"/>
   <ItemGroup>
-    <PackageReference Include="JetBrains.EnvDTE" Version="$(EnvDTEVersion)"/>
-    <PackageReference Include="JetBrains.EnvDTE80" Version="$(EnvDTEVersion)"/>
-    <PackageReference Include="JetBrains.EnvDTE90" Version="$(EnvDTEVersion)"/>
-    <PackageReference Include="JetBrains.EnvDTE90a" Version="$(EnvDTEVersion)"/>
-    <PackageReference Include="JetBrains.EnvDTE100" Version="$(EnvDTEVersion)"/>
+    <PackageReference Include="JetBrains.EnvDTE" Version="20201207.23.0" />
     <PackageReference Include="JetBrains.EnvDTE.Client" Version="$(EnvDTEVersion)"/>
   </ItemGroup>
 </Project>
