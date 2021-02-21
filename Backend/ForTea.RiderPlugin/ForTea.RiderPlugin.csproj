@@ -10,7 +10,6 @@
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
   </PropertyGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
-  <Import Project="$(SolutionDir)targets\EnvDTETargets.targets" />
   <ItemGroup>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
     <Reference Include="JetBrains.EnvDTE.Host.dll">

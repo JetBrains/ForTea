@@ -9,7 +9,6 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>Microsoft.VisualStudio.TextTemplating</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)targets\EnvDTETargets.targets"/>
   <ItemGroup>
     <PackageReference Include="JetBrains.EnvDTE" Version="20201207.23.0" />
     <Reference Include="JetBrains.EnvDTE.Client.dll">
