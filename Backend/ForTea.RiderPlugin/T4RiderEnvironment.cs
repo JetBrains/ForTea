@@ -27,12 +27,16 @@ namespace JetBrains.ForTea.RiderPlugin
 					yield return name;
 				}
 
-				yield return FileSystemPath.Parse(Assembly.GetExecutingAssembly().Location)
+				string textTemplating = FileSystemPath.Parse(Assembly.GetExecutingAssembly().Location)
 					.Parent
 					.GetChildren("JetBrains.TextTemplating.dll")
 					.Select(child => child.GetAbsolutePath())
-					.Single()
-					.FullPath;
+					.SingleItem()
+					?.FullPath;
+				if (textTemplating != null)
+				{
+					yield return textTemplating;
+				}
 			}
 		}
 
