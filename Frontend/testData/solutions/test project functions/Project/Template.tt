@@ -1,0 +1,19 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#
+    var provider = (IServiceProvider) Host;
+    var dte = (DTE) provider.GetService(typeof(DTE));
+    var solution = dte.Solution;
+    foreach (Project project in solution.Projects)
+    {
+#>Project:
+    Name: <#= project.Name #>
+    ProjectItems: <#= project.ProjectItems #>
+    DTE: <#= project.DTE #>
+    FileName exists: <#= !string.IsNullOrEmpty(project.FileName) #>
+    FullName exists: <#= !string.IsNullOrEmpty(project.FullName) #>
+    Collection: <#= project.Collection #>
+<#
+    }
+#>

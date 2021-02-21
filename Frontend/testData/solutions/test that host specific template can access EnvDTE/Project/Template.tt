@@ -1,0 +1,7 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#
+    var provider = (IServiceProvider) Host;
+    var dte = (DTE) provider.GetService(typeof(DTE));
+#><#= dte #>

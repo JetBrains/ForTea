@@ -1,0 +1,11 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#
+    var provider = (IServiceProvider) Host;
+    var dte = (DTE) provider.GetService(typeof(DTE));
+#>
+Name: <#= dte.Name #>
+FileName exists: <#= !string.IsNullOrEmpty(dte.FileName) #>
+FullName exists: <#= !string.IsNullOrEmpty(dte.FullName) #>
+Mode: <#= dte.Mode #>

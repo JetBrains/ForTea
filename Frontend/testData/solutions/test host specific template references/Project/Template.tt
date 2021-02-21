@@ -1,0 +1,16 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ output extension=".txt" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#
+    ITextTemplatingEngineHost h;
+    TextTransformation t = this;
+    ToStringHelper.ToStringWithCulture(32);
+    h = Host;
+#>
+<#
+    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+    {
+#><#= assembly.GetName().Name #>
+<#
+    }
+#>

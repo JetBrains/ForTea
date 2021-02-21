@@ -6,3 +6,10 @@
     TextTransformation t = this;
     ToStringHelper.ToStringWithCulture(32);
 #>
+<#
+    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+    {
+#><#= assembly.GetName().Name #>
+<#
+    }
+#>
