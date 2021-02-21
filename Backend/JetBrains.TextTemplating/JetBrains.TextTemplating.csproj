@@ -12,6 +12,9 @@
   <Import Project="$(SolutionDir)targets\EnvDTETargets.targets"/>
   <ItemGroup>
     <PackageReference Include="JetBrains.EnvDTE" Version="20201207.23.0" />
-    <PackageReference Include="JetBrains.EnvDTE.Client" Version="$(EnvDTEVersion)"/>
+    <Reference Include="JetBrains.EnvDTE.Client.dll">
+      <HintPath>../Libraries/JetBrains.EnvDTE.Client.dll</HintPath>
+    </Reference>
   </ItemGroup>
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')"/>
 </Project>
