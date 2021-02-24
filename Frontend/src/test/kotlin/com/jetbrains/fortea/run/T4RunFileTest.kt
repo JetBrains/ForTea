@@ -65,6 +65,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test how host resolves null`() = testExecutionFailure(".txt")
   @Test fun `test file with a macro twice`() = doTest(dumpCsproj = false)
   @Test fun `test default references`() = doTest(dumpCsproj = false)
+  @Ignore
   @Test fun `test host specific template references`() = doTest(dumpCsproj = false)
   @Test fun `test that host specific template can access EnvDTE`() = doTest(dumpCsproj = false)
   @Test fun `test basic DTE functions`() = doTest(dumpCsproj = false)
