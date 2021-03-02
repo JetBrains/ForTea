@@ -24,7 +24,7 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
       riderDotNetActiveRuntimeHost,
       debuggerHelperHost,
       dotNetExecutable.exePath,
-      dotNetExecutable.useMonoRuntime
+      dotNetExecutable.runtimeType
     )
     val model = environment.project.solution.t4ProtocolModel
     return when (executorId) {
