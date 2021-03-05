@@ -69,7 +69,7 @@ class T4BuildSessionViewImpl(
     val line = message.location.line + 1
     val column = message.location.column + 1
     val filePath = if (!message.file.isNullOrEmpty()) message.file else file
-    return BuildDiagnostic(kind, message.content, message.id, message.projectId, filePath, line, column)
+    return BuildDiagnostic(kind, message.content, message.id, message.projectId, null, filePath, line, column)
   }
 
   private fun toDiagnosticKind(kind: T4BuildMessageKind) = when (kind) {
