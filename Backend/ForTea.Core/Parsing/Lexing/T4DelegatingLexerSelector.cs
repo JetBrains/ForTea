@@ -31,5 +31,11 @@ namespace GammaJul.ForTea.Core.Parsing.Lexing
 			if (file == SourceFileForCustomLexer) return CustomLexer;
 			return Delegate.SelectLexer(file);
 		}
+
+		public bool HasCustomLexer(IPsiSourceFile file)
+		{
+			if (file == SourceFileForCustomLexer) return true;
+			return Delegate.HasCustomLexer(file);
+		}
 	}
 }

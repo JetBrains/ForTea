@@ -19,5 +19,7 @@ namespace GammaJul.ForTea.Core.Parsing.Lexing
 			.NotNull()
 			.GetPrimaryLexerFactory()
 			.CreateLexer(file.Document.Buffer);
+
+		public bool HasCustomLexer(IPsiSourceFile file) => false;
 	}
 }

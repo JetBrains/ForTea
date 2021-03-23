@@ -55,7 +55,8 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 			var rootSourceFile = graph.FindBestRoot(sourceFile).NotNull();
 			var selector = new T4DelegatingLexerSelector(lexer, sourceFile, T4DocumentLexerSelector.Instance);
 			var rootLexer = selector.SelectLexer(rootSourceFile);
-			return new T4Parser(rootLexer, rootSourceFile, sourceFile, selector);
+			if (rootSourceFile == sourceFile) return new T4Parser(rootLexer, rootSourceFile, sourceFile, selector);
+			return new T4CloningParser(rootSourceFile, sourceFile, selector);
 		}
 
 		/// <summary>

@@ -8,5 +8,7 @@ namespace GammaJul.ForTea.Core.Parsing.Lexing
 	{
 		[NotNull]
 		ILexer SelectLexer([NotNull] IPsiSourceFile file);
+
+		bool HasCustomLexer([NotNull] IPsiSourceFile file);
 	}
 }

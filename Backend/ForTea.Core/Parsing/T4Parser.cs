@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Lexing;
@@ -15,7 +14,6 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Parsing
 {
@@ -36,8 +34,8 @@ namespace GammaJul.ForTea.Core.Parsing
 		[CanBeNull]
 		private IT4IncludeResolver IncludeResolver { get; }
 
-		[CanBeNull]
-		private IT4MacroResolver MacroResolver { get; }
+		[NotNull]
+		private T4MacroInitializer MacroInitializer { get; }
 
 		[NotNull]
 		private IT4LexerSelector LexerSelector { get; }
@@ -65,7 +63,8 @@ namespace GammaJul.ForTea.Core.Parsing
 			SetLexer(new T4FilteringLexer(lexer));
 			var solution = physicalSourceFile?.GetSolution();
 			IncludeResolver = solution?.GetComponent<IT4IncludeResolver>();
-			MacroResolver = solution?.GetComponent<IT4MacroResolver>();
+			var macroResolver = solution?.GetComponent<IT4MacroResolver>();
+			MacroInitializer = new T4MacroInitializer(LogicalSourceFile, Context, macroResolver);
 		}
 
 		[NotNull]
@@ -109,8 +108,8 @@ namespace GammaJul.ForTea.Core.Parsing
 						var file = (File) ParseFileInternal();
 						T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
 						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
-						if (!CanResolveMacros) return file;
-						ResolveMacros(file);
+						if (!MacroInitializer.CanResolveMacros) return file;
+						MacroInitializer.ResolveMacros(file);
 						ResolveIncludes(file);
 						return file;
 					}
@@ -134,28 +133,6 @@ namespace GammaJul.ForTea.Core.Parsing
 			var tempParsingResult = Match(T4TokenNodeTypes.DIRECTIVE_START);
 			result.AppendNewChild(tempParsingResult);
 			return HandleErrorInDirective(result, new UnexpectedToken("Missing directive name"));
-		}
-
-		private bool CanResolveMacros =>
-			LogicalSourceFile != null && Context.MostSuitableProjectFile != null && MacroResolver != null;
-
-		private void ResolveMacros([NotNull] IT4File file)
-		{
-			var context = Context.MostSuitableProjectFile.NotNull();
-			var logicalSourceFile = LogicalSourceFile.NotNull();
-			var macros = new List<string>();
-			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
-			{
-				macros.AddRange(directive.RawMacros);
-			}
-
-			IReadOnlyDictionary<string, string> resolvedMacros;
-			if (macros.IsEmpty()) resolvedMacros = EmptyDictionary<string, string>.Instance;
-			else resolvedMacros = MacroResolver.NotNull().ResolveHeavyMacros(macros, context);
-			foreach (var directive in file.BlocksEnumerable.OfType<IT4DirectiveWithPath>())
-			{
-				directive.InitializeResolvedPath(resolvedMacros, logicalSourceFile, context);
-			}
 		}
 
 		private void ResolveIncludes([NotNull] IT4File file)
