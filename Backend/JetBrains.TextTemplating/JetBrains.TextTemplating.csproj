@@ -10,7 +10,7 @@
     <RootNamespace>Microsoft.VisualStudio.TextTemplating</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.EnvDTE" Version="20201207.23.0" />
+    <PackageReference Include="JetBrains.EnvDTE" Version=">=20201207.23.0" />
     <Reference Include="JetBrains.EnvDTE.Client.dll">
       <HintPath>../Libraries/JetBrains.EnvDTE.Client.dll</HintPath>
     </Reference>
