@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 using AttributeValue = GammaJul.ForTea.Core.Tree.Impl.AttributeValue;
 
 namespace GammaJul.ForTea.Core.Parsing
@@ -35,8 +33,6 @@ namespace GammaJul.ForTea.Core.Parsing
 			RootSourceFile = rootSourceFile;
 			SourceFile = sourceFile;
 			Selector = selector;
-			var x = new KeyValuePair<int, string>();
-			var y = x.Value;
 		}
 
 		public IFile ParseFile()
@@ -47,51 +43,21 @@ namespace GammaJul.ForTea.Core.Parsing
 				throw new InvalidOperationException("The root file has to be a T4 file");
 			}
 
-			return (IFile) CloneDescendents(t4File);
+			return (IFile) CloneDescendents(t4File, new CloningVisitor());
 		}
 
-		private static IT4TreeNode CloneDescendents([NotNull] IT4File file)
+		[NotNull]
+		private static IT4TreeNode CloneDescendents([NotNull] IT4TreeNode node, [NotNull] CloningVisitor visitor)
 		{
-			var stackOfHandledItems = new Stack<IT4TreeNode>();
-			bool currentStackTopChildrenAreHandled = false;
-			var clones = new Stack<IT4TreeNode>();
-			var visitor = new CloningVisitor();
-			file.Accept(visitor);
-			var root = visitor.CurrentClone;
-			clones.Push(root);
-			stackOfHandledItems.Push(file);
-			do
+			node.Accept(visitor);
+			var clonedNode = visitor.CurrentClone.NotNull();
+			foreach (var child in node.Children())
 			{
-				if (currentStackTopChildrenAreHandled)
-				{
-					var top = stackOfHandledItems.Pop();
-					clones.Pop();
-					var next = (IT4TreeNode) top.NextSibling;
-					if (next == null) continue;
-					next.Accept(visitor);
-					((T4CompositeElement) clones.Peek()).AppendNewChild((TreeElement) visitor.CurrentClone);
-					clones.Push(visitor.CurrentClone);
-					stackOfHandledItems.Push(next);
-					currentStackTopChildrenAreHandled = false;
-				}
-
-				var lastHandledItem = stackOfHandledItems.Peek();
-				var unhandledChildren = lastHandledItem.Children().AsList();
-				if (unhandledChildren.Count == 0)
-				{
-					currentStackTopChildrenAreHandled = true;
-					continue;
-				}
-
-				var child = (IT4TreeNode) unhandledChildren.First();
-				child.Accept(visitor);
-				((CompositeElement) clones.Peek()).AppendNewChild((TreeElement) visitor.CurrentClone);
-				clones.Push(visitor.CurrentClone);
-				stackOfHandledItems.Push(child);
+				var clonedChild = CloneDescendents((IT4TreeNode) child, visitor);
+				((CompositeElement) clonedNode).AppendNewChild((TreeElement) clonedChild);
 			}
-			while (!stackOfHandledItems.IsEmpty());
 
-			return root;
+			return clonedNode;
 		}
 
 		private sealed class CloningVisitor : TreeNodeVisitor
