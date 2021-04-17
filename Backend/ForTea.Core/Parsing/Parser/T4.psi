@@ -10,7 +10,7 @@ options {
   "lexerClassName"="JetBrains.ReSharper.Psi.Parsing.ILexer";
 
   // FQN of (non-generated) class that provides messages for the parser
-  parserMessagesClass="GammaJul.ForTea.Core.Parsing.ParserMessages";
+  parserMessagesClass="GammaJul.ForTea.Core.Parsing.Parser.ParserMessages";
 
   // Parser, error messages + token bitsets target folder
   parserTargetSubdir="Parsing";
@@ -25,7 +25,7 @@ options {
   "psiElementClassFQName"="GammaJul.ForTea.Core.Tree.IT4TreeNode";
 
   // Existing token type containing class + namespace
-  tokenTypePackageName="GammaJul.ForTea.Core.Parsing";
+  tokenTypePackageName="GammaJul.ForTea.Core.Parsing.Token";
   tokenTypeClassName="T4TokenNodeTypes";
 
   // Set base index for generated (element, not token) node types. Defaults to 2000, tokens default to 1000

@@ -2,6 +2,7 @@ using System;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Util;
+using GammaJul.ForTea.Core.Parsing.Token;
 
 %%
 
