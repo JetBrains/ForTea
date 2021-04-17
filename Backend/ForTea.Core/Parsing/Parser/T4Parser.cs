@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Parsing.Ranges;
@@ -41,6 +40,9 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		[NotNull]
 		private IT4LexerSelector LexerSelector { get; }
 
+		[NotNull]
+		private T4RangeTranslatorInitializer RangeTranslatorInitializer { get; }
+
 		/// <note>
 		/// Since the other ParseFile method is used in some external places,
 		/// this method should not contain any additional logic
@@ -66,34 +68,17 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 			IncludeResolver = solution?.GetComponent<IT4IncludeResolver>();
 			var macroResolver = solution?.GetComponent<IT4MacroResolver>();
 			MacroInitializer = new T4MacroInitializer(LogicalSourceFile, Context, macroResolver);
+			RangeTranslatorInitializer = new T4RangeTranslatorInitializer();
 		}
 
 		[NotNull]
 		public override TreeElement ParseFile()
 		{
 			var result = ParseFileWithoutCleanup();
-			SetUpRangeTranslators(result);
+			RangeTranslatorInitializer.SetUpRangeTranslators(result);
 			result.SetSourceFile(PhysicalSourceFile);
 			T4ParsingContextHelper.Reset();
 			return result;
-		}
-
-		private static void SetUpRangeTranslators([NotNull] File file)
-		{
-			file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file);
-			foreach (var include in file.Includes.Cast<IncludedFile>())
-			{
-				SetUpRangeTranslators(include);
-			}
-		}
-
-		private static void SetUpRangeTranslators([NotNull] IncludedFile file)
-		{
-			file.DocumentRangeTranslator = new T4DocumentRangeTranslator(file);
-			foreach (var include in file.IncludedFilesEnumerable.Cast<IncludedFile>())
-			{
-				SetUpRangeTranslators(include);
-			}
 		}
 
 		[NotNull]

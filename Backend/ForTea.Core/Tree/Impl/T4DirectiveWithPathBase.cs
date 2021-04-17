@@ -26,6 +26,8 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 
 		public T4ResolvedPath ResolvedPath => MyResolvedPath.NotNull();
 
+		public void InitializeResolvedPath([NotNull] T4ResolvedPath path) => MyResolvedPath = path;
+
 		public void InitializeResolvedPath(
 			IReadOnlyDictionary<string, string> resolveResults,
 			IPsiSourceFile sourceFile,

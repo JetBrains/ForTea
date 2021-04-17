@@ -18,12 +18,19 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 		[NotNull]
 		public static IncludedFile FromOtherNode([NotNull] IT4FileLikeNode node)
 		{
-			var includedFile = (IncludedFile) TreeElementFactory.CreateCompositeElement(ElementType.INCLUDED_FILE);
+			var includedFile = FromOtherNodeNoChildren(node);
 			foreach (var child in node.Children().Cast<TreeElement>().ToList())
 			{
 				includedFile.AppendNewChild(child);
 			}
 
+			return includedFile;
+		}
+
+		[NotNull]
+		public static IncludedFile FromOtherNodeNoChildren([NotNull] IT4FileLikeNode node)
+		{
+			var includedFile = (IncludedFile) TreeElementFactory.CreateCompositeElement(ElementType.INCLUDED_FILE);
 			includedFile.LogicalPsiSourceFile = node.LogicalPsiSourceFile;
 			return includedFile;
 		}
