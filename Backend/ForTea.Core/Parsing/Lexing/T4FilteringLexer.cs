@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Parsing;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Lexing
 {
 	/// <summary>Lexer filtering whitespaces.</summary>
 	internal sealed class T4FilteringLexer : FilteringLexer

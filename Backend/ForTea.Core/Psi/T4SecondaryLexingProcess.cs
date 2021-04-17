@@ -1,4 +1,4 @@
-using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;

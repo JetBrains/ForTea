@@ -1,5 +1,5 @@
 using System;
-using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;

@@ -1,5 +1,5 @@
 using System.Linq;
-using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Tree;

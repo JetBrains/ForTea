@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Lexing
 {
 	/// <summary>Factory creating <see cref="T4Lexer"/>.</summary>
 	internal sealed class T4LexerFactory : ILexerFactory

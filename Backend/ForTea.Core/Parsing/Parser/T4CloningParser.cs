@@ -11,7 +11,7 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using AttributeValue = GammaJul.ForTea.Core.Tree.Impl.AttributeValue;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Parser
 {
 	public sealed class T4CloningParser : IParser
 	{
@@ -91,12 +91,7 @@ namespace GammaJul.ForTea.Core.Parsing
 			public override void VisitFileNode(IT4File fileParam) => CurrentClone = new File();
 			public override void VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam) => CurrentClone = new ImportDirective();
 			public override void VisitIncludeDirectiveNode(IT4IncludeDirective includeDirectiveParam) => CurrentClone = new IncludeDirective();
-
-			public override void VisitIncludedFileNode(IT4IncludedFile includedFileParam)
-			{
-				CurrentClone = new IncludedFile();
-			}
-
+			public override void VisitIncludedFileNode(IT4IncludedFile includedFileParam) => CurrentClone = new IncludedFile();
 			public override void VisitMacroNode(IT4Macro macroParam) => CurrentClone = new Macro();
 			public override void VisitOutputDirectiveNode(IT4OutputDirective outputDirectiveParam) => CurrentClone = new OutputDirective();
 			public override void VisitParameterDirectiveNode(IT4ParameterDirective parameterDirectiveParam) => CurrentClone = new ParameterDirective();

@@ -34,7 +34,6 @@
       <Visible>False</Visible>
     </PsiLanguageNames>
     <CsLex Include="Parsing\Lexing\T4Lexer.lex" />
-    <ParserGen Include="Parsing\T4.psi" />
     <None Include="Parsing\T4.psi" />
   </ItemGroup>
 
@@ -84,5 +83,9 @@
       <OutputFile>Daemon\Highlightings\T4Warnings.Generated.cs</OutputFile>
       <SubType>Designer</SubType>
     </ErrorsGen>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ParserGen Include="Parsing\Parser\T4.psi" />
   </ItemGroup>
 </Project>

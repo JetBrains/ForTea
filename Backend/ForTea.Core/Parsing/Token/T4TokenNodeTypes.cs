@@ -1,8 +1,8 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using static GammaJul.ForTea.Core.Parsing.T4TokenNodeFlag;
+using static GammaJul.ForTea.Core.Parsing.Token.T4TokenNodeFlag;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Token
 {
 	public static partial class T4TokenNodeTypes
 	{

@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;

@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using GammaJul.ForTea.Core.Parsing;
+using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters;
 using GammaJul.ForTea.Core.Tree;

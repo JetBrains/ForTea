@@ -4,7 +4,7 @@ using GammaJul.ForTea.Core.Psi.Utils;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Parser
 {
 	public static class T4ParsingContextHelper
 	{

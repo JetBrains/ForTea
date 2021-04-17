@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Parser
 {
 	public static class ParserMessages
 	{

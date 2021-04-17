@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Parsing.Lexing;
+using GammaJul.ForTea.Core.Parsing.Parser;
 using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;

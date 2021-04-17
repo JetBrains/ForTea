@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Parsing.Ranges;
+using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.Psi.Resolve;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
@@ -15,7 +16,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Parser
 {
 	internal sealed class T4Parser : T4ParserGenerated, IParser
 	{

@@ -1,4 +1,4 @@
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Token
 {
 	public static partial class T4TokenNodeTypes
 	{

@@ -1,10 +1,11 @@
+using GammaJul.ForTea.Core.Parsing.Token;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Util;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Parser
 {
 	public class T4MissingTokenInserter : MissingTokenInserterBase
 	{

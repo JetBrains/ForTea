@@ -1,9 +1,8 @@
-using GammaJul.ForTea.Core.Parsing.Lexing;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 
-namespace GammaJul.ForTea.Core.Parsing
+namespace GammaJul.ForTea.Core.Parsing.Lexing
 {
 	// Delegation is used instead of inheritance to allow this class to be public
 	public sealed class T4Lexer : IIncrementalLexer

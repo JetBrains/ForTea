@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 
-namespace GammaJul.ForTea.Core.Parsing {
+namespace GammaJul.ForTea.Core.Parsing.Token {
 	
 	/// <summary>Represents a T4 token node type.</summary>
 	public sealed class T4TokenNodeType : TokenNodeType {
