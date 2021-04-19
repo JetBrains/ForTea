@@ -1,11 +1,8 @@
 ﻿using System.IO;
-using System.Linq;
 using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Parsing.Parser;
-using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Test;
 using GammaJul.ForTea.Core.Tree;
-using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.Tests.Mock;
@@ -15,7 +12,7 @@ using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Psi
 {
-	public sealed class T4CloningParserTest
+	public sealed class T4CloningParserTest : T4CloningParserTestBase
 	{
 		[Test]
 		public void TestCorrectness()
@@ -56,14 +53,6 @@ namespace JetBrains.ForTea.Tests.Psi
 			DebugUtil.DumpPsi(writer, file);
 			string result = writer.GetStringBuilder().ToString();
 			return result;
-		}
-
-		private static void InitializeResolvePaths([NotNull] IT4File file)
-		{
-			foreach (var directive in file.BlocksEnumerable.OfType<T4DirectiveWithPathBase>())
-			{
-				directive.InitializeResolvedPath(new T4ResolvedPath("dummy", null, null));
-			}
 		}
 	}
 }
