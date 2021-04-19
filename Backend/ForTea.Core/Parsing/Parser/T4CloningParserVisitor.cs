@@ -1,6 +1,6 @@
 ﻿using System;
 using GammaJul.ForTea.Core.Parsing.Lexing;
-using GammaJul.ForTea.Core.Parsing.Parser.Include;
+using GammaJul.ForTea.Core.Parsing.Parser.Impl;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
@@ -19,12 +19,12 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		[NotNull]
 		private IT4LexerSelector LexerSelector { get; }
 
-		[NotNull]
+		[CanBeNull]
 		private IPsiSourceFile PhysicalSourceFile { get; }
 
 		public T4CloningParserVisitor(
 			[NotNull] IT4LexerSelector lexerSelector,
-			[NotNull] IPsiSourceFile physicalSourceFile
+			[CanBeNull] IPsiSourceFile physicalSourceFile
 		)
 		{
 			LexerSelector = lexerSelector;

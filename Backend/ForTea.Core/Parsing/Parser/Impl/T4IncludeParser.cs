@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace GammaJul.ForTea.Core.Parsing.Parser.Include
+namespace GammaJul.ForTea.Core.Parsing.Parser.Impl
 {
 	public sealed class T4IncludeParser : IT4IncludeParser
 	{

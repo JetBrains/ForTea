@@ -1,7 +1,7 @@
 using System;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Lexing;
-using GammaJul.ForTea.Core.Parsing.Parser.Include;
+using GammaJul.ForTea.Core.Parsing.Parser.Impl;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.Psi.Resolve;
@@ -53,7 +53,8 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 			[CanBeNull] IPsiSourceFile logicalSourceFile,
 			[CanBeNull] IPsiSourceFile physicalSourceFile,
 			[NotNull] IT4LexerSelector lexerSelector,
-			[CanBeNull] T4MacroResolveContext context = null
+			[CanBeNull] T4MacroResolveContext context = null,
+			[CanBeNull] IT4IncludeParser includeParser = null
 		)
 		{
 			OriginalLexer = lexer;
@@ -66,7 +67,7 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 			var macroResolver = solution?.GetComponent<IT4MacroResolver>();
 			MacroInitializer = new T4MacroInitializer(LogicalSourceFile, Context, macroResolver);
 			RangeTranslatorInitializer = new T4RangeTranslatorInitializer();
-			IncludeParser = new T4IncludeParser(logicalSourceFile, physicalSourceFile, includeResolver, lexerSelector, Context);
+			IncludeParser = includeParser ?? new T4IncludeParser(logicalSourceFile, physicalSourceFile, includeResolver, lexerSelector, Context);
 		}
 
 		[NotNull]
@@ -82,23 +83,23 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		[NotNull]
 		internal File ParseFileWithoutCleanup()
 		{
-			using (Context.RegisterNextLayer(LogicalSourceFile.ToProjectFile()))
-			{
-				return T4ParsingContextHelper.ExecuteGuarded(
-					LogicalSourceFile.GetLocation(),
-					false,
-					() =>
+			using var macroContextCookie = Context.RegisterNextLayer(LogicalSourceFile.ToProjectFile());
+			return T4ParsingContextHelper.ExecuteGuarded(
+				LogicalSourceFile.GetLocation(),
+				false,
+				() =>
+				{
+					var file = (File) ParseFileInternal();
+					T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
+					if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
+					if (MacroInitializer.CanResolveMacros)
 					{
-						var file = (File) ParseFileInternal();
-						T4MissingTokenInserter.Run(file, OriginalLexer, this, null);
-						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
-						if (!MacroInitializer.CanResolveMacros) return file;
 						MacroInitializer.ResolveMacros(file);
-						ParseIncludes(file);
-						return file;
 					}
-				).NotNull("Attempted to parse same file recursively twice");
-			}
+					ParseIncludes(file);
+					return file;
+				}
+			).NotNull("Attempted to parse same file recursively twice");
 		}
 
 		public override TreeElement ParseDirective()

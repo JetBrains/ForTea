@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace GammaJul.ForTea.Core.Parsing.Parser.Include
+namespace GammaJul.ForTea.Core.Parsing.Parser.Impl
 {
 	public interface IT4IncludeParser
 	{

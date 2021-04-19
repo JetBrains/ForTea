@@ -1,5 +1,5 @@
-using System;
 using GammaJul.ForTea.Core.Parsing.Lexing;
+using GammaJul.ForTea.Core.Parsing.Parser.Impl;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
@@ -8,7 +8,6 @@ using JetBrains.Core;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -17,7 +16,7 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 	public sealed class T4CloningParser : IParser
 	{
 		[NotNull]
-		private IPsiSourceFile RootSourceFile { get; }
+		private IT4PsiFileProvider PsiFileProvider { get; }
 
 		[NotNull]
 		private T4RangeTranslatorInitializer RangeTranslatorInitializer { get; }
@@ -27,24 +26,27 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 
 		public T4CloningParser(
 			[NotNull] IPsiSourceFile rootSourceFile,
-			[NotNull] IPsiSourceFile sourceFile,
+			[CanBeNull] IPsiSourceFile physicalSourceFile,
+			[NotNull] IT4LexerSelector selector
+		) : this(new T4PsiFromSourceProvider(rootSourceFile), physicalSourceFile, selector)
+		{
+		}
+
+		public T4CloningParser(
+			[NotNull] IT4PsiFileProvider psiFileProvider,
+			[CanBeNull] IPsiSourceFile physicalSourceFile,
 			[NotNull] IT4LexerSelector selector
 		)
 		{
-			RootSourceFile = rootSourceFile;
+			PsiFileProvider = psiFileProvider;
 			RangeTranslatorInitializer = new T4RangeTranslatorInitializer();
-			CloningParserVisitor = new T4CloningParserVisitor(selector, sourceFile);
+			CloningParserVisitor = new T4CloningParserVisitor(selector, physicalSourceFile);
 		}
 
 		[NotNull]
 		public IFile ParseFile()
 		{
-			var primaryPsiFile = RootSourceFile.GetPrimaryPsiFile();
-			if (primaryPsiFile is not IT4File t4File)
-			{
-				throw new InvalidOperationException("The root file has to be a T4 file");
-			}
-
+			var t4File = PsiFileProvider.GetPsi();
 			var clone = (File) CloneDescendents(t4File);
 			RangeTranslatorInitializer.SetUpRangeTranslators(clone);
 			return clone;
