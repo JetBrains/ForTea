@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
+using JetBrains.Core;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -19,20 +20,20 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		private IPsiSourceFile RootSourceFile { get; }
 
 		[NotNull]
-		private IT4LexerSelector Selector { get; }
-
-		[NotNull]
 		private T4RangeTranslatorInitializer RangeTranslatorInitializer { get; }
 
 		[NotNull]
 		private T4CloningParserVisitor CloningParserVisitor { get; }
 
-		public T4CloningParser([NotNull] IPsiSourceFile rootSourceFile, [NotNull] IT4LexerSelector selector)
+		public T4CloningParser(
+			[NotNull] IPsiSourceFile rootSourceFile,
+			[NotNull] IPsiSourceFile sourceFile,
+			[NotNull] IT4LexerSelector selector
+		)
 		{
 			RootSourceFile = rootSourceFile;
-			Selector = selector;
 			RangeTranslatorInitializer = new T4RangeTranslatorInitializer();
-			CloningParserVisitor = new T4CloningParserVisitor();
+			CloningParserVisitor = new T4CloningParserVisitor(selector, sourceFile);
 		}
 
 		[NotNull]
@@ -52,8 +53,9 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		[NotNull]
 		private IT4TreeNode CloneDescendents([NotNull] IT4TreeNode node)
 		{
-			node.Accept(CloningParserVisitor);
-			var clonedNode = CloningParserVisitor.CurrentClone.NotNull();
+			var result = node.Accept(CloningParserVisitor, Unit.Instance);
+			var clonedNode = result.CurrentClone.NotNull();
+			if (!result.ShouldContinueRecursiveDescent) return clonedNode;
 			foreach (var child in node.Children())
 			{
 				var clonedChild = CloneDescendents((IT4TreeNode) child);

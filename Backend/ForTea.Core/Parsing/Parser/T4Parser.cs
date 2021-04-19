@@ -148,7 +148,7 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		}
 
 		[NotNull]
-		private CompositeElement BuildIncludedT4Tree([NotNull] IPsiSourceFile target)
+		internal CompositeElement BuildIncludedT4Tree([NotNull] IPsiSourceFile target)
 		{
 			var lexer = LexerSelector.SelectLexer(target);
 			// We need to parse File here, not IncludedFile,

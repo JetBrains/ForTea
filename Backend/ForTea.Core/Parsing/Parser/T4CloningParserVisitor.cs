@@ -1,61 +1,101 @@
 ﻿using System;
+using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
+using JetBrains.Core;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
+using AttributeValue = GammaJul.ForTea.Core.Tree.Impl.AttributeValue;
 
 namespace GammaJul.ForTea.Core.Parsing.Parser
 {
-	internal sealed class T4CloningParserVisitor : TreeNodeVisitor
+	internal sealed class T4CloningParserVisitor : TreeNodeVisitor<Unit, T4NodeCloningResult>
 	{
-		[CanBeNull]
-		public IT4TreeNode CurrentClone { get; private set; }
+		[NotNull]
+		private IT4LexerSelector LexerSelector { get; }
 
-		public override void VisitNode(ITreeNode node)
+		[NotNull]
+		private IPsiSourceFile PhysicalSourceFile { get; }
+
+		public T4CloningParserVisitor(
+			[NotNull] IT4LexerSelector lexerSelector,
+			[NotNull] IPsiSourceFile physicalSourceFile
+		)
 		{
-			if (node.NodeType is not TokenNodeType type)
-			{
-				CurrentClone = null;
-				return;
-			}
-
-			CurrentClone = (IT4TreeNode) type.Create(node.GetText());
+			LexerSelector = lexerSelector;
+			PhysicalSourceFile = physicalSourceFile;
 		}
 
-		public override void VisitAssemblyDirectiveNode(IT4AssemblyDirective assemblyDirectiveParam)
+		private T4NodeCloningResult CreateResult(IT4TreeNode result) => new(true, result);
+
+		public override T4NodeCloningResult VisitNode(ITreeNode node, Unit context)
+		{
+			if (node.NodeType is not TokenNodeType type) throw new InvalidOperationException();
+			return CreateResult((IT4TreeNode) type.Create(node.GetText()));
+		}
+
+		public override T4NodeCloningResult VisitAssemblyDirectiveNode(IT4AssemblyDirective assemblyDirectiveParam, [CanBeNull] Unit context)
 		{
 			var result = new AssemblyDirective();
 			result.InitializeResolvedPath(assemblyDirectiveParam.ResolvedPath);
-			CurrentClone = result;
+			return CreateResult(result);
 		}
 
-		public override void VisitAttributeNameNode(IT4AttributeName attributeNameParam) => CurrentClone = new AttributeName();
-		public override void VisitAttributeValueNode(IT4AttributeValue attributeValueParam) => CurrentClone = new AttributeValue();
-		public override void VisitBlockNode(IT4Block blockParam) => throw new InvalidOperationException();
-		public override void VisitCleanupBehaviorDirectiveNode(IT4CleanupBehaviorDirective cleanupBehaviorDirectiveParam) => CurrentClone = new CleanupBehaviorDirective();
-		public override void VisitCodeNode(IT4Code codeParam) => CurrentClone = new Code();
-		public override void VisitCodeBlockNode(IT4CodeBlock codeBlockParam) => throw new InvalidOperationException();
-		public override void VisitDirectiveNode(IT4Directive directiveParam) => throw new InvalidOperationException();
-		public override void VisitDirectiveAttributeNode(IT4DirectiveAttribute directiveAttributeParam) => CurrentClone = new DirectiveAttribute();
-		public override void VisitEnvironmentVariableNode(IT4EnvironmentVariable environmentVariableParam) => CurrentClone = new EnvironmentVariable();
-		public override void VisitExpressionBlockNode(IT4ExpressionBlock expressionBlockParam) => CurrentClone = new ExpressionBlock();
-		public override void VisitFeatureBlockNode(IT4FeatureBlock featureBlockParam) => CurrentClone = new FeatureBlock();
-		public override void VisitFileNode(IT4File fileParam) => CurrentClone = new File {LogicalPsiSourceFile = fileParam.LogicalPsiSourceFile};
-		public override void VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam) => CurrentClone = new ImportDirective();
-		public override void VisitIncludeDirectiveNode(IT4IncludeDirective includeDirectiveParam)
+		public override T4NodeCloningResult VisitAttributeNameNode(IT4AttributeName attributeNameParam, [CanBeNull] Unit context) => CreateResult(new AttributeName());
+		public override T4NodeCloningResult VisitAttributeValueNode(IT4AttributeValue attributeValueParam, [CanBeNull] Unit context) => CreateResult(new AttributeValue());
+		public override T4NodeCloningResult VisitBlockNode(IT4Block blockParam, [CanBeNull] Unit context) => throw new InvalidOperationException();
+		public override T4NodeCloningResult VisitCleanupBehaviorDirectiveNode(IT4CleanupBehaviorDirective cleanupBehaviorDirectiveParam, [CanBeNull] Unit context) => CreateResult(new CleanupBehaviorDirective());
+		public override T4NodeCloningResult VisitCodeNode(IT4Code codeParam, [CanBeNull] Unit context) => CreateResult(new Code());
+		public override T4NodeCloningResult VisitCodeBlockNode(IT4CodeBlock codeBlockParam, [CanBeNull] Unit context) => throw new InvalidOperationException();
+		public override T4NodeCloningResult VisitDirectiveNode(IT4Directive directiveParam, [CanBeNull] Unit context) => throw new InvalidOperationException();
+		public override T4NodeCloningResult VisitDirectiveAttributeNode(IT4DirectiveAttribute directiveAttributeParam, [CanBeNull] Unit context) => CreateResult(new DirectiveAttribute());
+		public override T4NodeCloningResult VisitEnvironmentVariableNode(IT4EnvironmentVariable environmentVariableParam, [CanBeNull] Unit context) => CreateResult(new EnvironmentVariable());
+		public override T4NodeCloningResult VisitExpressionBlockNode(IT4ExpressionBlock expressionBlockParam, [CanBeNull] Unit context) => CreateResult(new ExpressionBlock());
+		public override T4NodeCloningResult VisitFeatureBlockNode(IT4FeatureBlock featureBlockParam, [CanBeNull] Unit context) => CreateResult(new FeatureBlock());
+
+		public override T4NodeCloningResult VisitFileNode(IT4File fileParam, [CanBeNull] Unit context)
+		{
+			if (!LexerSelector.HasCustomLexer(fileParam.LogicalPsiSourceFile))
+			{
+				return CreateResult(new File {LogicalPsiSourceFile = fileParam.LogicalPsiSourceFile});
+			}
+
+			var originalLexer = LexerSelector.SelectLexer(fileParam.LogicalPsiSourceFile);
+			var parser = new T4Parser(originalLexer, fileParam.LogicalPsiSourceFile, PhysicalSourceFile, LexerSelector);
+			var node = (IT4TreeNode) parser.ParseFile();
+			return new T4NodeCloningResult(false, node);
+		}
+
+		public override T4NodeCloningResult VisitImportDirectiveNode(IT4ImportDirective importDirectiveParam, [CanBeNull] Unit context) =>
+			CreateResult(new ImportDirective());
+
+		public override T4NodeCloningResult VisitIncludeDirectiveNode(IT4IncludeDirective includeDirectiveParam, [CanBeNull] Unit context)
 		{
 			var result = new IncludeDirective();
 			result.InitializeResolvedPath(includeDirectiveParam.ResolvedPath);
-			CurrentClone = result;
+			return CreateResult(result);
 		}
 
-		public override void VisitIncludedFileNode(IT4IncludedFile includedFileParam) => CurrentClone = IncludedFile.FromOtherNodeNoChildren(includedFileParam);
-		public override void VisitMacroNode(IT4Macro macroParam) => CurrentClone = new Macro();
-		public override void VisitOutputDirectiveNode(IT4OutputDirective outputDirectiveParam) => CurrentClone = new OutputDirective();
-		public override void VisitParameterDirectiveNode(IT4ParameterDirective parameterDirectiveParam) => CurrentClone = new ParameterDirective();
-		public override void VisitStatementBlockNode(IT4StatementBlock statementBlockParam) => CurrentClone = new StatementBlock();
-		public override void VisitTemplateDirectiveNode(IT4TemplateDirective templateDirectiveParam) => CurrentClone = new TemplateDirective();
-		public override void VisitUnknownDirectiveNode(IT4UnknownDirective unknownDirectiveParam) => CurrentClone = new UnknownDirective();
+		public override T4NodeCloningResult VisitIncludedFileNode(IT4IncludedFile includedFileParam, [CanBeNull] Unit context)
+		{
+			if (!LexerSelector.HasCustomLexer(includedFileParam.LogicalPsiSourceFile))
+			{
+				return CreateResult(IncludedFile.FromOtherNodeNoChildren(includedFileParam));
+			}
+
+			var originalLexer = LexerSelector.SelectLexer(includedFileParam.LogicalPsiSourceFile);
+			var parser = new T4Parser(originalLexer, includedFileParam.LogicalPsiSourceFile, PhysicalSourceFile, LexerSelector);
+			var node = (IT4TreeNode) parser.BuildIncludedT4Tree(includedFileParam.LogicalPsiSourceFile);
+			return  new T4NodeCloningResult(false, node);
+		}
+
+		public override T4NodeCloningResult VisitMacroNode(IT4Macro macroParam, [CanBeNull] Unit context) => CreateResult(new Macro());
+		public override T4NodeCloningResult VisitOutputDirectiveNode(IT4OutputDirective outputDirectiveParam, [CanBeNull] Unit context) => CreateResult(new OutputDirective());
+		public override T4NodeCloningResult VisitParameterDirectiveNode(IT4ParameterDirective parameterDirectiveParam, [CanBeNull] Unit context) => CreateResult(new ParameterDirective());
+		public override T4NodeCloningResult VisitStatementBlockNode(IT4StatementBlock statementBlockParam, [CanBeNull] Unit context) => CreateResult(new StatementBlock());
+		public override T4NodeCloningResult VisitTemplateDirectiveNode(IT4TemplateDirective templateDirectiveParam, [CanBeNull] Unit context) => CreateResult(new TemplateDirective());
+		public override T4NodeCloningResult VisitUnknownDirectiveNode(IT4UnknownDirective unknownDirectiveParam, [CanBeNull] Unit context) => CreateResult(new UnknownDirective());
 	}
 }

@@ -56,7 +56,7 @@ namespace GammaJul.ForTea.Core.Psi.Service {
 			var selector = new T4DelegatingLexerSelector(lexer, sourceFile, T4DocumentLexerSelector.Instance);
 			var rootLexer = selector.SelectLexer(rootSourceFile);
 			if (rootSourceFile == sourceFile) return new T4Parser(rootLexer, rootSourceFile, sourceFile, selector);
-			return new T4CloningParser(rootSourceFile, selector);
+			return new T4CloningParser(rootSourceFile, sourceFile, selector);
 		}
 
 		/// <summary>

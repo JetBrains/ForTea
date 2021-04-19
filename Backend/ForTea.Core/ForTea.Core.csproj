@@ -34,7 +34,6 @@
       <Visible>False</Visible>
     </PsiLanguageNames>
     <CsLex Include="Parsing\Lexing\T4Lexer.lex" />
-    <None Include="Parsing\T4.psi" />
   </ItemGroup>
 
   <ItemGroup>
