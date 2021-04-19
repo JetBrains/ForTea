@@ -1,9 +1,12 @@
 ﻿using System;
 using GammaJul.ForTea.Core.Parsing.Lexing;
+using GammaJul.ForTea.Core.Parsing.Parser.Include;
+using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.Annotations;
 using JetBrains.Core;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
@@ -85,8 +88,9 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 				return CreateResult(IncludedFile.FromOtherNodeNoChildren(includedFileParam));
 			}
 
-			var originalLexer = LexerSelector.SelectLexer(includedFileParam.LogicalPsiSourceFile);
-			var parser = new T4Parser(originalLexer, includedFileParam.LogicalPsiSourceFile, PhysicalSourceFile, LexerSelector);
+			var solution = PhysicalSourceFile.GetSolution();
+			var resolver = solution.GetComponent<IT4IncludeResolver>();
+			var parser = new T4IncludeParser(includedFileParam.LogicalPsiSourceFile, PhysicalSourceFile, resolver, LexerSelector);
 			var node = (IT4TreeNode) parser.BuildIncludedT4Tree(includedFileParam.LogicalPsiSourceFile);
 			return  new T4NodeCloningResult(false, node);
 		}

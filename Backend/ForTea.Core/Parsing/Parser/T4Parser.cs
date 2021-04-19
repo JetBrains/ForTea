@@ -1,6 +1,7 @@
 using System;
 using GammaJul.ForTea.Core.Parser;
 using GammaJul.ForTea.Core.Parsing.Lexing;
+using GammaJul.ForTea.Core.Parsing.Parser.Include;
 using GammaJul.ForTea.Core.Parsing.Ranges;
 using GammaJul.ForTea.Core.Parsing.Token;
 using GammaJul.ForTea.Core.Psi.Resolve;
@@ -31,17 +32,14 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		[NotNull]
 		private T4MacroResolveContext Context { get; }
 
-		[CanBeNull]
-		private IT4IncludeResolver IncludeResolver { get; }
-
 		[NotNull]
 		private T4MacroInitializer MacroInitializer { get; }
 
 		[NotNull]
-		private IT4LexerSelector LexerSelector { get; }
+		private T4RangeTranslatorInitializer RangeTranslatorInitializer { get; }
 
 		[NotNull]
-		private T4RangeTranslatorInitializer RangeTranslatorInitializer { get; }
+		private IT4IncludeParser IncludeParser { get; }
 
 		/// <note>
 		/// Since the other ParseFile method is used in some external places,
@@ -61,14 +59,14 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 			OriginalLexer = lexer;
 			LogicalSourceFile = logicalSourceFile;
 			PhysicalSourceFile = physicalSourceFile;
-			LexerSelector = lexerSelector;
 			Context = context ?? new T4MacroResolveContext();
 			SetLexer(new T4FilteringLexer(lexer));
 			var solution = physicalSourceFile?.GetSolution();
-			IncludeResolver = solution?.GetComponent<IT4IncludeResolver>();
+			var includeResolver = solution?.GetComponent<IT4IncludeResolver>();
 			var macroResolver = solution?.GetComponent<IT4MacroResolver>();
 			MacroInitializer = new T4MacroInitializer(LogicalSourceFile, Context, macroResolver);
 			RangeTranslatorInitializer = new T4RangeTranslatorInitializer();
+			IncludeParser = new T4IncludeParser(logicalSourceFile, physicalSourceFile, includeResolver, lexerSelector, Context);
 		}
 
 		[NotNull]
@@ -82,7 +80,7 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 		}
 
 		[NotNull]
-		private File ParseFileWithoutCleanup()
+		internal File ParseFileWithoutCleanup()
 		{
 			using (Context.RegisterNextLayer(LogicalSourceFile.ToProjectFile()))
 			{
@@ -96,7 +94,7 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 						if (LogicalSourceFile != null) file.LogicalPsiSourceFile = LogicalSourceFile;
 						if (!MacroInitializer.CanResolveMacros) return file;
 						MacroInitializer.ResolveMacros(file);
-						ResolveIncludes(file);
+						ParseIncludes(file);
 						return file;
 					}
 				).NotNull("Attempted to parse same file recursively twice");
@@ -121,40 +119,14 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 			return HandleErrorInDirective(result, new UnexpectedToken("Missing directive name"));
 		}
 
-		private void ResolveIncludes([NotNull] IT4File file)
+		private void ParseIncludes([NotNull] IT4File file)
 		{
 			foreach (var includeDirective in file.Blocks.OfType<IncludeDirective>())
 			{
-				var includedFile = ResolveIncludeDirective(includeDirective);
+				var includedFile = IncludeParser.Parse(includeDirective);
 				if (includedFile == null) continue;
 				includeDirective.parent.AddChildAfter(includedFile, includeDirective);
 			}
-		}
-
-		[CanBeNull]
-		private CompositeElement ResolveIncludeDirective([NotNull] IT4IncludeDirective directive)
-		{
-			if (LogicalSourceFile == null) return null;
-			var pathWithMacros = directive.ResolvedPath;
-			var path = IncludeResolver?.ResolvePath(pathWithMacros);
-			if (path == null) return null;
-			var includeFile = T4ParsingContextHelper.ExecuteGuarded(
-				path,
-				directive.Once,
-				() => IncludeResolver?.Resolve(pathWithMacros)
-			);
-			if (includeFile == null) return null;
-			return BuildIncludedT4Tree(includeFile);
-		}
-
-		[NotNull]
-		internal CompositeElement BuildIncludedT4Tree([NotNull] IPsiSourceFile target)
-		{
-			var lexer = LexerSelector.SelectLexer(target);
-			// We need to parse File here, not IncludedFile,
-			// because File makes some important error recovery and token reinsertion
-			var parser = new T4Parser(lexer, target, PhysicalSourceFile, LexerSelector, Context);
-			return IncludedFile.FromOtherNode(parser.ParseFileWithoutCleanup());
 		}
 
 		#pragma warning disable CS0809
