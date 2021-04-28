@@ -33,7 +33,7 @@
     <PsiLanguageNames Include="T4">
       <Visible>False</Visible>
     </PsiLanguageNames>
-    <CsLex Include="Parsing\Lexing\T4Lexer.lex" />
+    <CsLex Include="Parsing\Lexing\T4Lexer.lex" References="Parsing\Lexing\T4Rules.lex" />
     <ParserGen Include="Parsing\T4.psi" />
     <None Include="Parsing\T4.psi" />
   </ItemGroup>
