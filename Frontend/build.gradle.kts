@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("org.jetbrains.intellij") version "0.6.4"
-  id("org.jetbrains.grammarkit") version "2020.2.1"
+  id("org.jetbrains.grammarkit") version "2021.1.2"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   id ("com.jetbrains.rdgen") version "0.203.161"
   kotlin("jvm") version "1.4.10"
@@ -23,6 +23,15 @@ apply {
 
 repositories {
   mavenCentral()
+  maven { setUrl("https://dl.bintray.com/jetbrains/intellij-third-party-dependencies/") }
+  maven { setUrl("https://repo.boundlessgeo.com/main/") }
+}
+
+// These dependencies are required for the GrammarKit plugin to be able to generate parser
+// That plugin does not set those dependencies up yet
+dependencies {
+  compile("org.jetbrains.intellij.deps.fastutil:intellij-deps-fastutil:8.5.2-6")
+  compile("dk.brics.automaton:automaton:1.11-8")
 }
 
 val baseVersion = "2021.2"
