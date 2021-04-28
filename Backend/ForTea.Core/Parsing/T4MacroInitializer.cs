@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Parsing
 {
-	public sealed class T4MacroInitializer
+	public class T4MacroInitializer
 	{
 		[CanBeNull]
 		private IPsiSourceFile LogicalSourceFile { get; }
@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Parsing
 		private T4MacroResolveContext Context { get; }
 
 		[CanBeNull]
-		private IT4MacroResolver MacroResolver { get; }
+		protected IT4MacroResolver MacroResolver { get; }
 
 		public T4MacroInitializer(
 			[CanBeNull] IPsiSourceFile logicalSourceFile,
@@ -32,10 +32,10 @@ namespace GammaJul.ForTea.Core.Parsing
 			MacroResolver = macroResolver;
 		}
 
-		public bool CanResolveMacros =>
+		public virtual bool CanResolveMacros =>
 			LogicalSourceFile != null && Context.MostSuitableProjectFile != null && MacroResolver != null;
 
-		public void ResolveMacros([NotNull] IT4File file)
+		public virtual void ResolveMacros([NotNull] IT4File file)
 		{
 			var context = Context.MostSuitableProjectFile.NotNull();
 			var logicalSourceFile = LogicalSourceFile.NotNull();

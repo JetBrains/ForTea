@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Psi
 {
-	public sealed class T4CloningParserTest : T4CloningParserTestBase
+	public sealed class T4CloningParserTest
 	{
 		[Test]
 		public void TestCorrectness()
@@ -37,7 +37,7 @@ namespace JetBrains.ForTea.Tests.Psi
 			var includePsi = T4ParserExposer.Create(includeText, new T4MockIncludeParser()).ParseFile();
 			var includerPsi = T4ParserExposer.Create(includerText, new T4MockIncludeParser(includePsi)).ParseFile();
 			string includerPsiText = PsiToString(includerPsi.NotNull());
-			InitializeResolvePaths((IT4File) includerPsi);
+			T4CloningParserTestUtils.InitializeResolvePaths((IT4File) includerPsi);
 
 			var psiProvider = new T4MockPsiFileProvider(includerPsi).NotNull();
 			var clonePsi = new T4CloningParser(psiProvider, null, T4DocumentLexerSelector.Instance).ParseFile();

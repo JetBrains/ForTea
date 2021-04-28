@@ -6,9 +6,9 @@ using JetBrains.Annotations;
 
 namespace JetBrains.ForTea.Tests.Psi
 {
-	public abstract class T4CloningParserTestBase
+	public static class T4CloningParserTestUtils
 	{
-		protected static void InitializeResolvePaths([NotNull] IT4File file)
+		public static void InitializeResolvePaths([NotNull] IT4File file)
 		{
 			foreach (var directive in file.BlocksEnumerable.OfType<T4DirectiveWithPathBase>())
 			{

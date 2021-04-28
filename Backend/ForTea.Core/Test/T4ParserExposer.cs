@@ -10,7 +10,8 @@ using JetBrains.Text;
 namespace GammaJul.ForTea.Core.Test
 {
 	/// <summary>
-	/// This class exists in order to make the internal T4 parser visible for tests
+	/// This class exists in order to make the internal T4 parser visible for tests.
+	/// This class should only be used in tests!
 	/// </summary>
 	public static class T4ParserExposer
 	{
@@ -19,7 +20,7 @@ namespace GammaJul.ForTea.Core.Test
 		{
 			var buffer = new StringBuffer(text);
 			var lexer = new T4Lexer(buffer);
-			return new T4Parser(lexer, sourceFile, null, T4DocumentLexerSelector.Instance, includeParser: includeParser);
+			return new T4Parser(lexer, sourceFile, sourceFile, T4DocumentLexerSelector.Instance, includeParser: includeParser);
 		}
 
 		[CanBeNull]

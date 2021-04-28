@@ -54,7 +54,8 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 			[CanBeNull] IPsiSourceFile physicalSourceFile,
 			[NotNull] IT4LexerSelector lexerSelector,
 			[CanBeNull] T4MacroResolveContext context = null,
-			[CanBeNull] IT4IncludeParser includeParser = null
+			[CanBeNull] IT4IncludeParser includeParser = null,
+			[CanBeNull] T4MacroInitializer macroInitializer = null
 		)
 		{
 			OriginalLexer = lexer;
@@ -65,7 +66,7 @@ namespace GammaJul.ForTea.Core.Parsing.Parser
 			var solution = physicalSourceFile?.GetSolution();
 			var includeResolver = solution?.GetComponent<IT4IncludeResolver>();
 			var macroResolver = solution?.GetComponent<IT4MacroResolver>();
-			MacroInitializer = new T4MacroInitializer(LogicalSourceFile, Context, macroResolver);
+			MacroInitializer = macroInitializer ?? new T4MacroInitializer(LogicalSourceFile, Context, macroResolver);
 			RangeTranslatorInitializer = new T4RangeTranslatorInitializer();
 			IncludeParser = includeParser ?? new T4IncludeParser(logicalSourceFile, physicalSourceFile, includeResolver, lexerSelector, Context);
 		}
