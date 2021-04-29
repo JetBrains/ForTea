@@ -9,7 +9,7 @@ using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Services;
 using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features;
+using JetBrains.RdBackend.Common.Features;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
 using JetBrains.UI.RichText;

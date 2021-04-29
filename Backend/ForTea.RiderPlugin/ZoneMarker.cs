@@ -2,8 +2,6 @@ using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.ReSharper.Feature.Services;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.Navigation;
-using JetBrains.ReSharper.Host.Env;
-using JetBrains.ReSharper.Host.Product;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 

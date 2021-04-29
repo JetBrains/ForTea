@@ -1,5 +1,5 @@
 using JetBrains.Application.BuildScript.Application.Zones;
-using JetBrains.ReSharper.Host.Env;
+using JetBrains.RdBackend.Common.Env;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.TestFramework;

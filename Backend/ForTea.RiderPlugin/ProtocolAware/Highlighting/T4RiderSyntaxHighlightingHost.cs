@@ -1,3 +1,4 @@
+using System.Reflection;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
@@ -5,10 +6,11 @@ using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features.Documents;
+using JetBrains.RdBackend.Common.Features.Documents;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.Rider.Backend.Features.Documents;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 
@@ -33,7 +35,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 		private IPsiFiles Files { get; }
 
 		[NotNull]
-		private DocumentHost Host { get; }
+		private RiderDocumentHost Host { get; }
 
 		public T4RiderSyntaxHighlightingHost(
 			Lifetime lifetime,
@@ -42,7 +44,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			[NotNull] ISolution solution,
 			[NotNull] IPsiCachesState state,
 			[NotNull] IPsiFiles files,
-			[NotNull] DocumentHost host
+			[NotNull] RiderDocumentHost host
 		)
 		{
 			Logger = logger;
@@ -63,14 +65,16 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			var editableEntity = Host.TryGetDocumentModel(rdDocumentId);
+			IDocumentViewModel editableEntity = Host.TryGetDocumentModel(rdDocumentId);
+			// Temporary hack to work around Ivan Yarkov's great and amazing refactoring
+			var ee1 = (RdDocumentModel) typeof(RiderDocumentViewModel).GetField("myDocumentModel", BindingFlags.NonPublic).GetValue(editableEntity);
 			if (editableEntity == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
 				return;
 			}
 
-			var t4EditableEntityModel = editableEntity.GetT4RdDocumentModel();
+			var t4EditableEntityModel = ee1.GetT4RdDocumentModel();
 			document.CreateOutputExtensionChangeListener(
 				editableEntityLifetime,
 				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)

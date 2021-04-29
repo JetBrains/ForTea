@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features.ProjectModel.View;
+using JetBrains.RdBackend.Common.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Resources.Shell;

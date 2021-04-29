@@ -2,7 +2,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Host.Features.RunMarkers;
+using JetBrains.Rider.Backend.Features.RunMarkers;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 {

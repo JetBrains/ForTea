@@ -1,5 +1,5 @@
 using GammaJul.ForTea.Core.Daemon.Attributes;
-using JetBrains.ReSharper.Host.Features.SyntaxHighlighting.Web;
+using JetBrains.Rider.Backend.Features.SyntaxHighlighting.Web;
 using JetBrains.TextControl.DocumentMarkup;
 
 namespace JetBrains.ForTea.RiderPlugin.Daemon.Attributes

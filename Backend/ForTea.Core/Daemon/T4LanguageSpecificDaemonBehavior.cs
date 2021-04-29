@@ -16,9 +16,13 @@ namespace GammaJul.ForTea.Core.Daemon {
 		public bool RunInFindCodeIssues
 			=> true;
 
-		public ErrorStripeRequest InitialErrorStripe(IPsiSourceFile sourceFile)
-			=> sourceFile.Properties.ProvidesCodeModel ? ErrorStripeRequest.STRIPE_AND_ERRORS : ErrorStripeRequest.NONE;
-
+		public ErrorStripeRequestWithDescription InitialErrorStripe(IPsiSourceFile sourceFile)
+		{
+			var properties = sourceFile.Properties;
+			return properties.ProvidesCodeModel
+				? ErrorStripeRequestWithDescription.StripeAndErrors
+				: ErrorStripeRequestWithDescription.CreateNoneNoCodeModel(properties);
+		}
 	}
 
 }

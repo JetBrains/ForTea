@@ -6,7 +6,7 @@ using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Services;
 using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features;
+using JetBrains.RdBackend.Common.Features;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {

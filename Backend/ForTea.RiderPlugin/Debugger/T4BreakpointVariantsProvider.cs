@@ -15,9 +15,14 @@ namespace JetBrains.ForTea.RiderPlugin.Debugger
 	{
 		// TODO: delegate to C# provider
 		[NotNull]
-		public List<string> GetSupportedFileExtensions() => T4ProjectFileType.AllExtensions.ToList();
+		public IEnumerable<string> GetSupportedFileExtensions() => T4ProjectFileType.AllExtensions.ToList();
 
-		public List<IBreakpoint> GetBreakpointVariants(IProjectFile file, int line, ISolution solution)
+		[CanBeNull]
+		public IEnumerable<IBreakpoint> GetBreakpointVariants(
+			[NotNull] IProjectFile file,
+			int line,
+			[NotNull] ISolution solution
+		)
 		{
 			var variants = new List<IBreakpoint>();
 

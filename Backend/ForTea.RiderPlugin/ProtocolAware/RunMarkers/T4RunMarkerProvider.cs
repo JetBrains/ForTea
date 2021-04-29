@@ -4,9 +4,9 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Host.Features.RunMarkers;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Rider.Backend.Features.RunMarkers;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 {
