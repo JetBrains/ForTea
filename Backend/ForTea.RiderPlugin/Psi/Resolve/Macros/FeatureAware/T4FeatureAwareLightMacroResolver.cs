@@ -3,8 +3,8 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features.Processes;
-using JetBrains.ReSharper.Host.Features.Toolset.Detecting;
+using JetBrains.RdBackend.Common.Features.Toolset.Detecting;
+using JetBrains.Rider.Backend.Features.Processes;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware

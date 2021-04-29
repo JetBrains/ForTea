@@ -10,7 +10,7 @@ using JetBrains.DocumentManagers.Transactions;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Host.Features.ProjectModel;
+using JetBrains.RdBackend.Common.Features.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 

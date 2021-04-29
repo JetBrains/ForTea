@@ -1,6 +1,6 @@
 using JetBrains.Application.BuildScript.Application.Zones;
-using JetBrains.ReSharper.Host.Env;
-using JetBrains.ReSharper.Host.Product;
+using JetBrains.Rider.Backend.Env;
+using JetBrains.Rider.Backend.Product;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.TestFramework
 {

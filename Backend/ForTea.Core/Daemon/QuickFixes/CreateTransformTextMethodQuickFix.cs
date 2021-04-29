@@ -72,7 +72,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
 		private static MemberSignature CreateTransformTextSignature([NotNull] ITreeNode node) {
 			var signatureProvider = new MemberSignatureProvider(node.GetPsiServices(), node.Language);
 			PredefinedType predefinedType = node.GetPredefinedType();
-			return signatureProvider.CreateFromTypes(predefinedType.String, EmptyList<IType>.InstanceList, node.GetSourceFile());
+			return signatureProvider.CreateFromTypes(predefinedType.String, EmptyList<Pair<IType, string>>.InstanceList, node.GetSourceFile());
 		}
 
 		[NotNull]
