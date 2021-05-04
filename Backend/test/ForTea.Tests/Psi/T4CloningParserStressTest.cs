@@ -51,6 +51,7 @@ namespace JetBrains.ForTea.Tests.Psi
 			for (int i = 0; i < MEASUREMENT_COUNT; i += 1)
 			{
 				IFile file;
+				GC.Collect();
 				using (new MyTimeMeasurementCookie(parseTimes))
 				{
 					file = T4ParserExposer
@@ -59,6 +60,7 @@ namespace JetBrains.ForTea.Tests.Psi
 					T4CloningParserTestUtils.InitializeResolvePaths(((IT4File) file)!);
 				}
 
+				GC.Collect();
 				using (new MyTimeMeasurementCookie(cloneTimes))
 				{
 					new T4CloningParser(new T4MockPsiFileProvider(file!), null, T4DocumentLexerSelector.Instance)
