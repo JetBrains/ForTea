@@ -1,4 +1,3 @@
-using System.Reflection;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
@@ -65,16 +64,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			IDocumentViewModel editableEntity = Host.TryGetDocumentModel(rdDocumentId);
-			// Temporary hack to work around Ivan Yarkov's great and amazing refactoring
-			var ee1 = (RdDocumentModel) typeof(RiderDocumentViewModel).GetField("myDocumentModel", BindingFlags.NonPublic).GetValue(editableEntity);
+			var editableEntity = (Host.TryGetDocumentModel(rdDocumentId) as RiderDocumentViewModel)?.DocumentModel;
 			if (editableEntity == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
 				return;
 			}
 
-			var t4EditableEntityModel = ee1.GetT4RdDocumentModel();
+			var t4EditableEntityModel = editableEntity.GetT4RdDocumentModel();
 			document.CreateOutputExtensionChangeListener(
 				editableEntityLifetime,
 				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)
