@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.fortea.model.t4ProtocolModel
+import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
@@ -19,12 +20,18 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
   private val debuggerHelperHost = DebuggerHelperHost.getInstance(project)
   override fun create(executorId: String, environment: ExecutionEnvironment): RunProfileState {
+    throw UnsupportedOperationException("Synchronous call to DotNetExeExecutorFactory::create is not supported")
+  }
+
+  suspend fun createAsync(executorId: String, environment: ExecutionEnvironment): RunProfileState {
     val dotNetExecutable = parameters.toDotNetExecutable()
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
+      environment.project.lifetime,
       riderDotNetActiveRuntimeHost,
       debuggerHelperHost,
       dotNetExecutable.exePath,
-      dotNetExecutable.runtimeType
+      dotNetExecutable.runtimeType,
+      dotNetExecutable.projectTfm
     )
     val model = environment.project.solution.t4ProtocolModel
     return when (executorId) {

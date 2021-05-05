@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("org.jetbrains.intellij") version "0.6.4"
-  id("org.jetbrains.grammarkit") version "2020.2.1"
+  id("org.jetbrains.grammarkit") version "2021.1.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   id ("com.jetbrains.rdgen") version "0.203.161"
   kotlin("jvm") version "1.4.10"
@@ -25,7 +25,7 @@ repositories {
   mavenCentral()
 }
 
-val baseVersion = "2021.1"
+val baseVersion = "2021.2"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
