@@ -1,6 +1,6 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using JetBrains.ProjectModel;
-using JetBrains.Rider.Backend.Features.Daemon.Tooltips.Request;
+using JetBrains.RdBackend.Common.Features.Daemon.Tooltips.Request;
 
 namespace JetBrains.ForTea.RiderPlugin.Daemon.Tooltip
 {

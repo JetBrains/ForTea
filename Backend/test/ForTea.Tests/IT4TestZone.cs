@@ -1,8 +1,8 @@
 using JetBrains.Application.BuildScript.Application.Zones;
-using JetBrains.RdBackend.Common.Env;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.TestFramework;
+using JetBrains.Rider.Backend.Env;
 using JetBrains.TestFramework.Application.Zones;
 
 namespace JetBrains.ForTea.Tests
