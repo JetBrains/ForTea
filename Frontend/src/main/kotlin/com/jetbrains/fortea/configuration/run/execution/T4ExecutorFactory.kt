@@ -15,12 +15,13 @@ import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.debugger.DebuggerHelperHost
+import kotlinx.coroutines.runBlocking
 
 class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
   private val debuggerHelperHost = DebuggerHelperHost.getInstance(project)
-  override fun create(executorId: String, environment: ExecutionEnvironment): RunProfileState {
-    throw UnsupportedOperationException("Synchronous call to DotNetExeExecutorFactory::create is not supported")
+  override fun create(executorId: String, environment: ExecutionEnvironment) = runBlocking {
+    createAsync(executorId, environment)
   }
 
   suspend fun createAsync(executorId: String, environment: ExecutionEnvironment): RunProfileState {
