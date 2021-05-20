@@ -14,6 +14,7 @@ using JetBrains.RdBackend.Common.Features.BackgroundTasks;
 using JetBrains.RdBackend.Common.Features.ProjectModel;
 using JetBrains.RdBackend.Common.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
+using JetBrains.Rider.Backend.Features.BackgroundTasks;
 using JetBrains.Rider.Model.Notifications;
 using JetBrains.Util;
 
