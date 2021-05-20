@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DefineConstants>$(DefineConstants);JET_MODE_ASSERT;RIDER</DefineConstants>
@@ -9,7 +9,8 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props')" />
   <ItemGroup>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
     <Reference Include="JetBrains.EnvDTE.Host.dll">
