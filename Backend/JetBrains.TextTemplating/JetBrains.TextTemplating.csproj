@@ -11,9 +11,7 @@
   </PropertyGroup>
   <Import Project="$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props" Condition="Exists('$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props')" />
   <ItemGroup>
-    <Reference Include="JetBrains.EnvDTE.Client.dll">
-      <HintPath>../Libraries/JetBrains.EnvDTE.Client.dll</HintPath>
-    </Reference>
+    <PackageReference Include="JetBrains.EnvDTE.Client" Version="20210521.39.0" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
 </Project>
