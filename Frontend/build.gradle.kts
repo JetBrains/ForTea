@@ -66,10 +66,9 @@ val pluginFiles = listOf(
 
 // We don't need to pack EnvDTE interface assemblies, because they're already referenced in ReSharperHost
 val libraryFiles = listOf(
-  // A temporary fix. Remove this once EnvDTE nugets are part of the platform
-  "JetBrains.EnvDTE.Client"
-).map { "output/JetBrains.TextTemplating/$buildConfiguration/$it" } +
+  "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.EnvDTE.Client",
   "output/ForTea.RiderPlugin/$buildConfiguration/JetBrains.EnvDTE.Host"
+)
 
 val dotNetSdkPath by lazy {
   val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
@@ -208,6 +207,8 @@ tasks {
 <configuration>
   <packageSources>
     <add key="resharper-sdk" value="$dotNetSdkPath" />
+    <!-- Support for open-source developers: need this to let them have EnvDTE.Client and EnvDTE.Host without access to private nuget feed-->
+    <add key="local" value="${File(repoRoot, "Backend/Libraries")}" />
   </packageSources>
 </configuration>
 """

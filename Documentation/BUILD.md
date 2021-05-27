@@ -3,7 +3,14 @@
 Prerequirements
 ----
 You'll need to have [.NET Core SDK](https://dotnet.microsoft.com/download) installed.  
-To build Rider plugin, you'll also need to have [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) installed.
+To build Rider plugin, you'll also need to have [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) installed.  
+If you are a JB employee, make sure that you have an office VPN active.
+Otherwise, create `Backend/Libraries` folder, build the [JetBrains.EnvDTE](https://github.com/jetbrains/jetbrains.envdte) project
+and move the following files from `JetBrains.EnvDTE` build outputs into the newly created `Libraries` folder:
+- `JetBrains.EnvDTE.Client.dll`
+- `JetBrains.EnvDTE.Client.pdb`
+- `JetBrains.EnvDTE.Host.dll`
+- `JetBrains.EnvDTE.Host.pdb`
 
 Building Rider plugin
 ----
@@ -25,7 +32,7 @@ To build R# plugin, run
 cd Frontend
 gradlew :prepare
 cd ../Backend
-./build pack
+./build.ps1 pack
 ```
 The build script will ask for build configuration.
 You most likely want to select the 'Debug' configuration.  
