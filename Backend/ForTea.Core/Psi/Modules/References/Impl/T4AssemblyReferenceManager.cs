@@ -112,7 +112,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 
 		private bool TryAddAssemblyReference([NotNull] FileSystemPath path)
 		{
-			var cookie = AssemblyFactory.AddRef(path, "T4", ResolveContext);
+			var cookie = AssemblyFactory.AddRef(new AssemblyLocation(path), "T4", ResolveContext);
 			if (cookie == null) return false;
 			MyAssemblyReferences.Add(path, cookie);
 			return true;

@@ -37,7 +37,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			AssemblyReferenceTarget target,
 			IProject project,
 			IModuleReferenceResolveContext resolveContext
-		) => ResolveManager.Resolve(target, project, resolveContext);
+		) => ResolveManager.Resolve(target, project, resolveContext)?.AssemblyPhysicalPath;
 
 		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.ResolvedPath);
 
