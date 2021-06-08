@@ -161,7 +161,7 @@ namespace JetBrains.ForTea.Tests
 			}
 
 			if (assembly.AssemblyName?.Name.Contains("Microsoft.CodeAnalysis") == true) return;
-			if (!packageFiles.Add(new ApplicationPackageFile(assembly.Location.MakeRelativeTo(productBinariesDir),
+			if (!packageFiles.Add(new ApplicationPackageFile(assembly.Location.AssemblyPhysicalPath.MakeRelativeTo(productBinariesDir),
 				assemblyNameInfo)))
 				return;
 

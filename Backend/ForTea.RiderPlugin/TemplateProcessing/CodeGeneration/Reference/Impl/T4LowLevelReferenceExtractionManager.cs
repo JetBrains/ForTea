@@ -4,6 +4,7 @@ using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.Annotations;
 using JetBrains.Application.Infra;
+using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
@@ -71,14 +72,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 				if (destination.Any(it => it.FullName == directDependency.FullName)) continue;
 				destination.Add(directDependency);
 				var indirectDependencies = AssemblyInfoDatabase
-					.GetReferencedAssemblyNames(directDependency.Location)
+					.GetReferencedAssemblyNames(new AssemblyLocation(directDependency.Location))
 					.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(
 						assemblyNameInfo =>
 						{
 							var resolver = BuildResolver(directDependency);
 							resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
 							if (path == null) return null;
-							return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path);
+							return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path.AssemblyPhysicalPath.NotNull());
 						}
 					);
 				ResolveTransitiveDependencies(indirectDependencies, resolveContext, destination);

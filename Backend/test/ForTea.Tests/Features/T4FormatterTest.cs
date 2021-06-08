@@ -57,9 +57,9 @@ namespace JetBrains.ForTea.Tests.Features
 				.CreateTransactionCookie(DefaultAction.Rollback, "Temporary change"))
 			{
 				var file = document.GetPsiSourceFile(Solution);
-				var codeCleanup = CodeCleanup.GetInstance(Solution);
+				var codeCleanup = CodeCleanupService.GetInstance(Solution);
 				var codeCleanupSettings = Shell.Instance.GetComponent<CodeCleanupSettingsComponent>();
-				var profile = codeCleanupSettings.GetDefaultProfile(CodeCleanup.DefaultProfileType.REFORMAT);
+				var profile = codeCleanupSettings.GetDefaultProfile(CodeCleanupService.DefaultProfileType.REFORMAT);
 				var selectionRange = textControl.Selection.OneDocRangeWithCaret();
 				codeCleanup.Run(file, selectionRange.Length > 0
 					? new DocumentRange(textControl.Document, selectionRange)
