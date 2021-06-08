@@ -5,7 +5,8 @@ Prerequirements
 You'll need to have [.NET Core SDK](https://dotnet.microsoft.com/download) installed.  
 To build Rider plugin, you'll also need to have [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) installed.  
 If you are a JB employee, make sure that you have an office VPN active.
-Otherwise, create `Backend/Libraries` folder, build the [JetBrains.EnvDTE](https://github.com/jetbrains/jetbrains.envdte) project
+Otherwise, adduncomment the following line in `NuGet.Config`: `<add key="local" value="C:\w\ForTea\Backend\Libraries" />`,
+create `Backend/Libraries` folder, build the [JetBrains.EnvDTE](https://github.com/jetbrains/jetbrains.envdte) project
 and move the following files from `JetBrains.EnvDTE` build outputs into the newly created `Libraries` folder:
 - `JetBrains.EnvDTE.Client.dll`
 - `JetBrains.EnvDTE.Client.pdb`

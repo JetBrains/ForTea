@@ -208,7 +208,7 @@ tasks {
   <packageSources>
     <add key="resharper-sdk" value="$dotNetSdkPath" />
     <!-- Support for open-source developers: need this to let them have EnvDTE.Client and EnvDTE.Host without access to private nuget feed-->
-    <add key="local" value="${File(repoRoot, "Backend/Libraries")}" />
+    <!-- <add key="local" value="${File(repoRoot, "Backend/Libraries")}" /> -->
   </packageSources>
 </configuration>
 """
