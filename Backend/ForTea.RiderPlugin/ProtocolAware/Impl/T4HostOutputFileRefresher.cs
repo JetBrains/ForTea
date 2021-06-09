@@ -3,19 +3,15 @@ using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.ProjectModel;
 using JetBrains.RdBackend.Common.Features;
-using JetBrains.RdBackend.Common.Features.Components.PerClientComponents;
 using JetBrains.RdBackend.Common.Features.Documents;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-	[SolutionPerClientComponent]
+	[SolutionComponent]
 	public sealed class T4HostOutputFileRefresher : T4BasicOutputFileRefresher
 	{
-		[NotNull]
-		private DocumentHostBase Host => DocumentHostBase.GetInstance(Solution);
-
 		public T4HostOutputFileRefresher(ISolution solution) : base(solution)
 		{
 		}
@@ -28,7 +24,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		}
 
 		private void SyncDocuments([NotNull] FileSystemPath destinationLocation) =>
-			Host.SyncDocumentsWithFiles(destinationLocation);
+			DocumentHostBase.GetInstance(Solution).SyncDocumentsWithFiles(destinationLocation);
 
 		private void RefreshFiles([NotNull] FileSystemPath destinationLocation) => Solution
 			.GetProtocolSolution()
