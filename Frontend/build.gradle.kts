@@ -11,7 +11,7 @@ plugins {
   id("org.jetbrains.intellij") version "0.6.4"
   id("org.jetbrains.grammarkit") version "2021.1.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
-  id ("com.jetbrains.rdgen") version "0.203.161"
+  id ("com.jetbrains.rdgen") version "0.211.238"
   kotlin("jvm") version "1.4.10"
 }
 
