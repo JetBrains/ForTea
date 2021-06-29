@@ -12,8 +12,8 @@ import com.jetbrains.fortea.model.T4PreprocessingResult
 import com.jetbrains.rd.platform.util.idea.LifetimedProjectService
 import com.jetbrains.rd.util.reactive.ViewableMap
 import com.jetbrains.rider.build.BuildToolWindowContext
-import com.jetbrains.rider.build.Diagnostics.BuildDiagnostic
-import com.jetbrains.rider.build.Diagnostics.DiagnosticKind
+import com.jetbrains.rider.build.diagnostics.BuildDiagnostic
+import com.jetbrains.rider.build.diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*
 
 class T4BuildSessionViewImpl(
