@@ -48,7 +48,8 @@ intellij {
   setPlugins("rider-plugins-appender")
 }
 
-val backendPluginFolderName = "Backend"
+val backendPluginFolderName = "RiderBackendPlugin"
+val frontendPluginFolderName = "RiderFrontendPlugin"
 val riderBackedPluginName = "ForTea.RiderPlugin"
 val backendPluginSolutionName = "ForTea.Backend.sln"
 
@@ -93,8 +94,8 @@ fun File.writeTextIfChanged(content: String) {
 }
 
 configure<RdGenExtension> {
-  val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
-  val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
+  val csOutput = File(repoRoot, "$backendPluginFolderName/ForTea.RiderPlugin/Model")
+  val ktOutput = File(repoRoot, "$frontendPluginFolderName/src/main/kotlin/com/jetbrains/fortea/model")
 
   verbose = true
   hashFolder = "build/rdgen"
@@ -105,7 +106,7 @@ configure<RdGenExtension> {
     val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
     "$rdLibDirectory/rider-model.jar"
   })
-  sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
+  sources(File(repoRoot, "$frontendPluginFolderName/protocol/src/main/kotlin/model"))
   packages = "model"
 
   generator {
@@ -208,7 +209,7 @@ tasks {
   <packageSources>
     <add key="resharper-sdk" value="$dotNetSdkPath" />
     <!-- Support for open-source developers: need this to let them have EnvDTE.Client and EnvDTE.Host without access to private nuget feed-->
-    <!-- <add key="local" value="${File(repoRoot, "Backend/Libraries")}" /> -->
+    <!-- <add key="local" value="${File(repoRoot, "$backendPluginFolderName/Libraries")}" /> -->
   </packageSources>
 </configuration>
 """
