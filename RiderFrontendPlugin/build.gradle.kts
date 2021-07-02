@@ -15,6 +15,10 @@ plugins {
   kotlin("jvm") version "1.4.10"
 }
 
+dependencies {
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+}
+
 apply {
   plugin("kotlin")
   plugin("com.jetbrains.rdgen")
@@ -25,7 +29,7 @@ repositories {
   mavenCentral()
 }
 
-val baseVersion = "2021.2"
+val baseVersion = "2021.3"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
