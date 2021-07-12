@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 15.0.27130.2003
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.Core", "ForTea.Core\ForTea.Core.csproj", "{E7556A8E-2ADB-46E4-B0C6-DB7A53268600}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.Core", "Core\ForTea.Core\ForTea.Core.csproj", "{E7556A8E-2ADB-46E4-B0C6-DB7A53268600}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.RiderPlugin", "RiderPlugin\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj", "{32BD9350-1B6D-4D2C-BE6F-B9E418BAD198}"
 EndProject

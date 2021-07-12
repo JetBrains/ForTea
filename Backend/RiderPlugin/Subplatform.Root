@@ -3,7 +3,7 @@
     <SubplatformInfo.SubplatformReferences>
         <SubplatformReference Name="Rider\Rider.Backend" />
         <SubplatformReference Name="Rider\RdBackend.Common" />
-        <SubplatformReference Name="Plugins\ForTea\Backend\ForTea.Core" />
+        <SubplatformReference Name="Plugins\ForTea\Backend\Core" />
         <SubplatformReference Name="Psi.Features\test\Framework" />
     </SubplatformInfo.SubplatformReferences>
 </SubplatformInfo>

@@ -11,7 +11,7 @@
     <JetTestProject>true</JetTestProject>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ForTea.Core\ForTea.Core.csproj" />
+    <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
     <ProjectReference Include="..\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

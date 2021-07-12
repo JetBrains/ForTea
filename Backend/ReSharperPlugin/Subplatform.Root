@@ -3,6 +3,6 @@
     <SubplatformInfo.SubplatformReferences>
         <SubplatformReference Name="Psi.Features\src" />
         <SubplatformReference Name="Platform\VisualStudio\SinceVs10" />
-        <SubplatformReference Name="Plugins\ForTea\Backend\ForTea.Core" />
+        <SubplatformReference Name="Plugins\ForTea\Backend\Core" />
     </SubplatformInfo.SubplatformReferences>
 </SubplatformInfo>

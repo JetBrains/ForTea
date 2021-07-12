@@ -6,7 +6,7 @@
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;INDEPENDENT_BUILD</DefineConstants>
-    <OutputPath Condition="!$(InternalBuild)">..\output\ForTea.Core\$(Configuration)</OutputPath>
+    <OutputPath Condition="!$(InternalBuild)">..\..\output\ForTea.Core\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>JetBrains.ForTea.Core</AssemblyName>
