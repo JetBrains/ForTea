@@ -17,7 +17,7 @@
 		</dependencies>
 	</metadata>
 	<files>
-        <file src="output\ForTea.Core\$configuration$\ForTea.Core.dll" target="DotFiles" />
-		<file src="output\ForTea.ReSharperPlugin\$configuration$\ForTea.ReSharperPlugin.dll" target="DotFiles" />
+        <file src="..\output\ForTea.Core\$configuration$\ForTea.Core.dll" target="DotFiles" />
+		<file src="..\output\ForTea.ReSharperPlugin\$configuration$\ForTea.ReSharperPlugin.dll" target="DotFiles" />
 	</files>
 </package>

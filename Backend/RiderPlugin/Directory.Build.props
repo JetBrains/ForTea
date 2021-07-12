@@ -1,0 +1,5 @@
+﻿<Project>
+  <PropertyGroup>
+    <PackageLockFilePath>$(MSBuildThisFileDirectory)PackagesLock.targets</PackageLockFilePath>
+  </PropertyGroup>
+</Project>

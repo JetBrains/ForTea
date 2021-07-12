@@ -12,6 +12,7 @@
     <AssemblyName>JetBrains.ForTea.Core</AssemblyName>
     <LangVersion>latest</LangVersion>
     <RootNamespace>GammaJul.ForTea.Core</RootNamespace>
+    <PackageLockFilePath>$(MSBuildThisFileDirectory)PackagesLock.targets</PackageLockFilePath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Resources\TemplateBaseStub.cs" />

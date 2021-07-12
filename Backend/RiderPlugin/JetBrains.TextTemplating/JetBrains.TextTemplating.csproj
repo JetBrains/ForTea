@@ -7,7 +7,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DefineConstants>$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
+    <OutputPath>..\..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Microsoft.VisualStudio.TextTemplating</RootNamespace>
     <AssemblyName>Microsoft.VisualStudio.TextTemplating</AssemblyName>

@@ -194,7 +194,7 @@ tasks {
   create<RdGenTask>("rdgenPwc") {
     doFirst {
       configure<RdGenExtension> {
-        val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
+        val csOutput = File(repoRoot, "Backend/RiderPlugin/ForTea.RiderPlugin/Model")
         val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
 
         verbose = true
@@ -217,7 +217,7 @@ tasks {
   create<RdGenTask>("rdgenIndependent") {
     doFirst {
       configure<RdGenExtension> {
-        val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
+        val csOutput = File(repoRoot, "Backend/RiderPlugin/ForTea.RiderPlugin/Model")
         val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
 
         verbose = true

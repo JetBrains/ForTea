@@ -7,7 +7,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DefineConstants>$(DefineConstants);JET_MODE_ASSERT;RIDER</DefineConstants>
-    <OutputPath>..\output\ForTea.RiderPlugin\$(Configuration)</OutputPath>
+    <OutputPath>..\..\output\ForTea.RiderPlugin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
     <AssemblyName>JetBrains.ForTea.RiderPlugin</AssemblyName>
@@ -18,7 +18,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
+    <ProjectReference Include="..\..\ForTea.Core\ForTea.Core.csproj" />
     <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.2.1" />
     <Reference Include="JetBrains.EnvDTE.Host.dll">
       <HintPath>../Libraries/JetBrains.EnvDTE.Host.dll</HintPath>
