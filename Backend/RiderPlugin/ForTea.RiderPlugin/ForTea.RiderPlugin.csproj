@@ -8,7 +8,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;RIDER;INDEPENDENT_BUILD</DefineConstants>
     <OutputPath>..\..\output\ForTea.RiderPlugin\$(Configuration)</OutputPath>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
     <AssemblyName>JetBrains.ForTea.RiderPlugin</AssemblyName>
     <OutputType>Library</OutputType>

@@ -6,6 +6,7 @@
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants Condition="!$(InternalBuild)" >$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
     <LangVersion>8.0</LangVersion>
     <OutputPath>..\..\output\ForTea.ReSharperPlugin\$(Configuration)</OutputPath>
     <RootNamespace>JetBrains.ForTea.ReSharperPlugin</RootNamespace>
