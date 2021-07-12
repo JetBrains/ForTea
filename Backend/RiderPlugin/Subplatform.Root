@@ -2,6 +2,8 @@
 <SubplatformInfo xmlns="urn:schemas-jetbrains-com:build-subplatform-info" CompanyNameHuman="JetBrains" IsGitSubplatform="true">
     <SubplatformInfo.SubplatformReferences>
         <SubplatformReference Name="Rider\Rider.Backend" />
-        <SubplatformReference Name="Rider\Rider.RdBackend" />
+        <SubplatformReference Name="Rider\RdBackend.Common" />
+        <SubplatformReference Name="Plugins\ForTea\Backend\ForTea.Core" />
+        <SubplatformReference Name="Psi.Features\test\Framework" />
     </SubplatformInfo.SubplatformReferences>
 </SubplatformInfo>

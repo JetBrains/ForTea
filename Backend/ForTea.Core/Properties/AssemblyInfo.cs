@@ -15,6 +15,8 @@
 #endregion
 using System.Reflection;
 
+#if INDEPENDENT_BUILD
+
 [assembly: AssemblyTitle("GammaJul.ReSharper.ForTea")]
 [assembly: AssemblyDescription("Provides support for editing T4 (.tt) files.")]
 [assembly: AssemblyConfiguration("")]
@@ -24,3 +26,5 @@ using System.Reflection;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.20.0")]
+
+#endif

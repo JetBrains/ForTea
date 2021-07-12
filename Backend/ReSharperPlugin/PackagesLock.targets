@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemGroup>
-        <PackageLock Include="FSharp.Core" Version="5.0.0"/>
+        <PackageLock Include="JetBrains.Vs.SinceVs10.Text" Version="3.0.20201223.1"/>
+        <PackageLock Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" Version="10.0.30320"/>
+        <PackageLock Include="Microsoft.VisualStudio.Shell.Interop.8.0" Version="8.0.50728"/>
     </ItemGroup>
 </Project>

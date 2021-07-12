@@ -3,21 +3,5 @@
     <SubplatformInfo.SubplatformReferences>
         <SubplatformReference Name="Psi.Features\Web\Core" />
         <SubplatformReference Name="Psi.Features\src" />
-        <SubplatformReference Name="Psi.Features\Tasks" />
-        <SubplatformReference Name="Psi.Features\Core" />
-        <SubplatformReference Name="Psi.Features\test\Framework" />
-        <SubplatformReference Name="Rider\Rider.Backend" />
-        <SubplatformReference Name="Platform\VisualStudio\SinceVs10" />
-        <SubplatformReference Name="Platform\VisualStudio\SinceVs09" />
-        <SubplatformReference Name="Platform\VisualStudio\Core" />
-        <SubplatformReference Name="Platform\VisualStudio\Protocol" />
-        <SubplatformReference Name="Platform\Core\Shell" />
-        <SubplatformReference Name="Platform\Core\Text" />
-        <SubplatformReference Name="Platform\Core\Ide" />
-        <SubplatformReference Name="Platform\RdProtocol" />
-        <SubplatformReference Name="Platform\Tests\Framework" />
     </SubplatformInfo.SubplatformReferences>
-    <SubplatformInfo.PrepareScripts>
-        <Gradlew TaskName="pwc" Path="frontendGradlew.cmd" />
-    </SubplatformInfo.PrepareScripts>
 </SubplatformInfo>

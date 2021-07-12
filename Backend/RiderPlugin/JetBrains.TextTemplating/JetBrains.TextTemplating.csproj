@@ -5,7 +5,7 @@
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <DefineConstants>$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
+    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;INDEPENDENT_BUILD</DefineConstants>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
@@ -15,7 +15,7 @@
   </PropertyGroup>
   <Import Project="$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props" Condition="Exists('$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props')" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.EnvDTE.Client" Version="20210521.39.0" />
+    <PackageReference Include="JetBrains.EnvDTE.Client" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
   <ItemGroup>

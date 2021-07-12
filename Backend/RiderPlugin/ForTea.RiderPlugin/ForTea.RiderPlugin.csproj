@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <InternalBuild Condition="Exists('ManagedProject.Generated.Targets')">true</InternalBuild>
+    <InternalBuild Condition="Exists('ManagedProject.Generated.Targets')">True</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <DefineConstants>$(DefineConstants);JET_MODE_ASSERT;RIDER</DefineConstants>
+    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;RIDER;INDEPENDENT_BUILD</DefineConstants>
     <OutputPath>..\..\output\ForTea.RiderPlugin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
@@ -14,15 +14,9 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\..\ForTea.Core\ForTea.Core.csproj" />
-    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.2.1" />
-    <Reference Include="JetBrains.EnvDTE.Host.dll">
-      <HintPath>../Libraries/JetBrains.EnvDTE.Host.dll</HintPath>
-    </Reference>
+    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
+    <PackageReference Include="JetBrains.EnvDTE.Host" />
     <Reference Include="System.Core" />
     <Reference Include="System" />
     <Reference Include="System.Threading.Tasks" />

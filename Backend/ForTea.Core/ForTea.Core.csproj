@@ -5,7 +5,7 @@
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
+    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;INDEPENDENT_BUILD</DefineConstants>
     <OutputPath Condition="!$(InternalBuild)">..\output\ForTea.Core\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>Library</OutputType>
@@ -74,9 +74,10 @@
     </ErrorsGen>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.2.1" />
+    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="mscorlib" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_Web_Core.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_Web_Core.Props')" />
