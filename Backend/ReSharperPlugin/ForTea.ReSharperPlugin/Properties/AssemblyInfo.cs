@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+#if INDEPENDENT_BUILD
+
 [assembly: AssemblyTitle("ForTea.ReSharperPlugin")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
@@ -9,3 +11,5 @@
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.20.0")]
+
+# endif

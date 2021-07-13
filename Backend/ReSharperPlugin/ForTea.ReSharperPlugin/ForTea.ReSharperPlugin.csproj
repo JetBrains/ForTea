@@ -6,15 +6,15 @@
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <DefineConstants Condition="!$(InternalBuild)" >$(DefineConstants);JET_MODE_ASSERT</DefineConstants>
+    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;INDEPENDENT_BUILD</DefineConstants>
     <LangVersion>8.0</LangVersion>
-    <OutputPath>..\..\output\ForTea.ReSharperPlugin\$(Configuration)</OutputPath>
+    <OutputPath Condition="!$(InternalBuild)">..\..\output\ForTea.ReSharperPlugin\$(Configuration)</OutputPath>
     <RootNamespace>JetBrains.ForTea.ReSharperPlugin</RootNamespace>
     <AssemblyName>JetBrains.ForTea.ReSharperPlugin</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Vs.SinceVs10.Text" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Vs.SinceVs10.Text" />
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
@@ -25,6 +25,5 @@
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props')" />
-
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
 </Project>
