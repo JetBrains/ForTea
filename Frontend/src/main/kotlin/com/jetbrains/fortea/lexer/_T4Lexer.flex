@@ -34,4 +34,4 @@ import com.jetbrains.fortea.psi.T4TokenNodeTypes;
     return null;
 %eofval}
 
-%include ../../../../../../../../Backend/ForTea.Core/Parsing/Lexing/T4Rules.lex
+%include ../../../../../../../../Backend/Core/ForTea.Core/Parsing/Lexing/T4Rules.lex

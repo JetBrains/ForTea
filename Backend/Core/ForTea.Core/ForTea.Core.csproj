@@ -10,9 +10,8 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>JetBrains.ForTea.Core</AssemblyName>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <RootNamespace>GammaJul.ForTea.Core</RootNamespace>
-    <PackageLockFilePath>$(MSBuildThisFileDirectory)PackagesLock.targets</PackageLockFilePath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Resources\TemplateBaseStub.cs" />
@@ -74,7 +73,6 @@
     </ErrorsGen>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="mscorlib" />

@@ -7,7 +7,7 @@
     <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);INDEPENDENT_BUILD</DefineConstants>
     <AssemblyName>JetBrains.ForTea.Tests</AssemblyName>
     <RootNamespace>JetBrains.ForTea.Tests</RootNamespace>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <JetTestProject>true</JetTestProject>
   </PropertyGroup>
   <ItemGroup>
