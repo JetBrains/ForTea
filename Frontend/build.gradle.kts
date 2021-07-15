@@ -8,10 +8,10 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "0.6.4"
+  id("org.jetbrains.intellij") version "1.1.3"
   id("org.jetbrains.grammarkit") version "2021.1.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
-  id ("com.jetbrains.rdgen") version "0.212.307"
+  id("com.jetbrains.rdgen") version "0.212.307"
   kotlin("jvm") version "1.4.10"
 }
 
@@ -30,22 +30,22 @@ val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
 intellij {
-  type = "RD"
+  type.set("RD")
   val dir = file("build/rider")
   if (dir.exists()) {
     logger.lifecycle("*** Using Rider SDK from local path " + dir.absolutePath)
-    localPath = dir.absolutePath
+    localPath.set(dir.absolutePath)
   } else {
     logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-    version = "$baseVersion-SNAPSHOT"
+    version.set("$baseVersion-SNAPSHOT")
   }
 
-  instrumentCode = false
-  downloadSources = false
-  updateSinceUntilBuild = false
+  instrumentCode.set(false)
+  downloadSources.set(false)
+  updateSinceUntilBuild.set(false)
 
   // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-  setPlugins("rider-plugins-appender")
+  plugins.set(listOf("rider-plugins-appender"))
 }
 
 val backendPluginFolderName = "Backend"
@@ -71,7 +71,8 @@ val libraryFiles = listOf(
 )
 
 val dotNetSdkPath by lazy {
-  val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
+  val sdkPath = intellij.ideaDependency.orNull?.classes?.resolve("lib")?.resolve("DotNetSdkForRdPlugins")
+    ?: error("intellij.ideaDependency.classes is null")
   if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
 
   println("SDK path: $sdkPath")
@@ -101,7 +102,7 @@ configure<RdGenExtension> {
   logger.info("Configuring rdgen params")
   classpath({
     logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
-    val sdkPath = intellij.ideaDependency.classes
+    val sdkPath = intellij.ideaDependency.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
     val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
     "$rdLibDirectory/rider-model.jar"
   })
@@ -127,7 +128,7 @@ configure<RdGenExtension> {
 
 tasks {
   withType<RunIdeTask> {
-    // IDEs from SDK are launched with 512m by default, which is not enough for Rider.
+    // IDEs from SDK are launched with 512mb by default, which is not enough for Rider.
     // Rider uses this value when launched not from SDK
     maxHeapSize = "1500m"
   }
