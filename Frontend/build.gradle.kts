@@ -191,10 +191,11 @@ tasks {
     }
   }
 
-  create<RdGenTask>("rdgenPwc") {
+  create<RdGenTask>("rdgenMonorepo") {
     doFirst {
       configure<RdGenExtension> {
         val csOutput = File(repoRoot, "Backend/RiderPlugin/ForTea.RiderPlugin/Model")
+        val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
         val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
 
         verbose = true
@@ -209,6 +210,14 @@ tasks {
           root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
           namespace = "JetBrains.Rider.Model"
           directory = "$csOutput"
+        }
+
+        generator {
+          language = "kotlin"
+          transform = "asis"
+          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+          namespace = "com.jetbrains.rider.model"
+          directory = "$ktOutput"
         }
       }
     }
@@ -253,12 +262,17 @@ tasks {
   
   create("pwc") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgenPwc")    
+    dependsOn("rdgenMonorepo")
   }
 
   create("prepare") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateT4Lexer, generateT4Parser)
+  }
+
+  create("prepareMonorepo") {
+    group = riderForTeaTargetsGroup
+    dependsOn("rdgenMonorepo", generateT4Lexer, generateT4Parser)
   }
 
   getByName("buildPlugin") {

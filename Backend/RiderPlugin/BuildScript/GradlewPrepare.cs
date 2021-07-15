@@ -17,10 +17,10 @@ namespace GammaJul.ForTea.BuildScript
         ? workingDir / "gradlew.bat"
         : workingDir / "gradlew";
 
-      var logPrefix = "4TEA_RDGEN: ";
+      var logPrefix = "4TEA_PWC: ";
         
       var arguments = new CommandLineBuilderJet();
-      arguments.AppendParameterWithQuoting("rdgenPwc");
+      arguments.AppendParameterWithQuoting("pwc");
       
       var startInfo = new InvokeChildProcess.StartInfo(path)
       {
@@ -36,9 +36,9 @@ namespace GammaJul.ForTea.BuildScript
         StartInJob = PlatformUtil.RuntimePlatform == PlatformUtil.Platform.Windows
       };
 
-      logger.Info("Start 4Tea rdgen call");
+      logger.Info("Start 4Tea pwc task call");
       await InvokeChildProcess.InvokeCore(lifetime, startInfo, InvokeChildProcess.SyncAsync.Async, logger);
-      logger.Info("End 4Tea rdgen call");
+      logger.Info("End 4Tea pwc task call");
       
       return LocalPrepareWorkingCopy.Item;
     }
