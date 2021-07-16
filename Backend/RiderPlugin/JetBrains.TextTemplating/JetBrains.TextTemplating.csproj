@@ -5,7 +5,7 @@
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;INDEPENDENT_BUILD</DefineConstants>
+    <DefineConstants Condition="!$(InternalBuild)">INDEPENDENT_BUILD</DefineConstants>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath Condition="!$(InternalBuild)">..\..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
     <LangVersion>9.0</LangVersion>

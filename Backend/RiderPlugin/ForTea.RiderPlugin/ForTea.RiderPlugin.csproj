@@ -6,7 +6,7 @@
     <TargetFramework>net472</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);JET_MODE_ASSERT;RIDER;INDEPENDENT_BUILD</DefineConstants>
+    <DefineConstants Condition="!$(InternalBuild)">INDEPENDENT_BUILD</DefineConstants>
     <OutputPath Condition="!$(InternalBuild)">..\..\output\ForTea.RiderPlugin\$(Configuration)</OutputPath>
     <LangVersion>9.0</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>

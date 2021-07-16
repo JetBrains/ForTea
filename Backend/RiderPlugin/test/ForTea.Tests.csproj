@@ -4,7 +4,7 @@
     <InternalBuild Condition="Exists('ManagedProject.Generated.Targets')">true</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
     <TargetFramework>net472</TargetFramework>
-    <DefineConstants Condition="!$(InternalBuild)">$(DefineConstants);INDEPENDENT_BUILD</DefineConstants>
+    <DefineConstants Condition="!$(InternalBuild)">INDEPENDENT_BUILD</DefineConstants>
     <AssemblyName>JetBrains.ForTea.Tests</AssemblyName>
     <RootNamespace>JetBrains.ForTea.Tests</RootNamespace>
     <LangVersion>9.0</LangVersion>
@@ -21,6 +21,5 @@
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_Sdk.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_Sdk.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_test_Framework.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_test_Framework.Props')" />
-
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
 </Project>

@@ -5,7 +5,7 @@ using JetBrains.Build;
 using JetBrains.Lifetimes;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.BuildScript
+namespace GammaJul.ForTea.BuildScript.RiderPlugin
 {
   public static class ForTeaGradlewPrepare
   {
