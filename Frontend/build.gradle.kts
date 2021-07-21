@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.1.3"
+  id("org.jetbrains.intellij") version "1.2-SNAPSHOT"
   id("org.jetbrains.grammarkit") version "2021.1.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   id("com.jetbrains.rdgen") version "0.212.307"
