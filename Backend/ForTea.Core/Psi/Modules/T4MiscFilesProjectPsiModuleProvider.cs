@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] IProjectFile projectFile,
 			PsiModuleChange.ChangeType changeType,
 			[NotNull] PsiModuleChangeBuilder changeBuilder,
-			[NotNull] FileSystemPath oldLocation
+			[NotNull] VirtualFileSystemPath oldLocation
 		) => _t4PsiModuleProvider.OnProjectFileChanged(projectFile, changeType, changeBuilder);
 
 		public T4MiscFilesProjectPsiModuleProvider(

@@ -9,8 +9,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	public sealed class T4ReversedFileDependencyData
 	{
 		[NotNull, ItemNotNull]
-		public IList<FileSystemPath> Includers { get; }
+		public IList<VirtualFileSystemPath> Includers { get; }
 
-		public T4ReversedFileDependencyData([NotNull, ItemNotNull] IList<FileSystemPath> includes) => Includers = includes;
+		public T4ReversedFileDependencyData([NotNull, ItemNotNull] IList<VirtualFileSystemPath> includes) => Includers = includes;
 	}
 }

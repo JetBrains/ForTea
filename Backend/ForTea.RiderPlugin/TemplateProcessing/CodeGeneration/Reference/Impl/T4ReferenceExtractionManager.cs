@@ -70,7 +70,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		}
 
 		[NotNull]
-		private List<FileSystemPath> ExtractReferenceLocations([NotNull] IT4File file)
+		private List<VirtualFileSystemPath> ExtractReferenceLocations([NotNull] IT4File file)
 		{
 			file.AssertContainsNoIncludeContext();
 			var directives = file.GetThisAndIncludedFilesRecursive()
@@ -100,14 +100,14 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		}
 
 		private void AddBaseReferences(
-			[NotNull, ItemNotNull] List<FileSystemPath> directDependencies,
+			[NotNull, ItemNotNull] List<VirtualFileSystemPath> directDependencies,
 			[NotNull] IT4File file
 		) => directDependencies.AddRange(
 			Environment.DefaultAssemblyNames.Select(assemblyName => ResolveBaseReference(file, assemblyName))
 		);
 
 		[NotNull]
-		private FileSystemPath ResolveBaseReference(
+		private VirtualFileSystemPath ResolveBaseReference(
 			[NotNull] IT4File file,
 			[NotNull] string assemblyName
 		)

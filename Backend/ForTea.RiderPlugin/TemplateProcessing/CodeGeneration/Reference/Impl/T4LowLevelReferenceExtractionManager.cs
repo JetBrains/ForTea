@@ -37,12 +37,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		// TODO: is this necessary?
 		[NotNull]
 		private static IAssemblyResolver ProtocolAssemblyResolver { get; } = new AssemblyResolverOnFolders(
-			FileSystemPath.Parse(typeof(Lifetime).Assembly.Location).Parent, // JetBrains.Lifetimes
-			FileSystemPath.Parse(typeof(IProtocol).Assembly.Location).Parent // JetBrains.RdFramework
+			VirtualFileSystemPath.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext).Parent, // JetBrains.Lifetimes
+			VirtualFileSystemPath.Parse(typeof(IProtocol).Assembly.Location, InteractionContext.SolutionContext).Parent // JetBrains.RdFramework
 		);
 
 		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
-			IList<FileSystemPath> directDependencies,
+			IList<VirtualFileSystemPath> directDependencies,
 			IModuleReferenceResolveContext resolveContext
 		)
 		{
@@ -51,15 +51,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 			return result;
 		}
 
-		private T4AssemblyReferenceInfo? Resolve([NotNull] FileSystemPath path)
+		private T4AssemblyReferenceInfo? Resolve([NotNull] VirtualFileSystemPath path)
 		{
 			var info = AssemblyInfoDatabase.GetAssemblyName(path);
 			if (info == null) return null;
 			return new T4AssemblyReferenceInfo(info.FullName, path);
 		}
 
-		public MetadataReference ResolveMetadata(Lifetime lifetime, FileSystemPath path) =>
-			Cache.GetMetadataReference(lifetime, path);
+		public MetadataReference ResolveMetadata(Lifetime lifetime, VirtualFileSystemPath path) =>
+			Cache.GetMetadataReference(lifetime, path.ToNativeFileSystemPath());
 
 		private void ResolveTransitiveDependencies(
 			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,

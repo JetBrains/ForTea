@@ -7,10 +7,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing
 	public interface IT4TargetFileManager
 	{
 		[NotNull]
-		FileSystemPath GetTemporaryExecutableLocation([NotNull] IT4File file);
+		VirtualFileSystemPath GetTemporaryExecutableLocation([NotNull] IT4File file);
 
 		[NotNull]
-		FileSystemPath GetExpectedTemporaryTargetFileLocation([NotNull] IT4File file);
+		VirtualFileSystemPath GetExpectedTemporaryTargetFileLocation([NotNull] IT4File file);
 
 		void TryProcessExecutionResults([NotNull] IT4File file);
 

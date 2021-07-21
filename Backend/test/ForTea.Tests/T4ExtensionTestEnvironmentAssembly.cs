@@ -72,7 +72,7 @@ namespace JetBrains.ForTea.Tests
 					reference => reference.PackageId.GetHashCode())
 			);
 
-			using (var loader = new MetadataLoader(productBinariesDir))
+			using (var loader = new MetadataLoader(productBinariesDir.ToVirtualFileSystemPath()))
 			{
 				ProcessAssembly(packages, productBinariesDir, loader, assemblyNameInfo, packageFiles,
 					packageReferences);
@@ -127,7 +127,7 @@ namespace JetBrains.ForTea.Tests
 						);
 
 						var assemblyNameInfo = AssemblyNameInfo.Parse(mainAssembly.FullName);
-						using (var loader = new MetadataLoader(productBinariesDir))
+						using (var loader = new MetadataLoader(productBinariesDir.ToVirtualFileSystemPath()))
 						{
 							ProcessAssembly(packages, productBinariesDir, loader, assemblyNameInfo, packageFiles,
 								packageReferences);
@@ -161,7 +161,7 @@ namespace JetBrains.ForTea.Tests
 			}
 
 			if (assembly.AssemblyName?.Name.Contains("Microsoft.CodeAnalysis") == true) return;
-			if (!packageFiles.Add(new ApplicationPackageFile(assembly.Location.AssemblyPhysicalPath.MakeRelativeTo(productBinariesDir),
+			if (!packageFiles.Add(new ApplicationPackageFile(assembly.Location.AssemblyPhysicalPath.MakeRelativeTo(productBinariesDir.ToVirtualFileSystemPath()),
 				assemblyNameInfo)))
 				return;
 
