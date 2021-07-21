@@ -139,11 +139,11 @@ tasks {
 
     paths.forEach {
       from(it) {
-        into("${intellij.pluginName}/dotnet")
+        into("${intellij.pluginName.get()}/dotnet")
       }
     }
 
-    into("${intellij.pluginName}/projectTemplates") {
+    into("${intellij.pluginName.get()}/projectTemplates") {
       from("projectTemplates")
     }
 
@@ -151,7 +151,7 @@ tasks {
       paths.forEach {
         val file = file(it)
         if (!file.exists()) throw RuntimeException("File $file does not exist")
-        logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/dotnet")
+        logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName.get()}/dotnet")
       }
     }
   }
