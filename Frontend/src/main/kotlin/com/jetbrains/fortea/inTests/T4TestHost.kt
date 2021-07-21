@@ -23,6 +23,7 @@ class T4TestHost(protocolHost: IProtocolHost) : ProtocolComponent(protocolHost) 
 
   fun waitForIndirectInvalidation() {
     if (ProtocolManager.isResharperBackendDisabled()) throw IllegalStateException("ReSharper backend is disabled")
+    frameworkLogger.info("Starting waitForIndirectInvalidation")
     model.waitForIndirectInvalidation.callSynchronously(Unit, protocol, lifetime)
     frameworkLogger.info("Complete waitForIndirectInvalidation")
   }
