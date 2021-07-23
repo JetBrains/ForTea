@@ -25,7 +25,7 @@ repositories {
   mavenCentral()
 }
 
-val baseVersion = "2021.2"
+val baseVersion = "2021.3"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
@@ -139,11 +139,11 @@ tasks {
 
     paths.forEach {
       from(it) {
-        into("${intellij.pluginName}/dotnet")
+        into("${intellij.pluginName.get()}/dotnet")
       }
     }
 
-    into("${intellij.pluginName}/projectTemplates") {
+    into("${intellij.pluginName.get()}/projectTemplates") {
       from("projectTemplates")
     }
 
@@ -151,7 +151,7 @@ tasks {
       paths.forEach {
         val file = file(it)
         if (!file.exists()) throw RuntimeException("File $file does not exist")
-        logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/dotnet")
+        logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName.get()}/dotnet")
       }
     }
   }
@@ -231,6 +231,12 @@ tasks {
 
   getByName("buildPlugin") {
     dependsOn("prepare")
+  }
+
+  getByName("test") {
+    // A fix for https://github.com/JetBrains/gradle-intellij-plugin/issues/743.
+    // Remove after it is publicly available
+    dependsOn("prepareTestingSandbox")
   }
 }
 
