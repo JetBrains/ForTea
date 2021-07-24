@@ -24,15 +24,15 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 		{
 		}
 
-		public override FileSystemPath Resolve(T4ResolvedPath pathWithMacros) =>
+		public override VirtualFileSystemPath Resolve(T4ResolvedPath pathWithMacros) =>
 			base.Resolve(pathWithMacros) ?? ResolveAsDte(pathWithMacros.ResolvedPath);
 
 		[CanBeNull]
-		private static FileSystemPath ResolveAsDte([NotNull] string assemblyName) =>
+		private static VirtualFileSystemPath ResolveAsDte([NotNull] string assemblyName) =>
 			NameToEnvDTEAssemblyMap.TryGetValue(assemblyName);
 
-		private static IDictionary<string, FileSystemPath> NameToEnvDTEAssemblyMap { get; } = FileSystemPath
-			.Parse(typeof(Lifetime).Assembly.Location)
+		private static IDictionary<string, VirtualFileSystemPath> NameToEnvDTEAssemblyMap { get; } = VirtualFileSystemPath
+			.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext)
 			.Parent
 			.GetChildren("*EnvDTE*.dll")
 			.Select(child => child.GetAbsolutePath())

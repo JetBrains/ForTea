@@ -7,11 +7,11 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 	public sealed class T4OutsideSolutionNavigationInfo
 	{
 		[NotNull]
-		public FileSystemPath FileSystemPath { get; }
+		public VirtualFileSystemPath FileSystemPath { get; }
 		public DocumentRange DocumentRange { get; }
 
 		public T4OutsideSolutionNavigationInfo(
-			[NotNull] FileSystemPath fileSystemPath,
+			[NotNull] VirtualFileSystemPath fileSystemPath,
 			DocumentRange documentRange
 		)
 		{

@@ -7,6 +7,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 	public interface IT4LightWeightAssemblyReferenceResolver
 	{
 		[CanBeNull]
-		FileSystemPath TryResolve([NotNull] T4ResolvedPath path);
+		VirtualFileSystemPath TryResolve([NotNull] T4ResolvedPath path);
 	}
 }

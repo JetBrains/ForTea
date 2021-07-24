@@ -20,13 +20,13 @@ namespace GammaJul.ForTea.Core
 		IEnumerable<string> DefaultAssemblyNames { get; }
 
 		[NotNull, ItemNotNull]
-		IEnumerable<FileSystemPath> AdditionalCompilationAssemblyLocations { get; }
+		IEnumerable<VirtualFileSystemPath> AdditionalCompilationAssemblyLocations { get; }
 
 		/// <summary>Gets whether the current environment is supported. VS2005 and VS2008 aren't.</summary>
 		bool IsSupported { get; }
 
 		/// <summary>Gets the common include paths from the registry.</summary>
 		[NotNull, ItemNotNull]
-		IEnumerable<FileSystemPath> IncludePaths { get; }
+		IEnumerable<VirtualFileSystemPath> IncludePaths { get; }
 	}
 }

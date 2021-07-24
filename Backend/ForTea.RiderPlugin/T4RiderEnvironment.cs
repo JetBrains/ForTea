@@ -27,7 +27,7 @@ namespace JetBrains.ForTea.RiderPlugin
 					yield return name;
 				}
 
-				string textTemplating = FileSystemPath.Parse(Assembly.GetExecutingAssembly().Location)
+				string textTemplating = VirtualFileSystemPath.Parse(Assembly.GetExecutingAssembly().Location, InteractionContext.SolutionContext)
 					.Parent
 					.GetChildren("JetBrains.TextTemplating.dll")
 					.Select(child => child.GetAbsolutePath())
@@ -40,9 +40,9 @@ namespace JetBrains.ForTea.RiderPlugin
 			}
 		}
 
-		public override IEnumerable<FileSystemPath> AdditionalCompilationAssemblyLocations
+		public override IEnumerable<VirtualFileSystemPath> AdditionalCompilationAssemblyLocations
 		{
-			get { yield return FileSystemPath.Parse(typeof(Lifetime).Assembly.Location); }
+			get { yield return VirtualFileSystemPath.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext); }
 		}
 
 		public override bool IsSupported => true;

@@ -45,7 +45,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			}
 		}
 		
-		public IProject TryResolveProject(FileSystemPath path) =>
+		public IProject TryResolveProject(VirtualFileSystemPath path) =>
 			!OutputAssemblies.TryGetProjectAndTargetFrameworkIdByOutputAssemblyLocation(path, out var pair)
 				? null
 				: pair.First;

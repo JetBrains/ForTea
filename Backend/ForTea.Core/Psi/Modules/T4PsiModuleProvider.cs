@@ -194,7 +194,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules {
 			// and whose IPsiSourceFile was previously managed by T4OutsideSolutionSourceFileManager.
 			// Those files will be reparsed with the new source file.
 			var fileManager = solution.GetComponent<T4OutsideSolutionSourceFileManager>();
-			FileSystemPath location = projectFile.Location;
+			VirtualFileSystemPath location = projectFile.Location;
 			if (fileManager.HasSourceFile(location)) {
 				fileManager.DeleteSourceFile(location);
 			}

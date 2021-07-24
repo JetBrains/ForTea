@@ -12,11 +12,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 	{
 		[NotNull]
 		IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
-			[NotNull, ItemNotNull] IList<FileSystemPath> directDependencies,
+			[NotNull, ItemNotNull] IList<VirtualFileSystemPath> directDependencies,
 			[NotNull] IModuleReferenceResolveContext resolveContext
 		);
 
 		[CanBeNull]
-		MetadataReference ResolveMetadata(Lifetime lifetime, [NotNull] FileSystemPath path);
+		MetadataReference ResolveMetadata(Lifetime lifetime, [NotNull] VirtualFileSystemPath path);
 	}
 }

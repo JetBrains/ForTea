@@ -44,11 +44,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			OutputFileRefresher = outputFileRefresher;
 		}
 
-		public FileSystemPath GetTemporaryExecutableLocation(IT4File file)
+		public VirtualFileSystemPath GetTemporaryExecutableLocation(IT4File file)
 		{
 			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile();
 			var project = projectFile?.GetProject();
-			if (project == null) return FileSystemPath.Empty;
+			if (project == null) return VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext);
 			var relativePath = projectFile.Location.MakeRelativeTo(project.Location.Parent);
 			var ttLocation = project.GetIntermediateDirectory(project.GetCurrentTargetFrameworkId())
 				.Combine("TextTemplating")
@@ -56,7 +56,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			return ttLocation.Parent.Combine(ttLocation.Name.WithoutExtension()).Combine("GeneratedTransformation.exe");
 		}
 
-		public FileSystemPath GetExpectedTemporaryTargetFileLocation(IT4File file) =>
+		public VirtualFileSystemPath GetExpectedTemporaryTargetFileLocation(IT4File file) =>
 			GetTemporaryExecutableLocation(file).Parent.Combine(GetExpectedTargetFileName(file));
 
 		[NotNull]
@@ -70,11 +70,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		[NotNull]
-		private FileSystemPath GetTemporaryTargetFileFolder([NotNull] IT4File file) =>
+		private VirtualFileSystemPath GetTemporaryTargetFileFolder([NotNull] IT4File file) =>
 			GetTemporaryExecutableLocation(file).Parent;
 
 		[CanBeNull]
-		private FileSystemPath TryFindTemporaryTargetFile([NotNull] IT4File file)
+		private VirtualFileSystemPath TryFindTemporaryTargetFile([NotNull] IT4File file)
 		{
 			string name = file.PhysicalPsiSourceFile.NotNull().Name.WithOtherExtension(".*");
 			var candidates = GetTemporaryTargetFileFolder(file).GetChildFiles(name);
@@ -94,7 +94,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private IProjectFile GetOrCreateSameDestinationFile(
 			[NotNull] IProjectModelTransactionCookie cookie,
 			[NotNull] IT4File file,
-			[NotNull] FileSystemPath temporary
+			[NotNull] VirtualFileSystemPath temporary
 		) => GetOrCreateSameDestinationFile(cookie, file, temporary.Name);
 
 		[NotNull]
@@ -143,7 +143,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		}
 
 		[NotNull]
-		private FileSystemPath GetDestinationLocation([NotNull] IT4File file, [NotNull] string temporaryName)
+		private VirtualFileSystemPath GetDestinationLocation([NotNull] IT4File file, [NotNull] string temporaryName)
 		{
 			Locks.AssertReadAccessAllowed();
 			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
@@ -180,7 +180,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private void RemoveLastGenOutputIfDifferent(
 			[NotNull] IT4File file,
 			[NotNull] IProjectModelTransactionCookie cookie,
-			[NotNull] FileSystemPath destinationLocation
+			[NotNull] VirtualFileSystemPath destinationLocation
 		)
 		{
 			var projectFile = file.PhysicalPsiSourceFile?.ToProjectFile();
@@ -197,7 +197,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		[NotNull]
 		private IProjectFile UpdateProjectModel(
 			[NotNull] IT4File file,
-			[NotNull] FileSystemPath result,
+			[NotNull] VirtualFileSystemPath result,
 			[NotNull] IProjectModelTransactionCookie cookie
 		)
 		{
@@ -213,7 +213,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			Locks.AssertWriteAccessAllowed();
-			FileSystemPath destinationLocation = null;
+			VirtualFileSystemPath destinationLocation = null;
 			IProjectFile destination = null;
 			Solution.InvokeUnderTransaction(cookie =>
 			{

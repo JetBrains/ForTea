@@ -8,7 +8,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 	{
 		[CanBeNull]
 		IPsiSourceFile FindMostSuitableFile(
-			[NotNull] FileSystemPath path,
+			[NotNull] VirtualFileSystemPath path,
 			[NotNull] IPsiSourceFile requester
 		);
 	}

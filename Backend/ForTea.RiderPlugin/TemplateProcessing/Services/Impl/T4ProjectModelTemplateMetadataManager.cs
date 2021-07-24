@@ -23,7 +23,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 			IProjectModelTransactionCookie cookie,
 			IProjectFile template,
 			T4TemplateKind kind,
-			FileSystemPath outputLocation
+			VirtualFileSystemPath outputLocation
 		) => cookie.EditFileProperties(template, properties =>
 		{
 			if (!(properties is ProjectFileProperties projectFileProperties)) return;

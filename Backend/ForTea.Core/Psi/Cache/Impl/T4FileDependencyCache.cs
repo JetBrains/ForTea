@@ -211,7 +211,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 				if (existingData == null)
 				{
 					handChange = true;
-					var includers = new List<FileSystemPath> {includerLocation};
+					var includers = new List<VirtualFileSystemPath> {includerLocation};
 					map[addedInclude] = new T4ReversedFileDependencyData(includers);
 				}
 				else if (!existingData.Includers.Contains(includerLocation))

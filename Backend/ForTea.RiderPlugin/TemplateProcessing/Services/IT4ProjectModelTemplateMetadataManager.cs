@@ -13,7 +13,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
 			[NotNull] IProjectModelTransactionCookie cookie,
 			[NotNull] IProjectFile template,
 			T4TemplateKind kind,
-			[CanBeNull] FileSystemPath outputLocation = null);
+			[CanBeNull] VirtualFileSystemPath outputLocation = null);
 
 		void UpdateGeneratedFileMetadata(
 			[NotNull] IProjectModelTransactionCookie cookie,

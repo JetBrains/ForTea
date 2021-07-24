@@ -9,18 +9,18 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 	public interface IT4AssemblyReferenceResolver
 	{
 		[CanBeNull]
-		FileSystemPath Resolve([NotNull] IT4AssemblyDirective directive);
+		VirtualFileSystemPath Resolve([NotNull] IT4AssemblyDirective directive);
 
 		[CanBeNull]
-		FileSystemPath Resolve([NotNull] T4ResolvedPath path);
+		VirtualFileSystemPath Resolve([NotNull] T4ResolvedPath path);
 
 		[CanBeNull]
-		FileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path);
+		VirtualFileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path);
 
 		/// <note>
 		/// assemblyName is assumed to NOT contain macros
 		/// </note>
 		[CanBeNull]
-		FileSystemPath Resolve([NotNull] string assemblyNameOrFile, [NotNull] IPsiSourceFile sourceFile);
+		VirtualFileSystemPath Resolve([NotNull] string assemblyNameOrFile, [NotNull] IPsiSourceFile sourceFile);
 	}
 }

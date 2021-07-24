@@ -118,7 +118,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 		private static CSharpCompilation CreateCompilation(
 			[NotNull] string code,
 			[NotNull] IEnumerable<MetadataReference> references,
-			[NotNull] FileSystemPath executablePath
+			[NotNull] VirtualFileSystemPath executablePath
 		)
 		{
 			var options = new CSharpCompilationOptions(OutputKind.ConsoleApplication)

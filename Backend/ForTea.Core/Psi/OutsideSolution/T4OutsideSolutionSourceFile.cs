@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 			IProjectFileExtensions projectFileExtensions,
 			PsiProjectFileTypeCoordinator projectFileTypeCoordinator,
 			IPsiModule module,
-			FileSystemPath path,
+			VirtualFileSystemPath path,
 			Func<PsiSourceFileFromPath, bool> validityCheck,
 			Func<PsiSourceFileFromPath, IPsiSourceFileProperties> propertiesFactory,
 			DocumentManager documentManager,

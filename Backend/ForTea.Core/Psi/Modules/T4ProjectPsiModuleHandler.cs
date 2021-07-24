@@ -29,7 +29,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 
 		public override void OnProjectFileChanged(
 			IProjectFile projectFile,
-			FileSystemPath oldLocation,
+			VirtualFileSystemPath oldLocation,
 			PsiModuleChange.ChangeType changeType,
 			PsiModuleChangeBuilder changeBuilder
 		)

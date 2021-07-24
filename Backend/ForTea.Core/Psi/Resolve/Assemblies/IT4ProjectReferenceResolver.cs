@@ -12,6 +12,6 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 		IEnumerable<IProject> GetProjectDependencies([NotNull] IT4File file);
 
 		[CanBeNull]
-		IProject TryResolveProject([NotNull] FileSystemPath path);
+		IProject TryResolveProject([NotNull] VirtualFileSystemPath path);
 	}
 }

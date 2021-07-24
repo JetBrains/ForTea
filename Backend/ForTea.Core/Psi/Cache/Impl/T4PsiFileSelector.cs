@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			Solution = solution;
 		}
 
-		public IPsiSourceFile FindMostSuitableFile(FileSystemPath path, IPsiSourceFile requester)
+		public IPsiSourceFile FindMostSuitableFile(VirtualFileSystemPath path, IPsiSourceFile requester)
 		{
 			var psf = TryFindFileInSolution(path, requester);
 			if (psf != null) return psf;
@@ -40,7 +40,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 		}
 
 		[CanBeNull]
-		private IPsiSourceFile TryFindFileInSolution([NotNull] FileSystemPath path, [NotNull] IPsiSourceFile requester)
+		private IPsiSourceFile TryFindFileInSolution([NotNull] VirtualFileSystemPath path, [NotNull] IPsiSourceFile requester)
 		{
 			if (path.IsEmpty) return null;
 			var potentialProjectFiles = Solution

@@ -23,7 +23,7 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 		// This might cause some memory leaks on IPsiSourceFile.
 		// Can be replaced with reference counting if that issue turns out to be important
 		[NotNull]
-		private ConcurrentDictionary<FileSystemPath, IPsiSourceFile> SourceFiles { get; }
+		private ConcurrentDictionary<VirtualFileSystemPath, IPsiSourceFile> SourceFiles { get; }
 
 		[NotNull]
 		private IProjectFileExtensions ProjectFileExtensions { get; }
@@ -52,7 +52,7 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 			ProjectFileExtensions = projectFileExtensions;
 			PsiProjectFileTypeCoordinator = psiProjectFileTypeCoordinator;
 			DocumentManager = documentManager;
-			SourceFiles = new ConcurrentDictionary<FileSystemPath, IPsiSourceFile>();
+			SourceFiles = new ConcurrentDictionary<VirtualFileSystemPath, IPsiSourceFile>();
 			lifetime.OnTermination(this);
 			PsiModule = new PsiModuleOnFileSystemPaths(
 				solution,
@@ -66,7 +66,7 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 		}
 
 		[NotNull]
-		public IPsiSourceFile GetOrCreateSourceFile([NotNull] FileSystemPath path)
+		public IPsiSourceFile GetOrCreateSourceFile([NotNull] VirtualFileSystemPath path)
 		{
 			Assertion.Assert(path.IsAbsolute, "path.IsAbsolute");
 			return SourceFiles.GetOrAdd(path, _ => new T4OutsideSolutionSourceFile(
@@ -81,9 +81,9 @@ namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 			);
 		}
 
-		public bool HasSourceFile([NotNull] FileSystemPath path) => SourceFiles.ContainsKey(path);
+		public bool HasSourceFile([NotNull] VirtualFileSystemPath path) => SourceFiles.ContainsKey(path);
 
-		public void DeleteSourceFile([NotNull] FileSystemPath path)
+		public void DeleteSourceFile([NotNull] VirtualFileSystemPath path)
 		{
 			SourceFiles.TryRemove(path, out var _);
 		}

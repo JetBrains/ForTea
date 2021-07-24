@@ -7,32 +7,32 @@ namespace GammaJul.ForTea.Core.Psi.Utils
 	public sealed class T4IncludeGuard
 	{
 		[NotNull, ItemCanBeNull]
-		private ISet<FileSystemPath> SeenFiles { get; }
+		private ISet<VirtualFileSystemPath> SeenFiles { get; }
 
 		[NotNull, ItemCanBeNull]
-		private Stack<FileSystemPath> FilesBeingProcessed { get; }
+		private Stack<VirtualFileSystemPath> FilesBeingProcessed { get; }
 
 		public T4IncludeGuard()
 		{
-			FilesBeingProcessed = new Stack<FileSystemPath>();
-			SeenFiles = new HashSet<FileSystemPath>();
+			FilesBeingProcessed = new Stack<VirtualFileSystemPath>();
+			SeenFiles = new HashSet<VirtualFileSystemPath>();
 		}
 
-		public bool CanProcess([NotNull] FileSystemPath file) => !FilesBeingProcessed.Contains(file);
+		public bool CanProcess([NotNull] VirtualFileSystemPath file) => !FilesBeingProcessed.Contains(file);
 
-		public void StartProcessing([NotNull] FileSystemPath file)
+		public void StartProcessing([NotNull] VirtualFileSystemPath file)
 		{
 			FilesBeingProcessed.Push(file);
 			SeenFiles.Add(file);
 		}
 
-		public bool HasSeenFile([NotNull] FileSystemPath file) => SeenFiles.Contains(file);
+		public bool HasSeenFile([NotNull] VirtualFileSystemPath file) => SeenFiles.Contains(file);
 		public void EndProcessing() => FilesBeingProcessed.Pop();
 
-		public void TryEndProcessing([CanBeNull] FileSystemPath file)
+		public void TryEndProcessing([CanBeNull] VirtualFileSystemPath file)
 		{
 			if (file == null) return;
-			if (EqualityComparer<FileSystemPath>.Default.Equals(FilesBeingProcessed.Peek(), file)) FilesBeingProcessed.Pop();
+			if (EqualityComparer<VirtualFileSystemPath>.Default.Equals(FilesBeingProcessed.Peek(), file)) FilesBeingProcessed.Pop();
 		}
 	}
 }
