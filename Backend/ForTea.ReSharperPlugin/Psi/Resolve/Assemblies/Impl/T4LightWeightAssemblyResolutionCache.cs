@@ -29,15 +29,22 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 	{
 		[NotNull] private readonly Lazy<Optional<ITextTemplatingComponents>> Components;
 
+		[NotNull]
+		private IInteractionContext InteractionContext { get; }
+
 		public T4LightWeightAssemblyResolutionCache(
 			Lifetime lifetime,
 			[NotNull] IShellLocks locks,
 			[NotNull] IPersistentIndexManager persistentIndexManager,
-			[NotNull] RawVsServiceProvider provider
-		) : base(lifetime, locks, persistentIndexManager, T4LightWeightAssemblyResolutionDataMarshaller.Instance) =>
+			[NotNull] RawVsServiceProvider provider,
+			[NotNull] IInteractionContext interactionContext
+		) : base(lifetime, locks, persistentIndexManager, T4LightWeightAssemblyResolutionDataMarshaller.Instance)
+		{
 			Components = Lazy.Of(() => new Optional<ITextTemplatingComponents>(
 				provider.Value.GetService<STextTemplating, ITextTemplatingComponents>()
 			), true);
+			InteractionContext = interactionContext;
+		}
 
 		[NotNull]
 		protected override T4LightWeightAssemblyResolutionRequest Build(IT4File file)
@@ -79,7 +86,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 			if (asAbsolute != null) return asAbsolute;
 			string resolved = Components.Value.CanBeNull?.Host?.ResolveAssemblyReference(resolvedPath.ResolvedPath);
 			if (resolved == null) return null;
-			var path = VirtualFileSystemPath.Parse(resolved, InteractionContext.SolutionContext);
+			var path = VirtualFileSystemPath.Parse(resolved, InteractionContext);
 			if (path.IsAbsolute) return path;
 			return null;
 		}
