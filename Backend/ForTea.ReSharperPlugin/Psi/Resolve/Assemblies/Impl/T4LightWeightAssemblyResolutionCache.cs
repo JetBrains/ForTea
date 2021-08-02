@@ -54,7 +54,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 			var request = (T4LightWeightAssemblyResolutionRequest) builtPart;
 			var projectFile = sourceFile.ToProjectFile().NotNull();
 			using var _ = Prepare(projectFile);
-			var response = new Dictionary<string, FileSystemPath>();
+			var response = new Dictionary<string, VirtualFileSystemPath>();
 			foreach (var path in request.NotNull().AssembliesToResolve)
 			{
 				var resolved = TryResolve(path);
@@ -66,20 +66,20 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		}
 
 		[CanBeNull]
-		public FileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path)
+		public VirtualFileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path)
 		{
 			using var _ = Prepare(path.ProjectFile);
 			return TryResolve(path);
 		}
 
 		[CanBeNull]
-		private FileSystemPath TryResolve([NotNull] T4ResolvedPath resolvedPath)
+		private VirtualFileSystemPath TryResolve([NotNull] T4ResolvedPath resolvedPath)
 		{
 			var asAbsolute = resolvedPath.TryResolveAbsolutePath();
 			if (asAbsolute != null) return asAbsolute;
 			string resolved = Components.Value.CanBeNull?.Host?.ResolveAssemblyReference(resolvedPath.ResolvedPath);
 			if (resolved == null) return null;
-			var path = FileSystemPath.Parse(resolved);
+			var path = VirtualFileSystemPath.Parse(resolved, InteractionContext.SolutionContext);
 			if (path.IsAbsolute) return path;
 			return null;
 		}
