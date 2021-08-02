@@ -21,7 +21,7 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 		[NotNull] private readonly IVsEnvironmentStaticInformation _vsEnvironmentInformation;
 		[NotNull] private readonly string[] _textTemplatingAssemblyNames;
 		[CanBeNull] private readonly TargetFrameworkId _targetFrameworkId;
-		[CanBeNull] private IList<FileSystemPath> _includePaths;
+		[CanBeNull] private IList<VirtualFileSystemPath> _includePaths;
 
 		/// <summary>Gets the target framework ID.</summary>
 		public override TargetFrameworkId TargetFrameworkId {
@@ -51,35 +51,35 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 		public override bool IsSupported => _targetFrameworkId != null;
 
 		/// <summary>Gets the common include paths from the registry.</summary>
-		public override IEnumerable<FileSystemPath> IncludePaths {
+		public override IEnumerable<VirtualFileSystemPath> IncludePaths {
 			get {
 				if (_targetFrameworkId == null)
-					return EmptyList<FileSystemPath>.InstanceList;
+					return EmptyList<VirtualFileSystemPath>.InstanceList;
 				return _includePaths ?? (_includePaths = ReadIncludePaths());
 			}
 		}
 
 		[NotNull]
-		private IList<FileSystemPath> ReadIncludePaths() {
+		private IList<VirtualFileSystemPath> ReadIncludePaths() {
 			string registryKey = _vsEnvironmentInformation.VisualStudioGlobalRegistryPath
 				+ @"_Config\TextTemplating\IncludeFolders\.tt";
 
 			using (RegistryKey key = Registry.CurrentUser.OpenSubKey(registryKey)) {
 
 				if (key == null)
-					return EmptyList<FileSystemPath>.InstanceList;
+					return EmptyList<VirtualFileSystemPath>.InstanceList;
 
 				string[] valueNames = key.GetValueNames();
 				if (valueNames.Length == 0)
-					return EmptyList<FileSystemPath>.InstanceList;
+					return EmptyList<VirtualFileSystemPath>.InstanceList;
 
-				var paths = new List<FileSystemPath>(valueNames.Length);
+				var paths = new List<VirtualFileSystemPath>(valueNames.Length);
 				foreach (string valueName in valueNames) {
 					var value = key.GetValue(valueName) as string;
 					if (String.IsNullOrEmpty(value))
 						continue;
 
-					var path = FileSystemPath.TryParse(value);
+					var path = VirtualFileSystemPath.TryParse(value, InteractionContext.SolutionContext);
 					if (!path.IsEmpty && path.IsAbsolute)
 						paths.Add(path);
 				}

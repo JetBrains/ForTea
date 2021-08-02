@@ -7,10 +7,10 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 	public sealed class T4LightWeightAssemblyResolutionData
 	{
 		[NotNull]
-		public IReadOnlyDictionary<string, FileSystemPath> ResolvedAssemblies { get; }
+		public IReadOnlyDictionary<string, VirtualFileSystemPath> ResolvedAssemblies { get; }
 
 		public T4LightWeightAssemblyResolutionData(
-			[NotNull] IReadOnlyDictionary<string, FileSystemPath> resolvedAssemblies
+			[NotNull] IReadOnlyDictionary<string, VirtualFileSystemPath> resolvedAssemblies
 		) => ResolvedAssemblies = resolvedAssemblies;
 	}
 }
