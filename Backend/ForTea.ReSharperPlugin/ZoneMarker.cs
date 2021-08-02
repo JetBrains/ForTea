@@ -10,7 +10,7 @@ namespace JetBrains.ForTea.ReSharperPlugin
 {
 	[ZoneMarker]
 	public class ZoneMarker : IPsiLanguageZone,
-		IRequire<ISinceVs10EnvZone>,
+		IRequire<ISinceVs10FrontEnvZone>,
 		IRequire<ILanguageCSharpZone>,
 		IRequire<ICodeEditingZone>,
 		IRequire<DaemonZone>,
