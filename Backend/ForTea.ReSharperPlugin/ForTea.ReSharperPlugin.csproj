@@ -16,6 +16,17 @@
     <Reference Include="PresentationCore" />
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Daemon\Attributes\T4MefDefinitions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>T4MefDefinitions.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Daemon\Attributes\T4MefDefinitions.cs">
+      <DependentUpon>T4MefDefinitions.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props')" />
 </Project>
