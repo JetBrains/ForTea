@@ -53,9 +53,44 @@ using GammaJul.ForTea.Core.Daemon.Attributes;
 using JetBrains.Platform.VisualStudio.SinceVs10.TextControl.Markup.FormatDefinitions;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using JetBrains.TextControl.DocumentMarkup;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 {
+<#
+	var identifiersWithAttributes = identifiers.Where(identifier => identifier.GenerateAttribute).ToList();
+	if (identifiersWithAttributes.Any())
+	{
+#>
+    #region registration
+<#
+	    foreach (var identifier in identifiersWithAttributes)
+	    {
+#>
+    [RegisterHighlighter(
+	    T4HighlightingAttributeIds.<#= ToConstantIdentifier(identifier.Name) #>,
+	    GroupId = T4HighlightingAttributeGroup.ID,
+	    EffectType = EffectType.TEXT,
+	    ForegroundColor = "<# PrintHexColor(identifier.ForegroundColor); #>"<#
+	        if (identifier.DarkForegroundColor != null)
+	        {
+#>,
+        DarkForegroundColor = "<# PrintHexColor(identifier.DarkForegroundColor.Value); #>"
+<#
+	        }
+#>
+
+    )]
+<#
+	    }
+#>
+    public class T4ReSharperAttributes
+    {
+    }
+    #endregion
+<#
+    }
+#>
 <#
 	foreach (var identifier in identifiers)
 	{
@@ -121,23 +156,29 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 #>#<#= color.R.ToString("X2") #><#= color.G.ToString("X2") #><#= color.B.ToString("X2") #><#+
 	}
 
-	private sealed class T4ColoredIdentifier
+	private readonly struct T4ColoredIdentifier
 	{
 		private GeneratedTextTransformation Transformation { get; }
 		public string Name { get; }
 		public Color BackgroundColor { get; }
 		public Color ForegroundColor { get; }
+        public Color? DarkForegroundColor { get; }
+        public bool GenerateAttribute { get; }
 
 		public T4ColoredIdentifier(
 			string name,
 			GeneratedTextTransformation transformation,
 			Color backgroundColor,
-			Color foregroundColor)
+			Color foregroundColor,
+            Color? darkForegroundColor = null,
+            bool generateAttribute = false)
 		{
 			Name = name;
 			Transformation = transformation;
 			BackgroundColor = backgroundColor;
 			ForegroundColor = foregroundColor;
+		    DarkForegroundColor = darkForegroundColor;
+		    GenerateAttribute = generateAttribute;
 		}
 
 		public void PrintGeneratedClassName() =>
