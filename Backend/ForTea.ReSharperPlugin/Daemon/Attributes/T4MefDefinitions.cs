@@ -11,6 +11,7 @@ using GammaJul.ForTea.Core.Daemon.Attributes;
 using JetBrains.Platform.VisualStudio.SinceVs10.TextControl.Markup.FormatDefinitions;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using JetBrains.TextControl.DocumentMarkup;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 {
