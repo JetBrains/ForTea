@@ -22,5 +22,8 @@ namespace GammaJul.ForTea.Core.Daemon.Attributes
 		public const string DIRECTIVE_ATTRIBUTE = "T4 Directive Attribute";
 		public const string ATTRIBUTE_VALUE = "T4 Attribute Value";
 		public const string CODE_BLOCK = "T4 Code Block";
+		public const string T4_SPECIFIC_STRING = "T4 ReSharper C# String";
+		public const string T4_SPECIFIC_NUMBER = "T4 ReSharper C# Number";
+		public const string T4_SPECIFIC_COMMENT = "T4 ReSharper C# Comment";
 	}
 }

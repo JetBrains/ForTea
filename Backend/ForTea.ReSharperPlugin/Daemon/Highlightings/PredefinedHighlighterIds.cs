@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Daemon.Attributes;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.TextControl.DocumentMarkup;
 
@@ -12,12 +13,12 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Highlightings
 	 RegisterHighlighter(UserTypeValueType, EffectType = EffectType.TEXT)]
 	public static class PredefinedHighlighterIds
 	{
-		public const string Comment = HighlightingAttributeIds.COMMENT;
+		public const string Comment = T4HighlightingAttributeIds.T4_SPECIFIC_COMMENT;
 		public const string Identifier = "Identifier";
-		public const string Keyword = HighlightingAttributeIds.KEYWORD;
-		public const string Number = HighlightingAttributeIds.NUMBER;
-		public const string Operator = HighlightingAttributeIds.OPERATOR_IDENTIFIER_ATTRIBUTE;
-		public const string String = HighlightingAttributeIds.STRING;
+		public const string Keyword = HighlightingAttributeIds.KEYWORD; // ok
+		public const string Number = T4HighlightingAttributeIds.T4_SPECIFIC_NUMBER;
+		public const string Operator = HighlightingAttributeIds.OPERATOR_IDENTIFIER_ATTRIBUTE; // ok
+		public const string String = T4HighlightingAttributeIds.T4_SPECIFIC_STRING;
 		public const string UserType = "User Types";
 		public const string UserTypeDelegate = "User Types(Delegates)";
 		public const string UserTypeEnum = "User Types(Enums)";

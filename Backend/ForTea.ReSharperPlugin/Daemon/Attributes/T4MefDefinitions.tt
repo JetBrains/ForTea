@@ -37,7 +37,28 @@
             "environment variable",
             this,
             backgroundColor: Color.Transparent,
-            foregroundColor: ColorTranslator.FromHtml("#B5CEA8"))
+            foregroundColor: ColorTranslator.FromHtml("#B5CEA8")),
+        new(
+            "t4 specific string",
+            this,
+            backgroundColor: Color.Transparent,
+            foregroundColor: ColorTranslator.FromHtml("#A31515"),
+            darkForegroundColor: ColorTranslator.FromHtml("#D69D85"),
+            generateAttribute: true),
+	    new(
+	        "t4 specific number",
+            this,
+	        backgroundColor: Color.Transparent,
+	        foregroundColor: ColorTranslator.FromHtml("#000000"),
+	        darkForegroundColor: ColorTranslator.FromHtml("#B5CEA8"),
+	        generateAttribute: true),
+	    new(
+	        "t4 specific comment",
+	        this,
+	        backgroundColor: Color.Transparent,
+            foregroundColor: ColorTranslator.FromHtml("#007F00"),
+            darkForegroundColor: ColorTranslator.FromHtml("#57A64A"),
+            generateAttribute: true)
 	};
 #>
 //------------------------------------------------------------------------------

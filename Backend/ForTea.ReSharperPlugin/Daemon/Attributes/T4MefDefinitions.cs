@@ -15,6 +15,35 @@ using JetBrains.TextControl.DocumentMarkup;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 {
+    #region registration
+    [RegisterHighlighter(
+	    T4HighlightingAttributeIds.T4_SPECIFIC_STRING,
+	    GroupId = T4HighlightingAttributeGroup.ID,
+	    EffectType = EffectType.TEXT,
+	    ForegroundColor = "#A31515",
+        DarkForegroundColor = "#D69D85"
+
+    )]
+    [RegisterHighlighter(
+	    T4HighlightingAttributeIds.T4_SPECIFIC_NUMBER,
+	    GroupId = T4HighlightingAttributeGroup.ID,
+	    EffectType = EffectType.TEXT,
+	    ForegroundColor = "#000000",
+        DarkForegroundColor = "#B5CEA8"
+
+    )]
+    [RegisterHighlighter(
+	    T4HighlightingAttributeIds.T4_SPECIFIC_COMMENT,
+	    GroupId = T4HighlightingAttributeGroup.ID,
+	    EffectType = EffectType.TEXT,
+	    ForegroundColor = "#007F00",
+        DarkForegroundColor = "#57A64A"
+
+    )]
+    public class T4ReSharperAttributes
+    {
+    }
+    #endregion
 	#region block tag
 	[ClassificationType(ClassificationTypeNames = Name)]
 	[Order(
@@ -159,6 +188,81 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 		{
 			DisplayName = Name;
 			ForegroundColor = Color.FromRgb(0xB5, 0xCE, 0xA8);
+		}
+
+		[Export, Name(Name), BaseDefinition("formal language")]
+		internal ClassificationTypeDefinition ClassificationTypeDefinition;
+	}
+	#endregion
+
+	#region t4 specific string
+	[ClassificationType(ClassificationTypeNames = Name)]
+	[Order(
+		After = VsSyntaxPriorityClassificationDefinition.Name,
+		Before = VsAnalysisPriorityClassificationDefinition.Name
+	)]
+	[Export(typeof(EditorFormatDefinition))]
+	[Name(Name)]
+	[System.ComponentModel.DisplayName(Name)]
+	[UserVisible(true)]
+	internal sealed class T4SpecificStringClassificationFormatDefinition : ClassificationFormatDefinition
+	{
+		private const string Name = T4HighlightingAttributeIds.T4_SPECIFIC_STRING;
+
+		public T4SpecificStringClassificationFormatDefinition()
+		{
+			DisplayName = Name;
+			ForegroundColor = Color.FromRgb(0xA3, 0x15, 0x15);
+		}
+
+		[Export, Name(Name), BaseDefinition("formal language")]
+		internal ClassificationTypeDefinition ClassificationTypeDefinition;
+	}
+	#endregion
+
+	#region t4 specific number
+	[ClassificationType(ClassificationTypeNames = Name)]
+	[Order(
+		After = VsSyntaxPriorityClassificationDefinition.Name,
+		Before = VsAnalysisPriorityClassificationDefinition.Name
+	)]
+	[Export(typeof(EditorFormatDefinition))]
+	[Name(Name)]
+	[System.ComponentModel.DisplayName(Name)]
+	[UserVisible(true)]
+	internal sealed class T4SpecificNumberClassificationFormatDefinition : ClassificationFormatDefinition
+	{
+		private const string Name = T4HighlightingAttributeIds.T4_SPECIFIC_NUMBER;
+
+		public T4SpecificNumberClassificationFormatDefinition()
+		{
+			DisplayName = Name;
+			ForegroundColor = Color.FromRgb(0x00, 0x00, 0x00);
+		}
+
+		[Export, Name(Name), BaseDefinition("formal language")]
+		internal ClassificationTypeDefinition ClassificationTypeDefinition;
+	}
+	#endregion
+
+	#region t4 specific comment
+	[ClassificationType(ClassificationTypeNames = Name)]
+	[Order(
+		After = VsSyntaxPriorityClassificationDefinition.Name,
+		Before = VsAnalysisPriorityClassificationDefinition.Name
+	)]
+	[Export(typeof(EditorFormatDefinition))]
+	[Name(Name)]
+	[System.ComponentModel.DisplayName(Name)]
+	[UserVisible(true)]
+	internal sealed class T4SpecificCommentClassificationFormatDefinition : ClassificationFormatDefinition
+	{
+		private const string Name = T4HighlightingAttributeIds.T4_SPECIFIC_COMMENT;
+
+		public T4SpecificCommentClassificationFormatDefinition()
+		{
+			DisplayName = Name;
+			ForegroundColor = Color.FromRgb(0x00, 0x7F, 0x00);
 		}
 
 		[Export, Name(Name), BaseDefinition("formal language")]
