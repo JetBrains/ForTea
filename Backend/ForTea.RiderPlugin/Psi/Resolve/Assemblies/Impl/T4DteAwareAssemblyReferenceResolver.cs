@@ -29,11 +29,25 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 
 		[CanBeNull]
 		private static VirtualFileSystemPath ResolveAsDte([NotNull] string assemblyName) =>
-			NameToEnvDTEAssemblyMap.TryGetValue(assemblyName);
+			NameToEnvDteAssemblyMap.TryGetValue(assemblyName);
 
-		private static IDictionary<string, VirtualFileSystemPath> NameToEnvDTEAssemblyMap { get; } = VirtualFileSystemPath
-			.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext)
-			.Parent
+		private static IDictionary<string, VirtualFileSystemPath> NameToEnvDteAssemblyMap { get; } =
+			FindEnvDteAssemblies();
+
+		private static Dictionary<string, VirtualFileSystemPath> FindEnvDteAssemblies()
+		{
+			var lifetimeDirectory = VirtualFileSystemPath
+				.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext)
+				.Parent;
+			var envDteAssembliesInLifetimeDirectory = FindEnvDteAssemblies(lifetimeDirectory);
+			if (!envDteAssembliesInLifetimeDirectory.IsEmpty()) return envDteAssembliesInLifetimeDirectory;
+			var envDteAssembliesInLifetimeDirectoryParent = FindEnvDteAssemblies(lifetimeDirectory.Parent);
+			return envDteAssembliesInLifetimeDirectoryParent;
+		}
+
+		private static Dictionary<string, VirtualFileSystemPath> FindEnvDteAssemblies(
+			VirtualFileSystemPath directory
+		) => directory
 			.GetChildren("*EnvDTE*.dll")
 			.Select(child => child.GetAbsolutePath())
 			.ToDictionary(assembly => assembly.NameWithoutExtension);
