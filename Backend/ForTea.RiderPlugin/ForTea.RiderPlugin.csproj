@@ -13,6 +13,6 @@
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props')" />
   <ItemGroup>
     <ProjectReference Include="..\ForTea.Core\ForTea.Core.csproj" />
-    <PackageReference Include="JetBrains.EnvDTE.Host" Version="20210521.39.0" />
+    <PackageReference Include="JetBrains.EnvDTE.Host" Version="20210726.40.0" />
   </ItemGroup>
 </Project>
