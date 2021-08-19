@@ -37,6 +37,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		// TODO: is this necessary?
 		[NotNull]
 		private static IAssemblyResolver ProtocolAssemblyResolver { get; } = new AssemblyResolverOnFolders(
+			FileSystemPath.Parse(typeof(Lifetime).Assembly.Location).Parent.Parent, // JetBrains.Lifetimes on .net core
+			FileSystemPath.Parse(typeof(IProtocol).Assembly.Location).Parent.Parent, // JetBrains.RdFramework on .net core
 			FileSystemPath.Parse(typeof(Lifetime).Assembly.Location).Parent, // JetBrains.Lifetimes
 			FileSystemPath.Parse(typeof(IProtocol).Assembly.Location).Parent // JetBrains.RdFramework
 		);

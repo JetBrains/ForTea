@@ -42,7 +42,21 @@ namespace JetBrains.ForTea.RiderPlugin
 
 		public override IEnumerable<FileSystemPath> AdditionalCompilationAssemblyLocations
 		{
-			get { yield return FileSystemPath.Parse(typeof(Lifetime).Assembly.Location); }
+			get
+			{
+				var lifetimesLocation = typeof(Lifetime).Assembly.Location;
+				var lifetimesPath = FileSystemPath.Parse(lifetimesLocation);
+				var classicLifetimesPath = lifetimesPath.Parent.Parent.GetChildren(lifetimesPath.Name);
+				if (!classicLifetimesPath.IsEmpty())
+				{
+					// If we are running on dotnet core, this is the location of the classical dll
+					yield return classicLifetimesPath.First().GetAbsolutePath();
+				}
+				else
+				{
+					yield return lifetimesPath;
+				}
+			}
 		}
 
 		public override bool IsSupported => true;
