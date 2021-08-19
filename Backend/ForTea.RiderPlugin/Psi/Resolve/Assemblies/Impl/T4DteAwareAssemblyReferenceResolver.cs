@@ -11,6 +11,10 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 {
+	/// <summary>
+	/// This resolver is capable of resolving everything its parent can,
+	/// and it is additionally capable of resolving EnvDTE.
+	/// </summary>
 	[SolutionComponent]
 	public sealed class T4DteAwareAssemblyReferenceResolver : T4AssemblyReferenceResolver
 	{
