@@ -174,7 +174,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 			[NotNull] IProjectFile projectFile,
 			[NotNull] DocumentManager documentManager,
 			[NotNull] IModuleReferenceResolveContext resolveContext
-		) => new PsiProjectFile(
+		) => new T4PsiProjectFile(
 			this,
 			projectFile,
 			(pf, sf) => new T4PsiProjectFileProperties(pf, sf, true),
