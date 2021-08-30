@@ -2,13 +2,14 @@ import com.jetbrains.rd.generator.gradle.RdGenExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
+import org.jetbrains.intellij.tasks.IntelliJInstrumentCodeTask
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.1.3"
+  id("org.jetbrains.intellij") version "1.1.4"
   id("org.jetbrains.grammarkit") version "2021.1.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   id("com.jetbrains.rdgen") version "0.212.307"
@@ -40,7 +41,6 @@ intellij {
     version.set("$baseVersion-SNAPSHOT")
   }
 
-  instrumentCode.set(false)
   downloadSources.set(false)
   updateSinceUntilBuild.set(false)
 
@@ -127,6 +127,20 @@ configure<RdGenExtension> {
 }
 
 tasks {
+  withType<IntelliJInstrumentCodeTask> {
+    val bundledMavenArtifacts = file("build/maven-artifacts")
+    if (bundledMavenArtifacts.exists()) {
+      logger.lifecycle("Use ant compiler artifacts from local folder: $bundledMavenArtifacts")
+      compilerClassPathFromMaven.set(
+        bundledMavenArtifacts.walkTopDown()
+          .filter { it.extension == "jar" && !it.name.endsWith("-sources.jar") }
+          .toList() + File("${ideaDependency.get().classes}/lib/util.jar")
+      )
+    } else {
+      logger.lifecycle("Use ant compiler artifacts from maven")
+    }
+  }
+
   withType<RunIdeTask> {
     // IDEs from SDK are launched with 512mb by default, which is not enough for Rider.
     // Rider uses this value when launched not from SDK
