@@ -5,6 +5,7 @@ using JetBrains.ProjectModel;
 using JetBrains.RdBackend.Common.Features;
 using JetBrains.RdBackend.Common.Features.Components.PerClientComponents;
 using JetBrains.RdBackend.Common.Features.Documents;
+using JetBrains.Rider.Backend.Features.Documents;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 
@@ -14,11 +15,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 	public sealed class T4HostOutputFileRefresher : T4BasicOutputFileRefresher
 	{
 		[NotNull]
-		private DocumentHostBase Host => DocumentHostBase.GetInstance(Solution);
+		private RiderDocumentHost Host { get; }
 
-		public T4HostOutputFileRefresher(ISolution solution) : base(solution)
-		{
-		}
+		public T4HostOutputFileRefresher(ISolution solution, [NotNull] RiderDocumentHost host) : base(solution) =>
+			Host = host;
 
 		public override void Refresh(IProjectFile output)
 		{
