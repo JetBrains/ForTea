@@ -11,9 +11,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference
 		public string FullName { get; }
 
 		[NotNull]
-		public FileSystemPath Location { get; }
+		public VirtualFileSystemPath Location { get; }
 
-		public T4AssemblyReferenceInfo([NotNull] string fullName, [NotNull] FileSystemPath location)
+		public T4AssemblyReferenceInfo([NotNull] string fullName, [NotNull] VirtualFileSystemPath location)
 		{
 			FullName = fullName;
 			Location = location;

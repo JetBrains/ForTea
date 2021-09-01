@@ -8,7 +8,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Assemblies.Impl
 	[SolutionComponent]
 	public sealed class T4LightWeightAssemblyReferenceResolver : T4BasicLightWeightAssemblyReferenceResolver
 	{
-		public override FileSystemPath TryResolve(T4ResolvedPath path)
+		public override VirtualFileSystemPath TryResolve(T4ResolvedPath path)
 		{
 			var absolutePath = path.TryResolveAbsolutePath();
 			if (absolutePath != null) return absolutePath;

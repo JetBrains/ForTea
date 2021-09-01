@@ -23,10 +23,10 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			RefreshFiles(output.Location);
 		}
 
-		private void SyncDocuments([NotNull] FileSystemPath destinationLocation) =>
+		private void SyncDocuments([NotNull] VirtualFileSystemPath destinationLocation) =>
 			DocumentHostBase.GetInstance(Solution).SyncDocumentsWithFiles(destinationLocation);
 
-		private void RefreshFiles([NotNull] FileSystemPath destinationLocation) => Solution
+		private void RefreshFiles([NotNull] VirtualFileSystemPath destinationLocation) => Solution
 			.GetProtocolSolution()
 			.GetFileSystemModel()
 			.RefreshPaths

@@ -18,12 +18,12 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 		public IProjectFile ProjectFile { get; }
 
 		[CanBeNull]
-		public FileSystemPath TryResolveAbsolutePath()
+		public VirtualFileSystemPath TryResolveAbsolutePath()
 		{
 			string expanded = ResolvedPath;
 
 			// search as absolute path
-			var asAbsolutePath = FileSystemPath.TryParse(expanded);
+			var asAbsolutePath = VirtualFileSystemPath.TryParse(expanded, InteractionContext.SolutionContext);
 			if (asAbsolutePath.IsAbsolute) return asAbsolutePath;
 
 			// search as relative path

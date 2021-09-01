@@ -15,9 +15,9 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 		public T4LightWeightAssemblyReferenceResolver([NotNull] T4LightWeightAssemblyResolutionCache cache) =>
 			Cache = cache;
 
-		public override FileSystemPath TryResolve(T4ResolvedPath path)
+		public override VirtualFileSystemPath TryResolve(T4ResolvedPath path)
 		{
-			FileSystemPath result = null;
+			VirtualFileSystemPath result = null;
 			Cache.Map.TryGetValue(path.SourceFile)?.ResolvedAssemblies.TryGetValue(path.ResolvedPath, out result);
 			return result;
 		}

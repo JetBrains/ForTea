@@ -27,7 +27,7 @@ namespace JetBrains.ForTea.RiderPlugin
 					yield return name;
 				}
 
-				string textTemplating = FileSystemPath.Parse(Assembly.GetExecutingAssembly().Location)
+				string textTemplating = VirtualFileSystemPath.Parse(Assembly.GetExecutingAssembly().Location, InteractionContext.SolutionContext)
 					.Parent
 					.GetChildren("JetBrains.TextTemplating.dll")
 					.Select(child => child.GetAbsolutePath())
@@ -40,9 +40,23 @@ namespace JetBrains.ForTea.RiderPlugin
 			}
 		}
 
-		public override IEnumerable<FileSystemPath> AdditionalCompilationAssemblyLocations
+		public override IEnumerable<VirtualFileSystemPath> AdditionalCompilationAssemblyLocations
 		{
-			get { yield return FileSystemPath.Parse(typeof(Lifetime).Assembly.Location); }
+			get
+			{
+				var lifetimesLocation = typeof(Lifetime).Assembly.Location;
+				var lifetimesPath = VirtualFileSystemPath.Parse(lifetimesLocation, InteractionContext.SolutionContext);
+				var classicLifetimesPath = lifetimesPath.Parent.Parent.GetChildren(lifetimesPath.Name);
+				if (!classicLifetimesPath.IsEmpty())
+				{
+					// If we are running on dotnet core, this is the location of the classical dll
+					yield return classicLifetimesPath.First().GetAbsolutePath();
+				}
+				else
+				{
+					yield return lifetimesPath;
+				}
+			}
 		}
 
 		public override bool IsSupported => true;

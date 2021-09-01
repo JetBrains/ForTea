@@ -10,10 +10,10 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	/// That class is not intended to be persisted
 	public sealed class T4FileDependencyDataMarshaller : IUnsafeMarshaller<T4FileDependencyData>
 	{
-		private IUnsafeMarshaller<IList<FileSystemPath>> PathListMarshaller { get; } =
-			UnsafeMarshallers.GetCollectionMarshaller<FileSystemPath, IList<FileSystemPath>>(
-				UnsafeMarshallers.FileSystemPathComparableMarshaller,
-				size => new List<FileSystemPath>(size)
+		private IUnsafeMarshaller<IList<VirtualFileSystemPath>> PathListMarshaller { get; } =
+			UnsafeMarshallers.GetCollectionMarshaller<VirtualFileSystemPath, IList<VirtualFileSystemPath>>(
+				UnsafeMarshallers.VirtualFileSystemPathCurrentSolutionMarshaller,
+				size => new List<VirtualFileSystemPath>(size)
 			);
 
 		private T4FileDependencyDataMarshaller()

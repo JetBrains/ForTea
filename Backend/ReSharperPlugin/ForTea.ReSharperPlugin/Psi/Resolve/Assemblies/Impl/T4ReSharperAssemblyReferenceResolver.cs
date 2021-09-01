@@ -20,7 +20,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 			[NotNull] T4LightWeightAssemblyResolutionCache cache
 		) : base(resolveManager, lightWeightResolver) => Cache = cache;
 
-		public override FileSystemPath ResolveWithoutCaching(T4ResolvedPath path) =>
+		public override VirtualFileSystemPath ResolveWithoutCaching(T4ResolvedPath path) =>
 			Cache.ResolveWithoutCaching(path)
 			?? ResolveAsAssemblyName(path)
 			?? ResolveAsAssemblyFile(path);

@@ -8,7 +8,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 	public interface IT4IncludeResolver
 	{
 		[NotNull]
-		FileSystemPath ResolvePath([NotNull] T4ResolvedPath path);
+		VirtualFileSystemPath ResolvePath([NotNull] T4ResolvedPath path);
 
 		[CanBeNull]
 		IPsiSourceFile Resolve([NotNull] T4ResolvedPath path);

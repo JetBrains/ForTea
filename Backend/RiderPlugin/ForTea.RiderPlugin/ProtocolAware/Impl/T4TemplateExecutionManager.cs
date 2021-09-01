@@ -24,7 +24,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 	public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
 	{
 		[NotNull]
-		private IDictionary<FileSystemPath, T4EnvDTEHost> RunningFiles { get; }
+		private IDictionary<VirtualFileSystemPath, T4EnvDTEHost> RunningFiles { get; }
 
 		[NotNull]
 		private object ExecutionLocker { get; } = new object();
@@ -70,7 +70,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			TemplateMetadataManager = templateMetadataManager;
 			BackgroundTaskHost = backgroundTaskHost;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
-			RunningFiles = new Dictionary<FileSystemPath, T4EnvDTEHost>();
+			RunningFiles = new Dictionary<VirtualFileSystemPath, T4EnvDTEHost>();
 		}
 
 		public void RememberExecution(IT4File file, bool withProgress) =>
@@ -83,7 +83,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			return info.ConnectionManager.Port;
 		}
 
-		private void RememberExecution([NotNull] FileSystemPath path, bool withProgress)
+		private void RememberExecution([NotNull] VirtualFileSystemPath path, bool withProgress)
 		{
 			var definition = Lifetime.CreateNested();
 			if (withProgress)

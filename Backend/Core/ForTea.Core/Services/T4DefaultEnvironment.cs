@@ -21,10 +21,10 @@ namespace GammaJul.ForTea.Core.Services
 			}
 		}
 
-		public virtual IEnumerable<FileSystemPath> AdditionalCompilationAssemblyLocations =>
-			EmptyList<FileSystemPath>.Enumerable;
+		public virtual IEnumerable<VirtualFileSystemPath> AdditionalCompilationAssemblyLocations =>
+			EmptyList<VirtualFileSystemPath>.Enumerable;
 
 		public virtual bool IsSupported => false;
-		public virtual IEnumerable<FileSystemPath> IncludePaths => EmptyList<FileSystemPath>.Enumerable;
+		public virtual IEnumerable<VirtualFileSystemPath> IncludePaths => EmptyList<VirtualFileSystemPath>.Enumerable;
 	}
 }

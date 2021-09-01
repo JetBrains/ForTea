@@ -7,8 +7,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	public sealed class T4IncludeData
 	{
 		[NotNull, ItemNotNull]
-		public IList<FileSystemPath> Includes { get; }
+		public IList<VirtualFileSystemPath> Includes { get; }
 
-		public T4IncludeData([NotNull, ItemNotNull] IList<FileSystemPath> includes) => Includes = includes;
+		public T4IncludeData([NotNull, ItemNotNull] IList<VirtualFileSystemPath> includes) => Includes = includes;
 	}
 }

@@ -12,7 +12,7 @@ namespace GammaJul.ForTea.Core.Parsing
 		private static ThreadLocal<T4IncludeGuard> Guard { get; } =
 			new ThreadLocal<T4IncludeGuard>(() => new T4IncludeGuard());
 
-		public static T ExecuteGuarded<T>([NotNull] FileSystemPath path, bool once, Func<T> action)
+		public static T ExecuteGuarded<T>([NotNull] VirtualFileSystemPath path, bool once, Func<T> action)
 		{
 			if (once && Guard.Value.HasSeenFile(path)) return default;
 			if (!Guard.Value.CanProcess(path)) return default;

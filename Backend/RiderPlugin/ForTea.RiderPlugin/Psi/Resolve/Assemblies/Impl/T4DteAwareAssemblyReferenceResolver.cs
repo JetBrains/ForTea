@@ -11,6 +11,10 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 {
+	/// <summary>
+	/// This resolver is capable of resolving everything its parent can,
+	/// and it is additionally capable of resolving EnvDTE.
+	/// </summary>
 	[SolutionComponent]
 	public sealed class T4DteAwareAssemblyReferenceResolver : T4AssemblyReferenceResolver
 	{
@@ -24,16 +28,30 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 		{
 		}
 
-		public override FileSystemPath Resolve(T4ResolvedPath pathWithMacros) =>
+		public override VirtualFileSystemPath Resolve(T4ResolvedPath pathWithMacros) =>
 			base.Resolve(pathWithMacros) ?? ResolveAsDte(pathWithMacros.ResolvedPath);
 
 		[CanBeNull]
-		private static FileSystemPath ResolveAsDte([NotNull] string assemblyName) =>
-			NameToEnvDTEAssemblyMap.TryGetValue(assemblyName);
+		private static VirtualFileSystemPath ResolveAsDte([NotNull] string assemblyName) =>
+			NameToEnvDteAssemblyMap.TryGetValue(assemblyName);
 
-		private static IDictionary<string, FileSystemPath> NameToEnvDTEAssemblyMap { get; } = FileSystemPath
-			.Parse(typeof(Lifetime).Assembly.Location)
-			.Parent
+		private static IDictionary<string, VirtualFileSystemPath> NameToEnvDteAssemblyMap { get; } =
+			FindEnvDteAssemblies();
+
+		private static Dictionary<string, VirtualFileSystemPath> FindEnvDteAssemblies()
+		{
+			var lifetimeDirectory = VirtualFileSystemPath
+				.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext)
+				.Parent;
+			var envDteAssembliesInLifetimeDirectory = FindEnvDteAssemblies(lifetimeDirectory);
+			if (!envDteAssembliesInLifetimeDirectory.IsEmpty()) return envDteAssembliesInLifetimeDirectory;
+			var envDteAssembliesInLifetimeDirectoryParent = FindEnvDteAssemblies(lifetimeDirectory.Parent);
+			return envDteAssembliesInLifetimeDirectoryParent;
+		}
+
+		private static Dictionary<string, VirtualFileSystemPath> FindEnvDteAssemblies(
+			VirtualFileSystemPath directory
+		) => directory
 			.GetChildren("*EnvDTE*.dll")
 			.Select(child => child.GetAbsolutePath())
 			.ToDictionary(assembly => assembly.NameWithoutExtension);

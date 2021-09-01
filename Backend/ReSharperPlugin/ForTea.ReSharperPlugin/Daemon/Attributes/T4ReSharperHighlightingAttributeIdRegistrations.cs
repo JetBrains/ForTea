@@ -17,8 +17,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 	 GroupId = T4HighlightingAttributeGroup.ID,
 	 Layer = HighlighterLayer.SYNTAX,
 	 BackgroundColor = "#F9F9F9",
-	 DarkBackgroundColor = "#2C2C2C",
-	 RiderPresentableName = "Code Block"
+	 DarkBackgroundColor = "#2C2C2C"
 )]
 public static class T4ReSharperHighlightingAttributeIds{}
 }

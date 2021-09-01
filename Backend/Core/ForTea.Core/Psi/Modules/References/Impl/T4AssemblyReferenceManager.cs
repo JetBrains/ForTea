@@ -29,9 +29,9 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 		private IT4Environment Environment { get; }
 
 		[NotNull]
-		private IDictionary<FileSystemPath, IAssemblyCookie> MyAssemblyReferences { get; }
+		private IDictionary<VirtualFileSystemPath, IAssemblyCookie> MyAssemblyReferences { get; }
 
-		private IDictionary<FileSystemPath, IProject> MyProjectReferences { get; }
+		private IDictionary<VirtualFileSystemPath, IProject> MyProjectReferences { get; }
 
 		public IEnumerable<IModule> AssemblyReferences =>
 			MyAssemblyReferences.Values.SelectNotNull(cookie => cookie.Assembly);
@@ -60,8 +60,8 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			[NotNull] IShellLocks shellLocks
 		)
 		{
-			MyProjectReferences = new Dictionary<FileSystemPath, IProject>();
-			MyAssemblyReferences = new Dictionary<FileSystemPath, IAssemblyCookie>();
+			MyProjectReferences = new Dictionary<VirtualFileSystemPath, IProject>();
+			MyAssemblyReferences = new Dictionary<VirtualFileSystemPath, IAssemblyCookie>();
 			AssemblyFactory = assemblyFactory;
 			ProjectFile = projectFile;
 			ResolveContext = resolveContext;
@@ -102,7 +102,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			return TryAddProjectReference(path) || TryAddAssemblyReference(path);
 		}
 
-		private bool TryAddProjectReference([NotNull] FileSystemPath path)
+		private bool TryAddProjectReference([NotNull] VirtualFileSystemPath path)
 		{
 			var project = ProjectReferenceResolver.TryResolveProject(path);
 			if (project == null) return false;
@@ -110,7 +110,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules.References.Impl
 			return true;
 		}
 
-		private bool TryAddAssemblyReference([NotNull] FileSystemPath path)
+		private bool TryAddAssemblyReference([NotNull] VirtualFileSystemPath path)
 		{
 			var cookie = AssemblyFactory.AddRef(new AssemblyLocation(path), "T4", ResolveContext);
 			if (cookie == null) return false;

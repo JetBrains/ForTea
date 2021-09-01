@@ -33,15 +33,15 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		}
 
 		[CanBeNull]
-		private FileSystemPath Resolve(
+		private VirtualFileSystemPath Resolve(
 			AssemblyReferenceTarget target,
 			IProject project,
 			IModuleReferenceResolveContext resolveContext
 		) => ResolveManager.Resolve(target, project, resolveContext)?.AssemblyPhysicalPath;
 
-		public FileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.ResolvedPath);
+		public VirtualFileSystemPath Resolve(IT4AssemblyDirective directive) => Resolve(directive.ResolvedPath);
 
-		public FileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
+		public VirtualFileSystemPath Resolve(string assemblyNameOrFile, IPsiSourceFile sourceFile)
 		{
 			var projectFile = sourceFile.ToProjectFile();
 			if (projectFile == null) return null;
@@ -49,23 +49,23 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			return Resolve(path);
 		}
 
-		public virtual FileSystemPath Resolve(T4ResolvedPath path) =>
+		public virtual VirtualFileSystemPath Resolve(T4ResolvedPath path) =>
 			ResolveAsLightReference(path)
 			?? ResolveAsAssemblyName(path)
 			?? ResolveAsAssemblyFile(path);
 
-		public virtual FileSystemPath ResolveWithoutCaching(T4ResolvedPath path) => Resolve(path);
+		public virtual VirtualFileSystemPath ResolveWithoutCaching(T4ResolvedPath path) => Resolve(path);
 
 		[CanBeNull]
-		private FileSystemPath ResolveAsLightReference([NotNull] T4ResolvedPath pathWithMacros) =>
+		private VirtualFileSystemPath ResolveAsLightReference([NotNull] T4ResolvedPath pathWithMacros) =>
 			LightWeightResolver.TryResolve(pathWithMacros);
 
 		[CanBeNull]
-		protected FileSystemPath ResolveAsAssemblyName([NotNull] T4ResolvedPath pathWithMacros) =>
+		protected VirtualFileSystemPath ResolveAsAssemblyName([NotNull] T4ResolvedPath pathWithMacros) =>
 			ResolveAssemblyNameOrFile(pathWithMacros.ProjectFile, pathWithMacros.ResolvedPath);
 
 		[CanBeNull]
-		protected FileSystemPath ResolveAsAssemblyFile([NotNull] T4ResolvedPath pathWithMacros)
+		protected VirtualFileSystemPath ResolveAsAssemblyFile([NotNull] T4ResolvedPath pathWithMacros)
 		{
 			string name = pathWithMacros.ResolvedPath;
 			string nameWithoutExtension = TryRemoveBinaryExtension(name);
@@ -83,7 +83,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 		}
 
 		[CanBeNull]
-		private FileSystemPath ResolveAssemblyNameOrFile(
+		private VirtualFileSystemPath ResolveAssemblyNameOrFile(
 			[NotNull] IProjectFile projectFile,
 			[NotNull] string assemblyNameOrFile
 		)
@@ -91,7 +91,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 			var resolveContext = projectFile.SelectResolveContext();
 			var nameInfo = AssemblyNameInfo.TryParse(assemblyNameOrFile);
 			if (nameInfo == null) return null;
-			var target = new AssemblyReferenceTarget(nameInfo, FileSystemPath.Empty);
+			var target = new AssemblyReferenceTarget(nameInfo, VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext));
 			var project = projectFile.GetProject().NotNull();
 			return Resolve(target, project, resolveContext);
 		}

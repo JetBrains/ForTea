@@ -12,12 +12,12 @@ namespace GammaJul.ForTea.Core.Psi.Resolve
 	public sealed class T4FileReference : PathReferenceBase<IT4DirectiveAttribute, ITreeNode>
 	{
 		[NotNull]
-		private FileSystemPath Path { get; }
+		private VirtualFileSystemPath Path { get; }
 
 		public T4FileReference(
 			[NotNull] IT4DirectiveAttribute owner,
 			[NotNull] ITreeNode node,
-			[NotNull] FileSystemPath path
+			[NotNull] VirtualFileSystemPath path
 		) : base(
 			owner,
 			null,
@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve
 			SelectRange(node)
 		) => Path = path;
 
-		public override FileSystemPath GetBasePath() => Path.Parent;
+		public override VirtualFileSystemPath GetBasePath() => Path.Parent;
 
 		protected override IReference BindToInternal(IDeclaredElement declaredElement, ISubstitution substitution) =>
 			this;

@@ -22,7 +22,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 			Environment = environment;
 		}
 
-		public FileSystemPath ResolvePath(T4ResolvedPath path)
+		public VirtualFileSystemPath ResolvePath(T4ResolvedPath path)
 		{
 			var absolute = path.TryResolveAbsolutePath();
 			if (absolute != null) return absolute;
@@ -32,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 				.Select(includePath => includePath.Combine(path.ResolvedPath))
 				.FirstOrDefault(resultPath => resultPath.ExistsFile);
 
-			return asGlobalInclude ?? FileSystemPath.Empty;
+			return asGlobalInclude ?? VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext);
 		}
 
 		public IPsiSourceFile Resolve(T4ResolvedPath path) =>
