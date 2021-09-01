@@ -9,6 +9,7 @@ using JetBrains.RdBackend.Common.Features.Documents;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.Rider.Backend.Features.Documents;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 
@@ -32,13 +33,17 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 		[NotNull]
 		private IPsiFiles Files { get; }
 
+		[NotNull]
+		private RiderDocumentHost Host { get; }
+
 		public T4RiderSyntaxHighlightingHost(
 			Lifetime lifetime,
 			[NotNull] ILogger logger,
 			[NotNull] T4OutputExtensionFrontendNotifier notifier,
 			[NotNull] ISolution solution,
 			[NotNull] IPsiCachesState state,
-			[NotNull] IPsiFiles files
+			[NotNull] IPsiFiles files,
+			[NotNull] RiderDocumentHost host
 		)
 		{
 			Logger = logger;
@@ -46,21 +51,20 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			Solution = solution;
 			State = state;
 			Files = files;
-			DocumentHostBase.ViewForAllClients(solution, lifetime, (hostLifetime, host) =>
-				host.ViewHostDocuments(hostLifetime, (docLifetime, docId, document) => CreateHandler(docLifetime, docId, document, host)));
+			Host = host;
+			host.ViewHostDocuments(lifetime, CreateHandler);
 		}
 
 		private void CreateHandler(
 			Lifetime editableEntityLifetime,
 			[NotNull] RdDocumentId rdDocumentId,
-			[NotNull] RiderDocument document,
-			[NotNull] DocumentHostBase host
+			[NotNull] RiderDocument document
 		)
 		{
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			var editableEntity = (host.TryGetDocumentModel(rdDocumentId) as RiderDocumentViewModel)?.DocumentModel;
+			var editableEntity = (Host.TryGetDocumentModel(rdDocumentId) as RiderDocumentViewModel)?.DocumentModel;
 			if (editableEntity == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
