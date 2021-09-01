@@ -55,7 +55,7 @@ val backendPluginSolutionName = "ForTea.Backend.sln"
 
 val repoRoot = projectDir.parentFile!!
 val backendPluginPath = File(repoRoot, backendPluginFolderName)
-val riderBackendPluginPath = File(repoRoot, riderBackedPluginName)
+val riderBackendPluginPath = File(repoRoot, "$backendPluginFolderName/RiderPlugin/$riderBackedPluginName")
 val backendPluginSolutionPath = File(backendPluginPath, backendPluginSolutionName)
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
@@ -209,7 +209,7 @@ tasks {
   create<RdGenTask>("rdgenMonorepo") {
     doFirst {
       configure<RdGenExtension> {
-        val csOutput = File(repoRoot, "Backend/RiderPlugin/ForTea.RiderPlugin/Model")
+        val csOutput = File(riderBackendPluginPath, "Model")
         val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
         val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
 
@@ -241,9 +241,9 @@ tasks {
   create<RdGenTask>("rdgenIndependent") {
     doFirst {
       configure<RdGenExtension> {
-        val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
+        val csOutput = File(riderBackendPluginPath, "Model")
         val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
-      
+
         verbose = true
         hashFolder = "build/rdgen"
         logger.info("Configuring rdgen params")
@@ -255,7 +255,7 @@ tasks {
         })
         sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
         packages = "model"
-      
+
         generator {
           language = "kotlin"
           transform = "asis"
@@ -263,7 +263,7 @@ tasks {
           namespace = "com.jetbrains.rider.model"
           directory = "$ktOutput"
         }
-      
+
         generator {
           language = "csharp"
           transform = "reversed"
