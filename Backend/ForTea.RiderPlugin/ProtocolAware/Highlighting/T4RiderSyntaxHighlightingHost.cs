@@ -5,6 +5,7 @@ using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.RdBackend.Common.Features.Components.PerClientComponents;
 using JetBrains.RdBackend.Common.Features.Documents;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -14,7 +15,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 {
-	[SolutionComponent]
+	[SolutionPerClientComponent]
 	public sealed class T4RiderSyntaxHighlightingHost
 	{
 		[NotNull]
@@ -32,6 +33,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 		[NotNull]
 		private IPsiFiles Files { get; }
 
+		[NotNull]
+		private DocumentHostBase Host { get; }
+
 		public T4RiderSyntaxHighlightingHost(
 			Lifetime lifetime,
 			[NotNull] ILogger logger,
@@ -46,21 +50,20 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			Solution = solution;
 			State = state;
 			Files = files;
-			DocumentHostBase.ViewForAllClients(solution, lifetime, (hostLifetime, host) =>
-				host.ViewHostDocuments(hostLifetime, (docLifetime, docId, document) => CreateHandler(docLifetime, docId, document, host)));
+			Host = DocumentHostBase.GetInstance(Solution);
+			Host.ViewHostDocuments(lifetime, CreateHandler);
 		}
 
 		private void CreateHandler(
 			Lifetime editableEntityLifetime,
 			[NotNull] RdDocumentId rdDocumentId,
-			[NotNull] RiderDocument document,
-			[NotNull] DocumentHostBase host
+			[NotNull] RiderDocument document
 		)
 		{
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			var editableEntity = (host.TryGetDocumentModel(rdDocumentId) as RiderDocumentViewModel)?.DocumentModel;
+			var editableEntity = (Host.TryGetDocumentModel(rdDocumentId) as RiderDocumentViewModel)?.DocumentModel;
 			if (editableEntity == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
