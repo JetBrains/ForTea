@@ -1,5 +1,5 @@
 ﻿<Project>
-  <Sdk Name="JetBrains.Build.VersionLockFileTargets" Version="0.0.3" />
+  <Sdk Name="JetBrains.Build.VersionLockFileTargets" Version="0.0.4" />
   <PropertyGroup>
     <IsIndependentBuild Condition="Exists('$(MSBuildThisFileDirectory)..\Frontend\build\DotNetSdkPath.generated.props')">True</IsIndependentBuild>
   </PropertyGroup>
