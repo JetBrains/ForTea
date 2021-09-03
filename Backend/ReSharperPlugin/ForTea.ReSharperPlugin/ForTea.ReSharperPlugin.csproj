@@ -10,7 +10,7 @@
     <LangVersion>9.0</LangVersion>
     <OutputPath Condition="!$(InternalBuild)">..\..\output\ForTea.ReSharperPlugin\$(Configuration)</OutputPath>
     <RootNamespace>JetBrains.ForTea.ReSharperPlugin</RootNamespace>
-    <AssemblyName>JetBrains.ForTea.ReSharperPlugin</AssemblyName>
+    <AssemblyName>ForTea.ReSharperPlugin</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>

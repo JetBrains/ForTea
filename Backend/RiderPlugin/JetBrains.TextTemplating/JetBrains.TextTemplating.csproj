@@ -10,7 +10,7 @@
     <OutputPath Condition="!$(InternalBuild)">..\..\output\JetBrains.TextTemplating\$(Configuration)</OutputPath>
     <LangVersion>9.0</LangVersion>
     <RootNamespace>Microsoft.VisualStudio.TextTemplating</RootNamespace>
-    <AssemblyName>Microsoft.VisualStudio.TextTemplating</AssemblyName>
+    <AssemblyName>JetBrains.TextTemplating</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <Import Project="$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props" Condition="Exists('$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props')" />

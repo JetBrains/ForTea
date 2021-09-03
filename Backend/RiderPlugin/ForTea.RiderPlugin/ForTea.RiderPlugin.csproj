@@ -10,7 +10,7 @@
     <OutputPath Condition="!$(InternalBuild)">..\..\output\ForTea.RiderPlugin\$(Configuration)</OutputPath>
     <LangVersion>9.0</LangVersion>
     <RootNamespace>JetBrains.ForTea.RiderPlugin</RootNamespace>
-    <AssemblyName>JetBrains.ForTea.RiderPlugin</AssemblyName>
+    <AssemblyName>ForTea.RiderPlugin</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
