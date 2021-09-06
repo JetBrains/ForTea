@@ -11,6 +11,11 @@
     <JetTestProject>true</JetTestProject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="data\**" />
+    <EmbeddedResource Remove="data\**" />
+    <None Remove="data\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
     <ProjectReference Include="..\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj" />
     <Reference Include="System" />
