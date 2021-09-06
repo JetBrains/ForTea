@@ -1,4 +1,5 @@
 import com.jetbrains.rd.generator.gradle.RdGenExtension
+import com.jetbrains.rd.generator.gradle.RdGenTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
@@ -12,7 +13,7 @@ plugins {
   id("org.jetbrains.intellij") version "1.1.4"
   id("org.jetbrains.grammarkit") version "2021.1.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
-  id("com.jetbrains.rdgen") version "0.212.307"
+  id ("com.jetbrains.rdgen") version "0.212.314"
   kotlin("jvm") version "1.4.10"
 }
 
@@ -54,7 +55,7 @@ val backendPluginSolutionName = "ForTea.Backend.sln"
 
 val repoRoot = projectDir.parentFile!!
 val backendPluginPath = File(repoRoot, backendPluginFolderName)
-val riderBackendPluginPath = File(repoRoot, riderBackedPluginName)
+val riderBackendPluginPath = File(repoRoot, "$backendPluginFolderName/RiderPlugin/$riderBackedPluginName")
 val backendPluginSolutionPath = File(backendPluginPath, backendPluginSolutionName)
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
@@ -90,39 +91,6 @@ fun File.writeTextIfChanged(content: String) {
   if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
     println("Writing $path")
     writeBytes(bytes)
-  }
-}
-
-configure<RdGenExtension> {
-  val csOutput = File(repoRoot, "Backend/ForTea.RiderPlugin/Model")
-  val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
-
-  verbose = true
-  hashFolder = "build/rdgen"
-  logger.info("Configuring rdgen params")
-  classpath({
-    logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
-    val sdkPath = intellij.ideaDependency.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
-    val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-    "$rdLibDirectory/rider-model.jar"
-  })
-  sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
-  packages = "model"
-
-  generator {
-    language = "kotlin"
-    transform = "asis"
-    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-    namespace = "com.jetbrains.rider.model"
-    directory = "$ktOutput"
-  }
-
-  generator {
-    language = "csharp"
-    transform = "reversed"
-    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-    namespace = "JetBrains.Rider.Model"
-    directory = "$csOutput"
   }
 }
 
@@ -238,9 +206,88 @@ tasks {
     }
   }
 
+  create<RdGenTask>("rdgenMonorepo") {
+    doFirst {
+      configure<RdGenExtension> {
+        val csOutput = File(riderBackendPluginPath, "Model")
+        val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
+        val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
+
+        verbose = true
+        hashFolder = "build/rdgen"
+        logger.info("Configuring rdgen params")
+        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"), File("$productsHome/Rider/Frontend/model/src"), File("$productsHome/Rider/ultimate/platform/rd-ide-model-sources"))
+
+        packages = "model"
+        generator {
+          language = "csharp"
+          transform = "reversed"
+          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+          namespace = "JetBrains.Rider.Model"
+          directory = "$csOutput"
+        }
+
+        generator {
+          language = "kotlin"
+          transform = "asis"
+          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+          namespace = "com.jetbrains.rider.model"
+          directory = "$ktOutput"
+        }
+      }
+    }
+  }
+
+  create<RdGenTask>("rdgenIndependent") {
+    doFirst {
+      configure<RdGenExtension> {
+        val csOutput = File(riderBackendPluginPath, "Model")
+        val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
+
+        verbose = true
+        hashFolder = "build/rdgen"
+        logger.info("Configuring rdgen params")
+        classpath({
+          logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
+          val sdkPath = intellij.ideaDependency.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
+          val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
+          "$rdLibDirectory/rider-model.jar"
+        })
+        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
+        packages = "model"
+
+        generator {
+          language = "kotlin"
+          transform = "asis"
+          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+          namespace = "com.jetbrains.rider.model"
+          directory = "$ktOutput"
+        }
+
+        generator {
+          language = "csharp"
+          transform = "reversed"
+          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+          namespace = "JetBrains.Rider.Model"
+          directory = "$csOutput"
+        }
+      }
+    }
+  }
+  
+  create("pwc") {
+    group = riderForTeaTargetsGroup
+    dependsOn("rdgenMonorepo")
+  }
+
   create("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", generateT4Lexer, generateT4Parser)
+    dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateT4Lexer, generateT4Parser)
+  }
+
+  create("prepareMonorepo") {
+    group = riderForTeaTargetsGroup
+    dependsOn("rdgenMonorepo", generateT4Lexer, generateT4Parser)
   }
 
   getByName("buildPlugin") {
