@@ -9,19 +9,30 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.fortea.model.t4ProtocolModel
+import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
+import com.jetbrains.rider.debugger.DebuggerHelperHost
+import kotlinx.coroutines.runBlocking
 
 class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
-  override fun create(executorId: String, environment: ExecutionEnvironment): RunProfileState {
+  private val debuggerHelperHost = DebuggerHelperHost.getInstance(project)
+  override fun create(executorId: String, environment: ExecutionEnvironment) = runBlocking {
+    createAsync(executorId, environment)
+  }
+
+  suspend fun createAsync(executorId: String, environment: ExecutionEnvironment): RunProfileState {
     val dotNetExecutable = parameters.toDotNetExecutable()
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
+      environment.project.lifetime,
       riderDotNetActiveRuntimeHost,
+      debuggerHelperHost,
       dotNetExecutable.exePath,
-      dotNetExecutable.useMonoRuntime
+      dotNetExecutable.runtimeType,
+      dotNetExecutable.projectTfm
     )
     val model = environment.project.solution.t4ProtocolModel
     return when (executorId) {

@@ -1,0 +1,16 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#
+    var provider = (IServiceProvider) Host;
+    var dte = (DTE) provider.GetService(typeof(DTE));
+    var solution = dte.Solution;
+#>
+DTE: <#= solution.DTE #>
+Parent: <#= solution.Parent #>
+File name exists: <#= !string.IsNullOrEmpty(solution.FileName) #>
+Full name exists: <#= !string.IsNullOrEmpty(solution.FullName) #>
+Item(1): <#= solution.Item(1) #>
+Count: <#= solution.Count #>
+Projects: <#= solution.Projects #>
+Enumerator: <#= solution.GetEnumerator() #>

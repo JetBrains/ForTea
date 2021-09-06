@@ -1,8 +1,0 @@
-<#@ template language="C#" #>
-<#@ output extension=".txt" #>
-<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
-<#
-    ITextTemplatingEngineHost h;
-    TextTransformation t = this;
-    ToStringHelper.ToStringWithCulture(32);
-#>

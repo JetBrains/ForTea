@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 15.0.27130.2003
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.Core", "ForTea.Core\ForTea.Core.csproj", "{E7556A8E-2ADB-46E4-B0C6-DB7A53268600}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.Core", "Core\ForTea.Core\ForTea.Core.csproj", "{E7556A8E-2ADB-46E4-B0C6-DB7A53268600}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.RiderPlugin", "ForTea.RiderPlugin\ForTea.RiderPlugin.csproj", "{32BD9350-1B6D-4D2C-BE6F-B9E418BAD198}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.RiderPlugin", "RiderPlugin\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj", "{32BD9350-1B6D-4D2C-BE6F-B9E418BAD198}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.Tests", "test\ForTea.Tests\ForTea.Tests.csproj", "{513A3186-35D4-4CBD-9CB6-A815B7BC0C75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JetBrains.TextTemplating", "RiderPlugin\JetBrains.TextTemplating\JetBrains.TextTemplating.csproj", "{D6079D04-9830-47EB-9C5E-85B568DE021E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JetBrains.TextTemplating", "JetBrains.TextTemplating\JetBrains.TextTemplating.csproj", "{D6079D04-9830-47EB-9C5E-85B568DE021E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.Tests", "RiderPlugin\test\ForTea.Tests.csproj", "{DA52E97C-8D7A-45D9-A2BD-6F4AB5869F40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +25,12 @@ Global
 		{32BD9350-1B6D-4D2C-BE6F-B9E418BAD198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32BD9350-1B6D-4D2C-BE6F-B9E418BAD198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32BD9350-1B6D-4D2C-BE6F-B9E418BAD198}.Release|Any CPU.Build.0 = Release|Any CPU
-		{513A3186-35D4-4CBD-9CB6-A815B7BC0C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{513A3186-35D4-4CBD-9CB6-A815B7BC0C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{513A3186-35D4-4CBD-9CB6-A815B7BC0C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{513A3186-35D4-4CBD-9CB6-A815B7BC0C75}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6079D04-9830-47EB-9C5E-85B568DE021E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D6079D04-9830-47EB-9C5E-85B568DE021E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6079D04-9830-47EB-9C5E-85B568DE021E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6079D04-9830-47EB-9C5E-85B568DE021E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA52E97C-8D7A-45D9-A2BD-6F4AB5869F40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA52E97C-8D7A-45D9-A2BD-6F4AB5869F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,12 +4,8 @@ import com.intellij.execution.*
 import com.intellij.execution.process.NopProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.projectView.ProjectModelViewHost
 
-abstract class T4AsyncRunConfigurationExecutorBase(
-  project: Project,
-  host: ProjectModelViewHost
-) : T4RunConfigurationExecutorBase(project, host) {
+abstract class T4AsyncRunConfigurationExecutorBase(project: Project) : T4RunConfigurationExecutorBase(project) {
   protected abstract val executor: Executor
 
   final override fun executeConfiguration(configuration: RunnerAndConfigurationSettings) {

@@ -1,0 +1,50 @@
+<#@ template language="C#" hostspecific="true" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#
+    var provider = (IServiceProvider) Host;
+    var dte = (DTE) provider.GetService(typeof(DTE));
+    var solution = dte.Solution;
+    foreach (Project project in solution.Projects)
+    {
+#><#= project.Name #>:
+<#
+        foreach (ProjectItem item in project.ProjectItems)
+        {
+#>  <#= item.Name #>:
+<#
+            var model = item.FileCodeModel;
+            if (model == null)
+            {
+#>    (code model is null)
+<#
+                continue;
+            }
+
+            foreach (CodeElement element in model.CodeElements)
+            {
+                Dump(element, 0);
+            }
+        }
+    }
+#>
+<#+
+    private void Dump(CodeElement element, int indent)
+    {
+#><#= new string(' ', (indent + 2) * 2) #><#= element.Name #>:
+<#= new string(' ', (indent + 2) * 2) #>{
+<#= new string(' ', (indent + 3) * 2) #>Kind: <#= element.Kind #>
+<#= new string(' ', (indent + 3) * 2) #>DTE: <#= element.DTE #>
+<#= new string(' ', (indent + 3) * 2) #>FullName: <#= element.FullName #>
+<#= new string(' ', (indent + 3) * 2) #>Children: <#= element.Children #>
+<#= new string(' ', (indent + 3) * 2) #>Collection: <#= element.Collection #>
+<#= new string(' ', (indent + 3) * 2) #>ProjectItem: <#= element.ProjectItem #>
+<#= new string(' ', (indent + 3) * 2) #>Language: <#= element.Language == CodeModelLanguageConstants.vsCMLanguageCSharp? "C#" : "WTF" #>
+<#= new string(' ', (indent + 2) * 2) #>}
+<#+
+        foreach (CodeElement childElement in element.Children)
+        {
+            Dump(childElement, indent + 1);
+        }
+    }
+#>

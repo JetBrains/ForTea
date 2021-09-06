@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## 2021.1
+- Improved highlighting for macros and environment variables
+- Fixed some reference resolution issues
+
+## 2020.3
+- Fixed minor include resolution issues
+- Fixed some exceptions
+
 ## 2020.2
 - Fixed a lot of assembly resolution issues
 - Improved plugin stability and performance

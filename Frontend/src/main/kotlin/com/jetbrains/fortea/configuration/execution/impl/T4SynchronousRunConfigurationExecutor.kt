@@ -7,14 +7,12 @@ import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.rdclient.util.idea.pumpMessages
-import com.jetbrains.rider.projectView.ProjectModelViewHost
 import org.jetbrains.annotations.TestOnly
 
 class T4SynchronousRunConfigurationExecutor(
   project: Project,
-  host: ProjectModelViewHost,
   private val waitFunc: () -> Boolean
-) : T4RunConfigurationExecutorBase(project, host) {
+) : T4RunConfigurationExecutorBase(project) {
   private val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
 
   override fun executeConfiguration(configuration: RunnerAndConfigurationSettings) {

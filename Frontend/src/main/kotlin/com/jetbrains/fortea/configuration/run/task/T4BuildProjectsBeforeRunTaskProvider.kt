@@ -8,7 +8,10 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.concurrency.Semaphore
+import com.intellij.workspaceModel.ide.WorkspaceModel
+import com.intellij.workspaceModel.ide.impl.virtualFile
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
+import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.handleEndOfExecution
 import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.platform.util.getComponent
@@ -16,10 +19,8 @@ import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters
 import com.jetbrains.rider.model.BuildResultKind
 import com.jetbrains.rider.model.BuildTarget
-import com.jetbrains.fortea.model.t4ProtocolModel
-import com.jetbrains.rider.projectView.ProjectModelViewHost
-import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import javax.swing.Icon
 
 class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjectsBeforeRunTask>() {
@@ -50,8 +51,8 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
     val selectedProjectsForBuild = model
       .getProjectDependencies
       .sync(configuration.parameters.request.location)
-      .mapNotNull(ProjectModelViewHost.getInstance(project)::getItemById)
-      .mapNotNull(ProjectModelNode::getVirtualFile)
+      .mapNotNull { WorkspaceModel.getInstance(project).getProjectModelEntity(it) }
+      .mapNotNull { it.url?.virtualFile }
       .map(VirtualFile::getPath)
     if (selectedProjectsForBuild.isEmpty()) return true
     val finished = Semaphore()

@@ -1,12 +1,13 @@
 package com.jetbrains.fortea.preprocess
 
+import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.jetbrains.fortea.inTests.T4TestHost
 import com.jetbrains.fortea.utils.T4TestHelper
-import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rdclient.protocol.protocolHost
 import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.fortea.model.T4FileLocation
-import com.jetbrains.rider.projectView.ProjectModelViewHost
+import com.jetbrains.rider.projectView.workspace.getId
+import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import org.testng.annotations.AfterMethod
@@ -39,9 +40,9 @@ abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
 
 
   private fun preprocessT4File() {
-    val host = project.getComponent<ProjectModelViewHost>()
     val virtualFile = helper!!.t4File.path.toVirtualFile(true).shouldNotBeNull()
-    val id = host.getItemsByVirtualFile(virtualFile).single().id
+    val projectModelEntity = WorkspaceModel.getInstance(project).getProjectModelEntities(virtualFile, project).single()
+    val id = projectModelEntity.getId(project)!!
     val location = T4FileLocation(id)
     T4TestHost.getInstance(project.protocolHost).preprocessFile(location)
   }

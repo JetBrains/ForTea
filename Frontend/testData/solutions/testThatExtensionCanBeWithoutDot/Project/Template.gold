@@ -1,1 +1,1 @@
-﻿Hello!
+Hello!

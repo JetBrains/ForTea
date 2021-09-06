@@ -12,8 +12,8 @@ import com.jetbrains.fortea.model.T4PreprocessingResult
 import com.jetbrains.rd.platform.util.idea.LifetimedProjectService
 import com.jetbrains.rd.util.reactive.ViewableMap
 import com.jetbrains.rider.build.BuildToolWindowContext
-import com.jetbrains.rider.build.Diagnostics.BuildDiagnostic
-import com.jetbrains.rider.build.Diagnostics.DiagnosticKind
+import com.jetbrains.rider.build.diagnostics.BuildDiagnostic
+import com.jetbrains.rider.build.diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*
 
 class T4BuildSessionViewImpl(
@@ -69,7 +69,7 @@ class T4BuildSessionViewImpl(
     val line = message.location.line + 1
     val column = message.location.column + 1
     val filePath = if (!message.file.isNullOrEmpty()) message.file else file
-    return BuildDiagnostic(kind, message.content, message.id, message.projectId, filePath, line, column)
+    return BuildDiagnostic(kind, message.content, message.id, message.projectId, null, filePath, line, column)
   }
 
   private fun toDiagnosticKind(kind: T4BuildMessageKind) = when (kind) {

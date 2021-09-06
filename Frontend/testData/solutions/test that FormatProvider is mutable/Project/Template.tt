@@ -1,0 +1,5 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Globalization" #>
+<#
+    ToStringHelper.FormatProvider = new CultureInfo(0x407);
+#>

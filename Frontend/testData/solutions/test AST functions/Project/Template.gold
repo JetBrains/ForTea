@@ -1,0 +1,56 @@
+Project:
+  Properties:
+    (code model is null)
+  Class1.cs:
+    ClassLibrary13:
+    {
+      Kind: vsCMElementNamespace
+      DTE: JetBrains.EnvDTE.Client.Impl.DteImplementation
+      FullName: ClassLibrary13
+      Children: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+      Collection: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+      ProjectItem: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectItemImplementation
+      Language: C#
+    }
+      Class1:
+      {
+        Kind: vsCMElementClass
+        DTE: JetBrains.EnvDTE.Client.Impl.DteImplementation
+        FullName: ClassLibrary13.Class1
+        Children: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+        Collection: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+        ProjectItem: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectItemImplementation
+        Language: C#
+      }
+        Foo:
+        {
+          Kind: vsCMElementFunction
+          DTE: JetBrains.EnvDTE.Client.Impl.DteImplementation
+          FullName: ClassLibrary13.Class1.Foo
+          Children: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+          Collection: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+          ProjectItem: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectItemImplementation
+          Language: C#
+        }
+        Bar:
+        {
+          Kind: vsCMElementFunction
+          DTE: JetBrains.EnvDTE.Client.Impl.DteImplementation
+          FullName: ClassLibrary13.Class1.Bar
+          Children: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+          Collection: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+          ProjectItem: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectItemImplementation
+          Language: C#
+        }
+      IClass1:
+      {
+        Kind: vsCMElementInterface
+        DTE: JetBrains.EnvDTE.Client.Impl.DteImplementation
+        FullName: ClassLibrary13.IClass1
+        Children: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+        Collection: JetBrains.EnvDTE.Client.Impl.Model.CodeElementsImplementation
+        ProjectItem: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectItemImplementation
+        Language: C#
+      }
+  Template.tt:
+    (code model is null)

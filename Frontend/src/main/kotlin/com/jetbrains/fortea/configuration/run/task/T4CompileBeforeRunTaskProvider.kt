@@ -6,15 +6,17 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.util.concurrency.Semaphore
+import com.intellij.workspaceModel.ide.WorkspaceModel
+import com.intellij.workspaceModel.ide.toPath
 import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.isSuccess
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.utils.handleEndOfExecution
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.fortea.model.t4ProtocolModel
-import com.jetbrains.rider.projectView.ProjectModelViewHost
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rd.platform.util.lifetime
+import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 
 class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunTask>() {
   override fun getName() = "Compile T4 File"
@@ -44,10 +46,9 @@ class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunT
     finished.down()
     var successful = false
 
-    val host = ProjectModelViewHost.getInstance(project)
     val location = executionRequest.location
-    val item = host.getItemById(location.id) ?: return false
-    val path = item.getVirtualFile()?.path ?: return false
+    val item = WorkspaceModel.getInstance(project).getProjectModelEntity(location.id) ?: return false
+    val path = item.url?.toPath()?.toString() ?: return false
     val model = project.solution.t4ProtocolModel
 
     model.requestCompilation.start(project.lifetime, location).result.advise(project.lifetime) { rdTaskResult ->
