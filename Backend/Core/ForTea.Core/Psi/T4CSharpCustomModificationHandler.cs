@@ -29,43 +29,42 @@ using JetBrains.ReSharper.Psi.Web.CodeBehindSupport;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi {
-// TODO: cleanup
+namespace GammaJul.ForTea.Core.Psi
+{
 	/// <summary>
 	/// C# custom modification handler that allows the T4 files to be modified in response to C# actions or quickfixes.
 	/// (eg: adding a using statement translates to an import directive).
 	/// </summary>
 	[ProjectFileType(typeof(T4ProjectFileType))]
-	public class T4CSharpCustomModificationHandler : CustomModificationHandler<IT4CodeBlock, IT4Directive>, ICSharpCustomModificationHandler {
+	public class T4CSharpCustomModificationHandler : CustomModificationHandler<IT4CodeBlock, IT4Directive>, ICSharpCustomModificationHandler
+	{
 		/// <summary>Determines whether namespace aliases can be used.</summary>
 		/// <returns>Always <c>false</c> since T4 files does not support aliases.</returns>
-		public bool CanUseAliases
-			=> false;
+		public bool CanUseAliases => false;
 
 		/// <summary>Determines whether static imports can be used.</summary>
 		/// <returns>Always <c>false</c> since T4 files does not support static imports.</returns>
-		public bool CanUseStaticImport
-			=> false;
+		public bool CanUseStaticImport => false;
 
-		public bool CanOmitBraces
-			=> false;
+		public bool CanOmitBraces => false;
 
 		/// <summary>Creates a new T4 code block.</summary>
 		/// <param name="text">The C# code.</param>
 		/// <param name="anchor">Where to insert the code.</param>
 		/// <returns>A new instance of <see cref="IT4CodeBlock"/>.</returns>
-		protected override IT4CodeBlock CreateInlineCodeBlock(string text, ITreeNode anchor) {
+		protected override IT4CodeBlock CreateInlineCodeBlock(string text, ITreeNode anchor)
+		{
 			var existingFeatureNode = anchor.FindPreviousNode(node => node is IT4FeatureBlock ? TreeNodeActionType.ACCEPT : TreeNodeActionType.CONTINUE);
 			return existingFeatureNode != null
-				? (IT4CodeBlock) T4ElementFactory.CreateFeatureBlock(text)
+				? T4ElementFactory.CreateFeatureBlock(text)
 				: T4ElementFactory.CreateStatementBlock(text);
 		}
 
 		/// <summary>Gets the code tree text range of a code block.</summary>
 		/// <param name="codeBlock">The code block.</param>
 		/// <returns>A <see cref="TreeTextRange"/> representing the code range in <paramref name="codeBlock"/>.</returns>
-		protected override TreeTextRange GetCodeTreeTextRange(IT4CodeBlock codeBlock)
-			=> codeBlock.Code?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
+		protected override TreeTextRange GetCodeTreeTextRange(IT4CodeBlock codeBlock) =>
+			codeBlock.Code?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 
 		/// <summary>Creates a T4 import directive instead of a C# using directive.</summary>
 		/// <param name="before"><c>true</c> to create the directive before <paramref name="anchor"/>; <c>false</c> to create it after.</param>
@@ -73,32 +72,31 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="usingDirective">The C# using directive.</param>
 		/// <param name="originalFile">The original T4 file where the directive must be created.</param>
 		/// <returns>A <see cref="TreeTextRange"/> corresponding to the namespace in the newly created directive.</returns>
-		protected override bool CreateAndMapUsingNode(bool before, IT4Directive anchor, ITreeNode usingDirective, IFile originalFile) {
+		protected override bool CreateAndMapUsingNode(bool before, IT4Directive anchor, ITreeNode usingDirective, IFile originalFile)
+		{
 			var t4File = (IT4File) originalFile;
 			string ns = GetNamespaceFromUsingDirective(usingDirective);
-			IT4Directive directive = T4DirectiveInfoManager.Import.CreateDirective(ns);
+			var directive = T4DirectiveInfoManager.Import.CreateDirective(ns);
 
 			if (anchor != null && anchor.GetContainingNode<IT4IncludeDirective>() == null)
-				directive = before ? t4File.AddDirectiveBefore(directive, anchor) : t4File.AddDirectiveAfter(directive, anchor);
+				directive = before
+					? t4File.AddDirectiveBefore(directive, anchor)
+					: t4File.AddDirectiveAfter(directive, anchor);
 			else
 				directive = t4File.AddDirective(directive);
 
-			IFile csharpFile = usingDirective.GetContainingFile();
-			if (csharpFile != null) {
+			var csharpFile = usingDirective.GetContainingFile();
+			if (csharpFile == null) return true;
+			var csharpUsingRange = GetNameRange(usingDirective);
+			if (!csharpUsingRange.IsValid()) return false;
 
-				var csharpUsingRange = GetNameRange(usingDirective);
-				if (!csharpUsingRange.IsValid())
-					return false;
+			var t4AttributeValueRange = directive.GetAttributeValueToken(T4DirectiveInfoManager.Import.NamespaceAttribute.Name).GetTreeTextRange();
+			if (!t4AttributeValueRange.IsValid()) return false;
 
-				var t4AttributeValueRange = directive.GetAttributeValueToken(T4DirectiveInfoManager.Import.NamespaceAttribute.Name).GetTreeTextRange();
-				if (!t4AttributeValueRange.IsValid())
-					return false;
-
-				csharpFile.GetRangeTranslator().AddProjectionItem(
-					new TreeTextRange<Generated>(csharpUsingRange),
-					new TreeTextRange<Original>(t4AttributeValueRange)
-				);
-			}
+			csharpFile.GetRangeTranslator().AddProjectionItem(
+				new TreeTextRange<Generated>(csharpUsingRange),
+				new TreeTextRange<Original>(t4AttributeValueRange)
+			);
 
 			return true;
 		}
@@ -106,14 +104,14 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <summary>Gets the text range of a C# using directive namespace.</summary>
 		/// <param name="usingDirective">The using directive.</param>
 		/// <returns>A <see cref="TreeTextRange"/> corresponding to the namespace in <paramref name="usingDirective"/>.</returns>
-		protected override TreeTextRange GetNameRange(ITreeNode usingDirective)
-			=> GetUsedNamespaceNode(usingDirective as IUsingDirective).GetTreeTextRange();
+		protected override TreeTextRange GetNameRange(ITreeNode usingDirective) =>
+			GetUsedNamespaceNode(usingDirective as IUsingDirective).GetTreeTextRange();
 
 		/// <summary>Removes an import directive.</summary>
 		/// <param name="originalFile">The original T4 file where the directive must be removed.</param>
 		/// <param name="directiveInOriginalFile">The import directive in the file.</param>
-		protected override void RemoveUsingNode(IFile originalFile, IT4Directive directiveInOriginalFile)
-			=> ((IT4File) originalFile).RemoveDirective(directiveInOriginalFile);
+		protected override void RemoveUsingNode(IFile originalFile, IT4Directive directiveInOriginalFile) =>
+			((IT4File) originalFile).RemoveDirective(directiveInOriginalFile);
 
 		/// <summary>Creates a new feature block with new type members.</summary>
 		/// <param name="originalFile">The original T4 file where the feature block must be created.</param>
@@ -121,8 +119,9 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="first">The first node.</param>
 		/// <param name="last">The last node.</param>
 		/// <returns>A <see cref="TreeTextRange"/> representing the code range in the newly created feature block.</returns>
-		protected override TreeTextRange CreateTypeMemberNode(IFile originalFile, string text, ITreeNode first, ITreeNode last) {
-			IT4FeatureBlock featureBlock = T4ElementFactory.CreateFeatureBlock(text);
+		protected override TreeTextRange CreateTypeMemberNode(IFile originalFile, string text, ITreeNode first, ITreeNode last)
+		{
+			var featureBlock = T4ElementFactory.CreateFeatureBlock(text);
 			featureBlock = ((IT4File) originalFile).AddFeatureBlock(featureBlock);
 			return featureBlock.Code.GetTreeTextRange();
 		}
@@ -130,31 +129,37 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <summary>Creates a new line token.</summary>
 		/// <param name="psiModule">The associated PSI module.</param>
 		/// <returns>A T4 new line token.</returns>
-		protected override ITreeNode CreateNewLineToken(IPsiModule psiModule)
-			=> CSharpTokenType.NEW_LINE.CreateLeafElement();
+		protected override ITreeNode CreateNewLineToken(IPsiModule psiModule) =>
+			CSharpTokenType.NEW_LINE.CreateLeafElement();
 
 		/// <summary>Gets an existing feature block that can contains type members.</summary>
 		/// <param name="originalFile">The original T4 file.</param>
 		/// <returns>A valid <see cref="TreeTextRange"/> if a feature block existed, <see cref="TreeTextRange.InvalidRange"/> otherwise.</returns>
-		protected override TreeTextRange GetExistingTypeMembersRange(IFile originalFile) {
+		protected override TreeTextRange GetExistingTypeMembersRange(IFile originalFile)
+		{
 			var lastFeatureBlock = ((IT4File) originalFile).Blocks.OfType<IT4FeatureBlock>().LastOrDefault();
 			return lastFeatureBlock?.Code.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 		}
 
 
-		protected override void AddSuperClassDirectiveToOriginalFile(IFile originalFile, ITreeNode anchor, ITreeNode superClassGeneratedNode) {
+		protected override void AddSuperClassDirectiveToOriginalFile(IFile originalFile, ITreeNode anchor, ITreeNode superClassGeneratedNode)
+		{
 			var t4File = (IT4File) originalFile;
-			IT4Directive directive = t4File.GetDirectives(T4DirectiveInfoManager.Template).FirstOrDefault();
+			var directive = t4File.GetDirectives(T4DirectiveInfoManager.Template).FirstOrDefault();
 			IT4DirectiveAttribute attribute;
 			string superClassName = superClassGeneratedNode.GetText();
 
-			if (directive == null) {
-				directive = T4DirectiveInfoManager.Template.CreateDirective(Pair.Of(T4DirectiveInfoManager.Template.InheritsAttribute.Name, superClassName));
+			if (directive == null)
+			{
+				directive = T4DirectiveInfoManager.Template.CreateDirective(
+					Pair.Of(T4DirectiveInfoManager.Template.InheritsAttribute.Name, superClassName));
 				directive = t4File.AddDirective(directive);
 				attribute = directive.Attributes.First();
 			}
-			else {
-				attribute = directive.AddAttribute(T4DirectiveInfoManager.Template.InheritsAttribute.CreateDirectiveAttribute(superClassName));
+			else
+			{
+				attribute = directive.AddAttribute(
+					T4DirectiveInfoManager.Template.InheritsAttribute.CreateDirectiveAttribute(superClassName));
 			}
 
 			superClassGeneratedNode.GetRangeTranslator().AddProjectionItem(
@@ -162,44 +167,40 @@ namespace GammaJul.ForTea.Core.Psi {
 				new TreeTextRange<Original>(attribute.Value.GetTreeTextRange()));
 		}
 
-		protected override ITreeNode GetSuperClassNodeFromOriginalFile(IFile originalFile) {
+		protected override ITreeNode GetSuperClassNodeFromOriginalFile(IFile originalFile)
+		{
 			var t4File = (IT4File) originalFile;
-			foreach (IT4Directive templateDirective in t4File.GetDirectives(T4DirectiveInfoManager.Template)) {
+			foreach (var templateDirective in t4File.GetDirectives(T4DirectiveInfoManager.Template))
+			{
 				var inheritsToken = templateDirective.GetAttributeValueToken(T4DirectiveInfoManager.Template.InheritsAttribute.Name);
-				if (inheritsToken != null)
-					return inheritsToken;
+				if (inheritsToken != null) return inheritsToken;
 			}
+
 			return null;
 		}
 
-		public bool IsQualifiedUsingAtNestedScope(ITreeNode context, IContextBoundSettingsStore settingsStore)
-			=> settingsStore.GetValue(CSharpUsingSettingsAccessor.QualifiedUsingAtNestedScope);
+		public bool IsQualifiedUsingAtNestedScope(ITreeNode context, IContextBoundSettingsStore settingsStore) =>
+			settingsStore.GetValue(CSharpUsingSettingsAccessor.QualifiedUsingAtNestedScope);
 
 		/// <summary>Determines whether a specified C# using directive can be removed.</summary>
 		/// <param name="document">The document.</param>
 		/// <param name="usingDirective">The using directive.</param>
 		/// <returns><c>true</c> if the specified using directive can be removed; otherwise, <c>false</c>.</returns>
 		/// <remarks>As long as the using is represented as a T4 import directive in the root file, it can be removed.</remarks>
-		public bool CanRemoveUsing(IDocument document, IUsingDirective usingDirective) {
-			TreeTextRange nameRange = GetNameRange(usingDirective);
+		public bool CanRemoveUsing(IDocument document, IUsingDirective usingDirective)
+		{
+			var nameRange = GetNameRange(usingDirective);
 			if (!nameRange.IsValid())
 				return false;
 
-			IFile containingFile = usingDirective.GetContainingFile();
+			var containingFile = usingDirective.GetContainingFile();
 			if (containingFile == null)
 				return false;
 
-			DocumentRange documentRange = containingFile.GetDocumentRange(nameRange);
+			var documentRange = containingFile.GetDocumentRange(nameRange);
 			return documentRange.IsValid() && documentRange.Document == document;
-
-//			IReferenceName namespaceNode = usingDirective.GetUsedNamespaceNode();
-//			if (namespaceNode == null)
-//				return false;
-//
-//			var directive = namespaceNode.GetT4ContainerFromCSharpNode<IT4Directive>();
-//			return directive != null && directive.GetContainingNode<IT4Include>() == null;
 		}
-		
+
 		public ICSharpStatementsRange HandleAddStatementsRange(
 			IPsiServices psiServices,
 			Func<ITreeNode, ICSharpStatementsRange> addAction,
@@ -207,9 +208,11 @@ namespace GammaJul.ForTea.Core.Psi {
 			ITreeNode anchor,
 			bool before,
 			bool strict
-		) {
-			using (CustomGeneratedChangePromotionCookie.Create(block)) {
-				ICSharpStatementsRange range = addAction(anchor);
+		)
+		{
+			using (CustomGeneratedChangePromotionCookie.Create(block))
+			{
+				var range = addAction(anchor);
 				FinishAddStatementsRange(range.TreeRange, before);
 				return range;
 			}
@@ -218,10 +221,12 @@ namespace GammaJul.ForTea.Core.Psi {
 		public void HandleRemoveStatementsRange(IPsiServices psiServices, ITreeRange treeRange, Action action)
 			=> action();
 
-		public ITreeRange HandleChangeStatements(IPsiServices psiServices, ITreeRange rangeBeforeChange, Func<ITreeRange> changeAction, bool strict)
+		public ITreeRange HandleChangeStatements(IPsiServices psiServices, ITreeRange rangeBeforeChange,
+			Func<ITreeRange> changeAction, bool strict)
 			=> changeAction();
 
-		public void HandleChangeExpressionInStatement(IPsiServices psiServices, IStatement statement, Action changeAction)
+		public void HandleChangeExpressionInStatement(IPsiServices psiServices, IStatement statement,
+			Action changeAction)
 			=> changeAction();
 
 		/// <summary>
@@ -236,11 +241,13 @@ namespace GammaJul.ForTea.Core.Psi {
 			ICSharpTypeAndNamespaceHolderDeclaration scope,
 			IUsingDirective usingDirective,
 			Action action
-		) {
+		)
+		{
 			ICSharpTreeNode namespaceNode = GetUsedNamespaceNode(usingDirective);
 			if (namespaceNode == null)
 				Assertion.Fail("Only a namespace using can be removed.");
-			else {
+			else
+			{
 				TreeTextRange range = namespaceNode.GetTreeTextRange();
 				HandleRemoveImportInternal(psiServices, scope, usingDirective, action, CSharpLanguage.Instance, range);
 			}
@@ -250,12 +257,14 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="psiServices">The PSI services.</param>
 		/// <param name="node">The node that must be removed.</param>
 		/// <param name="action">The action to execute to remove the node.</param>
-		public void HandleRemoveTypeMember(IPsiServices psiServices, ITreeNode node, Action action) {
+		public void HandleRemoveTypeMember(IPsiServices psiServices, ITreeNode node, Action action)
+		{
 			action();
 			RemoveContainingBlockIfEmpty(node);
 		}
 
-		private static void RemoveContainingBlockIfEmpty([CanBeNull] ITreeNode node) {
+		private static void RemoveContainingBlockIfEmpty([CanBeNull] ITreeNode node)
+		{
 			var block = node.GetT4ContainerFromCSharpNode<IT4CodeBlock>();
 			string code = block?.Code.GetText();
 			if (code == null || code.Trim().Length == 0)
@@ -281,7 +290,8 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="usingDirective">The using directive.</param>
 		/// <returns>The namespace contained in <paramref name="usingDirective"/>.</returns>
 		[NotNull]
-		private static string GetNamespaceFromUsingDirective([NotNull] ITreeNode usingDirective) {
+		private static string GetNamespaceFromUsingDirective([NotNull] ITreeNode usingDirective)
+		{
 			IReferenceName namespaceNode = GetUsedNamespaceNode(usingDirective as IUsingDirective);
 			if (namespaceNode == null)
 				throw new FailPsiTransactionException("Cannot create namespace alias.");
@@ -295,33 +305,33 @@ namespace GammaJul.ForTea.Core.Psi {
 		/// <param name="before">Whether to add the statements before of after <paramref name="generatedAnchor"/>.</param>
 		/// <param name="generatedFile">The generated file.</param>
 		/// <returns>An instance of <see cref="IUsingDirective"/>.</returns>
-		public IUsingDirective HandleAddImport(IPsiServices psiServices, Func<IUsingDirective> action, ITreeNode generatedAnchor, bool before, IFile generatedFile)
-			=> HandleAddImportInternal(psiServices, action, generatedAnchor, before, CSharpLanguage.Instance, generatedFile);
+		public IUsingDirective HandleAddImport(IPsiServices psiServices, Func<IUsingDirective> action, ITreeNode generatedAnchor, bool before, IFile generatedFile) =>
+			HandleAddImportInternal(psiServices, action, generatedAnchor, before, CSharpLanguage.Instance, generatedFile);
 
-		public bool PreferQualifiedReference(IQualifiableReference reference)
-			=> reference.GetTreeNode().GetSettingsStore().GetValue(CSharpUsingSettingsAccessor.PreferQualifiedReference);
+		public bool PreferQualifiedReference(IQualifiableReference reference) => reference
+			.GetTreeNode()
+			.GetSettingsStore()
+			.GetValue(CSharpUsingSettingsAccessor.PreferQualifiedReference);
 
-		public string GetSpecialMethodType(DeclaredElementPresenterStyle presenter, IMethod method, ISubstitution substitution)
-			=> null;
+		public string GetSpecialMethodType(DeclaredElementPresenterStyle presenter, IMethod method, ISubstitution substitution) =>
+			null;
 
-		public ThisQualifierSettingsKey GetThisQualifierStyle(ITreeNode context, IContextBoundSettingsStore settingsStore)
-			=> context.GetSettingsStore().GetKey<ThisQualifierSettingsKey>(SettingsOptimization.OptimizeDefault);
+		public ThisQualifierSettingsKey GetThisQualifierStyle(ITreeNode context, IContextBoundSettingsStore settingsStore) =>
+			context.GetSettingsStore().GetKey<ThisQualifierSettingsKey>(SettingsOptimization.OptimizeDefault);
 
-		public IList<ITreeRange> GetHolderBlockRanges(ITreeNode treeNode)
-			=> new ITreeRange[] { new TreeRange(treeNode.FirstChild, treeNode.LastChild) };
+		public IList<ITreeRange> GetHolderBlockRanges(ITreeNode treeNode) =>
+			new ITreeRange[] {new TreeRange(treeNode.FirstChild, treeNode.LastChild)};
 
 		/// <summary>Initializes a new instance of the <see cref="T4CSharpCustomModificationHandler"/> class.</summary>
 		/// <param name="languageManager">The language manager.</param>
-		public T4CSharpCustomModificationHandler([NotNull] ILanguageManager languageManager)
-			: base(languageManager) {
+		public T4CSharpCustomModificationHandler([NotNull] ILanguageManager languageManager) : base(languageManager)
+		{
 		}
 
 		[CanBeNull]
-		private static IReferenceName GetUsedNamespaceNode([CanBeNull] IUsingDirective directive)
-			=> directive is IUsingSymbolDirective usingSymbolDirective && usingSymbolDirective.StaticKeyword == null
+		private static IReferenceName GetUsedNamespaceNode([CanBeNull] IUsingDirective directive) =>
+			directive is IUsingSymbolDirective usingSymbolDirective && usingSymbolDirective.StaticKeyword == null
 				? usingSymbolDirective.ImportedSymbolName
 				: null;
-
 	}
-
 }
