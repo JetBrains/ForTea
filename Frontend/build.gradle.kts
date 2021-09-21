@@ -153,6 +153,10 @@ tasks {
     this.pathToPsiRoot = "fakePathToPsiRoot" // same
   }
 
+  grammarKit {
+    grammarKitRelease = "6be52771bbac429a54b18141aa2a4dcd19c0ed87"
+  }
+
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
