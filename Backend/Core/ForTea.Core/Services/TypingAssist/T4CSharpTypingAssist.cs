@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
+using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.CommandProcessing;
 using JetBrains.Application.Settings;
 using JetBrains.Lifetimes;
@@ -20,6 +21,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 {
 	/// <summary>Typing assistant for C# embedded in T4 files.</summary>
 	[SolutionComponent]
+	[ZoneMarker(typeof(IWebPsiLanguageZone))]
 	public sealed class T4CSharpTypingAssist : CSharpTypingAssistBase
 	{
 		protected override bool IsSupported(ITextControl textControl)

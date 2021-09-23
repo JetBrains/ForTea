@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.Settings;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
@@ -36,6 +37,7 @@ namespace GammaJul.ForTea.Core.Psi
 	/// (eg: adding a using statement translates to an import directive).
 	/// </summary>
 	[ProjectFileType(typeof(T4ProjectFileType))]
+	[ZoneMarker(typeof(IWebPsiLanguageZone))]
 	public class T4CSharpCustomModificationHandler : CustomModificationHandler<IT4CodeBlock, IT4Directive>, ICSharpCustomModificationHandler
 	{
 		/// <summary>Determines whether namespace aliases can be used.</summary>
