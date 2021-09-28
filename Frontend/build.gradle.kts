@@ -102,7 +102,9 @@ tasks {
       compilerClassPathFromMaven.set(
         bundledMavenArtifacts.walkTopDown()
           .filter { it.extension == "jar" && !it.name.endsWith("-sources.jar") }
-          .toList() + File("${ideaDependency.get().classes}/lib/util.jar")
+          .toList()
+          + File("${ideaDependency.get().classes}/lib/3rd-party-rt.jar")
+          + File("${ideaDependency.get().classes}/lib/util.jar")
       )
     } else {
       logger.lifecycle("Use ant compiler artifacts from maven")
