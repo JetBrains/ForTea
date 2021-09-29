@@ -166,6 +166,7 @@ tasks {
 
   withType<Test> {
     useTestNG()
+    jvmArgs = listOf("-Didea.force.use.core.classloader=true")
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
     testLogging {
       showStandardStreams = true
