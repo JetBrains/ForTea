@@ -11,7 +11,7 @@ import org.testng.annotations.Test
 class T4CSharpTemplatesTest : CompletionTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4"
 
-  @Test
+  //@Test
   fun testForeach() {
     executeWithGold(testCaseGoldDirectory.resolve("Template.tt")) { printStream ->
       withOpenedEditor("Template.tt") {
