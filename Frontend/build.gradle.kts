@@ -102,7 +102,9 @@ tasks {
       compilerClassPathFromMaven.set(
         bundledMavenArtifacts.walkTopDown()
           .filter { it.extension == "jar" && !it.name.endsWith("-sources.jar") }
-          .toList() + File("${ideaDependency.get().classes}/lib/util.jar")
+          .toList()
+          + File("${ideaDependency.get().classes}/lib/3rd-party-rt.jar")
+          + File("${ideaDependency.get().classes}/lib/util.jar")
       )
     } else {
       logger.lifecycle("Use ant compiler artifacts from maven")
@@ -153,6 +155,10 @@ tasks {
     this.pathToPsiRoot = "fakePathToPsiRoot" // same
   }
 
+  grammarKit {
+    grammarKitRelease = "6be52771bbac429a54b18141aa2a4dcd19c0ed87"
+  }
+
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
@@ -160,6 +166,7 @@ tasks {
 
   withType<Test> {
     useTestNG()
+    jvmArgs = listOf("-Didea.force.use.core.classloader=true")
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
     testLogging {
       showStandardStreams = true
