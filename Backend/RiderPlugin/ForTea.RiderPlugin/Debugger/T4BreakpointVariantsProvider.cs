@@ -3,6 +3,8 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
+using JetBrains.Application.BuildScript.Application.Zones;
+using JetBrains.IDE.Debugger;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Debugger;
 using JetBrains.ReSharper.Psi;
@@ -11,6 +13,7 @@ using JetBrains.ReSharper.Psi.Modules;
 namespace JetBrains.ForTea.RiderPlugin.Debugger
 {
 	[Language(typeof(T4Language))]
+	[ZoneMarker(typeof(IDebuggerZone))]
 	public class T4BreakpointVariantsProvider : IBreakpointVariantsProvider
 	{
 		// TODO: delegate to C# provider
