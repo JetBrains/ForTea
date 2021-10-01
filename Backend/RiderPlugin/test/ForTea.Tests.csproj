@@ -22,6 +22,14 @@
     <Reference Include="System.Core" />
     <PackageReference Include="NUnit.Console" />
     <PackageReference Include="NUnit3TestAdapter" />
+    
+    <!-- Just For Pwc: PWC can't resolve package dependencies transitively -->
+    <PackageReference Include="NUnit.ConsoleRunner" />
+    <PackageReference Include="NUnit.Extension.NUnitProjectLoader" />
+    <PackageReference Include="NUnit.Extension.VSProjectLoader" />
+    <PackageReference Include="NUnit.Extension.NUnitV2ResultWriter" />
+    <PackageReference Include="NUnit.Extension.NUnitV2Driver" />
+    <PackageReference Include="NUnit.Extension.TeamCityEventListener" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="data\**" />
