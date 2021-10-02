@@ -19,17 +19,13 @@ import kotlinx.coroutines.runBlocking
 
 class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
-  private val debuggerHelperHost = DebuggerHelperHost.getInstance(project)
-  override fun create(executorId: String, environment: ExecutionEnvironment) = runBlocking {
+  override fun create(executorId: String, environment: ExecutionEnvironment) =
     createAsync(executorId, environment)
-  }
 
-  suspend fun createAsync(executorId: String, environment: ExecutionEnvironment): RunProfileState {
+  fun createAsync(executorId: String, environment: ExecutionEnvironment): RunProfileState {
     val dotNetExecutable = parameters.toDotNetExecutable()
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
-      environment.project.lifetime,
       riderDotNetActiveRuntimeHost,
-      debuggerHelperHost,
       dotNetExecutable.exePath,
       dotNetExecutable.runtimeType,
       dotNetExecutable.projectTfm
