@@ -3,8 +3,6 @@ rootProject.name = "ForTea"
 pluginManagement {
   repositories {
     gradlePluginPortal()
-    // This is for RdGen plugin.
-    maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
     // This is for snapshot version of 'org.jetbrains.intellij' plugin
     maven { setUrl("https://oss.sonatype.org/content/repositories/snapshots/") }
   }
