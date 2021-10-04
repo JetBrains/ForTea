@@ -1,4 +1,4 @@
 <#
-  GeneratedTextTransformation x = this;
-  Template y = this;<caret>
+    GeneratedTextTransformation x = this;
+    Template y = this;<caret>
 #>

@@ -10,10 +10,10 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.1.4"
+  id("org.jetbrains.intellij") version "1.2.0"
   id("org.jetbrains.grammarkit") version "2021.1.3"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
-  id ("com.jetbrains.rdgen") version "0.212.314"
+  id ("com.jetbrains.rdgen") version "2021.3.4"
   kotlin("jvm") version "1.4.10"
 }
 
@@ -166,7 +166,6 @@ tasks {
 
   withType<Test> {
     useTestNG()
-    jvmArgs = listOf("-Didea.force.use.core.classloader=true")
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
     testLogging {
       showStandardStreams = true
