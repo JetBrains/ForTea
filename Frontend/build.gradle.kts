@@ -216,9 +216,9 @@ tasks {
   create<RdGenTask>("rdgenMonorepo") {
     doFirst {
       configure<RdGenExtension> {
-        val csOutput = File(riderBackendPluginPath, "Model")
-        val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
         val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
+        val csOutput = File(productsHome, "Plugins/ForTea.Model/Backend")
+        val ktOutput = File(productsHome, "Plugins/ForTea.Model/Frontend")
 
         verbose = true
         hashFolder = "build/rdgen"
@@ -232,6 +232,7 @@ tasks {
           root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
           namespace = "JetBrains.Rider.Model"
           directory = "$csOutput"
+          generatedFileSuffix = ".Pregenerated"
         }
 
         generator {
@@ -240,6 +241,7 @@ tasks {
           root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
           namespace = "com.jetbrains.rider.model"
           directory = "$ktOutput"
+          generatedFileSuffix = ".Pregenerated"
         }
       }
     }

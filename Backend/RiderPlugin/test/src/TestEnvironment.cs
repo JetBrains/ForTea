@@ -1,6 +1,7 @@
 using System.Threading;
 using GammaJul.ForTea.Core;
 using JetBrains.ForTea.RiderPlugin;
+using JetBrains.ForTea.TestsActivator;
 using JetBrains.TestFramework;
 using NUnit.Framework;
 
@@ -11,7 +12,7 @@ namespace JetBrains.ForTea.Tests
 
 #if INDEPENDENT_BUILD
 	[SetUpFixture]
-	public sealed class TestEnvironment : T4ExtensionTestEnvironmentAssembly<IT4TestZone> // HACK
+	public sealed class TestEnvironment : T4ExtensionTestEnvironmentAssembly<T4TestsEnvZone> // HACK
 	{
 #pragma warning disable 169
 		// These fields are here to force load assemblies
@@ -21,7 +22,7 @@ namespace JetBrains.ForTea.Tests
 	}
 #else
 	[SetUpFixture]
-	public sealed class TestEnvironment : ExtensionTestEnvironmentAssembly<IT4TestZone>
+	public sealed class TestEnvironment : ExtensionTestEnvironmentAssembly<T4TestsEnvZone>
 	{
 		public override bool IsRunningTestsWithAsyncBehaviorProhibited => true;
 

@@ -4,7 +4,13 @@
     <PackageLock Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.6.1" />
     <PackageLock Include="JetBrains.EnvDTE.Client" Version="20210521.39.0" />
     <PackageLock Include="JetBrains.EnvDTE.Host" Version="20210726.40.0" />
-    <PackageLock Include="NUnit.Console" Version="3.10.0" />
+    <PackageLock Include="NUnit.Console" Version="3.12.0" />
     <PackageLock Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageLock Include="NUnit.ConsoleRunner" Version="3.12.0" />
+    <PackageLock Include="NUnit.Extension.NUnitProjectLoader" Version="3.6.0" />
+    <PackageLock Include="NUnit.Extension.VSProjectLoader" Version="3.8.0" />
+    <PackageLock Include="NUnit.Extension.NUnitV2ResultWriter" Version="3.6.0"/>
+    <PackageLock Include="NUnit.Extension.NUnitV2Driver" Version="3.8.0" />
+    <PackageLock Include="NUnit.Extension.TeamCityEventListener" Version="1.0.7"/>
   </ItemGroup>
 </Project>
