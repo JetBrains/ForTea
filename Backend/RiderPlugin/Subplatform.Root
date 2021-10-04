@@ -5,6 +5,6 @@
         <SubplatformReference Name="Rider\RdBackend.Common" />
         <SubplatformReference Name="Plugins\ForTea\Backend\Core" />
         <SubplatformReference Name="Psi.Features\test\Framework" />
-        <SubplatformReference Name="Plugins\ForTea.Model\Backend" />
+        <SubplatformReference Name="Plugins\ForTea.Pregenerated\BackendModel" />
     </SubplatformInfo.SubplatformReferences>
 </SubplatformInfo>
