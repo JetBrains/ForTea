@@ -34,6 +34,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			.GetProtocolSolution()
 			.GetFileSystemModel()
 			.RefreshPaths
-			.Start(new RdRefreshRequest(new List<string> {destinationLocation.FullPath}, true));
+			.Start(new RdFsRefreshRequest(new List<string> {destinationLocation.FullPath}, true));
 	}
 }
