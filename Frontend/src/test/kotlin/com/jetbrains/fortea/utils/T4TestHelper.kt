@@ -58,7 +58,7 @@ open class T4TestHelper(val project: Project) {
 
   fun dumpExecutionResult(resultExtension: String? = null, printer: ((String) -> String)? = null) = executeWithGold(t4File.path) {
     val text = Files.readString(findOutputFile(resultExtension).toPath())
-      .replace("/r/n", "/n").replace("\uFEFF", "")
+      .replace("\\r\\n", "\\n").replace("\uFEFF", "")
     it.print(printer?.let { printer(text) } ?: text)
   }
 
