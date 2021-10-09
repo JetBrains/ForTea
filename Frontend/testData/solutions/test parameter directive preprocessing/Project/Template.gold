@@ -27,13 +27,13 @@ namespace Project
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("File start\r\n");
-            this.Write("After template directive\r\n");
-            this.Write("After import directive\r\n");
-            this.Write("Before parameter\r\n");
-            this.Write("After parameter\r\nBefore parameter 2\r\n");
-            this.Write("After parameter 2\r\n");
-            this.Write("Before statement\r\n");
+            this.Write("File start\n");
+            this.Write("After template directive\n");
+            this.Write("After import directive\n");
+            this.Write("Before parameter\n");
+            this.Write("After parameter\nBefore parameter 2\n");
+            this.Write("After parameter 2\n");
+            this.Write("Before statement\n");
             
             #line 15 ".../Template.tt"
 
@@ -42,14 +42,14 @@ namespace Project
             
             #line default
             #line hidden
-            this.Write("After statement\r\nBefore expression\r\n");
+            this.Write("After statement\nBefore expression\n");
             
             #line 20 ".../Template.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(meaning));
             
             #line default
             #line hidden
-            this.Write("\r\nAfter expression\r\nBefore feature\r\n");
+            this.Write("\nAfter expression\nBefore feature\n");
             return this.GenerationEnvironment.ToString();
         }
         
@@ -70,7 +70,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(42));
         #line hidden
         
         #line 27 ".../Template.tt"
-this.Write("\r\n");
+this.Write("\n");
 
         
         #line default

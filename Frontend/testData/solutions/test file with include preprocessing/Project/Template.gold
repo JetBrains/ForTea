@@ -28,14 +28,14 @@ namespace Project
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\nBase template text.\r\n\r\n");
+            this.Write("\nBase template text.\n\n");
             
             #line 1 ".../OutputProps.ttinclude"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vm.A));
             
             #line default
             #line hidden
-            this.Write("\r\n\r\n");
+            this.Write("\n\n");
             
             #line 3 ".../OutputProps.ttinclude"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vm.B));
