@@ -4,11 +4,13 @@ import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
+import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
 class T4CompletionInExecutableTest : CompletionTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4"
 
+  @Ignore("broken")
   @Test
   fun testClassName() = doTest {
     // correct name should be hidden. See https://github.com/JetBrains/ForTea/issues/28
