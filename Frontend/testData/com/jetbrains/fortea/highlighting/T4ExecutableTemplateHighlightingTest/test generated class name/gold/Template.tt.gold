@@ -1,0 +1,4 @@
+<#
+	global::JetBrains.Rider.TextTemplating.GeneratedTextTransformation proof6 = this;
+	global::Microsoft.VisualStudio.TextTemplating.TextTransformation proof7 = this;
+#>
