@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryT4TemplateDependsUpon", "LibraryT4TemplateDependsUpon\LibraryT4TemplateDependsUpon.csproj", "{9E1480DB-3355-4B0E-AC21-F63560DD6B6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project", "Project\Project.csproj", "{F32CD2FC-242F-404A-AD0A-05363578B9DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E1480DB-3355-4B0E-AC21-F63560DD6B6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E1480DB-3355-4B0E-AC21-F63560DD6B6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E1480DB-3355-4B0E-AC21-F63560DD6B6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E1480DB-3355-4B0E-AC21-F63560DD6B6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F32CD2FC-242F-404A-AD0A-05363578B9DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F32CD2FC-242F-404A-AD0A-05363578B9DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F32CD2FC-242F-404A-AD0A-05363578B9DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F32CD2FC-242F-404A-AD0A-05363578B9DD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

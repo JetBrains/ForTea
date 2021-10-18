@@ -1,0 +1,4 @@
+<#
+	global::ProjectWithPreprocessedT4.Template x = this;
+	global::ProjectWithPreprocessedT4.TemplateBase proof7 = this;
+#>
