@@ -72,4 +72,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test solution functions`() = doTest(dumpCsproj = false)
   @Test fun `test project functions`() = doTest(dumpCsproj = false)
   @Test fun `test AST functions`() = doTest(dumpCsproj = false)
+  // https://youtrack.jetbrains.com/issue/RIDER-69121
+  @Test fun `test namespace of generate class 1`() = doTest(dumpCsproj = false)
+  @Test fun `test namespace of generate class 2`() = testExecutionFailure(".cs")
 }
