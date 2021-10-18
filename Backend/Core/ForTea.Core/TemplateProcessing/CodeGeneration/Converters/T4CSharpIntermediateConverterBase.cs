@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.GeneratorKind;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
@@ -27,13 +25,18 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 		[NotNull]
 		protected IT4File File { get; }
 
+		[NotNull]
+		private IT4GeneratorKind GeneratorKind { get; }
+
 		protected T4CSharpIntermediateConverterBase(
 			[NotNull] IT4File file,
-			[NotNull] IT4GeneratedClassNameProvider classNameProvider
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
+			[NotNull] IT4GeneratorKind generatorKind
 		)
 		{
 			File = file;
 			ClassNameProvider = classNameProvider;
+			GeneratorKind = generatorKind;
 			Result = new T4CSharpCodeGenerationResult(File);
 		}
 
@@ -42,10 +45,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
 		)
 		{
-			string ns = File
-				.LogicalPsiSourceFile
-				.ToProjectFile()
-				?.CalculateExpectedNamespace(T4Language.Instance);
+			string ns = GeneratorKind.ProvideTemplateNamespace(File);
 			bool hasNamespace = !string.IsNullOrEmpty(ns);
 			if (hasNamespace)
 			{

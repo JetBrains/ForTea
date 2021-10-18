@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.GeneratorKind;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
@@ -13,7 +14,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 	{
 		public T4CSharpExecutableCodeBehindIntermediateConverter([NotNull] IT4File file) : base(
 			file,
-			new T4ExecutableClassNameProvider()
+			new T4ExecutableClassNameProvider(),
+			new T4ExecutableGeneratorKind()
 		)
 		{
 		}

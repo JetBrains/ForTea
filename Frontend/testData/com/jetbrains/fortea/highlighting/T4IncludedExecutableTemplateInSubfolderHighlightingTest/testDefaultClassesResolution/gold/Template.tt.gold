@@ -6,7 +6,7 @@
 	// make sure TextTemplating assembly is referenced
 	global::Microsoft.VisualStudio.TextTemplating.TextTransformation h = this;
 	// make sure the class name is correct
-	global::Project.OtherDir.GeneratedTextTransformation i = this;
+	global::JetBrains.Rider.TextTemplating.GeneratedTextTransformation i = this;
 	// make sure that host is available
 	global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost j = Host;
 #>
