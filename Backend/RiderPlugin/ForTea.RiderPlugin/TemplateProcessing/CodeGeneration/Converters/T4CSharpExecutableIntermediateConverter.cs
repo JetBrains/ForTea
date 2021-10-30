@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.GeneratorKind;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
@@ -34,7 +35,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 		public T4CSharpExecutableIntermediateConverter(
 			[NotNull] IT4File file,
 			[NotNull] IT4ReferenceExtractionManager referenceExtractionManager
-		) : base(file, new T4ExecutableClassNameProvider())
+		) : base(file, new T4ExecutableClassNameProvider(), new T4ExecutableGeneratorKind())
 		{
 			file.AssertContainsNoIncludeContext();
 			ReferenceExtractionManager = referenceExtractionManager;
