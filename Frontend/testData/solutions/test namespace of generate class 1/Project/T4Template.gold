@@ -1,0 +1,2 @@
+Common.Namespace.Class1
+JetBrains.Rider.TextTemplating.GeneratedTextTransformation

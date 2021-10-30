@@ -1,0 +1,7 @@
+<#@ template language="C#" #>
+<#@ assembly name="$(SolutionDir)LibraryT4TemplateDependsUpon\bin\Debug\netstandard2.0\LibraryT4TemplateDependsUpon.dll" #>
+<#
+    _ = new Class1();
+#>
+<#= typeof(Class1).FullName #>
+<#= typeof(GeneratedTextTransformation).FullName #>
