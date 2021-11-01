@@ -11,4 +11,5 @@ class T4ExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
   @Test fun testIncompleteMacro() = doTestErrors()
   @Test fun `test that default base class has TransformText`() = doTestErrors()
   @Test fun `test that default base class implements IDisposable`() = doTestErrors()
+  @Test fun `test generated class name`() = doTestErrors()
 }

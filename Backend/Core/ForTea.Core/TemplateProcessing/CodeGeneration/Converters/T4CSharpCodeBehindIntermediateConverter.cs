@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
+using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.GeneratorKind;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 
@@ -28,7 +29,16 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 			[NotNull] IT4File file,
 			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
 			bool isRoot = true
-		) : base(file, classNameProvider)
+		) : this(file, classNameProvider, new T4PreprocessedGeneratorKind(), isRoot)
+		{
+		}
+
+		protected T4CSharpCodeBehindIntermediateConverter(
+			[NotNull] IT4File file,
+			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
+			IT4GeneratorKind generatorKind,
+			bool isRoot = true
+		) : base(file, classNameProvider, generatorKind)
 		{
 			IsRoot = isRoot;
 			if (IsRoot)
