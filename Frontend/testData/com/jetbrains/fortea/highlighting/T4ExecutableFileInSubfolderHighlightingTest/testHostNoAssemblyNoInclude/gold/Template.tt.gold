@@ -4,7 +4,7 @@
 <#= <ERROR_UNRESOLVED>Meaning</ERROR_UNRESOLVED> #>
 <#
 	global::Microsoft.VisualStudio.TextTemplating.ITextTemplatingEngineHost proof1 = Host;
-	global::Project.Subdirectory.GeneratedTextTransformation proof2 = this;
+	global::JetBrains.Rider.TextTemplating.GeneratedTextTransformation proof2 = this;
 	global::Microsoft.VisualStudio.TextTemplating.TextTransformation proof3 = this;
 	global::System.Collections.Generic.IEnumerable<int> proof4 = global::System.<ERROR_UNRESOLVED>Linq</ERROR_UNRESOLVED>.Enumerable.Empty<int>();
 #>

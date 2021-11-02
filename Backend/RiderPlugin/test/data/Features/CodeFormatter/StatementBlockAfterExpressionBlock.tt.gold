@@ -3,5 +3,5 @@ This is some incredibly long text that adds reasonable offset <#= 6 * 9 == 42 #>
   int answer = 6 * 9;
 #>
 <#=
-      answer == answer #>
+        answer == answer #>
 {caret}
