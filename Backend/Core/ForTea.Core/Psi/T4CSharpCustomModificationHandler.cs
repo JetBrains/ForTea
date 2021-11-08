@@ -285,6 +285,9 @@ namespace GammaJul.ForTea.Core.Psi
 		public IBlock GetMethodBodyVisibleForUser(ICSharpFunctionDeclaration method)
 			=> method.Body;
 
+		public bool PreferQualifiedReference(IQualifiableReference reference, IDeclaredElement targetElement) =>
+			false;
+
 		public bool IsToAddImportsToDeepestScope(ITreeNode context, IContextBoundSettingsStore settingsStore)
 			=> false;
 
