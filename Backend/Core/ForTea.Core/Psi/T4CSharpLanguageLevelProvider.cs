@@ -27,7 +27,6 @@ namespace GammaJul.ForTea.Core.Psi
 		public T4CSharpLanguageLevelProvider(
 			[NotNull] IT4Environment t4Environment,
 			[NotNull] CSharpLanguageLevelProjectProperty projectProperty,
-			[CanBeNull] ILanguageLevelOverrider<CSharpLanguageLevel> languageLevelOverrider = null,
 			[CanBeNull] Lazy<ILanguageVersionModifier<CSharpLanguageVersion>> languageVersionModifier = null
 		) : base(projectProperty, languageVersionModifier) => _t4Environment = t4Environment;
 	}
