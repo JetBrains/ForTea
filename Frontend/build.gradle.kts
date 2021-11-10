@@ -59,7 +59,7 @@ val riderBackendPluginPath = File(repoRoot, "$backendPluginFolderName/RiderPlugi
 val backendPluginSolutionPath = File(backendPluginPath, backendPluginSolutionName)
 val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
-val pregeneratedMonorepoPath = File(productsHome, "Plugins/ForTea.Pregenerated")
+val pregeneratedMonorepoPath = File(productsHome, "Plugins/_ForTea.Pregenerated")
 
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
