@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.ReSharper.FeaturesTestFramework.Completion;
 using JetBrains.ReSharper.TestFramework;
@@ -11,6 +12,11 @@ namespace JetBrains.ForTea.Tests
 	{
 		protected override CodeCompletionTestType TestType => CodeCompletionTestType.List;
 		protected override string RelativeTestDataPath => @"CodeCompletion";
+
+		protected override IList<string> TraceCategories() => new List<string>
+		{
+			"JetBrains.Application.Threading.ContentModelReadWriteLock"
+		};
 
 		[TestCase("Directive")]
 		[TestCase("Attribute")]
