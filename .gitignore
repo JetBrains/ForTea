@@ -1,15 +1,15 @@
-**.suo
-**.user
+*.suo
+*.user
 **/.vs
 **/.tmp
-**.tmp
+*.tmp
 **/bin
 **/obj
 **/output
 **/artifacts
 **/_ReSharper.Caches
 Backend/.idea
-**.DotSettings
+*.DotSettings
 
 */out/
 */packages/
@@ -17,5 +17,5 @@ Backend/.idea
 */RiderSdkPackageVersion.props
 /NuGet.Config
 
-**.Generated.kt
-**.Generated.cs
+*.Generated.kt
+*.Generated.cs
