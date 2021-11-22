@@ -57,7 +57,9 @@ val repoRoot = projectDir.parentFile!!
 val backendPluginPath = File(repoRoot, backendPluginFolderName)
 val riderBackendPluginPath = File(repoRoot, "$backendPluginFolderName/RiderPlugin/$riderBackedPluginName")
 val backendPluginSolutionPath = File(backendPluginPath, backendPluginSolutionName)
+val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
+val pregeneratedMonorepoPath = File(productsHome, "Plugins/_ForTea.Pregenerated")
 
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
@@ -140,16 +142,34 @@ tasks {
     }
   }
 
+  val lexerSource = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
+  val parserSource = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
+
   val generateT4Lexer = task<GenerateLexer>("generateT4Lexer") {
-    source = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
+    source = lexerSource
     targetDir = "src/main/java/com/jetbrains/fortea/lexer"
     targetClass = "_T4Lexer"
     purgeOldFiles = true
   }
 
   val generateT4Parser = task<GenerateParser>("generateT4Parser") {
-    source = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
+    source = parserSource
     this.targetRoot = "src/main/java"
+    purgeOldFiles = true
+    this.pathToParser = "fakePathToParser" // I have no idea what should be inserted here, but this works
+    this.pathToPsiRoot = "fakePathToPsiRoot" // same
+  }
+
+  val generateT4LexerMonorepo = task<GenerateLexer>("generateT4LexerMonorepo") {
+    source = lexerSource
+    targetDir  = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer")
+    targetClass = "_T4Lexer"
+    purgeOldFiles = true
+  }
+
+  val generateT4ParserMonorepo = task<GenerateParser>("generateT4ParserMonorepo") {
+    source = parserSource
+    this.targetRoot = pregeneratedMonorepoPath.resolve("Frontend/src/")
     purgeOldFiles = true
     this.pathToParser = "fakePathToParser" // I have no idea what should be inserted here, but this works
     this.pathToPsiRoot = "fakePathToPsiRoot" // same
@@ -215,9 +235,8 @@ tasks {
   create<RdGenTask>("rdgenMonorepo") {
     doFirst {
       configure<RdGenExtension> {
-        val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
-        val csOutput = File(productsHome, "Plugins/ForTea.Model/Backend")
-        val ktOutput = File(productsHome, "Plugins/ForTea.Model/Frontend")
+        val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
+        val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
 
         verbose = true
         hashFolder = "build/rdgen"
@@ -295,7 +314,7 @@ tasks {
 
   create("prepareMonorepo") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgenMonorepo", generateT4Lexer, generateT4Parser)
+    dependsOn("rdgenMonorepo", generateT4LexerMonorepo, generateT4ParserMonorepo)
   }
 
   getByName("buildPlugin") {
