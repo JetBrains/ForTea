@@ -150,6 +150,8 @@ tasks {
     targetDir = "src/main/java/com/jetbrains/fortea/lexer"
     targetClass = "_T4Lexer"
     purgeOldFiles = true
+    // quick fix for https://github.com/JetBrains/Grammar-Kit/issues/292
+    classpath += files(File("${intellij.ideaDependency.get().classes}/lib/app.jar"))
   }
 
   val generateT4Parser = task<GenerateParser>("generateT4Parser") {
@@ -158,6 +160,8 @@ tasks {
     purgeOldFiles = true
     this.pathToParser = "fakePathToParser" // I have no idea what should be inserted here, but this works
     this.pathToPsiRoot = "fakePathToPsiRoot" // same
+    // quick fix for https://github.com/JetBrains/Grammar-Kit/issues/292
+    classpath += files(File("${intellij.ideaDependency.get().classes}/lib/app.jar"))
   }
 
   val generateT4LexerMonorepo = task<GenerateLexer>("generateT4LexerMonorepo") {
@@ -165,6 +169,8 @@ tasks {
     targetDir  = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer")
     targetClass = "_T4Lexer"
     purgeOldFiles = true
+    // quick fix for https://github.com/JetBrains/Grammar-Kit/issues/292
+    classpath += files(File("${intellij.ideaDependency.get().classes}/lib/app.jar"))
   }
 
   val generateT4ParserMonorepo = task<GenerateParser>("generateT4ParserMonorepo") {
@@ -173,6 +179,8 @@ tasks {
     purgeOldFiles = true
     this.pathToParser = "fakePathToParser" // I have no idea what should be inserted here, but this works
     this.pathToPsiRoot = "fakePathToPsiRoot" // same
+    // quick fix for https://github.com/JetBrains/Grammar-Kit/issues/292
+    classpath += files(File("${intellij.ideaDependency.get().classes}/lib/app.jar"))
   }
 
   grammarKit {
