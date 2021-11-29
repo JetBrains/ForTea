@@ -104,7 +104,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 		{
 			get
 			{
-				InterruptableActivityCookie.CheckAndThrow();
+				Interruption.Current.CheckAndThrow();
 				return false;
 			}
 		}
