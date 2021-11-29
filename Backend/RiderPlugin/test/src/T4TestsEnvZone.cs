@@ -25,11 +25,18 @@ namespace JetBrains.ForTea.TestsActivator
 		[ZoneMarker(typeof(T4TestsEnvZone))]
 		public class T4TestsZoneActivator
 			: IActivate<PsiFeatureTestZone>
-			, IActivate<IT4Zone>
 			, IActivate<IRiderPlatformZone>
 			, IActivate<IPsiLanguageZone>
 			, IActivate<ILanguageCSharpZone>
+			, IActivate<IT4TestZone>
 		{
 		}
+	}
+
+	[ZoneDefinition]
+	public interface IT4TestZone : IZone, 
+									IRequire<IT4Zone>
+	{
+		
 	}
 }
