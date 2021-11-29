@@ -3,7 +3,6 @@ using System.Linq;
 using GammaJul.ForTea.Core.Services;
 
 using JetBrains.Application;
-using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace JetBrains.ForTea.Tests.Mock
 {
