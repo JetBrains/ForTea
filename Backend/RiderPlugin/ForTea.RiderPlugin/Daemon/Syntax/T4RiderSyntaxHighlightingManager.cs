@@ -1,5 +1,5 @@
 using GammaJul.ForTea.Core.Psi;
-using JetBrains.RdBackend.Common.Features.SyntaxHighlighting;
+using JetBrains.IdeaInterop.Backend.Common.Features.Daemon;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Psi;
 

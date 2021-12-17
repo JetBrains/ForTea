@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl;
+using JetBrains.Platform.MsBuildHost.Autodetect.Advanced;
 using JetBrains.ProjectModel;
 using JetBrains.RdBackend.Common.Features.Processes;
 using JetBrains.RdBackend.Common.Features.Toolset.Detecting;
