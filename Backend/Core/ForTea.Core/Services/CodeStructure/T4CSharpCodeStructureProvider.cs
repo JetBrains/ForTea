@@ -134,7 +134,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 					return;
 				}
 
-				case IAccessorDeclaration _:
+				case IAccessorDeclaration:
 					return;
 
 				case IEnumDeclaration enumDeclaration: {
