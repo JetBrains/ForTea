@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.Cache.Impl;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -28,8 +29,9 @@ namespace JetBrains.ForTea.Tests.Mock
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
 			[NotNull] IPsiServices services,
-			[NotNull] IPsiCachesState state
-		) : base(lifetime, notifier, services, state)
+			[NotNull] IPsiCachesState state,
+			[NotNull] IShellLocks locks
+		) : base(lifetime, notifier, services, state, locks)
 		{
 		}
 
