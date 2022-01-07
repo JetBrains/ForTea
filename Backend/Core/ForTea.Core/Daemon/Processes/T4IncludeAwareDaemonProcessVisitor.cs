@@ -67,16 +67,16 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
 		{
 			switch (directive)
 			{
-				case IT4OutputDirective _ when !SeenOutputDirective:
+				case IT4OutputDirective when !SeenOutputDirective:
 					SeenOutputDirective = true;
 					break;
-				case IT4OutputDirective _:
+				case IT4OutputDirective:
 					ReportDuplicateDirective(directive);
 					break;
-				case IT4TemplateDirective _ when !SeenTemplateDirective:
+				case IT4TemplateDirective when !SeenTemplateDirective:
 					SeenTemplateDirective = true;
 					break;
-				case IT4TemplateDirective _:
+				case IT4TemplateDirective:
 					ReportDuplicateDirective(directive);
 					break;
 			}
