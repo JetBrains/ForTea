@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -17,6 +18,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 	[SolutionComponent]
 	public class T4FileDependencyInvalidator : T4IndirectFileChangeObserverBase
 	{
+		[NotNull] private readonly IShellLocks myLocks;
+
 		[NotNull, ItemNotNull]
 		private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; set; } =
 			new HashSet<IPsiSourceFile>();
@@ -25,27 +28,34 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 			Lifetime lifetime,
 			[NotNull] IT4FileGraphNotifier notifier,
 			[NotNull] IPsiServices services,
-			[NotNull] IPsiCachesState state
+			[NotNull] IPsiCachesState state,
+			[NotNull] IShellLocks locks
 		) : base(lifetime, notifier, services, state)
 		{
+			myLocks = locks;
 		}
 
 		protected sealed override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
 		{
-			using var cookie = WriteLockCookie.Create();
-			foreach (var file in indirectDependencies)
-			{
-				file.SetBeingIndirectlyUpdated(true);
-				Services.Caches.MarkAsDirty(file);
-				Services.Files.MarkAsDirty(file);
-			}
+			myLocks.ExecuteWithWriteLockWhenAvailable(Lifetime,
+				$"{nameof(T4FileDependencyInvalidator)} :: AfterCommitSync",
+				() =>
+				{
+					foreach (var file in indirectDependencies)
+					{
+						file.SetBeingIndirectlyUpdated(true);
+						Services.Caches.MarkAsDirty(file);
+						Services.Files.MarkAsDirty(file);
+					}
 
-			foreach (var file in PreviousIterationIndirectDependencies.Except(indirectDependencies))
-			{
-				file.SetBeingIndirectlyUpdated(false);
-			}
+					foreach (var file in PreviousIterationIndirectDependencies.Except(indirectDependencies))
+					{
+						file.SetBeingIndirectlyUpdated(false);
+					}
 
-			PreviousIterationIndirectDependencies = indirectDependencies;
+					PreviousIterationIndirectDependencies = indirectDependencies;
+
+				});
 		}
 
 		protected override string ActivityName => "T4 indirect dependencies invalidation";
