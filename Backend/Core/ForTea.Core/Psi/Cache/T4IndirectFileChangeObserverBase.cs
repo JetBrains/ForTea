@@ -19,7 +19,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
 		[NotNull]
 		protected IPsiServices Services { get; }
 
-		private Lifetime Lifetime { get; }
+		protected Lifetime Lifetime { get; }
 
 		protected T4IndirectFileChangeObserverBase(
 			Lifetime lifetime,
