@@ -10,6 +10,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <DefineConstants Condition="!$(InternalBuild)">INDEPENDENT_BUILD</DefineConstants>
+    <OutputType>Library</OutputType>
     <AssemblyName>JetBrains.ForTea.Tests</AssemblyName>
     <RootNamespace>JetBrains.ForTea.Tests</RootNamespace>
     <LangVersion>9.0</LangVersion>
