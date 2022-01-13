@@ -18,6 +18,8 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 	[ShellComponent]
 	public sealed class T4ReSharperEnvironment : T4DefaultEnvironment
 	{
+		// temporary solution until that constant is added into the SDK
+		private const int VsVersion2022 = 17;
 		[NotNull] private readonly IVsEnvironmentStaticInformation _vsEnvironmentInformation;
 		[NotNull] private readonly string[] _textTemplatingAssemblyNames;
 		[CanBeNull] private readonly TargetFrameworkId _targetFrameworkId;
@@ -88,8 +90,7 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 		}
 
 		[NotNull, Pure]
-		private static NotSupportedException Unsupported() =>
-			throw new NotSupportedException("Unsupported environment");
+		private static NotSupportedException Unsupported() => new("Unsupported environment");
 
 		[NotNull]
 		private static string CreateGacAssemblyName([NotNull] string name, int majorVersion)
@@ -168,6 +169,16 @@ namespace JetBrains.ForTea.ReSharperPlugin {
 					CSharpLanguageLevel = CSharpLanguageLevel.CSharp73;
 					_textTemplatingAssemblyNames = new[] {
 						CreateDevEnvPublicAssemblyName(vsEnvironmentInformation, "Microsoft.VisualStudio.TextTemplating.15.0"),
+						CreateDevEnvPublicAssemblyName(vsEnvironmentInformation, "Microsoft.VisualStudio.TextTemplating.Interfaces.11.0"),
+						CreateDevEnvPublicAssemblyName(vsEnvironmentInformation, "Microsoft.VisualStudio.TextTemplating.Interfaces.10.0")
+					};
+					break;
+
+				case VsVersion2022:
+					_targetFrameworkId = TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, new Version(4, 8));
+					CSharpLanguageLevel = CSharpLanguageLevel.CSharp100;
+					_textTemplatingAssemblyNames = new[] {
+						CreateDevEnvPublicAssemblyName(vsEnvironmentInformation, "Microsoft.VisualStudio.TextTemplating"),
 						CreateDevEnvPublicAssemblyName(vsEnvironmentInformation, "Microsoft.VisualStudio.TextTemplating.Interfaces.11.0"),
 						CreateDevEnvPublicAssemblyName(vsEnvironmentInformation, "Microsoft.VisualStudio.TextTemplating.Interfaces.10.0")
 					};
