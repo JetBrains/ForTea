@@ -44,7 +44,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 			[NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
 			[NotNull] CSharpCodeStructureProcessingState state
 		) {
-			InterruptableActivityCookie.CheckAndThrow();
+			Interruption.Current.CheckAndThrow();
 
 			switch (node) {
 				case IT4Directive directive:
@@ -88,7 +88,7 @@ namespace GammaJul.ForTea.Core.Services.CodeStructure {
 
 		private static void ProcessCSharpNode([NotNull] ITreeNode node, [NotNull] CodeStructureElement parentElement,
 			[NotNull] CSharpCodeStructureProcessingState state) {
-			InterruptableActivityCookie.CheckAndThrow();
+			Interruption.Current.CheckAndThrow();
 
 			switch (node) {
 				case IDeclaration declaration:
