@@ -1,8 +1,8 @@
 import com.jetbrains.rd.generator.gradle.RdGenExtension
 import com.jetbrains.rd.generator.gradle.RdGenTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.grammarkit.tasks.GenerateLexer
-import org.jetbrains.grammarkit.tasks.GenerateParser
+import org.jetbrains.grammarkit.tasks.GenerateLexerTask
+import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.intellij.tasks.IntelliJInstrumentCodeTask
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.tasks.RunIdeTask
@@ -10,11 +10,11 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.2.0"
-  id("org.jetbrains.grammarkit") version "2021.1.3"
+  id("org.jetbrains.intellij") version "1.3.1"
+  id("org.jetbrains.grammarkit") version "2021.2.1"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   id ("com.jetbrains.rdgen") version "2021.3.4"
-  kotlin("jvm") version "1.4.10"
+  kotlin("jvm") version "1.6.10"
 }
 
 apply {
@@ -23,12 +23,20 @@ apply {
   plugin("org.jetbrains.grammarkit")
 }
 
+val buildNumber = ext.properties["build.number"]
+val onTC = buildNumber != null
+
 repositories {
   mavenCentral()
+
+  if (onTC) {
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
+  }
 }
 
-val baseVersion = "2021.3"
-val buildCounter = ext.properties["build.number"] ?: "9999"
+val baseVersion = "2022.1"
+val buildCounter = buildNumber ?: "9999"
 version = "$baseVersion.$buildCounter"
 
 intellij {
@@ -57,7 +65,9 @@ val repoRoot = projectDir.parentFile!!
 val backendPluginPath = File(repoRoot, backendPluginFolderName)
 val riderBackendPluginPath = File(repoRoot, "$backendPluginFolderName/RiderPlugin/$riderBackedPluginName")
 val backendPluginSolutionPath = File(backendPluginPath, backendPluginSolutionName)
+val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
+val pregeneratedMonorepoPath = File(productsHome, "Plugins/_ForTea.Pregenerated")
 
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
@@ -70,15 +80,6 @@ val libraryFiles = listOf(
   "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.EnvDTE.Client",
   "output/ForTea.RiderPlugin/$buildConfiguration/JetBrains.EnvDTE.Host"
 )
-
-val dotNetSdkPath by lazy {
-  val sdkPath = intellij.ideaDependency.orNull?.classes?.resolve("lib")?.resolve("DotNetSdkForRdPlugins")
-    ?: error("intellij.ideaDependency.classes is null")
-  if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
-
-  println("SDK path: $sdkPath")
-  return@lazy sdkPath
-}
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
@@ -95,6 +96,15 @@ fun File.writeTextIfChanged(content: String) {
 }
 
 tasks {
+  val dotNetSdkPath by lazy {
+    val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes?.resolve("lib")?.resolve("DotNetSdkForRdPlugins")
+      ?: error("intellij.ideaDependency.classes is null")
+    if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
+
+    println("SDK path: $sdkPath")
+    return@lazy sdkPath
+  }
+
   withType<IntelliJInstrumentCodeTask> {
     val bundledMavenArtifacts = file("build/maven-artifacts")
     if (bundledMavenArtifacts.exists()) {
@@ -103,8 +113,8 @@ tasks {
         bundledMavenArtifacts.walkTopDown()
           .filter { it.extension == "jar" && !it.name.endsWith("-sources.jar") }
           .toList()
-          + File("${ideaDependency.get().classes}/lib/3rd-party-rt.jar")
-          + File("${ideaDependency.get().classes}/lib/util.jar")
+        + File("${setupDependencies.get().idea.get().classes}/lib/3rd-party-rt.jar")
+        + File("${setupDependencies.get().idea.get().classes}/lib/util.jar")
       )
     } else {
       logger.lifecycle("Use ant compiler artifacts from maven")
@@ -140,27 +150,42 @@ tasks {
     }
   }
 
-  val generateT4Lexer = task<GenerateLexer>("generateT4Lexer") {
-    source = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
-    targetDir = "src/main/java/com/jetbrains/fortea/lexer"
-    targetClass = "_T4Lexer"
-    purgeOldFiles = true
+  val lexerSource = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
+  val parserSource = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
+
+  val generateT4Lexer = task<GenerateLexerTask>("generateT4Lexer") {
+    source.set(lexerSource)
+    targetDir.set("src/main/java/com/jetbrains/fortea/lexer")
+    targetClass.set("_T4Lexer")
+    purgeOldFiles.set(true)
   }
 
-  val generateT4Parser = task<GenerateParser>("generateT4Parser") {
-    source = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
-    this.targetRoot = "src/main/java"
-    purgeOldFiles = true
-    this.pathToParser = "fakePathToParser" // I have no idea what should be inserted here, but this works
-    this.pathToPsiRoot = "fakePathToPsiRoot" // same
+  val generateT4Parser = task<GenerateParserTask>("generateT4Parser") {
+    source.set(parserSource)
+    this.targetRoot.set("src/main/java")
+    purgeOldFiles.set(true)
+    this.pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
+    this.pathToPsiRoot.set("fakePathToPsiRoot") // same
   }
 
-  grammarKit {
-    grammarKitRelease = "6be52771bbac429a54b18141aa2a4dcd19c0ed87"
+  val generateT4LexerMonorepo = task<GenerateLexerTask>("generateT4LexerMonorepo") {
+    source.set(lexerSource)
+    targetDir.set( pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer").canonicalPath)
+    purgeOldFiles.set(true)
+    targetClass.set("_T4Lexer")
+    purgeOldFiles.set(true)
+  }
+
+  val generateT4ParserMonorepo = task<GenerateParserTask>("generateT4ParserMonorepo") {
+    source.set(parserSource)
+    this.targetRoot.set(pregeneratedMonorepoPath.resolve("Frontend/src/").canonicalPath)
+    purgeOldFiles.set(true)
+    this.pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
+    this.pathToPsiRoot.set("fakePathToPsiRoot") // same
   }
 
   withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
   }
 
@@ -215,9 +240,8 @@ tasks {
   create<RdGenTask>("rdgenMonorepo") {
     doFirst {
       configure<RdGenExtension> {
-        val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
-        val csOutput = File(productsHome, "Plugins/ForTea.Model/Backend")
-        val ktOutput = File(productsHome, "Plugins/ForTea.Model/Frontend")
+        val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
+        val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
 
         verbose = true
         hashFolder = "build/rdgen"
@@ -256,11 +280,11 @@ tasks {
         hashFolder = "build/rdgen"
         logger.info("Configuring rdgen params")
         classpath({
-          logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
-          val sdkPath = intellij.ideaDependency.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
-          val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-          "$rdLibDirectory/rider-model.jar"
-        })
+                    logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.orNull?.idea?.orNull}")
+                    val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
+                    val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
+                    "$rdLibDirectory/rider-model.jar"
+                  })
         sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
         packages = "model"
 
@@ -282,7 +306,7 @@ tasks {
       }
     }
   }
-  
+
   create("pwc") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgenMonorepo")
@@ -295,7 +319,7 @@ tasks {
 
   create("prepareMonorepo") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgenMonorepo", generateT4Lexer, generateT4Parser)
+    dependsOn("rdgenMonorepo", generateT4LexerMonorepo, generateT4ParserMonorepo)
   }
 
   getByName("buildPlugin") {

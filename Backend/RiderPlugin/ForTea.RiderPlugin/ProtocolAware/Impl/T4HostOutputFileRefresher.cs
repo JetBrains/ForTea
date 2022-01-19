@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
+using JetBrains.IDE.PerClientComponents;
 using JetBrains.ProjectModel;
 using JetBrains.RdBackend.Common.Features;
-using JetBrains.RdBackend.Common.Features.Components.PerClientComponents;
 using JetBrains.RdBackend.Common.Features.Documents;
 using JetBrains.Rider.Backend.Features.Documents;
 using JetBrains.Rider.Model;

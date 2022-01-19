@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using GammaJul.ForTea.Core.Tree;
+ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.UI.ActionSystem.Text;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers;
 using JetBrains.DocumentModel;
 using JetBrains.IDE;
-using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
@@ -15,11 +12,11 @@ using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.ReSharper.TestFramework;
 using JetBrains.TextControl;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Psi
 {
-	[Ignore("Broken after qx added an assert")]
 	public sealed class T4RangeTranslatorTest : BaseTestWithSingleProject
 	{
 		[Test]
@@ -42,6 +39,7 @@ namespace JetBrains.ForTea.Tests.Psi
 			new[] {"Includer3.tt", "Include6.ttinclude"},
 			(lifetime, solution, project) =>
 			{
+				using var readLock = ReadLockCookie.Create();
 				var projectFile = project.GetSubFiles("Include6.ttinclude").Single();
 				var sourceFile = projectFile.ToSourceFiles().Single();
 				RunGuarded(() => ExecuteWithGold(sourceFile, writer =>
@@ -53,7 +51,8 @@ namespace JetBrains.ForTea.Tests.Psi
 						.NotNull();
 					lifetime.OnTermination(() => RunGuarded(() => editorManager.CloseTextControl(textControl)));
 					// The beginning of the newline
-					textControl.Caret.MoveTo(83, CaretVisualPlacement.Generic);
+					using var writeLock = WriteLockCookie.Create();
+					textControl.Caret.MoveTo((Int32<DocLine>) 3, (Int32<DocColumn>) 0, CaretVisualPlacement.Generic);
 					textControl.EmulateAction(TextControlActions.ActionIds.Backspace);
 					solution.GetComponent<IPsiFiles>().CommitAllDocuments();
 					writer.Write(textControl.Document.GetText());
@@ -62,8 +61,9 @@ namespace JetBrains.ForTea.Tests.Psi
 		);
 
 		private void DoTest([NotNull] params string[] fileNames) =>
-			WithSingleProject(fileNames, (lifetime, solution, project) =>
+			WithSingleProject(fileNames, (_, _, project) =>
 			{
+				using var readLock = ReadLockCookie.Create();
 				foreach (string fileName in fileNames)
 				{
 					var projectFile = project.GetSubFiles(fileName).Single();
@@ -90,14 +90,5 @@ namespace JetBrains.ForTea.Tests.Psi
 			if (start < 0) return false;
 			return document.GetText(new TextRange(start, offset)).Equals(template);
 		}
-
-		private new void WithSingleProject(
-			[NotNull] IEnumerable<string> fileNames,
-			[NotNull] Action<Lifetime, ISolution, IProject> F
-		) => base.WithSingleProject(fileNames, (lifetime, solution, project) =>
-		{
-			using var cookie = WriteLockCookie.Create();
-			F(lifetime, solution, project);
-		});
 	}
 }

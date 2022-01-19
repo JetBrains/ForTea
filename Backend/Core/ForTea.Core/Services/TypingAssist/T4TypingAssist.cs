@@ -190,7 +190,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist {
 			switch (previousToken)
 			{
 				case null:
-				case T4TokenNodeType _:
+				case T4TokenNodeType:
 					return false;
 				default:
 					return true;
