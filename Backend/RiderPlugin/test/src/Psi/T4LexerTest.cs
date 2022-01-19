@@ -11,7 +11,8 @@ namespace JetBrains.ForTea.Tests.Psi
 	public sealed class T4LexerTest : LexerTestBase
 	{
 		protected override string RelativeTestDataPath => @"Psi\Lexer";
-		protected override ILexer CreateLexer(IBuffer buffer) => new T4Lexer(buffer);
+		protected override ILexer CreateLexer(IBuffer buffer) =>
+			new T4Lexer(new StringBuffer(buffer.GetText().Replace("\r\n", "\n")));
 
 		[TestCase("Simple")]
 		[TestCase("CSharpCode")]
