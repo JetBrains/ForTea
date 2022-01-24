@@ -1,4 +1,3 @@
-using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -13,9 +12,8 @@ namespace GammaJul.ForTea.Core.Parsing
 		private T4MissingTokenInserter(
 			ILexer lexer,
 			ITokenOffsetProvider offsetProvider,
-			SeldomInterruptChecker interruptChecker,
 			ITokenIntern intern
-		) : base(offsetProvider, interruptChecker, intern) => myLexer = lexer;
+		) : base(offsetProvider, intern) => myLexer = lexer;
 
 		protected override void ProcessLeafElement(TreeElement leafElement)
 		{
@@ -51,7 +49,7 @@ namespace GammaJul.ForTea.Core.Parsing
 			var eofNode = new T4TokenNodeType("", 0, null, T4TokenNodeFlag.None)
 				.Create(lexer.Buffer, new TreeOffset(lexer.Buffer.Length), new TreeOffset(lexer.Buffer.Length));
 			cRoot.AppendNewChild(eofNode);
-			var inserter = new T4MissingTokenInserter(lexer, offsetProvider, new SeldomInterruptChecker(), intern);
+			var inserter = new T4MissingTokenInserter(lexer, offsetProvider, intern);
 			lexer.Start();
 			inserter.Run(root);
 			cRoot.DeleteChildRange(eofNode, eofNode);
