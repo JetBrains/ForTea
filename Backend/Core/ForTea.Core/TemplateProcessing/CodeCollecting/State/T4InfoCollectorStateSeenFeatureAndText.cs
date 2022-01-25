@@ -38,11 +38,11 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		{
 			switch (element)
 			{
-				case IT4FeatureBlock _:
+				case IT4FeatureBlock:
 					return new T4InfoCollectorStateSeenFeature(Interrupter);
-				case IT4ExpressionBlock _:
+				case IT4ExpressionBlock:
 					return new T4InfoCollectorStateSeenFeatureAndExpressionBlock(Interrupter);
-				case IT4Token _: return this;
+				case IT4Token: return this;
 				default:
 					var data = T4FailureRawData.FromElement(FirstElement, "Unexpected element after feature");
 					Interrupter.InterruptAfterProblem(data);

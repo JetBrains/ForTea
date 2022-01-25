@@ -20,8 +20,8 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.State
 		{
 			switch (element)
 			{
-				case IT4FeatureBlock _: return this;
-				case IT4ExpressionBlock _:
+				case IT4FeatureBlock: return this;
+				case IT4ExpressionBlock:
 					return new T4InfoCollectorStateSeenFeatureAndExpressionBlock(Interrupter);
 				default:
 					if (element.NodeType == T4TokenNodeTypes.NEW_LINE)
