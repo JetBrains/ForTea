@@ -39,7 +39,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl
 			result.Add("ProjectFileName", project.ProjectFileLocation.Name);
 			result.Add("ProjectName", project.Name);
 			result.Add("ProjectPath", project.Location.FullPathWithTrailingPathSeparator());
-			var intermediate = project.GetIntermidiateDirectories().FirstOrDefault();
+			var intermediate = project.GetIntermediateDirectories().FirstOrDefault();
 			if (intermediate != null) result.Add("IntDir", intermediate.FullPathWithTrailingPathSeparator());
 			AddMsBuildProjectProperties(result, project);
 		}
