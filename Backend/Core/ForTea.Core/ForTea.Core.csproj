@@ -15,7 +15,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>ForTea.Core</AssemblyName>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <RootNamespace>GammaJul.ForTea.Core</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
