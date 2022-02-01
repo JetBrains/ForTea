@@ -10,7 +10,7 @@
 
 <#
   var descriptions = new[]
-  {new InterfaceDescription("Foo", "Oof", "Oops"), new InterfaceDescription("Boo", "Whatever", "Hey", "H")};
+  { new InterfaceDescription("Foo", "Oof", "Oops"), new InterfaceDescription("Boo", "Whatever", "Hey", "H") };
 #>
 
 namespace Foo
