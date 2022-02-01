@@ -1,5 +1,5 @@
 <#
-    var data = new[] {1, 2, 3};
+    var data = new[] { 1, 2, 3 };
     foreach (var <selstart>i<selend> in data)
     {
         
