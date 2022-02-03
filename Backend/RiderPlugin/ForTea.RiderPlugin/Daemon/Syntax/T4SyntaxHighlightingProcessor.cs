@@ -2,6 +2,7 @@ using System;
 using GammaJul.ForTea.Core.Daemon.Syntax;
 using GammaJul.ForTea.Core.Tree;
 using GammaJul.ForTea.Core.Tree.Impl;
+using JetBrains.ReSharper.Daemon.Syntax;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Parsing;
