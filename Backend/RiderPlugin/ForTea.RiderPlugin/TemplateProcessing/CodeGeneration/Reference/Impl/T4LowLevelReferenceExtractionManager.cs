@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Debugger.Common.MetadataAndPdb;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.Annotations;
 using JetBrains.Application.Infra;
@@ -11,6 +10,7 @@ using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Metadata.Utils;
 using JetBrains.ProjectModel;
 using JetBrains.Rd;
+using JetBrains.Roslyn.Worker.Metadata;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 
