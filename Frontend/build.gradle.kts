@@ -35,6 +35,10 @@ repositories {
   }
 }
 
+dependencies {
+  testImplementation(kotlin("test"))
+}
+
 val baseVersion = "2022.1"
 val buildCounter = buildNumber ?: "9999"
 version = "$baseVersion.$buildCounter"
