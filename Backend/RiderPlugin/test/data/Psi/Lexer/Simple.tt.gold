@@ -9,4 +9,4 @@
 0026: QUOTE '"'
 0027: WHITE_SPACE ' '
 0028: BLOCK_END '#>'
-0030: NEW_LINE '\r\n'
+0030: NEW_LINE '\n'

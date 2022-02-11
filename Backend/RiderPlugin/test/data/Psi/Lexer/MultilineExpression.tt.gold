@@ -1,3 +1,3 @@
 ﻿0000: EXPRESSION_BLOCK_START '<#='
-0003: RAW_CODE '\r\n    42\r\n'
-0013: BLOCK_END '#>'
+0003: RAW_CODE '\n    42\n'
+0011: BLOCK_END '#>'
