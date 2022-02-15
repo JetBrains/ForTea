@@ -2,6 +2,7 @@ package com.jetbrains.fortea.configuration.run.execution
 
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.Key
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.fortea.utils.handleEndOfExecution
@@ -11,7 +12,9 @@ class T4PostProcessorProcessListener(
   private val model: T4ProtocolModel,
   private val parameters: T4RunConfigurationParameters
 ) : ProcessListener {
+  private val logger = logger<T4PostProcessorProcessListener>()
   override fun onTextAvailable(p0: ProcessEvent, p1: Key<*>) {
+    logger.info(p0.text)
   }
 
   override fun processTerminated(p0: ProcessEvent) {
