@@ -27,7 +27,7 @@ namespace JetBrains.ForTea.RiderPlugin
 					yield return name;
 				}
 
-				string textTemplating = VirtualFileSystemPath.Parse(Assembly.GetExecutingAssembly().Location, InteractionContext.SolutionContext)
+				string textTemplating = Assembly.GetExecutingAssembly().GetPath().ToVirtualFileSystemPath()
 					.Parent
 					.GetChildren("JetBrains.TextTemplating.dll")
 					.Select(child => child.GetAbsolutePath())
@@ -44,8 +44,8 @@ namespace JetBrains.ForTea.RiderPlugin
 		{
 			get
 			{
-				var lifetimesLocation = typeof(Lifetime).Assembly.Location;
-				var lifetimesPath = VirtualFileSystemPath.Parse(lifetimesLocation, InteractionContext.SolutionContext);
+				var lifetimesLocation = typeof(Lifetime).Assembly.GetPath();
+				var lifetimesPath = lifetimesLocation.ToVirtualFileSystemPath();
 				var classicLifetimesPath = lifetimesPath.Parent.Parent.GetChildren(lifetimesPath.Name);
 				if (!classicLifetimesPath.IsEmpty())
 				{
