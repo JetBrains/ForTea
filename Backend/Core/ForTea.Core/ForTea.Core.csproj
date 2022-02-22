@@ -78,7 +78,6 @@
     </ErrorsGen>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="mscorlib" />

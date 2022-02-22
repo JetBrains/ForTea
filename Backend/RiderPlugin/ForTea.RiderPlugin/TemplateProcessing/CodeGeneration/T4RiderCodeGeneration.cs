@@ -3,11 +3,11 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassName;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration
 {
