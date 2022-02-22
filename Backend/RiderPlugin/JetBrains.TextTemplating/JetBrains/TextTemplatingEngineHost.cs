@@ -8,6 +8,7 @@ using EnvDTE80;
 using JetBrains.EnvDTE.Client;
 using JetBrains.EnvDTE.Client.Impl;
 using JetBrains.Lifetimes;
+using JetBrains.Util;
 
 namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 {
@@ -90,7 +91,7 @@ namespace Microsoft.VisualStudio.TextTemplating.JetBrains
 		}
 
 		public IList<string> StandardAssemblyReferences =>
-			new[] {typeof(Uri).Assembly.Location};
+			new[] {typeof(Uri).Assembly.GetPath().FullPath};
 
 		public IList<string> StandardImports => new[] {"System"};
 
