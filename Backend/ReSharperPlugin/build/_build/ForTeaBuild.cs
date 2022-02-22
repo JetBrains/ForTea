@@ -111,7 +111,7 @@ internal class ForTeaBuild : NukeBuild
 
 	[NotNull]
 	private static string GetLatestReleaseNotes() => File
-		.ReadAllLines(RootDirectory.Parent / "CHANGELOG.md")
+		.ReadAllLines(RootDirectory.Parent.Parent / "CHANGELOG.md")
 		.SkipWhile(x => !x.StartsWith("##", StringComparison.Ordinal))
 		.Skip(1)
 		.TakeWhile(x => !string.IsNullOrWhiteSpace(x))

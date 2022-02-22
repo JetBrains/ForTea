@@ -155,8 +155,7 @@ namespace JetBrains.ForTea.Tests
 			if (subplatformOfAssembly != null)
 			{
 				var subplatformReference = new ApplicationPackageReference(subplatformOfAssembly.Name,
-					subplatformOfAssembly.GetCompanyNameHuman(),
-					null);
+					subplatformOfAssembly.GetCompanyNameHuman());
 				packageReferences.Add(subplatformReference);
 				return;
 			}

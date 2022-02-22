@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## 2021.3.2.1
+- Added support for Visual Studio 2022
+
 ## 2021.1
 - Improved highlighting for macros and environment variables
 - Fixed some reference resolution issues
