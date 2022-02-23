@@ -3,13 +3,14 @@ using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.Application.Threading;
+using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Transaction;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
+
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
