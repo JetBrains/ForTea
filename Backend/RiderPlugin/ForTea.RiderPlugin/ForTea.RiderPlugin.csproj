@@ -20,7 +20,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
-    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
     <PackageReference Include="JetBrains.EnvDTE.Host" />
     <Reference Include="System.Core" />
     <Reference Include="System" />
