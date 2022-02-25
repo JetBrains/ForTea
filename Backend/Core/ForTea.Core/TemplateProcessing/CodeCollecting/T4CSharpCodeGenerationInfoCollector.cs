@@ -2,8 +2,8 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 {
