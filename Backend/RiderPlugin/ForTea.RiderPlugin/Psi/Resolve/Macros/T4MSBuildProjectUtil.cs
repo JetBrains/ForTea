@@ -17,7 +17,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros
 			{
 				{AutoGenElement, True},
 				{DesignTimeElement, True},
-				{MSBuildProjectUtil.DependentUponElement, projectFile.Name}
+				{MSBuildProjectUtil.DependentUponAttr, projectFile.Name}
 			});
 
 		public static string GetTargetExtension(IProject project)
