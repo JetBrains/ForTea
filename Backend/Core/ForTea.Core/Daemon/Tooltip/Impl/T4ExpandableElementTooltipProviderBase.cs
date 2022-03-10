@@ -27,7 +27,7 @@ namespace GammaJul.ForTea.Core.Daemon.Tooltip.Impl
 		}
 
 		[NotNull]
-		protected override RichTextBlock GetRichTooltip(IHighlighter highlighter) =>
+		protected override RichTextBlock GetRichTooltip(IHighlighter highlighter, HighlighterTooltipKind where) =>
 			new RichTextBlock(GetTooltip(highlighter));
 
 		[NotNull]
