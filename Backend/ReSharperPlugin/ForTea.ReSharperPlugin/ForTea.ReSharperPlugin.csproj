@@ -23,6 +23,7 @@
     <PackageReference Include="JetBrains.Vs.SinceVs10.CoreUtility" />
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
+    <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" />
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
     <Reference Include="PresentationCore" />
     <Reference Include="System.ComponentModel.Composition" />
