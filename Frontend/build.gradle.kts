@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.3.1"
+  id("org.jetbrains.intellij") version "1.4.0"
   id("org.jetbrains.grammarkit") version "2021.2.1"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   id ("com.jetbrains.rdgen") version "2022.1.2"
