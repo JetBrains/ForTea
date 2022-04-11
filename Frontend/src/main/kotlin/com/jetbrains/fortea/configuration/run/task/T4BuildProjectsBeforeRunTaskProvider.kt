@@ -7,13 +7,13 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.application
 import com.intellij.util.concurrency.Semaphore
 import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.intellij.workspaceModel.ide.impl.virtualFile
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.handleEndOfExecution
-import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters

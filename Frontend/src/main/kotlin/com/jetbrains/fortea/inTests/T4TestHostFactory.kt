@@ -1,6 +1,6 @@
 package com.jetbrains.fortea.inTests
 
-import com.jetbrains.rd.platform.util.application
+import com.intellij.util.application
 import com.jetbrains.rdclient.protocol.IProtocolHost
 import com.jetbrains.rdclient.protocol.ProtocolComponentFactory
 import com.jetbrains.rider.inTests.isPlayBackTestMode

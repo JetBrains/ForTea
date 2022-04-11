@@ -1,7 +1,6 @@
 package com.jetbrains.fortea.configuration.impl
 
 import com.intellij.openapi.application.Application
-import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.T4BuildToolWindowFactory
 import com.jetbrains.fortea.configuration.toBuildResultKind
@@ -9,7 +8,7 @@ import com.jetbrains.fortea.model.T4BuildMessage
 import com.jetbrains.fortea.model.T4BuildMessageKind
 import com.jetbrains.fortea.model.T4BuildResult
 import com.jetbrains.fortea.model.T4PreprocessingResult
-import com.jetbrains.rd.platform.util.idea.LifetimedProjectService
+import com.jetbrains.rd.platform.util.idea.LifetimedService
 import com.jetbrains.rd.util.reactive.ViewableMap
 import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.diagnostics.BuildDiagnostic
@@ -17,10 +16,9 @@ import com.jetbrains.rider.build.diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*
 
 class T4BuildSessionViewImpl(
-  project: Project,
   private val windowFactory: T4BuildToolWindowFactory,
   private val application: Application
-) : LifetimedProjectService(project), T4BuildSessionView {
+) : LifetimedService(), T4BuildSessionView {
   override fun openWindow(message: String) = application.invokeLater {
     val context = initializeContext(ExecutingT4BuildHeader)
     context.clear()
