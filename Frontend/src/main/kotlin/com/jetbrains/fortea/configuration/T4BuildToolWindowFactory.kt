@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
@@ -78,7 +77,6 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
   }
 
   companion object {
-    fun getInstance(project: Project): T4BuildToolWindowFactory =
-      ServiceManager.getService(project, T4BuildToolWindowFactory::class.java)
+    fun getInstance(project: Project): T4BuildToolWindowFactory = project.getService()
   }
 }
