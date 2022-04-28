@@ -1,12 +1,14 @@
 package com.jetbrains.fortea.completion
 
+import com.intellij.codeInsight.lookup.LookupManager
 import com.jetbrains.fortea.inTests.T4TestHost
 import com.jetbrains.rdclient.protocol.protocolHost
+import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
+import java.time.Duration
 
 class T4CSharpTemplatesTest : CompletionTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithT4"
@@ -23,6 +25,9 @@ class T4CSharpTemplatesTest : CompletionTestBase() {
         typeWithLatency("data.foreach")
         callBasicCompletion()
         completeWithEnter()
+        waitAndPump(Duration.ofSeconds(10), { LookupManager.getActiveLookup(this) != null }) {
+          "Failed to wait for completion in a live template item"
+        }
         completeWithEnter()
         dumpOpenedDocument(printStream, project!!)
       }
