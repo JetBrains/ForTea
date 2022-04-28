@@ -37,10 +37,10 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 		// TODO: is this necessary?
 		[NotNull]
 		private static IAssemblyResolver ProtocolAssemblyResolver { get; } = new AssemblyResolverOnFolders(
-			VirtualFileSystemPath.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext).Parent.Parent, // JetBrains.Lifetimes on .net core
-			VirtualFileSystemPath.Parse(typeof(IProtocol).Assembly.Location, InteractionContext.SolutionContext).Parent.Parent, // JetBrains.RdFramework on .net core
-			VirtualFileSystemPath.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext).Parent, // JetBrains.Lifetimes
-			VirtualFileSystemPath.Parse(typeof(IProtocol).Assembly.Location, InteractionContext.SolutionContext).Parent // JetBrains.RdFramework
+			typeof(Lifetime).Assembly.GetPath().ToVirtualFileSystemPath().Parent.Parent, // JetBrains.Lifetimes on .net core
+			typeof(IProtocol).Assembly.GetPath().ToVirtualFileSystemPath().Parent.Parent, // JetBrains.RdFramework on .net core
+			typeof(Lifetime).Assembly.GetPath().ToVirtualFileSystemPath().Parent, // JetBrains.Lifetimes
+			typeof(IProtocol).Assembly.GetPath().ToVirtualFileSystemPath().Parent // JetBrains.RdFramework
 		);
 
 		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(

@@ -40,8 +40,8 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
 
 		private static Dictionary<string, VirtualFileSystemPath> FindEnvDteAssemblies()
 		{
-			var lifetimeDirectory = VirtualFileSystemPath
-				.Parse(typeof(Lifetime).Assembly.Location, InteractionContext.SolutionContext)
+			var lifetimeDirectory = 
+				typeof(Lifetime).Assembly.GetPath().ToVirtualFileSystemPath()
 				.Parent;
 			var envDteAssembliesInLifetimeDirectory = FindEnvDteAssemblies(lifetimeDirectory);
 			if (!envDteAssembliesInLifetimeDirectory.IsEmpty()) return envDteAssembliesInLifetimeDirectory;
