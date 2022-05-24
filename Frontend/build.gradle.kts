@@ -250,7 +250,7 @@ tasks {
         verbose = true
         hashFolder = "build/rdgen"
         logger.info("Configuring rdgen params")
-        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"), File("$productsHome/Rider/Frontend/model/src"), File("$productsHome/Rider/ultimate/platform/rd-ide-model-sources"))
+        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"), File("$productsHome/Rider/Frontend/model/src"), File("$productsHome/Rider/ultimate/remote-dev/rd-ide-model-sources"))
 
         packages = "model"
         generator {
