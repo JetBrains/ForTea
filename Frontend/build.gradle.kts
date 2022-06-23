@@ -14,7 +14,7 @@ plugins {
   id("org.jetbrains.grammarkit") version "2021.2.2"
   id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
   id ("com.jetbrains.rdgen") version "2022.3.0"
-  kotlin("jvm") version "1.6.10"
+  kotlin("jvm") version "1.7.0"
 }
 
 apply {
