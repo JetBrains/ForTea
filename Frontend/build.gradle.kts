@@ -39,7 +39,7 @@ dependencies {
   testImplementation(kotlin("test"))
 }
 
-val baseVersion = "2022.2"
+val baseVersion = "2022.3"
 val buildCounter = buildNumber ?: "9999"
 version = "$baseVersion.$buildCounter"
 
