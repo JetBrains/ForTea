@@ -190,7 +190,7 @@ tasks {
   }
 
   withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
   }
 
