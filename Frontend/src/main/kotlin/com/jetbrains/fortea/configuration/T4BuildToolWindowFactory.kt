@@ -14,7 +14,6 @@ import com.jetbrains.rd.platform.util.idea.LifetimedService
 import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.BuildToolWindowFactory
 import com.jetbrains.rider.build.redesign.BuildToolwindowWidget
-import com.jetbrains.rider.build.ui.BuildResultPanel
 import com.jetbrains.rider.util.idea.getService
 import java.awt.BorderLayout
 import javax.swing.JPanel
@@ -49,7 +48,7 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
   }
 
   private fun createToolbarPanel(
-    buildResultPanel: BuildResultPanel,
+    buildResultPanel: BuildToolwindowWidget,
     contentManager: ContentManager,
     toolWindowContent: Content
   ): JPanel {
