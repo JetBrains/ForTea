@@ -32,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Service.Impl
 			TokenNodeType rightToken
 		) => MinimalSeparatorType.NotRequired;
 
-		public override ITreeNode CreateSpace(string indent, ITreeNode replacedSpace) => new T4Token(
+		public override ITreeNode CreateSpace(string indent, NodeType replacedOrLeftSiblingType) => new T4Token(
 			T4TokenNodeTypes.WHITE_SPACE,
 			new StringBuffer(indent),
 			TreeOffset.Zero,
