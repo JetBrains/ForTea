@@ -15,6 +15,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.Quickdocs
 {
+	[QuickDocProvider(-100)]
 	public class T4QuickDocProvider : IQuickDocProvider
 	{
 		public bool CanNavigate(IDataContext context)
