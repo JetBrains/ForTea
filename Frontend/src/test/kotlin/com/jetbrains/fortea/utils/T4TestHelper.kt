@@ -1,6 +1,7 @@
 package com.jetbrains.fortea.utils
 
 import com.intellij.openapi.project.Project
+import com.intellij.util.application
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
 import com.jetbrains.rider.projectView.solutionDirectory
@@ -10,7 +11,6 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.flushQueues
 import com.jetbrains.rider.test.scriptingApi.waitAllCommandsFinished
 import com.jetbrains.rider.test.scriptingApi.waitForProjectModelReady
-import com.jetbrains.rd.platform.util.application
 import java.io.File
 import java.nio.file.Files
 

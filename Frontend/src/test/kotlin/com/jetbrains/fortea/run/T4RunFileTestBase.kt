@@ -2,7 +2,6 @@ package com.jetbrains.fortea.run
 
 import com.intellij.execution.ExecutionManager
 import com.intellij.execution.impl.ExecutionManagerImpl
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.jetbrains.fortea.configuration.execution.impl.T4SynchronousRunConfigurationExecutor
 import com.jetbrains.fortea.utils.T4TestHelper
@@ -15,6 +14,7 @@ import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.util.idea.getService
 import org.testng.annotations.BeforeMethod
 
 open class T4RunFileTestBase : BaseTestWithSolution() {
@@ -25,7 +25,7 @@ open class T4RunFileTestBase : BaseTestWithSolution() {
 
   @BeforeMethod
   open fun setUp() {
-    val manager = ServiceManager.getService(project, ExecutionManager::class.java) as ExecutionManagerImpl
+    val manager = project.getService<ExecutionManager>() as ExecutionManagerImpl
     manager.forceCompilationInTests = true
     helper = createTestHelper()
   }

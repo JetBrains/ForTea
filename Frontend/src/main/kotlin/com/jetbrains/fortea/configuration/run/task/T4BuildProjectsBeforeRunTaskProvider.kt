@@ -7,13 +7,13 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.application
 import com.intellij.util.concurrency.Semaphore
 import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.intellij.workspaceModel.ide.impl.virtualFile
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.handleEndOfExecution
-import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters
@@ -26,7 +26,7 @@ import javax.swing.Icon
 class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjectsBeforeRunTask>() {
   override fun getId() = providerId
   override fun getName() = "Build Project"
-  override fun getDescription(task: T4BuildProjectsBeforeRunTask?) = "Build project"
+  override fun getDescription(task: T4BuildProjectsBeforeRunTask) = "Build project"
   override fun getIcon(): Icon = AllIcons.Actions.Compile
 
   override fun createTask(runConfiguration: RunConfiguration): T4BuildProjectsBeforeRunTask? {
