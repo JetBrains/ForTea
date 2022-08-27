@@ -26,7 +26,7 @@ import javax.swing.Icon
 class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjectsBeforeRunTask>() {
   override fun getId() = providerId
   override fun getName() = "Build Project"
-  override fun getDescription(task: T4BuildProjectsBeforeRunTask?) = "Build project"
+  override fun getDescription(task: T4BuildProjectsBeforeRunTask) = "Build project"
   override fun getIcon(): Icon = AllIcons.Actions.Compile
 
   override fun createTask(runConfiguration: RunConfiguration): T4BuildProjectsBeforeRunTask? {
