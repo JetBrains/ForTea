@@ -59,7 +59,7 @@ intellij {
   updateSinceUntilBuild.set(false)
 
   // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-  plugins.set(listOf("rider-plugins-appender"))
+  plugins.set(listOf("rider.intellij.plugin.appender"))
 }
 
 val backendPluginFolderName = "Backend"
