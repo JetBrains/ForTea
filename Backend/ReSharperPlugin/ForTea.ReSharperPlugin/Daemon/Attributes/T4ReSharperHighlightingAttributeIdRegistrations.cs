@@ -9,8 +9,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Attributes
 	EffectType = EffectType.TEXT,
 	ForegroundColor = "#000000",
 	BackgroundColor = "#FBFB64",
-	Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
-	VSPriority = VSPriority.IDENTIFIERS
+	Layer = HighlighterLayer.ADDITIONAL_SYNTAX
 ), RegisterHighlighter(
 	 T4HighlightingAttributeIds.CODE_BLOCK,
 	 EffectType = EffectType.HIGHLIGHT_ABOVE_TEXT_MARKER,

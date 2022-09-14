@@ -10,10 +10,11 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.6.0"
+  id("org.jetbrains.intellij") version "1.9.0"
   id("org.jetbrains.grammarkit") version "2021.2.2"
-  id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
-  id ("com.jetbrains.rdgen") version "2022.3.0"
+  id("me.filippov.gradle.jvm.wrapper") version "0.11.0"
+  // Version is configured in gradle.properties
+  id("com.jetbrains.rdgen")
   kotlin("jvm") version "1.7.0"
 }
 
@@ -58,7 +59,7 @@ intellij {
   updateSinceUntilBuild.set(false)
 
   // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-  plugins.set(listOf("rider-plugins-appender"))
+  plugins.set(listOf("rider.intellij.plugin.appender"))
 }
 
 val backendPluginFolderName = "Backend"
@@ -157,7 +158,7 @@ tasks {
   val lexerSource = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
   val parserSource = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
 
-  val generateT4Lexer = task<GenerateLexerTask>("generateT4Lexer") {
+  generateLexer.configure {
     source.set(lexerSource)
     targetDir.set("src/main/java/com/jetbrains/fortea/lexer")
     targetClass.set("_T4Lexer")
@@ -189,12 +190,56 @@ tasks {
   }
 
   withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
+    dependsOn(generateLexer, generateT4Parser)
   }
 
   withType<Test> {
     useTestNG()
+
+    // Should be the same as community/plugins/devkit/devkit-core/src/run/OpenedPackages.txt
+    jvmArgs("--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+            "--add-opens=java.base/java.net=ALL-UNNAMED",
+            "--add-opens=java.base/java.nio=ALL-UNNAMED",
+            "--add-opens=java.base/java.nio.charset=ALL-UNNAMED",
+            "--add-opens=java.base/java.text=ALL-UNNAMED",
+            "--add-opens=java.base/java.time=ALL-UNNAMED",
+            "--add-opens=java.base/java.util=ALL-UNNAMED",
+            "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+            "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+            "--add-opens=java.base/jdk.internal.vm=ALL-UNNAMED",
+            "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+            "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED",
+            "--add-opens=java.base/sun.security.util=ALL-UNNAMED",
+            "--add-opens=java.desktop/com.apple.eawt=ALL-UNNAMED",
+            "--add-opens=java.desktop/com.apple.eawt.event=ALL-UNNAMED",
+            "--add-opens=java.desktop/com.apple.laf=ALL-UNNAMED",
+            "--add-opens=java.desktop/com.sun.java.swing.plaf.gtk=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.dnd.peer=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.image=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.peer=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.font=ALL-UNNAMED",
+            "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
+            "--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+            "--add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt.datatransfer=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt.image=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt.windows=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.java2d=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.swing=ALL-UNNAMED",
+            "--add-opens=jdk.attach/sun.tools.attach=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+            "--add-opens=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED",
+            "--add-opens=jdk.jdi/com.sun.tools.jdi=ALL-UNNAMED")
+
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
     testLogging {
       showStandardStreams = true
@@ -318,7 +363,7 @@ tasks {
 
   create("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateT4Lexer, generateT4Parser)
+    dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
   }
 
   create("prepareMonorepo") {

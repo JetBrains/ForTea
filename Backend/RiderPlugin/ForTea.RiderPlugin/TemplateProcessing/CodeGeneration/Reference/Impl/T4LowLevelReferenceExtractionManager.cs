@@ -24,13 +24,18 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 
 		[NotNull]
 		private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
+		
+		[NotNull]
+		private ISolution Solution { get; }
 
 		public T4LowLevelReferenceExtractionManager(
 			Lifetime lifetime,
-			[NotNull] AssemblyInfoDatabase assemblyInfoDatabase
+			[NotNull] AssemblyInfoDatabase assemblyInfoDatabase,
+			[NotNull] ISolution solution
 		)
 		{
 			AssemblyInfoDatabase = assemblyInfoDatabase;
+			Solution = solution;
 			Cache = new RoslynMetadataReferenceCache(lifetime);
 		}
 
@@ -80,7 +85,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
 						{
 							var resolver = BuildResolver(directDependency);
 							resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-							if (path == null) return null;
+							if (path == null)
+							{
+								var assemblyFromSolution = Solution.GetAllAssemblies().FirstOrDefault(assembly => assembly.AssemblyName == assemblyNameInfo);
+								if (assemblyFromSolution == null) return null;
+								return new T4AssemblyReferenceInfo(
+									assemblyFromSolution.FullAssemblyName,
+									assemblyFromSolution.Location.AssemblyPhysicalPath.NotNull()
+								);
+							}
 							return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path.AssemblyPhysicalPath.NotNull());
 						}
 					);

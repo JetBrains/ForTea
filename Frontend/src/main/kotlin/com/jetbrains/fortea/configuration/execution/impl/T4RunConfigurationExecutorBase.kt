@@ -5,7 +5,7 @@ import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.openapi.project.Project
 import com.intellij.util.PathUtil
 import com.intellij.workspaceModel.ide.WorkspaceModel
-import com.intellij.workspaceModel.ide.impl.virtualFile
+import com.intellij.workspaceModel.ide.impl.toVirtualFile
 import com.jetbrains.fortea.configuration.execution.T4RunConfigurationExecutor
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationFactory
@@ -29,7 +29,7 @@ abstract class T4RunConfigurationExecutorBase(protected val project: Project) : 
     val model = project.solution.t4ProtocolModel
     val projectModelId = request.location.id
     val item = WorkspaceModel.getInstance(project).getProjectModelEntity(projectModelId)
-    val virtualFile = item?.url?.virtualFile!!
+    val virtualFile = item?.url?.toVirtualFile()!!
     val t4Path = virtualFile.path
     val protocolConfiguration = model.getConfiguration.sync(T4FileLocation(projectModelId))
     val parameters = T4RunConfigurationParameters(
