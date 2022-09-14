@@ -1,14 +1,11 @@
 using GammaJul.ForTea.Core.Daemon.Attributes;
-using GammaJul.ForTea.Core.Daemon.Tooltip;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Daemon;
 using JetBrains.ReSharper.Daemon.SyntaxHighlighting;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Highlightings
 {
-	[DaemonTooltipProvider(typeof(IT4MacroTooltipProvider))]
 	[StaticSeverityHighlighting(
 		Severity.INFO,
 		typeof(HighlightingGroupIds.IdentifierHighlightings),
@@ -32,7 +29,6 @@ namespace GammaJul.ForTea.Core.Daemon.Highlightings
 		public DocumentRange CalculateRange() => Range;
 	}
 
-	[DaemonTooltipProvider(typeof(IT4EnvironmentVariableTooltipProvider))]
 	[StaticSeverityHighlighting(
 		Severity.INFO,
 		typeof(HighlightingGroupIds.IdentifierHighlightings),
