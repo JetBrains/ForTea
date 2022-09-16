@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Tree.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Format;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
@@ -24,7 +25,7 @@ namespace GammaJul.ForTea.Core.Psi.Service.Impl
 			ITreeNode firstNode,
 			ITreeNode lastNode,
 			AdditionalFormatterParameters parameters,
-			ICustomFormatterInfoProvider provider, int tabWidth) => new CodeFormattingContext(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger, parameters, tabWidth);
+			ICustomFormatterInfoProvider provider, int tabWidth, FormatterChangeAccumulator formatterChangeAccumulator) => new CodeFormattingContext(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger, parameters, tabWidth, formatterChangeAccumulator);
 
 		public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(
 			TokenNodeType leftToken,
