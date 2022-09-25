@@ -57,7 +57,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 		private void CreateHandler(
 			Lifetime editableEntityLifetime,
 			[NotNull] RdDocumentId rdDocumentId,
-			[NotNull] RiderDocument document, RdDocumentModelBase arg4)
+			[NotNull] RiderDocument document, RdDocumentModel arg4)
 		{
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
