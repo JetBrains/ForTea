@@ -8,7 +8,7 @@ import org.testng.annotations.Test
 
 // Note: due to Windows path length restriction
 // test method name cannot be longer than 60 symbols
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.LATEST_STABLE)
 class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatFileCanBeExecuted() = doTest()
   @Test fun testThatHostSpecificTemplateCanBeExecuted() = doTest()
