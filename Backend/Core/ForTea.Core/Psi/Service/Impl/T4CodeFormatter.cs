@@ -25,7 +25,7 @@ namespace GammaJul.ForTea.Core.Psi.Service.Impl
 			ITreeNode firstNode,
 			ITreeNode lastNode,
 			AdditionalFormatterParameters parameters,
-			ICustomFormatterInfoProvider provider, int tabWidth, FormatterChangeAccumulator formatterChangeAccumulator) => new CodeFormattingContext(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger, parameters, tabWidth, formatterChangeAccumulator);
+			ICustomFormatterInfoProvider provider, int tabWidth, SingleLangChangeAccu changeAccu) => new CodeFormattingContext(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger, parameters, tabWidth, changeAccu);
 
 		public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(
 			TokenNodeType leftToken,
