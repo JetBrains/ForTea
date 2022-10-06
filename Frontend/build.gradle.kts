@@ -158,7 +158,7 @@ tasks {
   val lexerSource = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
   val parserSource = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
 
-  val generateT4Lexer = task<GenerateLexerTask>("generateT4Lexer") {
+  generateLexer.configure {
     source.set(lexerSource)
     targetDir.set("src/main/java/com/jetbrains/fortea/lexer")
     targetClass.set("_T4Lexer")
@@ -192,6 +192,7 @@ tasks {
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
+    dependsOn(generateLexer, generateT4Parser)
   }
 
   withType<Test> {
@@ -362,7 +363,7 @@ tasks {
 
   create("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateT4Lexer, generateT4Parser)
+    dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
   }
 
   create("prepareMonorepo") {

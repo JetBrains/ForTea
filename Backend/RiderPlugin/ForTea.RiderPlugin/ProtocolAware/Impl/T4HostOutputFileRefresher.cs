@@ -14,11 +14,9 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 	[SolutionPerClientComponent]
 	public sealed class T4HostOutputFileRefresher : T4BasicOutputFileRefresher
 	{
-		[NotNull]
-		private RiderDocumentHost Host { get; }
-
-		public T4HostOutputFileRefresher(ISolution solution, [NotNull] RiderDocumentHost host) : base(solution) =>
-			Host = host;
+		public T4HostOutputFileRefresher(ISolution solution) : base(solution)
+		{
+		}
 
 		public override void Refresh(IProjectFile output)
 		{
@@ -28,7 +26,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		}
 
 		private void SyncDocuments([NotNull] VirtualFileSystemPath destinationLocation) =>
-			Host.SyncDocumentsWithFiles(destinationLocation);
+			Solution.SyncDocumentsWithFiles(destinationLocation);
 
 		private void RefreshFiles([NotNull] VirtualFileSystemPath destinationLocation) => Solution
 			.GetProtocolSolution()

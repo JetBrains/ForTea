@@ -5,7 +5,7 @@ import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.LATEST_STABLE)
 class T4TemplateInMultiTargetProjectHighlightingTest : T4HighlightingTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithMultipleTargetFrameworks"
   override val testFilePath get() = "Project/$fileName"
