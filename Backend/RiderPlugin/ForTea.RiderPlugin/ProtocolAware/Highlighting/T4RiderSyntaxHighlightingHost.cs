@@ -33,7 +33,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 		private IPsiFiles Files { get; }
 
 		[NotNull]
-		private DocumentHostBase Host { get; }
+		private IDocumentHost Host { get; }
 
 		public T4RiderSyntaxHighlightingHost(
 			Lifetime lifetime,
@@ -42,7 +42,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			[NotNull] ISolution solution,
 			[NotNull] IPsiCachesState state,
 			[NotNull] IPsiFiles files,
-			[NotNull] DocumentHostBase host
+			[NotNull] IDocumentHost host
 		)
 		{
 			Logger = logger;
@@ -62,7 +62,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			var editableEntity = Host.TryGetDocumentModel(rdDocumentId);
+			var editableEntity = Host.TryGetHostDocument(rdDocumentId)?.GetProtocolOperationHandler().DocumentModel;
 			if (editableEntity == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
