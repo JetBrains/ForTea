@@ -51,7 +51,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			State = state;
 			Files = files;
 			Host = host;
-			host.ViewHostDocuments(lifetime, CreateHandler);
+			host.ViewDocuments(lifetime, CreateHandler);
 		}
 
 		private void CreateHandler(
@@ -62,14 +62,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			var editableEntity = Host.TryGetHostDocument(rdDocumentId)?.GetProtocolOperationHandler().DocumentModel;
-			if (editableEntity == null)
+			var documentModel = Host.TryGetDocument(rdDocumentId)?.GetProtocolSynchronizerSafe()?.DocumentModel;
+			if (documentModel == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
 				return;
 			}
 
-			var t4EditableEntityModel = editableEntity.GetT4RdDocumentModel();
+			var t4EditableEntityModel = documentModel.GetT4RdDocumentModel();
 			document.CreateOutputExtensionChangeListener(
 				editableEntityLifetime,
 				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)
