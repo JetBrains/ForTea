@@ -238,7 +238,10 @@ tasks {
             "--add-opens=jdk.attach/sun.tools.attach=ALL-UNNAMED",
             "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
             "--add-opens=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED",
-            "--add-opens=jdk.jdi/com.sun.tools.jdi=ALL-UNNAMED")
+            "--add-opens=jdk.jdi/com.sun.tools.jdi=ALL-UNNAMED",
+            "-Didea.jna.unpacked=true",
+            "-Djna.nounpack=true",
+            "-Djna.boot.library.path=${setupDependencies.orNull?.idea?.get()?.classes}/lib/jna/${System.getProperty("os.arch")}")
 
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
     testLogging {
