@@ -52,7 +52,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		public void AppendTypeMapped([NotNull] T4CSharpCodeGenerationResult result)
 		{
 			string typeText = TypeToken.GetText();
-			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(typeText));
+			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(typeText), TypeToken.GetPsiModule());
 			if (keyword != null)
 			{
 				result.Append(keyword);
@@ -67,7 +67,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 		[NotNull]
 		private string GetTypeString()
 		{
-			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(TypeToken.GetText()));
+			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(TypeToken.GetText()), TypeToken.GetPsiModule());
 			if (keyword != null)
 			{
 				return keyword;
