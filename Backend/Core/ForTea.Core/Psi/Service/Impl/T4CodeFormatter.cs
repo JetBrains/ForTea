@@ -21,11 +21,8 @@ namespace GammaJul.ForTea.Core.Psi.Service.Impl
 		}
 
 		protected override CodeFormattingContext CreateFormatterContext(
-			CodeFormatProfile profile,
-			ITreeNode firstNode,
-			ITreeNode lastNode,
 			AdditionalFormatterParameters parameters,
-			ICustomFormatterInfoProvider provider, int tabWidth, SingleLangChangeAccu changeAccu) => new CodeFormattingContext(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger, parameters, tabWidth, changeAccu);
+			ICustomFormatterInfoProvider provider, int tabWidth, SingleLangChangeAccu changeAccu, FormatTask[] formatTasks) => new CodeFormattingContext(this, FormatterLoggerProvider.FormatterLogger, parameters, tabWidth, changeAccu, formatTasks);
 
 		public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(
 			TokenNodeType leftToken,
