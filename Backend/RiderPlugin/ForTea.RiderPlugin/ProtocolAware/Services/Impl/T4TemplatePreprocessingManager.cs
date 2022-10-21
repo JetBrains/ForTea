@@ -65,7 +65,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Services.Impl
 			try
 			{
 				string message = T4RiderCodeGeneration.GeneratePreprocessedCode(contextFreeTree).RawText;
-				solution.Locks.ExecuteOrQueueEx(solution.GetLifetime(), "T4 template preprocessing", () =>
+				solution.Locks.ExecuteOrQueueEx(solution.GetSolutionLifetimes().UntilSolutionCloseLifetime, "T4 template preprocessing", () =>
 				{
 					using (WriteLockCookie.Create())
 					{
