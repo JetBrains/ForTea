@@ -9,12 +9,11 @@ using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.ProjectsHost.SolutionHost.Progress;
 using JetBrains.RdBackend.Common.Features;
-using JetBrains.RdBackend.Common.Features.BackgroundTasks;
 using JetBrains.RdBackend.Common.Features.ProjectModel;
 using JetBrains.RdBackend.Common.Features.ProjectModel.View;
 using JetBrains.ReSharper.Psi;
-using JetBrains.Rider.Backend.Features.BackgroundTasks;
 using JetBrains.Rider.Model.Notifications;
 using JetBrains.Util;
 
@@ -41,7 +40,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private IT4ProjectModelTemplateMetadataManager TemplateMetadataManager { get; }
 
 		[NotNull]
-		private RiderBackgroundTaskHost BackgroundTaskHost { get; }
+		private BackgroundProgressManager BackgroundProgressManager { get; }
 
 		[NotNull]
 		private ProjectModelViewHost ProjectModelViewHost { get; }
@@ -59,7 +58,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			[NotNull] NotificationsModel notificationsModel,
 			[NotNull] ILogger logger,
 			[NotNull] IT4ProjectModelTemplateMetadataManager templateMetadataManager,
-			[NotNull] RiderBackgroundTaskHost backgroundTaskHost
+			[NotNull] BackgroundProgressManager backgroundProgressManager
 		)
 		{
 			Lifetime = lifetime;
@@ -68,7 +67,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 			NotificationsModel = notificationsModel;
 			Logger = logger;
 			TemplateMetadataManager = templateMetadataManager;
-			BackgroundTaskHost = backgroundTaskHost;
+			BackgroundProgressManager = backgroundProgressManager;
 			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
 			RunningFiles = new Dictionary<VirtualFileSystemPath, T4EnvDTEHost>();
 		}
@@ -92,7 +91,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				IProgressIndicator iProgress = progress;
 				iProgress.Start(1);
 				progress.Advance();
-				var task = RiderBackgroundTaskBuilder
+				var task = BackgroundProgressBuilder
 					.FromProgressIndicator(progress)
 					.AsIndeterminate()
 					.WithHeader("Executing template")
@@ -101,7 +100,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 				Solution.Locks.ExecuteOrQueueEx(
 					definition.Lifetime,
 					"T4 execution progress launching",
-					() => BackgroundTaskHost.AddNewTask(definition.Lifetime, task)
+					() => BackgroundProgressManager.AddNewTask(definition.Lifetime, task)
 				);
 			}
 

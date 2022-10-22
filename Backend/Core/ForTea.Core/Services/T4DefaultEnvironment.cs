@@ -18,6 +18,9 @@ namespace GammaJul.ForTea.Core.Services
 			{
 				yield return "mscorlib";
 				yield return "System";
+				yield return "System.Core";
+				yield return "System.Data";
+				yield return "System.Xml";
 			}
 		}
 
