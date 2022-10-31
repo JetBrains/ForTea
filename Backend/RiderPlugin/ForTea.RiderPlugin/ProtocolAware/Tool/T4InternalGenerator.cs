@@ -17,6 +17,7 @@ using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.UI.Icons;
 using JetBrains.Util;
+using Strings = JetBrains.ForTea.RiderPlugin.Resources.Strings;
 using UsageStatisticsNew = JetBrains.Application.ActivityTrackingNew.UsageStatistics;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
@@ -24,7 +25,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 	[ShellComponent] // This class cannot be made a solution component
 	public sealed class T4InternalGenerator : ISingleFileCustomTool
 	{
-		public string Name => "Bundled T4 template executor";
+		public string Name => Strings.BundledT4TemplateExecutor_Text;
 		public string ActionName => null;
 		public IconId Icon => FileLayoutThemedIcons.TypeTemplate.Id;
 		public string[] CustomTools => new[] {"T4 Generator Custom Tool"};
