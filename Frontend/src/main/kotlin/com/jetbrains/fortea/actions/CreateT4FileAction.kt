@@ -7,21 +7,22 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.jetbrains.fortea.language.T4FileType
+import com.jetbrains.fortea.utils.RiderT4Bundle
 
 
 class CreateT4FileAction : CreateFileFromTemplateAction(
-  "T4 File",
-  "Creates a new T4 file",
+  RiderT4Bundle.message("action.t4.file.create.title"),
+  RiderT4Bundle.message("action.t4.file.create.description"),
   T4FileType.icon
 ), DumbAware {
   override fun buildDialog(project: Project, directory: PsiDirectory, builder: CreateFileFromTemplateDialog.Builder) {
-    builder.setTitle("New T4 File")
-      .addKind("T4 File", T4FileType.icon, T4_TEMPLATE_NAME)
-      .addKind("T4 Include", T4FileType.icon, T4_INCLUDE_NAME)
+    builder.setTitle(RiderT4Bundle.message("dialog.title.new.t4.file"))
+      .addKind(RiderT4Bundle.message("list.item.t4.file"), T4FileType.icon, T4_TEMPLATE_NAME)
+      .addKind(RiderT4Bundle.message("list.item.t4.include"), T4FileType.icon, T4_INCLUDE_NAME)
   }
 
   override fun getActionName(directory: PsiDirectory, newName: String, templateName: String): String {
-    return "Create T4 file $newName"
+    return RiderT4Bundle.message("command.name.create.t4.file", newName)
   }
 
   override fun createFile(name: String, templateName: String, dir: PsiDirectory): PsiFile? {

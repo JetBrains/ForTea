@@ -8,12 +8,14 @@ import com.jetbrains.fortea.model.T4BuildMessage
 import com.jetbrains.fortea.model.T4BuildMessageKind
 import com.jetbrains.fortea.model.T4BuildResult
 import com.jetbrains.fortea.model.T4PreprocessingResult
+import com.jetbrains.fortea.utils.RiderT4Bundle
 import com.jetbrains.rd.platform.util.idea.LifetimedService
 import com.jetbrains.rd.util.reactive.ViewableMap
 import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*
+import org.jetbrains.annotations.Nls
 
 class T4BuildSessionViewImpl(
   private val windowFactory: T4BuildToolWindowFactory,
@@ -78,9 +80,9 @@ class T4BuildSessionViewImpl(
   }
 
   companion object {
-    const val ExecutingT4BuildHeader = "Executing T4 Build..."
-    const val PreprocessingT4Header = "Preprocessing T4..."
-    const val T4BuildHeader = "T4 Build"
-    const val T4PreprocessingHeader = "T4 Preprocessing"
+    val ExecutingT4BuildHeader = RiderT4Bundle.message("status.executing.t4.build")
+    val PreprocessingT4Header = RiderT4Bundle.message("status.preprocessing.t4")
+    val T4BuildHeader = RiderT4Bundle.message("status.t4.build")
+    val T4PreprocessingHeader = RiderT4Bundle.message("status.t4.preprocessing")
   }
 }
