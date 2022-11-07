@@ -13,6 +13,7 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
+import com.jetbrains.rider.runtime.custom.CustomRuntimeHistoryManager
 
 class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
@@ -25,6 +26,7 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
       riderDotNetActiveRuntimeHost,
       dotNetExecutable.exePath,
       dotNetExecutable.runtimeType,
+      CustomRuntimeHistoryManager.getInstance(),
       dotNetExecutable.projectTfm
     )
     val model = environment.project.solution.t4ProtocolModel
