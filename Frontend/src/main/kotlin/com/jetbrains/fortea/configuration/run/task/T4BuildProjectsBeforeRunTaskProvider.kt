@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.application
 import com.intellij.util.concurrency.Semaphore
 import com.intellij.workspaceModel.ide.WorkspaceModel
-import com.intellij.workspaceModel.ide.impl.toVirtualFile
+import com.intellij.workspaceModel.ide.impl.virtualFile
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.RiderT4Bundle
@@ -53,7 +53,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
       .getProjectDependencies
       .sync(configuration.parameters.request.location)
       .mapNotNull { WorkspaceModel.getInstance(project).getProjectModelEntity(it) }
-      .mapNotNull { it.url?.toVirtualFile() }
+      .mapNotNull { it.url?.virtualFile }
       .map(VirtualFile::getPath)
     if (selectedProjectsForBuild.isEmpty()) return true
     val finished = Semaphore()
