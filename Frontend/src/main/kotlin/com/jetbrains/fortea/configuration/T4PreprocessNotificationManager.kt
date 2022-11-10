@@ -8,6 +8,7 @@ import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rd.util.reactive.advise
 import com.jetbrains.fortea.model.T4PreprocessingResult
 import com.jetbrains.fortea.model.t4ProtocolModel
+import com.jetbrains.fortea.utils.RiderT4Bundle
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 
@@ -26,6 +27,6 @@ class T4PreprocessNotificationManager(private val project: Project) {
 
   private fun onPreprocessStarted() {
     val view = project.getComponent<T4BuildSessionView>()
-    view.openWindow("T4 Preprocessing Started...")
+    view.openWindow(RiderT4Bundle.message("status.t4.preprocessing.started"))
   }
 }

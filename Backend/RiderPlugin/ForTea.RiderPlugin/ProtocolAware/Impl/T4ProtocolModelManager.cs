@@ -95,7 +95,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 		private T4BuildResult Compile([NotNull] IPsiSourceFile sourceFile)
 		{
 			T4BuildResult result = null;
-			Solution.GetLifetime().UsingNested(nested => result = Compiler.Compile(nested, sourceFile));
+			Solution.GetSolutionLifetimes().UntilSolutionCloseLifetime.UsingNested(nested => result = Compiler.Compile(nested, sourceFile));
 			return result;
 		}
 
