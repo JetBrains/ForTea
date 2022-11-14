@@ -26,7 +26,6 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
       riderDotNetActiveRuntimeHost,
       dotNetExecutable.exePath,
       dotNetExecutable.runtimeType,
-      CustomRuntimeHistoryManager.getInstance(),
       dotNetExecutable.projectTfm
     )
     val model = environment.project.solution.t4ProtocolModel
