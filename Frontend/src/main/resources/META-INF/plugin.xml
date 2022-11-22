@@ -74,6 +74,7 @@
 
     <internalFileTemplate name="T4 File"/>
     <internalFileTemplate name="T4 Include"/>
+    <solutionExplorerCustomization implementation="com.jetbrains.fortea.actions.T4SolutionExplorerCustomization"/>
   </extensions>
   <actions>
     <action
