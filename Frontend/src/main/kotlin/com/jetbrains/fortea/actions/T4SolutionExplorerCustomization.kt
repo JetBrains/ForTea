@@ -1,4 +1,4 @@
-package kotlin.com.jetbrains.fortea.actions
+package com.jetbrains.fortea.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbService
