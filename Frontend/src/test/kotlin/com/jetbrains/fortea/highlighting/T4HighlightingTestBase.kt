@@ -4,7 +4,7 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.fortea.inTests.T4TestHost
 import com.jetbrains.rdclient.protocol.protocolHost
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
 
 abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
