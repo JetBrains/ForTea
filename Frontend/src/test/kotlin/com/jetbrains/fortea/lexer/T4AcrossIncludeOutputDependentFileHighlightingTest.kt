@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.lexer
 
 import com.intellij.openapi.editor.impl.EditorImpl
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.waitForDaemonAndCaches
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor

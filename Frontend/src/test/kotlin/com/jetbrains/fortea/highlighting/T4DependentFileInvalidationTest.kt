@@ -6,7 +6,7 @@ import com.jetbrains.rdclient.daemon.FrontendMarkupAdapter
 import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
 import com.jetbrains.rdclient.daemon.util.severity
 import com.jetbrains.rdclient.testFramework.typeWithLatency
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rdclient.daemon.util.annotateDocumentWithHighlighterTags
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.framework.executeWithGold

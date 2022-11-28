@@ -42,7 +42,7 @@
         implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
     <backend.typedHandler
         language="T4"
-        implementationClass="com.jetbrains.rdclient.editorActions.FrontendTypedHandler"/>
+        implementationClass="com.jetbrains.rider.editorActions.FrontendTypedHandler"/>
     <codeInsight.parameterInfo
         language="T4"
         implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler"/>
@@ -51,7 +51,7 @@
         implementationClass="com.jetbrains.rider.completion.BackendAndGenericIJ"/>
     <completion.contributor
         language="T4"
-        implementationClass="com.jetbrains.rdclient.completion.ProtocolCompletionContributor"/>
+        implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor"/>
     <backend.markup.adapterFactory
         language="T4"
         implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory"/>
@@ -74,6 +74,7 @@
 
     <internalFileTemplate name="T4 File"/>
     <internalFileTemplate name="T4 Include"/>
+    <solutionExplorerCustomization implementation="com.jetbrains.fortea.actions.T4SolutionExplorerCustomization"/>
   </extensions>
   <actions>
     <action
