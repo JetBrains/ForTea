@@ -44,7 +44,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
     task: T4BuildProjectsBeforeRunTask
   ): Boolean {
     val project = configuration.project
-    val buildHost = project.getComponent<BuildHost>()
+    val buildHost = BuildHost.getInstance(project)
     if (configuration !is T4RunConfiguration) return false
     val model = project
       .solution
