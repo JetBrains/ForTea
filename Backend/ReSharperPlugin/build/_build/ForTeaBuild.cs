@@ -5,6 +5,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.Execution;
+using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.NuGet;
@@ -15,7 +16,7 @@ using static Nuke.Common.Tools.NuGet.NuGetTasks;
 [CheckBuildProjectConfigurations]
 internal class ForTeaBuild : NukeBuild
 {
-	[Parameter] public Configuration Configuration;
+	[Parameter] public string Configuration;
 	[Parameter] public string WaveVersion;
 	[Parameter] public readonly string NuGetSource = "https://plugins.jetbrains.com/";
 	[Parameter] public readonly string NuGetApiKey;
@@ -40,15 +41,15 @@ internal class ForTeaBuild : NukeBuild
 		string line = Console.ReadLine();
 		if (string.IsNullOrEmpty(line))
 		{
-			Configuration = Configuration.Release;
+			Configuration = "Release";
 			return;
 		}
 
 		int number = int.Parse(line);
 		Configuration = number switch
 		{
-			1 => Configuration.Release,
-			2 => Configuration.Debug,
+			1 => "Release",
+			2 => "Debug",
 			_ => throw new ArgumentOutOfRangeException()
 		};
 	});
@@ -83,7 +84,7 @@ internal class ForTeaBuild : NukeBuild
 			.SetOutputDirectory(OutputDirectory)
 			.SetProperty("jetBrainsYearSpan", GetJetBrainsYearSpan())
 			.SetProperty("releaseNotes", GetLatestReleaseNotes())
-			.SetProperty("configuration", Configuration.ToString())
+			.SetProperty("configuration", Configuration)
 			.SetProperty("wave", WaveVersion)
 			.EnableNoPackageAnalysis()));
 
@@ -91,7 +92,7 @@ internal class ForTeaBuild : NukeBuild
 	public Target Push => target => target
 		.DependsOn(Pack)
 		.Requires(() => NuGetApiKey)
-		.Requires(() => Configuration.Release.Equals(Configuration))
+		.Requires(() => "Release".Equals(Configuration))
 		.Requires(() => GlobFiles(OutputDirectory, "*.nupkg").Count == 1)
 		.Executes(() => NuGetPush(settings => settings
 			.SetTargetPath(GlobFiles(OutputDirectory, "*.nupkg").Single())
