@@ -33,7 +33,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 		private IPsiFiles Files { get; }
 
 		[NotNull]
-		private DocumentHostBase Host { get; }
+		private IDocumentHost Host { get; }
 
 		public T4RiderSyntaxHighlightingHost(
 			Lifetime lifetime,
@@ -42,7 +42,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			[NotNull] ISolution solution,
 			[NotNull] IPsiCachesState state,
 			[NotNull] IPsiFiles files,
-			[NotNull] DocumentHostBase host
+			[NotNull] IDocumentHost host
 		)
 		{
 			Logger = logger;
@@ -51,7 +51,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			State = state;
 			Files = files;
 			Host = host;
-			host.ViewHostDocuments(lifetime, CreateHandler);
+			host.ViewDocuments(lifetime, CreateHandler);
 		}
 
 		private void CreateHandler(
@@ -62,14 +62,14 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 			var psiSourceFile = document.GetPsiSourceFile(Solution);
 			if (psiSourceFile == null) return;
 			if (!psiSourceFile.LanguageType.Is<T4ProjectFileType>()) return;
-			var editableEntity = Host.TryGetDocumentModel(rdDocumentId);
-			if (editableEntity == null)
+			var documentModel = Host.TryGetDocument(rdDocumentId)?.GetProtocolSynchronizerSafe()?.DocumentModel;
+			if (documentModel == null)
 			{
 				Logger.Error("Editable entity not found in a document!");
 				return;
 			}
 
-			var t4EditableEntityModel = editableEntity.GetT4RdDocumentModel();
+			var t4EditableEntityModel = documentModel.GetT4RdDocumentModel();
 			document.CreateOutputExtensionChangeListener(
 				editableEntityLifetime,
 				new T4OutputExtensionChangeListener(t4EditableEntityModel.RawTextExtension)

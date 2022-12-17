@@ -14,12 +14,13 @@ import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.utils.handleEndOfExecution
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.fortea.model.t4ProtocolModel
+import com.jetbrains.fortea.utils.RiderT4Bundle
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 
 class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunTask>() {
-  override fun getName() = "Compile T4 File"
+  override fun getName() = RiderT4Bundle.message("task.compile.t4.file")
 
   override fun getId(): Key<T4CompileBeforeRunTask> = providerId
 
@@ -41,7 +42,7 @@ class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunT
     val project = configuration.project
     val view = project.getComponent<T4BuildSessionView>()
     val executionRequest = configuration.parameters.request
-    if (executionRequest.isVisible) view.openWindow("T4 Build Started...")
+    if (executionRequest.isVisible) view.openWindow(RiderT4Bundle.message("status.t4.build.started"))
     val finished = Semaphore()
     finished.down()
     var successful = false

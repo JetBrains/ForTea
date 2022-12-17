@@ -10,9 +10,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.application
 import com.intellij.util.concurrency.Semaphore
 import com.intellij.workspaceModel.ide.WorkspaceModel
-import com.intellij.workspaceModel.ide.impl.toVirtualFile
+import com.intellij.workspaceModel.ide.impl.virtualFile
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.model.t4ProtocolModel
+import com.jetbrains.fortea.utils.RiderT4Bundle
 import com.jetbrains.fortea.utils.handleEndOfExecution
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.build.BuildHost
@@ -25,8 +26,8 @@ import javax.swing.Icon
 
 class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjectsBeforeRunTask>() {
   override fun getId() = providerId
-  override fun getName() = "Build Project"
-  override fun getDescription(task: T4BuildProjectsBeforeRunTask) = "Build project"
+  override fun getName() = RiderT4Bundle.message("task.build.project.title")
+  override fun getDescription(task: T4BuildProjectsBeforeRunTask) = RiderT4Bundle.message("task.build.project.description")
   override fun getIcon(): Icon = AllIcons.Actions.Compile
 
   override fun createTask(runConfiguration: RunConfiguration): T4BuildProjectsBeforeRunTask? {
@@ -52,7 +53,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
       .getProjectDependencies
       .sync(configuration.parameters.request.location)
       .mapNotNull { WorkspaceModel.getInstance(project).getProjectModelEntity(it) }
-      .mapNotNull { it.url?.toVirtualFile() }
+      .mapNotNull { it.url?.virtualFile }
       .map(VirtualFile::getPath)
     if (selectedProjectsForBuild.isEmpty()) return true
     val finished = Semaphore()

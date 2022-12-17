@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 			string keyword = node.GetText();
 			Assertion.Assert(CSharpLexer.IsKeyword(keyword), "CSharpLexer.IsKeyword(text)");
 			
-			var qualified = CSharpTypeFactory.GetFullyQualifiedNameByKeyword(keyword).NotNull();
+			var qualified = CSharpTypeFactory.GetFullyQualifiedNameByKeyword(keyword, node.GetPsiModule()).NotNull();
 			var newNode = T4ElementFactory.CreateAttributeValue(qualified.FullName);
 			var file = node.GetContainingFile().NotNull();
 			

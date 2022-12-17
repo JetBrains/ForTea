@@ -25,6 +25,20 @@
     <Reference Include="System" />
     <Reference Include="System.Threading.Tasks" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Resources\Strings.resx" />
+    <EmbeddedResource Include="Resources\Strings.resx">
+      <Generator>JetResourceGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\Strings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props')" />
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />

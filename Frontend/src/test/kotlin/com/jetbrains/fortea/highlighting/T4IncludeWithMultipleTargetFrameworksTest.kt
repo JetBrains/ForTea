@@ -1,6 +1,6 @@
 package com.jetbrains.fortea.highlighting
 
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.checkSwea
 import org.testng.annotations.Test
 
