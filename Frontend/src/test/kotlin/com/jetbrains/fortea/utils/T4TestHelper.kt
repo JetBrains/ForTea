@@ -38,7 +38,7 @@ open class T4TestHelper(val project: Project) {
     flushQueues()
     waitForProjectModelReady(project)
     waitAllCommandsFinished()
-    project.getComponent<VfsWriteOperationsHost>().waitRefreshIsFinished()
+    VfsWriteOperationsHost.getInstance(project).waitRefreshIsFinished()
   }
 
   fun dumpCsprojContents() = executeWithGold(csprojFile.path) {
