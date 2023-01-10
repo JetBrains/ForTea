@@ -34,7 +34,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 					(manager, file) => manager.Execute(file),
 					T4StatisticIdBundle.RunFromGutter
 				),
-				new RichText(T4TemplateExecutionNameBundle.Run),
+				new RichText(Strings.RunTemplate_Text),
 				RunMarkersThemedIcons.RunThis.Id,
 				BulbMenuAnchors.PermanentBackgroundItems);
 			yield return new BulbMenuItem(
@@ -43,7 +43,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 					(manager, file) => manager.Debug(file),
 					T4StatisticIdBundle.DebugFromGutter
 				),
-				new RichText(T4TemplateExecutionNameBundle.Debug),
+				new RichText(Strings.DebugTemplate_Text),
 				RunMarkersThemedIcons.DebugThis.Id,
 				BulbMenuAnchors.PermanentBackgroundItems
 			);
@@ -59,7 +59,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
 					model.PreprocessingStarted();
 					model.PreprocessingFinished(preprocessingManager.Preprocess(file));
 				}),
-				new RichText(T4TemplateExecutionNameBundle.Preprocess),
+				new RichText(Strings.PreprocessTemplate_Text),
 				null,
 				BulbMenuAnchors.PermanentBackgroundItems
 			);
