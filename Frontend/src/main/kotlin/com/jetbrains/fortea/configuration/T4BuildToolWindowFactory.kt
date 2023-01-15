@@ -63,7 +63,7 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
           context = null
         }
       })
-      //TODO ? buildResultPanel.showEvents()
+      //TODO[sbe] ? buildResultPanel.showEvents()
     }
     return JPanel(BorderLayout()).apply {
       add(
