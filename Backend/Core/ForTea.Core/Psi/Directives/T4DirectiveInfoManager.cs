@@ -39,7 +39,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 		/// <summary>Gets a collection of all known directives.</summary>
 		/// <remarks>Order of elements in this collection will be used to order the directives.</remarks>
 		[NotNull, ItemNotNull]
-		public static ImmutableArray<DirectiveInfo> AllDirectives { get; }
+		public static JetImmutableArray<DirectiveInfo> AllDirectives { get; }
 
 		[CanBeNull]
 		public static DirectiveInfo GetDirectiveByName([CanBeNull] string directiveName) =>

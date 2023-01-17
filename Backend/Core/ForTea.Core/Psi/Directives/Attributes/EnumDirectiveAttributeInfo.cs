@@ -7,12 +7,12 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 
 	public class EnumDirectiveAttributeInfo : DirectiveAttributeInfo {
 
-		[NotNull] [ItemNotNull] private readonly ImmutableArray<string> _enumValues;
+		[NotNull] [ItemNotNull] private readonly JetImmutableArray<string> _enumValues;
 		
 		public override bool IsValid(string value)
 			=> _enumValues.Contains(value, StringComparer.OrdinalIgnoreCase);
 
-		public override ImmutableArray<string> IntelliSenseValues
+		public override JetImmutableArray<string> IntelliSenseValues
 			=> _enumValues;
 
 		public EnumDirectiveAttributeInfo(

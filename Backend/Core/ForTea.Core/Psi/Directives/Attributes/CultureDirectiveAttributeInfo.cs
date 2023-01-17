@@ -11,7 +11,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 	public class CultureDirectiveAttributeInfo : DirectiveAttributeInfo {
 
 		[NotNull] [ItemNotNull] private readonly Lazy<JetHashSet<string>> _cultureCodes;
-		[CanBeNull] [ItemNotNull] private ImmutableArray<string> _intellisenseValues;
+		[CanBeNull] [ItemNotNull] private JetImmutableArray<string> _intellisenseValues;
 
 		[NotNull]
 		private static JetHashSet<string> CreateCultureCodes()
@@ -26,7 +26,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 		public override bool IsValid(string value)
 			=> _cultureCodes.Value.Contains(value);
 
-		public override ImmutableArray<string> IntelliSenseValues
+		public override JetImmutableArray<string> IntelliSenseValues
 			=> _intellisenseValues ?? (_intellisenseValues = _cultureCodes.Value.ToImmutableArray());
 
 		public CultureDirectiveAttributeInfo([NotNull] string name, DirectiveAttributeOptions options)

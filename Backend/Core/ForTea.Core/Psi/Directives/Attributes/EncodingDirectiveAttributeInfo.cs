@@ -15,7 +15,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
 		private Lazy<JetHashSet<string>> Encodings { get; }
 
 		[NotNull, ItemNotNull]
-		private Lazy<ImmutableArray<string>> CompletionValues { get; }
+		private Lazy<JetImmutableArray<string>> CompletionValues { get; }
 
 		public EncodingDirectiveAttributeInfo(
 			DirectiveAttributeOptions options
@@ -28,14 +28,14 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
 		public override bool IsValid(string value) =>
 			T4EncodingsManager.IsCodePage(value) || T4EncodingsManager.IsEncodingName(value);
 
-		public override ImmutableArray<string> IntelliSenseValues =>
+		public override JetImmutableArray<string> IntelliSenseValues =>
 			CompletionValues.Value;
 
 		[NotNull]
 		private static JetHashSet<string> CreateEncodings() =>
 			Encoding.GetEncodings().Select(info => info.Name).ToJetHashSet(StringComparer.OrdinalIgnoreCase);
 
-		private ImmutableArray<string> CreateCompletionValues() =>
+		private JetImmutableArray<string> CreateCompletionValues() =>
 			Encodings.Value.ToImmutableArray();
 	}
 }

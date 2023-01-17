@@ -22,8 +22,8 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 			=> true;
 
 		[NotNull]
-		public virtual ImmutableArray<string> IntelliSenseValues
-			=> ImmutableArray<string>.Empty;
+		public virtual JetImmutableArray<string> IntelliSenseValues
+			=> JetImmutableArray<string>.Empty;
 
 		[NotNull]
 		public IT4DirectiveAttribute CreateDirectiveAttribute([CanBeNull] string value)

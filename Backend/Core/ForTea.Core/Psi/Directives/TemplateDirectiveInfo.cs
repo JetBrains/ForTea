@@ -31,7 +31,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 		[NotNull]
 		public DirectiveAttributeInfo VisibilityAttribute { get; }
 
-		public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+		public override JetImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
 		public TemplateDirectiveInfo() : base("template")
 		{

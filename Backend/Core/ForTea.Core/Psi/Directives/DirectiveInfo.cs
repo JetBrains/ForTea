@@ -17,7 +17,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 
 		[NotNull]
 		[ItemNotNull]
-		public abstract ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+		public abstract JetImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
 		[CanBeNull]
 		public DirectiveAttributeInfo GetAttributeByName([CanBeNull] string attributeName)

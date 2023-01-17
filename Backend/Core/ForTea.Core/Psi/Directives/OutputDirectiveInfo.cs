@@ -12,7 +12,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 		[NotNull]
 		public DirectiveAttributeInfo EncodingAttribute { get; }
 
-		public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+		public override JetImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
 		public OutputDirectiveInfo()
 			: base("output") {
