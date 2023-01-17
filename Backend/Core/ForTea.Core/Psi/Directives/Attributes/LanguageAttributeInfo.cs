@@ -1,5 +1,5 @@
+using System.Collections.Immutable;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 
 namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
 {
@@ -10,17 +10,16 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
 		[NotNull] public const string VBLanguageAttributeValue = "VB";
 
 		[NotNull, ItemNotNull]
-		public static JetImmutableArray<string> PromotedValues { get; } = new[]
-		{
+		public static ImmutableArray<string> PromotedValues { get; } = ImmutableArray.Create(
 			CSharpLanguageAttributeValue,
 			NewCSharpLanguageAttributeValue
-		}.ToImmutableArray();
+		);
 
 		[NotNull, ItemNotNull]
-		private JetImmutableArray<string> OtherValues { get; } = new[] {VBLanguageAttributeValue}.ToImmutableArray();
+		private ImmutableArray<string> OtherValues { get; } = new[] {VBLanguageAttributeValue}.ToImmutableArray();
 
 		public override bool IsValid(string value) => PromotedValues.Contains(value) || OtherValues.Contains(value);
-		public override JetImmutableArray<string> IntelliSenseValues => PromotedValues;
+		public override ImmutableArray<string> IntelliSenseValues => PromotedValues;
 
 		public LanguageAttributeInfo() : base("language", DirectiveAttributeOptions.None)
 		{

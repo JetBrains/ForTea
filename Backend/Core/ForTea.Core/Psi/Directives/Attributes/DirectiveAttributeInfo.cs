@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
@@ -22,8 +23,8 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 			=> true;
 
 		[NotNull]
-		public virtual JetImmutableArray<string> IntelliSenseValues
-			=> JetImmutableArray<string>.Empty;
+		public virtual ImmutableArray<string> IntelliSenseValues
+			=> ImmutableArray<string>.Empty;
 
 		[NotNull]
 		public IT4DirectiveAttribute CreateDirectiveAttribute([CanBeNull] string value)

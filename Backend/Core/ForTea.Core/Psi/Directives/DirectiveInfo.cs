@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
@@ -17,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 
 		[NotNull]
 		[ItemNotNull]
-		public abstract JetImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+		public abstract ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
 		[CanBeNull]
 		public DirectiveAttributeInfo GetAttributeByName([CanBeNull] string attributeName)

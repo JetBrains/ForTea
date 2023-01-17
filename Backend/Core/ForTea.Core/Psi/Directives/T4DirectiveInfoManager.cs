@@ -1,9 +1,9 @@
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.VB;
@@ -39,7 +39,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 		/// <summary>Gets a collection of all known directives.</summary>
 		/// <remarks>Order of elements in this collection will be used to order the directives.</remarks>
 		[NotNull, ItemNotNull]
-		public static JetImmutableArray<DirectiveInfo> AllDirectives { get; }
+		public static ImmutableArray<DirectiveInfo> AllDirectives { get; }
 
 		[CanBeNull]
 		public static DirectiveInfo GetDirectiveByName([CanBeNull] string directiveName) =>
@@ -77,15 +77,14 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 			Include = new IncludeDirectiveInfo();
 			Assembly = new AssemblyDirectiveInfo();
 			Import = new ImportDirectiveInfo();
-			AllDirectives = ImmutableArray.FromArguments(new DirectiveInfo[]
-			{
+			AllDirectives = ImmutableArray.Create<DirectiveInfo>(
 				Template,
 				Parameter,
 				Output,
 				Include,
 				Assembly,
 				Import
-			});
+			);
 		}
 	}
 }

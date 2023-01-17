@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using JetBrains.Annotations;
 using JetBrains.DataStructures;
@@ -31,7 +32,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 		[NotNull]
 		public DirectiveAttributeInfo VisibilityAttribute { get; }
 
-		public override JetImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+		public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
 		public TemplateDirectiveInfo() : base("template")
 		{
@@ -51,8 +52,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 			VisibilityAttribute = new T4VisibilityDirectiveAttributeInfo(DirectiveAttributeOptions.None);
 
 
-			SupportedAttributes = new List<DirectiveAttributeInfo>(8)
-			{
+			SupportedAttributes = ImmutableArray.Create(
 				LanguageAttribute,
 				HostSpecificAttribute,
 				DebugAttribute,
@@ -61,7 +61,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives
 				CompilerOptionsAttribute,
 				LinePragmasAttribute,
 				VisibilityAttribute
-			}.ToImmutableArray();
+			);
 		}
 	}
 }

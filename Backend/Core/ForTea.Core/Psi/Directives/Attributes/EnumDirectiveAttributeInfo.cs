@@ -1,18 +1,18 @@
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 
 namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 
 	public class EnumDirectiveAttributeInfo : DirectiveAttributeInfo {
 
-		[NotNull] [ItemNotNull] private readonly JetImmutableArray<string> _enumValues;
+		[NotNull] [ItemNotNull] private readonly ImmutableArray<string> _enumValues;
 		
 		public override bool IsValid(string value)
 			=> _enumValues.Contains(value, StringComparer.OrdinalIgnoreCase);
 
-		public override JetImmutableArray<string> IntelliSenseValues
+		public override ImmutableArray<string> IntelliSenseValues
 			=> _enumValues;
 
 		public EnumDirectiveAttributeInfo(

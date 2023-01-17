@@ -1,8 +1,8 @@
+using System.Collections.Immutable;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Directives {
@@ -12,7 +12,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 		[NotNull]
 		public DirectiveAttributeInfo NamespaceAttribute { get; }
 
-		public override JetImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+		public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
 		[NotNull]
 		public IT4Directive CreateDirective([NotNull] string namespaceName)
@@ -24,7 +24,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 				"namespace",
 				DirectiveAttributeOptions.Required | DirectiveAttributeOptions.DisplayInCodeStructure
 			);
-			SupportedAttributes = ImmutableArray.FromArguments(NamespaceAttribute);
+			SupportedAttributes = ImmutableArray.Create(NamespaceAttribute);
 		}
 
 	}
