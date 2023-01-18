@@ -15,7 +15,7 @@ plugins {
   id("me.filippov.gradle.jvm.wrapper") version "0.11.0"
   // Version is configured in gradle.properties
   id("com.jetbrains.rdgen")
-  kotlin("jvm") version "1.7.0"
+  kotlin("jvm") version "1.8.0"
 }
 
 apply {
