@@ -1,6 +1,6 @@
+using System.Collections.Immutable;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 
 namespace GammaJul.ForTea.Core.Psi.Directives {
 
@@ -18,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 			: base("output") {
 			ExtensionAttribute = new DirectiveAttributeInfo("extension", DirectiveAttributeOptions.None);
 			EncodingAttribute = new EncodingDirectiveAttributeInfo(DirectiveAttributeOptions.None);
-			SupportedAttributes = ImmutableArray.FromArguments(ExtensionAttribute, EncodingAttribute);
+			SupportedAttributes = ImmutableArray.Create(ExtensionAttribute, EncodingAttribute);
 		}
 
 	}

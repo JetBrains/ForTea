@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using JetBrains.Annotations;
@@ -11,7 +12,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 	public class CultureDirectiveAttributeInfo : DirectiveAttributeInfo {
 
 		[NotNull] [ItemNotNull] private readonly Lazy<JetHashSet<string>> _cultureCodes;
-		[CanBeNull] [ItemNotNull] private ImmutableArray<string> _intellisenseValues;
+		[CanBeNull] [ItemNotNull] private ImmutableArray<string>? _intellisenseValues;
 
 		[NotNull]
 		private static JetHashSet<string> CreateCultureCodes()
@@ -27,7 +28,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 			=> _cultureCodes.Value.Contains(value);
 
 		public override ImmutableArray<string> IntelliSenseValues
-			=> _intellisenseValues ?? (_intellisenseValues = _cultureCodes.Value.ToImmutableArray());
+			=> _intellisenseValues ?? (_intellisenseValues = _cultureCodes.Value.ToImmutableArray()).Value;
 
 		public CultureDirectiveAttributeInfo([NotNull] string name, DirectiveAttributeOptions options)
 			: base(name, options) {

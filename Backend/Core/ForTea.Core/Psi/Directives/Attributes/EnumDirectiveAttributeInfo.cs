@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 
 namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
 
