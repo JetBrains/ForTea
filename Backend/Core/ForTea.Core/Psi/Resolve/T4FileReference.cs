@@ -9,28 +9,27 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve
 {
-	public sealed class T4FileReference : PathReferenceBase<IT4DirectiveAttribute, ITreeNode>
-	{
-		[NotNull]
-		private VirtualFileSystemPath Path { get; }
+  public sealed class T4FileReference : PathReferenceBase<IT4DirectiveAttribute, ITreeNode>
+  {
+    [NotNull] private VirtualFileSystemPath Path { get; }
 
-		public T4FileReference(
-			[NotNull] IT4DirectiveAttribute owner,
-			[NotNull] ITreeNode node,
-			[NotNull] VirtualFileSystemPath path
-		) : base(
-			owner,
-			null,
-			node,
-			SelectRange(node)
-		) => Path = path;
+    public T4FileReference(
+      [NotNull] IT4DirectiveAttribute owner,
+      [NotNull] ITreeNode node,
+      [NotNull] VirtualFileSystemPath path
+    ) : base(
+      owner,
+      null,
+      node,
+      SelectRange(node)
+    ) => Path = path;
 
-		public override VirtualFileSystemPath GetBasePath() => Path.Parent;
+    public override VirtualFileSystemPath GetBasePath() => Path.Parent;
 
-		protected override IReference BindToInternal(IDeclaredElement declaredElement, ISubstitution substitution) =>
-			this;
+    protected override IReference BindToInternal(IDeclaredElement declaredElement, ISubstitution substitution) =>
+      this;
 
-		private static TreeTextRange SelectRange(ITreeNode node) => node.GetUnquotedRangeWithin();
-		public override bool IsValid() => true;
-	}
+    private static TreeTextRange SelectRange(ITreeNode node) => node.GetUnquotedRangeWithin();
+    public override bool IsValid() => true;
+  }
 }

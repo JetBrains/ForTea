@@ -8,15 +8,15 @@ using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference
 {
-	public interface IT4LowLevelReferenceExtractionManager
-	{
-		[NotNull]
-		IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
-			[NotNull, ItemNotNull] IList<VirtualFileSystemPath> directDependencies,
-			[NotNull] IModuleReferenceResolveContext resolveContext
-		);
+  public interface IT4LowLevelReferenceExtractionManager
+  {
+    [NotNull]
+    IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
+      [NotNull, ItemNotNull] IList<VirtualFileSystemPath> directDependencies,
+      [NotNull] IModuleReferenceResolveContext resolveContext
+    );
 
-		[CanBeNull]
-		MetadataReference ResolveMetadata(Lifetime lifetime, [NotNull] VirtualFileSystemPath path);
-	}
+    [CanBeNull]
+    MetadataReference ResolveMetadata(Lifetime lifetime, [NotNull] VirtualFileSystemPath path);
+  }
 }

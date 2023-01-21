@@ -12,42 +12,42 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 
-namespace GammaJul.ForTea.Core.Services.CodeCompletion {
+namespace GammaJul.ForTea.Core.Services.CodeCompletion
+{
+  [SolutionComponent]
+  public class AutopopupInDirective : IAutomaticCodeCompletionStrategy
+  {
+    [NotNull] private readonly SettingsScalarEntry _settingsEntry;
 
-	[SolutionComponent]
-	public class AutopopupInDirective : IAutomaticCodeCompletionStrategy {
+    public bool AcceptTyping(char c, ITextControl textControl, IContextBoundSettingsStore boundSettingsStore)
+      => Char.IsLetterOrDigit(c) || c == ' ' || c == '"';
 
-		[NotNull] private readonly SettingsScalarEntry _settingsEntry;
+    public bool ProcessSubsequentTyping(char c, ITextControl textControl)
+      => Char.IsLetterOrDigit(c);
 
-		public bool AcceptTyping(char c, ITextControl textControl, IContextBoundSettingsStore boundSettingsStore)
-			=> Char.IsLetterOrDigit(c) || c == ' ' || c == '"';
+    public bool AcceptsFile(IFile file, ITextControl textControl)
+      => file is IT4File && this.MatchTokenType(file, textControl, IsSupportedTokenType);
 
-		public bool ProcessSubsequentTyping(char c, ITextControl textControl)
-			=> Char.IsLetterOrDigit(c);
+    private static bool IsSupportedTokenType(TokenNodeType tokenType)
+      => tokenType == T4TokenNodeTypes.TOKEN
+         || tokenType == T4TokenNodeTypes.WHITE_SPACE
+         || tokenType == T4TokenNodeTypes.DIRECTIVE_START
+         || tokenType == T4TokenNodeTypes.QUOTE
+         || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
 
-		public bool AcceptsFile(IFile file, ITextControl textControl)
-			=> file is IT4File && this.MatchTokenType(file, textControl, IsSupportedTokenType);
+    public AutopopupType IsEnabledInSettings(IContextBoundSettingsStore settingsStore, ITextControl textControl)
+      => (AutopopupType)settingsStore.GetValue(_settingsEntry, null);
 
-		private static bool IsSupportedTokenType(TokenNodeType tokenType)
-			=> tokenType == T4TokenNodeTypes.TOKEN
-			|| tokenType == T4TokenNodeTypes.WHITE_SPACE
-			|| tokenType == T4TokenNodeTypes.DIRECTIVE_START
-			|| tokenType == T4TokenNodeTypes.QUOTE
-			|| tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
+    public PsiLanguageType Language
+      => T4Language.Instance;
 
-		public AutopopupType IsEnabledInSettings(IContextBoundSettingsStore settingsStore, ITextControl textControl)
-			=> (AutopopupType) settingsStore.GetValue(_settingsEntry, null);
+    public bool ForceHideCompletion
+      => false;
 
-		public PsiLanguageType Language
-			=> T4Language.Instance;
-
-		public bool ForceHideCompletion
-			=> false;
-
-		public AutopopupInDirective([NotNull] ISettingsStore settingsStore) {
-			_settingsEntry = settingsStore.Schema.GetScalarEntry<T4AutopopupSettingsKey, AutopopupType>(key => key.InDirectives);
-		}
-
-	}
-
+    public AutopopupInDirective([NotNull] ISettingsStore settingsStore)
+    {
+      _settingsEntry
+        = settingsStore.Schema.GetScalarEntry<T4AutopopupSettingsKey, AutopopupType>(key => key.InDirectives);
+    }
+  }
 }

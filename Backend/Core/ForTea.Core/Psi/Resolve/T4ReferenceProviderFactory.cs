@@ -9,22 +9,21 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve
 {
-	[ReferenceProviderFactory]
-	public sealed class T4ReferenceProviderFactory : IReferenceProviderFactory
-	{
-		public ISignal<IReferenceProviderFactory> Changed { get; }
+  [ReferenceProviderFactory]
+  public sealed class T4ReferenceProviderFactory : IReferenceProviderFactory
+  {
+    public ISignal<IReferenceProviderFactory> Changed { get; }
 
-		[NotNull]
-		private IT4IncludeResolver IncludeResolver { get; }
+    [NotNull] private IT4IncludeResolver IncludeResolver { get; }
 
-		// ReSharper disable once AssignNullToNotNullAttribute
-		public T4ReferenceProviderFactory(Lifetime lifetime, [NotNull] IT4IncludeResolver includeResolver)
-		{
-			IncludeResolver = includeResolver;
-			Changed = new Signal<IReferenceProviderFactory>(lifetime, GetType().FullName);
-		}
+    // ReSharper disable once AssignNullToNotNullAttribute
+    public T4ReferenceProviderFactory(Lifetime lifetime, [NotNull] IT4IncludeResolver includeResolver)
+    {
+      IncludeResolver = includeResolver;
+      Changed = new Signal<IReferenceProviderFactory>(lifetime, GetType().FullName);
+    }
 
-		public IReferenceFactory CreateFactory(IPsiSourceFile sourceFile, IFile file, IWordIndex wordIndexForChecks) =>
-			sourceFile.PrimaryPsiLanguage.Is<T4Language>() ? new T4ReferenceFactory(IncludeResolver) : null;
-	}
+    public IReferenceFactory CreateFactory(IPsiSourceFile sourceFile, IFile file, IWordIndex wordIndexForChecks) =>
+      sourceFile.PrimaryPsiLanguage.Is<T4Language>() ? new T4ReferenceFactory(IncludeResolver) : null;
+  }
 }

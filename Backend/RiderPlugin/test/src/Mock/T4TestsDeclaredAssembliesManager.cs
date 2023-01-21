@@ -8,17 +8,17 @@ using JetBrains.ReSharper.Psi.Files;
 
 namespace JetBrains.ForTea.Tests.Mock
 {
-	[PsiComponent]
-	public sealed class T4TestsDeclaredAssembliesManager : T4DeclaredAssembliesManager
-	{
-		public T4TestsDeclaredAssembliesManager(
-			Lifetime lifetime,
-			[NotNull] IPsiFiles psiFiles,
-			[NotNull] IShellLocks locks
-		) : base(lifetime, psiFiles, locks)
-		{
-		}
+  [PsiComponent]
+  public sealed class T4TestsDeclaredAssembliesManager : T4DeclaredAssembliesManager
+  {
+    public T4TestsDeclaredAssembliesManager(
+      Lifetime lifetime,
+      [NotNull] IPsiFiles psiFiles,
+      [NotNull] IShellLocks locks
+    ) : base(lifetime, psiFiles, locks)
+    {
+    }
 
-		protected override void CreateOrUpdateData(IT4File t4File) => DoInvalidateAssemblies(t4File);
-	}
+    protected override void CreateOrUpdateData(IT4File t4File) => DoInvalidateAssemblies(t4File);
+  }
 }

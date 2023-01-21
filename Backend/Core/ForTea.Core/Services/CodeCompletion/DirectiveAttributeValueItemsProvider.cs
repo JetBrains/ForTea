@@ -12,55 +12,59 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace GammaJul.ForTea.Core.Services.CodeCompletion {
+namespace GammaJul.ForTea.Core.Services.CodeCompletion
+{
+  [Language(typeof(T4Language))]
+  public class DirectiveAttributeValueItemsProvider : ItemsProviderOfSpecificContext<T4CodeCompletionContext>
+  {
+    protected override LookupFocusBehaviour GetLookupFocusBehaviour(T4CodeCompletionContext context)
+      => LookupFocusBehaviour.SoftWhenEmpty;
 
-	[Language(typeof(T4Language))]
-	public class DirectiveAttributeValueItemsProvider : ItemsProviderOfSpecificContext<T4CodeCompletionContext> {
-		protected override LookupFocusBehaviour GetLookupFocusBehaviour(T4CodeCompletionContext context)
-			=> LookupFocusBehaviour.SoftWhenEmpty;
+    protected override bool IsAvailable(T4CodeCompletionContext context)
+    {
+      ITreeNode node = context.BasicContext.File.FindNodeAt(context.BasicContext.SelectedTreeRange);
+      if (!(node?.Parent is IT4DirectiveAttribute))
+        return false;
 
-		protected override bool IsAvailable(T4CodeCompletionContext context) {
-			ITreeNode node = context.BasicContext.File.FindNodeAt(context.BasicContext.SelectedTreeRange);
-			if (!(node?.Parent is IT4DirectiveAttribute))
-				return false;
+      TokenNodeType tokenType = node.GetTokenType();
+      if (tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE)
+        return true;
 
-			TokenNodeType tokenType = node.GetTokenType();
-			if (tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE)
-				return true;
+      if (tokenType == T4TokenNodeTypes.QUOTE)
+      {
+        ITreeNode leftSibling = node.GetPreviousMeaningfulSibling();
+        if (leftSibling != null && leftSibling.GetTokenType() == T4TokenNodeTypes.EQUAL)
+          return true;
+      }
 
-			if (tokenType == T4TokenNodeTypes.QUOTE) {
-				ITreeNode leftSibling = node.GetPreviousMeaningfulSibling();
-				if (leftSibling != null && leftSibling.GetTokenType() == T4TokenNodeTypes.EQUAL)
-					return true;
-			}
+      return false;
+    }
 
-			return false;
-		}
+    protected override bool AddLookupItems(T4CodeCompletionContext context, IItemsCollector collector)
+    {
+      ITreeNode node = context.BasicContext.File.FindNodeAt(context.BasicContext.SelectedTreeRange);
+      Assertion.AssertNotNull(node, "node == null");
+      var ranges = context.BasicContext.GetRanges(node);
 
-		protected override bool AddLookupItems(T4CodeCompletionContext context, IItemsCollector collector) {
-			ITreeNode node = context.BasicContext.File.FindNodeAt(context.BasicContext.SelectedTreeRange);
-			Assertion.AssertNotNull(node, "node == null");
-			var ranges = context.BasicContext.GetRanges(node);
+      var attribute = node.GetContainingNode<IT4DirectiveAttribute>();
+      Assertion.AssertNotNull(attribute, "attribute != null");
 
-			var attribute = node.GetContainingNode<IT4DirectiveAttribute>();
-			Assertion.AssertNotNull(attribute, "attribute != null");
+      var directive = attribute.GetContainingNode<IT4Directive>();
+      Assertion.AssertNotNull(directive, "directive != null");
 
-			var directive = attribute.GetContainingNode<IT4Directive>();
-			Assertion.AssertNotNull(directive, "directive != null");
+      DirectiveInfo directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name.GetText());
+      DirectiveAttributeInfo attributeInfo = directiveInfo?.GetAttributeByName(attribute.Name.GetText());
+      if (attributeInfo == null)
+        return false;
 
-			DirectiveInfo directiveInfo = T4DirectiveInfoManager.GetDirectiveByName(directive.Name.GetText());
-			DirectiveAttributeInfo attributeInfo = directiveInfo?.GetAttributeByName(attribute.Name.GetText());
-			if (attributeInfo == null)
-				return false;
-			
-			foreach (string intellisenseValue in attributeInfo.IntelliSenseValues) {
-				var item = new TextLookupItem(intellisenseValue);
-				item.InitializeRanges(ranges, context.BasicContext);
-				collector.Add(item);
-			}
+      foreach (string intellisenseValue in attributeInfo.IntelliSenseValues)
+      {
+        var item = new TextLookupItem(intellisenseValue);
+        item.InitializeRanges(ranges, context.BasicContext);
+        collector.Add(item);
+      }
 
-			return true;
-		}
-	}
-
+      return true;
+    }
+  }
 }

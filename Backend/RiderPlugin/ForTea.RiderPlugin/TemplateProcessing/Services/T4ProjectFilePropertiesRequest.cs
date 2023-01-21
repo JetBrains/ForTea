@@ -4,22 +4,22 @@ using JetBrains.ProjectModel.Properties;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
 {
-	[ShellComponent]
-	public class T4ProjectFilePropertiesRequest : IProjectFilePropertiesRequest
-	{
-		public const string AutoGenProperty = "AutoGen";
-		public const string DesignTimeProperty = "DesignTime";
-		public const string GeneratorProperty = "Generator";
-		public const string LastGenOutputProperty = "LastGenOutput";
+  [ShellComponent]
+  public class T4ProjectFilePropertiesRequest : IProjectFilePropertiesRequest
+  {
+    public const string AutoGenProperty = "AutoGen";
+    public const string DesignTimeProperty = "DesignTime";
+    public const string GeneratorProperty = "Generator";
+    public const string LastGenOutputProperty = "LastGenOutput";
 
-		private static IEnumerable<string> OurRequestedProperties { get; } = new[]
-		{
-			AutoGenProperty,
-			DesignTimeProperty,
-			GeneratorProperty,
-			LastGenOutputProperty
-		};
+    private static IEnumerable<string> OurRequestedProperties { get; } = new[]
+    {
+      AutoGenProperty,
+      DesignTimeProperty,
+      GeneratorProperty,
+      LastGenOutputProperty
+    };
 
-		public IEnumerable<string> RequestedProperties => OurRequestedProperties;
-	}
+    public IEnumerable<string> RequestedProperties => OurRequestedProperties;
+  }
 }

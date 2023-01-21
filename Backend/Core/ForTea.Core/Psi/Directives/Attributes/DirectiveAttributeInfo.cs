@@ -4,37 +4,36 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.DataStructures;
 
-namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
+namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
+{
+  public class DirectiveAttributeInfo
+  {
+    private readonly DirectiveAttributeOptions _options;
 
-	public class DirectiveAttributeInfo {
+    [NotNull] public string Name { get; }
 
-		private readonly DirectiveAttributeOptions _options;
+    public bool IsRequired
+      => (_options & DirectiveAttributeOptions.Required) == DirectiveAttributeOptions.Required;
 
-		[NotNull]
-		public string Name { get; }
+    public bool IsDisplayedInCodeStructure
+      => (_options & DirectiveAttributeOptions.DisplayInCodeStructure) ==
+         DirectiveAttributeOptions.DisplayInCodeStructure;
 
-		public bool IsRequired
-			=> (_options & DirectiveAttributeOptions.Required) == DirectiveAttributeOptions.Required;
+    public virtual bool IsValid(string value)
+      => true;
 
-		public bool IsDisplayedInCodeStructure
-			=> (_options & DirectiveAttributeOptions.DisplayInCodeStructure) == DirectiveAttributeOptions.DisplayInCodeStructure;
+    [NotNull]
+    public virtual ImmutableArray<string> IntelliSenseValues
+      => ImmutableArray<string>.Empty;
 
-		public virtual bool IsValid(string value)
-			=> true;
+    [NotNull]
+    public IT4DirectiveAttribute CreateDirectiveAttribute([CanBeNull] string value)
+      => T4ElementFactory.CreateDirectiveAttribute(Name, value);
 
-		[NotNull]
-		public virtual ImmutableArray<string> IntelliSenseValues
-			=> ImmutableArray<string>.Empty;
-
-		[NotNull]
-		public IT4DirectiveAttribute CreateDirectiveAttribute([CanBeNull] string value)
-			=> T4ElementFactory.CreateDirectiveAttribute(Name, value);
-
-		public DirectiveAttributeInfo([NotNull] string name, DirectiveAttributeOptions options) {
-			Name = name;
-			_options = options;
-		}
-
-	}
-
+    public DirectiveAttributeInfo([NotNull] string name, DirectiveAttributeOptions options)
+    {
+      Name = name;
+      _options = options;
+    }
+  }
 }

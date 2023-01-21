@@ -5,11 +5,11 @@ using JetBrains.ReSharper.Psi.CSharp.Impl.CodeStyle;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders.Impl
 {
-	[ProjectFileType(typeof(T4ProjectFileType))]
-	internal sealed class T4ComplexCodeBlockInnerBoundSpaceTypeProvider : T4BlockInnerBoundSpaceTypeProviderBase
-	{
-		protected override SpaceType Type => SpaceType.VerticalNearBrackets;
-		protected override string StartComment => T4CSharpCodeBehindIntermediateConverter.CodeCommentStartText;
-		protected override string EndComment => T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
-	}
+  [ProjectFileType(typeof(T4ProjectFileType))]
+  internal sealed class T4ComplexCodeBlockInnerBoundSpaceTypeProvider : T4BlockInnerBoundSpaceTypeProviderBase
+  {
+    protected override SpaceType Type => SpaceType.VerticalNearBrackets;
+    protected override string StartComment => T4CSharpCodeBehindIntermediateConverter.CodeCommentStartText;
+    protected override string EndComment => T4CSharpCodeBehindIntermediateConverter.CodeCommentEndText;
+  }
 }

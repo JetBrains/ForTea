@@ -8,32 +8,28 @@ using JetBrains.Annotations;
 using JetBrains.DataStructures;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Directives {
+namespace GammaJul.ForTea.Core.Psi.Directives
+{
+  /// <summary>Contains information about supported T4 directives.</summary>
+  public abstract class DirectiveInfo
+  {
+    [NotNull] public string Name { get; }
 
-	/// <summary>Contains information about supported T4 directives.</summary>
-	public abstract class DirectiveInfo {
+    [NotNull] [ItemNotNull] public abstract ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
-		[NotNull]
-		public string Name { get; }
+    [CanBeNull]
+    public DirectiveAttributeInfo GetAttributeByName([CanBeNull] string attributeName)
+      => String.IsNullOrEmpty(attributeName)
+        ? null
+        : SupportedAttributes.FirstOrDefault(di => di.Name.Equals(attributeName, StringComparison.OrdinalIgnoreCase));
 
-		[NotNull]
-		[ItemNotNull]
-		public abstract ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+    [NotNull]
+    public IT4Directive CreateDirective([CanBeNull] params Pair<string, string>[] attributes)
+      => T4ElementFactory.CreateDirective(Name, attributes);
 
-		[CanBeNull]
-		public DirectiveAttributeInfo GetAttributeByName([CanBeNull] string attributeName)
-			=> String.IsNullOrEmpty(attributeName)
-				? null
-				: SupportedAttributes.FirstOrDefault(di => di.Name.Equals(attributeName, StringComparison.OrdinalIgnoreCase));
-
-		[NotNull]
-		public IT4Directive CreateDirective([CanBeNull] params Pair<string, string>[] attributes)
-			=> T4ElementFactory.CreateDirective(Name, attributes);
-
-		protected DirectiveInfo([NotNull] string name) {
-			Name = name;
-		}
-
-	}
-
+    protected DirectiveInfo([NotNull] string name)
+    {
+      Name = name;
+    }
+  }
 }

@@ -5,14 +5,14 @@ using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 {
-	public interface IT4MacroResolver
-	{
-		[NotNull]
-		IReadOnlyDictionary<string, string> ResolveHeavyMacros(
-			[NotNull, ItemNotNull] IEnumerable<string> macros,
-			[NotNull] IProjectFile file
-		);
+  public interface IT4MacroResolver
+  {
+    [NotNull]
+    IReadOnlyDictionary<string, string> ResolveHeavyMacros(
+      [NotNull, ItemNotNull] IEnumerable<string> macros,
+      [NotNull] IProjectFile file
+    );
 
-		bool IsSupported([NotNull] IT4Macro macro);
-	}
+    bool IsSupported([NotNull] IT4Macro macro);
+  }
 }

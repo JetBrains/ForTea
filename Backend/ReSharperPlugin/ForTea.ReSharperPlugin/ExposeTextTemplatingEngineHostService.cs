@@ -2,18 +2,17 @@
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 
-namespace JetBrains.ForTea.ReSharperPlugin {
+namespace JetBrains.ForTea.ReSharperPlugin
+{
+  [WrapVsInterfaces]
+  public class ExposeTextTemplatingEngineServices : IExposeVsServices
+  {
+    public void Register(VsServiceProviderResolver.VsServiceMap map)
+    {
+      if (map.Resolve(typeof(ITextTemplatingEngineHost)) != null)
+        return;
 
-	[WrapVsInterfaces]
-	public class ExposeTextTemplatingEngineServices : IExposeVsServices {
-
-		public void Register(VsServiceProviderResolver.VsServiceMap map) {
-			if (map.Resolve(typeof(ITextTemplatingEngineHost)) != null)
-				return;
-
-			map.QueryService<STextTemplating>().As<ITextTemplatingEngineHost>();
-		}
-
-	}
-
+      map.QueryService<STextTemplating>().As<ITextTemplatingEngineHost>();
+    }
+  }
 }

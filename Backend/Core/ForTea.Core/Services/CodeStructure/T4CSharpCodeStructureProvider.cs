@@ -15,171 +15,188 @@ using JetBrains.ReSharper.Psi.Files;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Services.CodeStructure {
+namespace GammaJul.ForTea.Core.Services.CodeStructure
+{
+  [ProjectFileType(typeof(T4ProjectFileType))]
+  public class T4CSharpCodeStructureProvider : IProjectFileCodeStructureProvider
+  {
+    public CodeStructureRootElement Build(IPsiSourceFile sourceFile, CodeStructureOptions options)
+    {
+      if (!(sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File))
+        return null;
 
-	[ProjectFileType(typeof(T4ProjectFileType))]
-	public class T4CSharpCodeStructureProvider : IProjectFileCodeStructureProvider {
-		public CodeStructureRootElement Build(IPsiSourceFile sourceFile, CodeStructureOptions options) {
-			if (!(sourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File))
-				return null;
+      var cSharpFile = sourceFile.GetTheOnlyPsiFile(CSharpLanguage.Instance) as ICSharpFile;
 
-			var cSharpFile = sourceFile.GetTheOnlyPsiFile(CSharpLanguage.Instance) as ICSharpFile;
+      var secondaryRangeTranslator = (cSharpFile as IFileImpl)?.SecondaryRangeTranslator;
+      if (secondaryRangeTranslator == null)
+        return null;
 
-			var secondaryRangeTranslator = (cSharpFile as IFileImpl)?.SecondaryRangeTranslator;
-			if (secondaryRangeTranslator == null)
-				return null;
+      var state = new CSharpCodeStructureProcessingState(CodeStructureOptions.Default);
 
-			var state = new CSharpCodeStructureProcessingState(CodeStructureOptions.Default);
+      var rootElement = new T4CodeStructureRootElement(t4File);
+      foreach (ITreeNode treeNode in t4File.Children())
+        ProcessT4Node(treeNode, rootElement, cSharpFile, secondaryRangeTranslator, state);
+      return rootElement;
+    }
 
-			var rootElement = new T4CodeStructureRootElement(t4File);
-			foreach (ITreeNode treeNode in t4File.Children())
-				ProcessT4Node(treeNode, rootElement, cSharpFile, secondaryRangeTranslator, state);
-			return rootElement;
-		}
+    private void ProcessT4Node(
+      [NotNull] ITreeNode node,
+      [NotNull] CodeStructureElement parentElement,
+      [NotNull] ICSharpFile cSharpFile,
+      [NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
+      [NotNull] CSharpCodeStructureProcessingState state
+    )
+    {
+      Interruption.Current.CheckAndThrow();
 
-		private void ProcessT4Node(
-			[NotNull] ITreeNode node,
-			[NotNull] CodeStructureElement parentElement,
-			[NotNull] ICSharpFile cSharpFile,
-			[NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
-			[NotNull] CSharpCodeStructureProcessingState state
-		) {
-			Interruption.Current.CheckAndThrow();
+      switch (node)
+      {
+        case IT4Directive directive:
+          ProcessT4Directive(directive, parentElement);
+          return;
+        case IT4FeatureBlock featureBlock:
+          ProcessT4FeatureBlock(featureBlock, parentElement, cSharpFile, secondaryRangeTranslator, state);
+          break;
+      }
+    }
 
-			switch (node) {
-				case IT4Directive directive:
-					ProcessT4Directive(directive, parentElement);
-					return;
-				case IT4FeatureBlock featureBlock:
-					ProcessT4FeatureBlock(featureBlock, parentElement, cSharpFile, secondaryRangeTranslator, state);
-					break;
-			}
-		}
+    [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+    private void ProcessT4Directive([NotNull] IT4Directive directive, [NotNull] CodeStructureElement parentElement)
+      => new T4CodeStructureDirective(parentElement, directive);
 
-		[SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
-		private void ProcessT4Directive([NotNull] IT4Directive directive, [NotNull] CodeStructureElement parentElement)
-			=> new T4CodeStructureDirective(parentElement, directive);
+    private static void ProcessT4FeatureBlock(
+      [NotNull] IT4FeatureBlock featureBlock,
+      [NotNull] CodeStructureElement parentElement,
+      [NotNull] ICSharpFile cSharpFile,
+      [NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
+      [NotNull] CSharpCodeStructureProcessingState state
+    )
+    {
+      TreeTextRange t4Range = featureBlock.Code.GetTreeTextRange();
+      TreeTextRange cSharpRange = secondaryRangeTranslator.OriginalToGenerated(t4Range);
+      if (!cSharpRange.IsValid())
+        return;
 
-		private static void ProcessT4FeatureBlock(
-			[NotNull] IT4FeatureBlock featureBlock,
-			[NotNull] CodeStructureElement parentElement,
-			[NotNull] ICSharpFile cSharpFile,
-			[NotNull] ISecondaryRangeTranslator secondaryRangeTranslator,
-			[NotNull] CSharpCodeStructureProcessingState state
-		) {
-			TreeTextRange t4Range = featureBlock.Code.GetTreeTextRange();
-			TreeTextRange cSharpRange = secondaryRangeTranslator.OriginalToGenerated(t4Range);
-			if (!cSharpRange.IsValid())
-				return;
+      TreeOffset cSharpStart = cSharpRange.StartOffset;
+      TreeOffset cSharpEnd = cSharpRange.EndOffset;
 
-			TreeOffset cSharpStart = cSharpRange.StartOffset;
-			TreeOffset cSharpEnd = cSharpRange.EndOffset;
+      ITreeNode containingNode = cSharpFile.FindNodeAt(cSharpRange);
+      if (containingNode == null)
+        return;
 
-			ITreeNode containingNode = cSharpFile.FindNodeAt(cSharpRange);
-			if (containingNode == null)
-				return;
+      for (ITreeNode node = containingNode.FirstChild; node != null; node = node.NextSibling)
+      {
+        TreeOffset nodeStart = node.GetTreeStartOffset();
+        if (nodeStart >= cSharpStart && nodeStart < cSharpEnd)
+          ProcessCSharpNode(node, parentElement, state);
+      }
+    }
 
-			for (ITreeNode node = containingNode.FirstChild; node != null; node = node.NextSibling) {
-				TreeOffset nodeStart = node.GetTreeStartOffset();
-				if (nodeStart >= cSharpStart && nodeStart < cSharpEnd)
-					ProcessCSharpNode(node, parentElement, state);
-			}
-		}
+    private static void ProcessCSharpNode([NotNull] ITreeNode node, [NotNull] CodeStructureElement parentElement,
+      [NotNull] CSharpCodeStructureProcessingState state)
+    {
+      Interruption.Current.CheckAndThrow();
 
-		private static void ProcessCSharpNode([NotNull] ITreeNode node, [NotNull] CodeStructureElement parentElement,
-			[NotNull] CSharpCodeStructureProcessingState state) {
-			Interruption.Current.CheckAndThrow();
+      switch (node)
+      {
+        case IDeclaration declaration:
+          if (!declaration.IsSynthetic())
+            ProcessCSharpDeclaration(declaration, parentElement, state);
+          return;
+        case IMultipleDeclaration multiDeclaration:
+          ProcessCSharpMultipleDeclaration(multiDeclaration, parentElement, state);
+          return;
+        case IPreprocessorDirective preprocessorDirective:
+          ProcessCSharpPreprocessorDirective(preprocessorDirective, parentElement, state);
+          break;
+      }
+    }
 
-			switch (node) {
-				case IDeclaration declaration:
-					if (!declaration.IsSynthetic())
-						ProcessCSharpDeclaration(declaration, parentElement, state);
-					return;
-				case IMultipleDeclaration multiDeclaration:
-					ProcessCSharpMultipleDeclaration(multiDeclaration, parentElement, state);
-					return;
-				case IPreprocessorDirective preprocessorDirective:
-					ProcessCSharpPreprocessorDirective(preprocessorDirective, parentElement, state);
-					break;
-			}
-		}
+    private static void ProcessCSharpChildren(
+      [NotNull] ITreeNode node,
+      [NotNull] CodeStructureElement parentElement,
+      [NotNull] CSharpCodeStructureProcessingState state
+    )
+    {
+      foreach (ITreeNode childNode in node.Children())
+        ProcessCSharpNode(childNode, parentElement, state);
+    }
 
-		private static void ProcessCSharpChildren(
-			[NotNull] ITreeNode node,
-			[NotNull] CodeStructureElement parentElement,
-			[NotNull] CSharpCodeStructureProcessingState state
-		) {
-			foreach (ITreeNode childNode in node.Children())
-				ProcessCSharpNode(childNode, parentElement, state);
-		}
+    private static void ProcessCSharpDeclaration(
+      [NotNull] IDeclaration declaration,
+      [NotNull] CodeStructureElement parentElement,
+      [NotNull] CSharpCodeStructureProcessingState state
+    )
+    {
+      switch (declaration)
+      {
+        case IClassLikeDeclaration classLikeDeclaration:
+        {
+          var codeStructureClass = new T4CSharpCodeStructureDeclaredElement(parentElement, declaration, state);
+          if (classLikeDeclaration.Body != null)
+            ProcessCSharpChildren(classLikeDeclaration.Body, codeStructureClass, state);
+          return;
+        }
 
-		private static void ProcessCSharpDeclaration(
-			[NotNull] IDeclaration declaration,
-			[NotNull] CodeStructureElement parentElement,
-			[NotNull] CSharpCodeStructureProcessingState state
-		) {
-			switch (declaration) {
-				
-				case IClassLikeDeclaration classLikeDeclaration: {
-					var codeStructureClass = new T4CSharpCodeStructureDeclaredElement(parentElement, declaration, state);
-					if (classLikeDeclaration.Body != null)
-						ProcessCSharpChildren(classLikeDeclaration.Body, codeStructureClass, state);
-					return;
-				}
+        case ICSharpNamespaceDeclaration namespaceDeclaration:
+        {
+          var structureNamespace = new T4CSharpCodeStructureNamespace(parentElement, declaration, state);
+          if (namespaceDeclaration.Body != null)
+            ProcessCSharpChildren(namespaceDeclaration.Body, structureNamespace, state);
+          return;
+        }
 
-				case ICSharpNamespaceDeclaration namespaceDeclaration: {
-					var structureNamespace = new T4CSharpCodeStructureNamespace(parentElement, declaration, state);
-					if (namespaceDeclaration.Body != null)
-						ProcessCSharpChildren(namespaceDeclaration.Body, structureNamespace, state);
-					return;
-				}
+        case IAccessorDeclaration:
+          return;
 
-				case IAccessorDeclaration:
-					return;
+        case IEnumDeclaration enumDeclaration:
+        {
+          var codeStructureElement = new T4CSharpCodeStructureDeclaredElement(parentElement, declaration, state)
+            { InitiallyExpanded = false };
+          ProcessCSharpChildren(enumDeclaration.EnumBody, codeStructureElement, state);
+          return;
+        }
 
-				case IEnumDeclaration enumDeclaration: {
-					var codeStructureElement = new T4CSharpCodeStructureDeclaredElement(parentElement, declaration, state) { InitiallyExpanded = false };
-					ProcessCSharpChildren(enumDeclaration.EnumBody, codeStructureElement, state);
-					return;
-				}
+        default:
+        {
+          var codeStructureElement2 = new T4CSharpCodeStructureDeclaredElement(parentElement, declaration, state);
+          ProcessCSharpChildren(declaration, codeStructureElement2, state);
+          break;
+        }
+      }
+    }
 
-				default: {
-					var codeStructureElement2 = new T4CSharpCodeStructureDeclaredElement(parentElement, declaration, state);
-					ProcessCSharpChildren(declaration, codeStructureElement2, state);
-					break;
-				}
-			}
-		}
+    private static void ProcessCSharpMultipleDeclaration(
+      [NotNull] IMultipleDeclaration declaration,
+      [NotNull] CodeStructureElement parentElement,
+      [NotNull] CSharpCodeStructureProcessingState state
+    )
+    {
+      foreach (IMultipleDeclarationMember declarationMember in declaration.DeclaratorsEnumerable)
+      {
+        if (!declarationMember.IsSynthetic())
+          ProcessCSharpDeclaration(declarationMember, parentElement, state);
+      }
+    }
 
-		private static void ProcessCSharpMultipleDeclaration(
-			[NotNull] IMultipleDeclaration declaration,
-			[NotNull] CodeStructureElement parentElement,
-			[NotNull] CSharpCodeStructureProcessingState state
-		) {
-			foreach (IMultipleDeclarationMember declarationMember in declaration.DeclaratorsEnumerable) {
-				if (!declarationMember.IsSynthetic())
-					ProcessCSharpDeclaration(declarationMember, parentElement, state);
-			}
-		}
+    [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+    private static void ProcessCSharpPreprocessorDirective(
+      [NotNull] IPreprocessorDirective preprocessorDirective,
+      [NotNull] CodeStructureElement parentElement,
+      [NotNull] CSharpCodeStructureProcessingState state
+    )
+    {
+      switch (preprocessorDirective.Kind)
+      {
+        case PreprocessorDirectiveKind.REGION:
+          state.Regions.Push(new T4CSharpCodeStructureRegion(parentElement, preprocessorDirective, state));
+          break;
 
-		[SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
-		private static void ProcessCSharpPreprocessorDirective(
-			[NotNull] IPreprocessorDirective preprocessorDirective,
-			[NotNull] CodeStructureElement parentElement,
-			[NotNull] CSharpCodeStructureProcessingState state
-		) {
-			switch (preprocessorDirective.Kind) {
-
-				case PreprocessorDirectiveKind.REGION:
-					state.Regions.Push(new T4CSharpCodeStructureRegion(parentElement, preprocessorDirective, state));
-					break;
-
-				case PreprocessorDirectiveKind.ENDREGION:
-					state.Regions.TryPop();
-					new T4CSharpCodeStructureRegionEnd(parentElement, preprocessorDirective, state);
-					break;
-			}
-		}
-	}
-
+        case PreprocessorDirectiveKind.ENDREGION:
+          state.Regions.TryPop();
+          new T4CSharpCodeStructureRegionEnd(parentElement, preprocessorDirective, state);
+          break;
+      }
+    }
+  }
 }

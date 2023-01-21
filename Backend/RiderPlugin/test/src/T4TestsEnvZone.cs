@@ -1,5 +1,4 @@
 using GammaJul.ForTea.Core;
-
 using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.Environment;
 using JetBrains.ReSharper.Psi;
@@ -18,25 +17,25 @@ using JetBrains.TestFramework.Application.Zones;
 
 namespace JetBrains.ForTea.TestsActivator
 {
-	[ZoneDefinition]
-	public class T4TestsEnvZone : ITestsEnvZone
-	{
-		[ZoneActivator]
-		[ZoneMarker(typeof(T4TestsEnvZone))]
-		public class T4TestsZoneActivator
-			: IActivate<PsiFeatureTestZone>
-			, IActivate<IRiderPlatformZone>
-			, IActivate<IPsiLanguageZone>
-			, IActivate<ILanguageCSharpZone>
-			, IActivate<IT4TestZone>
-		{
-		}
-	}
+  [ZoneDefinition]
+  public class T4TestsEnvZone : ITestsEnvZone
+  {
+    [ZoneActivator]
+    [ZoneMarker(typeof(T4TestsEnvZone))]
+    public class T4TestsZoneActivator
+      : IActivate<PsiFeatureTestZone>
+        , IActivate<IRiderPlatformZone>
+        , IActivate<IPsiLanguageZone>
+        , IActivate<ILanguageCSharpZone>
+        , IActivate<IT4TestZone>
+    {
+    }
+  }
 
-	[ZoneDefinition]
-	public interface IT4TestZone : IZone, 
-									IRequire<IT4Zone>
-	{
-		
-	}
+  [ZoneDefinition]
+  public interface IT4TestZone
+    : IZone
+      , IRequire<IT4Zone>
+  {
+  }
 }

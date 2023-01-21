@@ -19,187 +19,178 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-	[SolutionComponent]
-	public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
-	{
-		[NotNull]
-		private IDictionary<VirtualFileSystemPath, T4EnvDTEHost> RunningFiles { get; }
+  [SolutionComponent]
+  public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
+  {
+    [NotNull] private IDictionary<VirtualFileSystemPath, T4EnvDTEHost> RunningFiles { get; }
 
-		[NotNull]
-		private object ExecutionLocker { get; } = new object();
+    [NotNull] private object ExecutionLocker { get; } = new object();
 
-		[NotNull]
-		private T4ProtocolModel Model { get; }
+    [NotNull] private T4ProtocolModel Model { get; }
 
-		private Lifetime Lifetime { get; }
+    private Lifetime Lifetime { get; }
 
-		[NotNull]
-		private ISolution Solution { get; }
+    [NotNull] private ISolution Solution { get; }
 
-		[NotNull]
-		private IT4ProjectModelTemplateMetadataManager TemplateMetadataManager { get; }
+    [NotNull] private IT4ProjectModelTemplateMetadataManager TemplateMetadataManager { get; }
 
-		[NotNull]
-		private BackgroundProgressManager BackgroundProgressManager { get; }
+    [NotNull] private BackgroundProgressManager BackgroundProgressManager { get; }
 
-		[NotNull]
-		private ProjectModelViewHost ProjectModelViewHost { get; }
+    [NotNull] private ProjectModelViewHost ProjectModelViewHost { get; }
 
-		[NotNull]
-		private NotificationsModel NotificationsModel { get; }
+    [NotNull] private NotificationsModel NotificationsModel { get; }
 
-		[NotNull]
-		private ILogger Logger { get; }
+    [NotNull] private ILogger Logger { get; }
 
-		public T4TemplateExecutionManager(
-			Lifetime lifetime,
-			[NotNull] ISolution solution,
-			[NotNull] ProjectModelViewHost projectModelViewHost,
-			[NotNull] NotificationsModel notificationsModel,
-			[NotNull] ILogger logger,
-			[NotNull] IT4ProjectModelTemplateMetadataManager templateMetadataManager,
-			[NotNull] BackgroundProgressManager backgroundProgressManager
-		)
-		{
-			Lifetime = lifetime;
-			Solution = solution;
-			ProjectModelViewHost = projectModelViewHost;
-			NotificationsModel = notificationsModel;
-			Logger = logger;
-			TemplateMetadataManager = templateMetadataManager;
-			BackgroundProgressManager = backgroundProgressManager;
-			Model = solution.GetProtocolSolution().GetT4ProtocolModel();
-			RunningFiles = new Dictionary<VirtualFileSystemPath, T4EnvDTEHost>();
-		}
+    public T4TemplateExecutionManager(
+      Lifetime lifetime,
+      [NotNull] ISolution solution,
+      [NotNull] ProjectModelViewHost projectModelViewHost,
+      [NotNull] NotificationsModel notificationsModel,
+      [NotNull] ILogger logger,
+      [NotNull] IT4ProjectModelTemplateMetadataManager templateMetadataManager,
+      [NotNull] BackgroundProgressManager backgroundProgressManager
+    )
+    {
+      Lifetime = lifetime;
+      Solution = solution;
+      ProjectModelViewHost = projectModelViewHost;
+      NotificationsModel = notificationsModel;
+      Logger = logger;
+      TemplateMetadataManager = templateMetadataManager;
+      BackgroundProgressManager = backgroundProgressManager;
+      Model = solution.GetProtocolSolution().GetT4ProtocolModel();
+      RunningFiles = new Dictionary<VirtualFileSystemPath, T4EnvDTEHost>();
+    }
 
-		public void RememberExecution(IT4File file, bool withProgress) =>
-			RememberExecution(file.PhysicalPsiSourceFile.NotNull().GetLocation(), withProgress);
+    public void RememberExecution(IT4File file, bool withProgress) =>
+      RememberExecution(file.PhysicalPsiSourceFile.NotNull().GetLocation(), withProgress);
 
-		public int GetEnvDTEPort(IT4File file)
-		{
-			bool hasInfo = RunningFiles.TryGetValue(file.PhysicalPsiSourceFile.GetLocation(), out var info);
-			if (!hasInfo) return 0;
-			return info.ConnectionManager.Port;
-		}
+    public int GetEnvDTEPort(IT4File file)
+    {
+      bool hasInfo = RunningFiles.TryGetValue(file.PhysicalPsiSourceFile.GetLocation(), out var info);
+      if (!hasInfo) return 0;
+      return info.ConnectionManager.Port;
+    }
 
-		private void RememberExecution([NotNull] VirtualFileSystemPath path, bool withProgress)
-		{
-			var definition = Lifetime.CreateNested();
-			if (withProgress)
-			{
-				var progress = new ProgressIndicator(definition.Lifetime);
-				IProgressIndicator iProgress = progress;
-				iProgress.Start(1);
-				progress.Advance();
-				var task = BackgroundProgressBuilder
-					.FromProgressIndicator(progress)
-					.AsIndeterminate()
-					.WithHeader("Executing template")
-					.WithDescription($"{path.Name}")
-					.Build();
-				Solution.Locks.ExecuteOrQueueEx(
-					definition.Lifetime,
-					"T4 execution progress launching",
-					() => BackgroundProgressManager.AddNewTask(definition.Lifetime, task)
-				);
-			}
+    private void RememberExecution([NotNull] VirtualFileSystemPath path, bool withProgress)
+    {
+      var definition = Lifetime.CreateNested();
+      if (withProgress)
+      {
+        var progress = new ProgressIndicator(definition.Lifetime);
+        IProgressIndicator iProgress = progress;
+        iProgress.Start(1);
+        progress.Advance();
+        var task = BackgroundProgressBuilder
+          .FromProgressIndicator(progress)
+          .AsIndeterminate()
+          .WithHeader("Executing template")
+          .WithDescription($"{path.Name}")
+          .Build();
+        Solution.Locks.ExecuteOrQueueEx(
+          definition.Lifetime,
+          "T4 execution progress launching",
+          () => BackgroundProgressManager.AddNewTask(definition.Lifetime, task)
+        );
+      }
 
-			RunningFiles[path] = new T4EnvDTEHost(definition, Solution);
-		}
+      RunningFiles[path] = new T4EnvDTEHost(definition, Solution);
+    }
 
-		public void UpdateTemplateKind(IT4File file)
-		{
-			Logger.Verbose("Updating template kind");
-			var projectFile = file.PhysicalPsiSourceFile.ToProjectFile().NotNull();
-			Solution.InvokeUnderTransaction(cookie =>
-				TemplateMetadataManager.UpdateTemplateMetadata(cookie, projectFile, T4TemplateKind.Executable));
-			// Apply the changes, just in case the template kind was different
-			Solution.GetPsiServices().Files.CommitAllDocuments();
-		}
+    public void UpdateTemplateKind(IT4File file)
+    {
+      Logger.Verbose("Updating template kind");
+      var projectFile = file.PhysicalPsiSourceFile.ToProjectFile().NotNull();
+      Solution.InvokeUnderTransaction(cookie =>
+        TemplateMetadataManager.UpdateTemplateMetadata(cookie, projectFile, T4TemplateKind.Executable));
+      // Apply the changes, just in case the template kind was different
+      Solution.GetPsiServices().Files.CommitAllDocuments();
+    }
 
-		public void Execute(IT4File file)
-		{
-			Logger.Verbose("Trying to execute a file");
-			lock (ExecutionLocker)
-			{
-				if (IsExecutionRunning(file))
-				{
-					ShowNotification();
-					return;
-				}
+    public void Execute(IT4File file)
+    {
+      Logger.Verbose("Trying to execute a file");
+      lock (ExecutionLocker)
+      {
+        if (IsExecutionRunning(file))
+        {
+          ShowNotification();
+          return;
+        }
 
-				RememberExecution(file, false);
-			}
+        RememberExecution(file, false);
+      }
 
-			Model.RequestExecution.Start(new T4ExecutionRequest(GetT4FileLocation(file), true));
-		}
+      Model.RequestExecution.Start(new T4ExecutionRequest(GetT4FileLocation(file), true));
+    }
 
-		public void ExecuteSilently(IT4File file)
-		{
-			Logger.Verbose("Trying to execute a file silently");
-			lock (ExecutionLocker)
-			{
-				if (IsExecutionRunning(file))
-				{
-					ShowNotification();
-					return;
-				}
+    public void ExecuteSilently(IT4File file)
+    {
+      Logger.Verbose("Trying to execute a file silently");
+      lock (ExecutionLocker)
+      {
+        if (IsExecutionRunning(file))
+        {
+          ShowNotification();
+          return;
+        }
 
-				RememberExecution(file, true);
-			}
+        RememberExecution(file, true);
+      }
 
-			Model.RequestExecution.Start(new T4ExecutionRequest(GetT4FileLocation(file), false));
-		}
+      Model.RequestExecution.Start(new T4ExecutionRequest(GetT4FileLocation(file), false));
+    }
 
-		public void Debug(IT4File file)
-		{
-			Logger.Verbose("Trying to debug a file");
-			lock (ExecutionLocker)
-			{
-				if (IsExecutionRunning(file))
-				{
-					ShowNotification();
-					return;
-				}
+    public void Debug(IT4File file)
+    {
+      Logger.Verbose("Trying to debug a file");
+      lock (ExecutionLocker)
+      {
+        if (IsExecutionRunning(file))
+        {
+          ShowNotification();
+          return;
+        }
 
-				RememberExecution(file, false);
-			}
+        RememberExecution(file, false);
+      }
 
-			Model.RequestDebug.Start(new T4ExecutionRequest(GetT4FileLocation(file), true));
-		}
+      Model.RequestDebug.Start(new T4ExecutionRequest(GetT4FileLocation(file), true));
+    }
 
-		private bool IsExecutionRunning([NotNull] IT4File file) =>
-			IsExecutionRunning(file.PhysicalPsiSourceFile.NotNull());
+    private bool IsExecutionRunning([NotNull] IT4File file) =>
+      IsExecutionRunning(file.PhysicalPsiSourceFile.NotNull());
 
-		public bool IsExecutionRunning(IPsiSourceFile file) =>
-			RunningFiles.ContainsKey(file.GetLocation());
+    public bool IsExecutionRunning(IPsiSourceFile file) =>
+      RunningFiles.ContainsKey(file.GetLocation());
 
-		public void OnExecutionFinished(IT4File file)
-		{
-			lock (ExecutionLocker)
-			{
-				var location = file.PhysicalPsiSourceFile.GetLocation();
-				var runtime = RunningFiles[location];
-				runtime.LifetimeDefinition.Terminate();
-				RunningFiles.Remove(location);
-			}
-		}
+    public void OnExecutionFinished(IT4File file)
+    {
+      lock (ExecutionLocker)
+      {
+        var location = file.PhysicalPsiSourceFile.GetLocation();
+        var runtime = RunningFiles[location];
+        runtime.LifetimeDefinition.Terminate();
+        RunningFiles.Remove(location);
+      }
+    }
 
-		[NotNull]
-		private T4FileLocation GetT4FileLocation([NotNull] IT4File file)
-		{
-			var sourceFile = file.PhysicalPsiSourceFile.NotNull();
-			var projectFile = sourceFile.ToProjectFile().NotNull();
-			int id = ProjectModelViewHost.GetIdByItem(projectFile);
-			return new T4FileLocation(id);
-		}
+    [NotNull]
+    private T4FileLocation GetT4FileLocation([NotNull] IT4File file)
+    {
+      var sourceFile = file.PhysicalPsiSourceFile.NotNull();
+      var projectFile = sourceFile.ToProjectFile().NotNull();
+      int id = ProjectModelViewHost.GetIdByItem(projectFile);
+      return new T4FileLocation(id);
+    }
 
-		private void ShowNotification() => NotificationsModel.Notification(new NotificationModel(
-			"Could not execute T4 file",
-			"Execution is already running",
-			true,
-			RdNotificationEntryType.ERROR,
-			new List<NotificationHyperlink>()
-		));
-	}
+    private void ShowNotification() => NotificationsModel.Notification(new NotificationModel(
+      "Could not execute T4 file",
+      "Execution is already running",
+      true,
+      RdNotificationEntryType.ERROR,
+      new List<NotificationHyperlink>()
+    ));
+  }
 }

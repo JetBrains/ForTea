@@ -11,337 +11,327 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
 {
-	public abstract class T4CSharpIntermediateConverterBase : IT4ElementAppendFormatProvider
-	{
-		[NotNull] public const string GeneratedClassNameString = "GeneratedTextTransformation";
-		[NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
-		[NotNull] internal const string DefaultTransformTextMethodName = "TransformText";
-		[NotNull] protected const string OverrideKeyword = "override";
-		[NotNull] protected const string VirtualKeyword = "virtual";
+  public abstract class T4CSharpIntermediateConverterBase : IT4ElementAppendFormatProvider
+  {
+    [NotNull] public const string GeneratedClassNameString = "GeneratedTextTransformation";
+    [NotNull] public const string GeneratedBaseClassNameString = "TextTransformation";
+    [NotNull] internal const string DefaultTransformTextMethodName = "TransformText";
+    [NotNull] protected const string OverrideKeyword = "override";
+    [NotNull] protected const string VirtualKeyword = "virtual";
 
-		[NotNull]
-		protected T4CSharpCodeGenerationResult Result { get; }
+    [NotNull] protected T4CSharpCodeGenerationResult Result { get; }
 
-		[NotNull]
-		protected IT4File File { get; }
+    [NotNull] protected IT4File File { get; }
 
-		[NotNull]
-		private IT4GeneratorKind GeneratorKind { get; }
+    [NotNull] private IT4GeneratorKind GeneratorKind { get; }
 
-		protected T4CSharpIntermediateConverterBase(
-			[NotNull] IT4File file,
-			[NotNull] IT4GeneratedClassNameProvider classNameProvider,
-			[NotNull] IT4GeneratorKind generatorKind
-		)
-		{
-			File = file;
-			ClassNameProvider = classNameProvider;
-			GeneratorKind = generatorKind;
-			Result = new T4CSharpCodeGenerationResult(File);
-		}
+    protected T4CSharpIntermediateConverterBase(
+      [NotNull] IT4File file,
+      [NotNull] IT4GeneratedClassNameProvider classNameProvider,
+      [NotNull] IT4GeneratorKind generatorKind
+    )
+    {
+      File = file;
+      ClassNameProvider = classNameProvider;
+      GeneratorKind = generatorKind;
+      Result = new T4CSharpCodeGenerationResult(File);
+    }
 
-		[NotNull]
-		public virtual T4CSharpCodeGenerationResult Convert(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
-		)
-		{
-			string ns = GeneratorKind.ProvideTemplateNamespace(File);
-			bool hasNamespace = !string.IsNullOrEmpty(ns);
-			if (hasNamespace)
-			{
-				Result.AppendLine($"namespace {ns}");
-				Result.AppendLine("{");
-				PushIndent();
-				AppendNamespaceContents(intermediateResult);
-				PopIndent();
-				Result.AppendLine("}");
-			}
-			else
-			{
-				AppendNamespaceContents(intermediateResult);
-			}
+    [NotNull]
+    public virtual T4CSharpCodeGenerationResult Convert(
+      [NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
+    )
+    {
+      string ns = GeneratorKind.ProvideTemplateNamespace(File);
+      bool hasNamespace = !string.IsNullOrEmpty(ns);
+      if (hasNamespace)
+      {
+        Result.AppendLine($"namespace {ns}");
+        Result.AppendLine("{");
+        PushIndent();
+        AppendNamespaceContents(intermediateResult);
+        PopIndent();
+        Result.AppendLine("}");
+      }
+      else
+      {
+        AppendNamespaceContents(intermediateResult);
+      }
 
-			return Result;
-		}
+      return Result;
+    }
 
-		private void AppendNamespaceContents([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-			AppendImports(intermediateResult);
-			AppendClasses(intermediateResult);
-		}
+    private void AppendNamespaceContents([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+      AppendImports(intermediateResult);
+      AppendClasses(intermediateResult);
+    }
 
-		protected virtual void AppendClasses([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-			AppendClass(intermediateResult);
-			AppendIndent();
-			Result.AppendLine();
-			AppendBaseClass(intermediateResult);
-		}
+    protected virtual void AppendClasses([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+      AppendClass(intermediateResult);
+      AppendIndent();
+      Result.AppendLine();
+      AppendBaseClass(intermediateResult);
+    }
 
-		private void AppendImports([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-			foreach (var description in intermediateResult.ImportDescriptions)
-			{
-				description.AppendContent(Result, this);
-			}
+    private void AppendImports([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+      foreach (var description in intermediateResult.ImportDescriptions)
+      {
+        description.AppendContent(Result, this);
+      }
 
-			if (ShouldAppendPragmaDirectives)
-			{
-				AppendIndent();
-				Result.AppendLine("#pragma warning disable 8019");
-			}
+      if (ShouldAppendPragmaDirectives)
+      {
+        AppendIndent();
+        Result.AppendLine("#pragma warning disable 8019");
+      }
 
-			AppendIndent();
-			Result.AppendLine("using System;");
+      AppendIndent();
+      Result.AppendLine("using System;");
 
-			if (ShouldAppendPragmaDirectives)
-			{
-				AppendIndent();
-				Result.AppendLine("#pragma warning restore 8019");
-			}
-		}
+      if (ShouldAppendPragmaDirectives)
+      {
+        AppendIndent();
+        Result.AppendLine("#pragma warning restore 8019");
+      }
+    }
 
-		protected virtual void AppendClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-			AppendIndent();
-			Result.Append(intermediateResult.AccessRightsText);
-			Result.Append($" partial class {ClassNameProvider.GeneratedClassName} : ");
-			AppendBaseClassName(intermediateResult);
-			Result.AppendLine();
-			using (new CodeBlockCookie(this))
-			{
-				AppendConstructor(intermediateResult);
-				AppendTransformMethod(intermediateResult);
-				
-				AppendFeatures(intermediateResult);
-				if (!intermediateResult.ParameterDescriptions.IsEmpty())
-				{
-					AppendIndent();
-					Result.AppendLine();
-					AppendIndent();
-					Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
-					Result.AppendLine();
-				}
+    protected virtual void AppendClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+      AppendIndent();
+      Result.Append(intermediateResult.AccessRightsText);
+      Result.Append($" partial class {ClassNameProvider.GeneratedClassName} : ");
+      AppendBaseClassName(intermediateResult);
+      Result.AppendLine();
+      using (new CodeBlockCookie(this))
+      {
+        AppendConstructor(intermediateResult);
+        AppendTransformMethod(intermediateResult);
 
-				using (new UnindentCookie(this))
-				{
-					AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
-					AppendTemplateInitialization(intermediateResult.ParameterDescriptions, intermediateResult.HasHost);
-				}
+        AppendFeatures(intermediateResult);
+        if (!intermediateResult.ParameterDescriptions.IsEmpty())
+        {
+          AppendIndent();
+          Result.AppendLine();
+          AppendIndent();
+          Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
+          Result.AppendLine();
+        }
 
-				if (!intermediateResult.ParameterDescriptions.IsEmpty())
-				{
-					Result.AppendLine();
-					Result.AppendLine();
-					AppendIndent();
-					Result.AppendLine();
-					AppendIndent();
-					Result.AppendLine("#line default");
-					AppendIndent();
-					Result.AppendLine("#line hidden");
-				}
-			}
-		}
+        using (new UnindentCookie(this))
+        {
+          AppendParameterDeclarations(intermediateResult.ParameterDescriptions);
+          AppendTemplateInitialization(intermediateResult.ParameterDescriptions, intermediateResult.HasHost);
+        }
 
-		private void AppendFeatures([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-			if (intermediateResult.HasHost) AppendHost();
-			foreach (var description in intermediateResult.FeatureDescriptions)
-			{
-				description.AppendContent(Result, this);
-			}
-		}
+        if (!intermediateResult.ParameterDescriptions.IsEmpty())
+        {
+          Result.AppendLine();
+          Result.AppendLine();
+          AppendIndent();
+          Result.AppendLine();
+          AppendIndent();
+          Result.AppendLine("#line default");
+          AppendIndent();
+          Result.AppendLine("#line hidden");
+        }
+      }
+    }
 
-		protected virtual void AppendConstructor([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-		}
+    private void AppendFeatures([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+      if (intermediateResult.HasHost) AppendHost();
+      foreach (var description in intermediateResult.FeatureDescriptions)
+      {
+        description.AppendContent(Result, this);
+      }
+    }
 
-		private void AppendParameterDeclarations(
-			[NotNull, ItemNotNull] IEnumerable<T4ParameterDescription> descriptions
-		)
-		{
-			foreach (var description in descriptions)
-			{
-				AppendFieldDeclaration(description);
-				AppendParameterDeclaration(description);
-			}
-		}
+    protected virtual void AppendConstructor([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+    }
 
-		protected virtual void AppendFieldDeclaration([NotNull] T4ParameterDescription description)
-		{
-			AppendIndent();
-			Result.Append("private ");
-			description.AppendType(Result);
-			Result.Append(" ");
-			Result.Append(description.FieldNameString);
-			Result.AppendLine(";");
-			Result.AppendLine();
-		}
+    private void AppendParameterDeclarations(
+      [NotNull, ItemNotNull] IEnumerable<T4ParameterDescription> descriptions
+    )
+    {
+      foreach (var description in descriptions)
+      {
+        AppendFieldDeclaration(description);
+        AppendParameterDeclaration(description);
+      }
+    }
 
-		protected virtual void AppendTemplateInitialization(
-			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
-			bool hasHost
-		)
-		{
-			using var unindent = new UnindentCookie(this);
-			if (descriptions.IsEmpty()) return;
-			Result.AppendLine(@"
+    protected virtual void AppendFieldDeclaration([NotNull] T4ParameterDescription description)
+    {
+      AppendIndent();
+      Result.Append("private ");
+      description.AppendType(Result);
+      Result.Append(" ");
+      Result.Append(description.FieldNameString);
+      Result.AppendLine(";");
+      Result.AppendLine();
+    }
+
+    protected virtual void AppendTemplateInitialization(
+      [NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
+      bool hasHost
+    )
+    {
+      using var unindent = new UnindentCookie(this);
+      if (descriptions.IsEmpty()) return;
+      Result.AppendLine(@"
 /// <summary>
 /// Initialize the template
 /// </summary>
 public virtual void Initialize()");
-			Result.AppendLine("{");
-			PushIndent();
-			AppendParameterInitialization(descriptions, hasHost);
-			PopIndent();
-			AppendIndent();
-			Result.AppendLine("}");
-		}
+      Result.AppendLine("{");
+      PushIndent();
+      AppendParameterInitialization(descriptions, hasHost);
+      PopIndent();
+      AppendIndent();
+      Result.AppendLine("}");
+    }
 
-		protected virtual void AppendTransformMethod(
-			[NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
-		)
-		{
-			if (!TransformTextAttributes.IsNullOrEmpty())
-			{
-				AppendIndent();
-				Result.AppendLine(TransformTextAttributes);
-			}
-			AppendIndent();
-			Result.Append("public ");
-			Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
-			Result.AppendLine($" string {TransformTextMethodName}()");
-			using (new CodeBlockCookie(this))
-			{
-				foreach (var description in intermediateResult.TransformationDescriptions)
-				{
-					description.AppendContent(Result, this);
-				}
+    protected virtual void AppendTransformMethod(
+      [NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
+    )
+    {
+      if (!TransformTextAttributes.IsNullOrEmpty())
+      {
+        AppendIndent();
+        Result.AppendLine(TransformTextAttributes);
+      }
 
-				AppendIndent();
-				Result.AppendLine("return this.GenerationEnvironment.ToString();");
-			}
-		}
+      AppendIndent();
+      Result.Append("public ");
+      Result.Append(GetTransformTextOverridabilityModifier(intermediateResult.HasBaseClass));
+      Result.AppendLine($" string {TransformTextMethodName}()");
+      using (new CodeBlockCookie(this))
+      {
+        foreach (var description in intermediateResult.TransformationDescriptions)
+        {
+          description.AppendContent(Result, this);
+        }
 
-		private void AppendBaseClassName([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-			if (intermediateResult.HasBaseClass) Result.Append(intermediateResult.CollectedBaseClass);
-			else Result.Append(ClassNameProvider.GeneratedBaseClassFQN);
-		}
+        AppendIndent();
+        Result.AppendLine("return this.GenerationEnvironment.ToString();");
+      }
+    }
 
-		protected virtual void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
-		{
-			if (intermediateResult.HasBaseClass) return;
-			Result.AppendLine(BaseClassDescription);
-			AppendIndent();
-			Result.Append(intermediateResult.AccessRightsText);
-			Result.Append(" class ");
-			Result.AppendLine(ClassNameProvider.GeneratedBaseClassName);
-			string resource = BaseClassResourceName;
-			var provider = new T4TemplateResourceProvider(resource);
-			Result.Append(provider.Template);
-		}
+    private void AppendBaseClassName([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+      if (intermediateResult.HasBaseClass) Result.Append(intermediateResult.CollectedBaseClass);
+      else Result.Append(ClassNameProvider.GeneratedBaseClassFQN);
+    }
 
-		[NotNull]
-		protected virtual string TransformTextMethodName => DefaultTransformTextMethodName;
+    protected virtual void AppendBaseClass([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
+    {
+      if (intermediateResult.HasBaseClass) return;
+      Result.AppendLine(BaseClassDescription);
+      AppendIndent();
+      Result.Append(intermediateResult.AccessRightsText);
+      Result.Append(" class ");
+      Result.AppendLine(ClassNameProvider.GeneratedBaseClassName);
+      string resource = BaseClassResourceName;
+      var provider = new T4TemplateResourceProvider(resource);
+      Result.Append(provider.Template);
+    }
 
-		[NotNull]
-		protected virtual string TransformTextAttributes => "";
+    [NotNull] protected virtual string TransformTextMethodName => DefaultTransformTextMethodName;
 
-		protected abstract void AppendHost();
-		protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
+    [NotNull] protected virtual string TransformTextAttributes => "";
 
-		[NotNull]
-		protected abstract string BaseClassDescription { get; }
+    protected abstract void AppendHost();
+    protected abstract void AppendParameterDeclaration([NotNull] T4ParameterDescription description);
 
-		[NotNull]
-		protected abstract string BaseClassResourceName { get; }
+    [NotNull] protected abstract string BaseClassDescription { get; }
 
-		[NotNull]
-		protected IT4GeneratedClassNameProvider ClassNameProvider { get; }
+    [NotNull] protected abstract string BaseClassResourceName { get; }
 
-		protected abstract void AppendParameterInitialization(
-			[NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
-			bool hasHost
-		);
+    [NotNull] protected IT4GeneratedClassNameProvider ClassNameProvider { get; }
 
-		protected virtual bool ShouldAppendPragmaDirectives => false;
+    protected abstract void AppendParameterInitialization(
+      [NotNull, ItemNotNull] IReadOnlyCollection<T4ParameterDescription> descriptions,
+      bool hasHost
+    );
 
-		[NotNull]
-		protected virtual string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass) => OverrideKeyword;
+    protected virtual bool ShouldAppendPragmaDirectives => false;
 
-		#region Indentation
-		protected int CurrentIndent { get; private set; }
-		protected void PushIndent() => CurrentIndent += 1;
-		protected void PopIndent() => CurrentIndent -= 1;
-		protected void AppendIndent() => AppendIndent(CurrentIndent);
-		protected abstract void AppendIndent(int size);
+    [NotNull]
+    protected virtual string GetTransformTextOverridabilityModifier(bool hasCustomBaseClass) => OverrideKeyword;
 
-		protected sealed class CodeBlockCookie : IDisposable
-		{
-			[NotNull]
-			private T4CSharpIntermediateConverterBase Converter { get; }
+    #region Indentation
 
-			public CodeBlockCookie([NotNull] T4CSharpIntermediateConverterBase converter)
-			{
-				Converter = converter;
-				Converter.AppendIndent();
-				Converter.Result.AppendLine("{");
-				Converter.PushIndent();
-			}
+    protected int CurrentIndent { get; private set; }
+    protected void PushIndent() => CurrentIndent += 1;
+    protected void PopIndent() => CurrentIndent -= 1;
+    protected void AppendIndent() => AppendIndent(CurrentIndent);
+    protected abstract void AppendIndent(int size);
 
-			public void Dispose()
-			{
-				Converter.PopIndent();
-				Converter.AppendIndent();
-				Converter.Result.AppendLine("}");
-			}
-		}
+    protected sealed class CodeBlockCookie : IDisposable
+    {
+      [NotNull] private T4CSharpIntermediateConverterBase Converter { get; }
 
-		protected sealed class UnindentCookie : IDisposable
-		{
-			[NotNull]
-			private T4CSharpIntermediateConverterBase Converter { get; }
+      public CodeBlockCookie([NotNull] T4CSharpIntermediateConverterBase converter)
+      {
+        Converter = converter;
+        Converter.AppendIndent();
+        Converter.Result.AppendLine("{");
+        Converter.PushIndent();
+      }
 
-			private int SavedIndent { get; }
+      public void Dispose()
+      {
+        Converter.PopIndent();
+        Converter.AppendIndent();
+        Converter.Result.AppendLine("}");
+      }
+    }
 
-			public UnindentCookie([NotNull] T4CSharpIntermediateConverterBase converter)
-			{
-				Converter = converter;
-				SavedIndent = Converter.CurrentIndent;
-				Converter.CurrentIndent = 0;
-			}
+    protected sealed class UnindentCookie : IDisposable
+    {
+      [NotNull] private T4CSharpIntermediateConverterBase Converter { get; }
 
-			public void Dispose()
-			{
-				Converter.CurrentIndent = SavedIndent;
-			}
-		}
+      private int SavedIndent { get; }
 
-		#endregion Indentation
+      public UnindentCookie([NotNull] T4CSharpIntermediateConverterBase converter)
+      {
+        Converter = converter;
+        SavedIndent = Converter.CurrentIndent;
+        Converter.CurrentIndent = 0;
+      }
 
-		#region IT4ElementAppendFormatProvider
-		[NotNull]
-		public virtual string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
+      public void Dispose()
+      {
+        Converter.CurrentIndent = SavedIndent;
+      }
+    }
 
-		[NotNull]
-		public string ToStringConversionSuffix => ")";
+    #endregion Indentation
 
-		[NotNull]
-		public string ExpressionWritingPrefix => "this.Write(";
+    #region IT4ElementAppendFormatProvider
 
-		[NotNull]
-		public string ExpressionWritingSuffix => ");";
+    [NotNull] public virtual string ToStringConversionPrefix => "this.ToStringHelper.ToStringWithCulture(";
 
-		public abstract string CodeCommentStart { get; }
-		public abstract string CodeCommentEnd { get; }
-		public abstract string ExpressionCommentStart { get; }
-		public abstract string ExpressionCommentEnd { get; }
-		public abstract string Indent { get; }
-		public abstract bool ShouldBreakExpressionWithLineDirective { get; }
-		public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
-		public abstract void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
-		public abstract void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code);
-		#endregion IT4ElementAppendFormatProvider
-	}
+    [NotNull] public string ToStringConversionSuffix => ")";
+
+    [NotNull] public string ExpressionWritingPrefix => "this.Write(";
+
+    [NotNull] public string ExpressionWritingSuffix => ");";
+
+    public abstract string CodeCommentStart { get; }
+    public abstract string CodeCommentEnd { get; }
+    public abstract string ExpressionCommentStart { get; }
+    public abstract string ExpressionCommentEnd { get; }
+    public abstract string Indent { get; }
+    public abstract bool ShouldBreakExpressionWithLineDirective { get; }
+    public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
+    public abstract void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
+    public abstract void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code);
+
+    #endregion IT4ElementAppendFormatProvider
+  }
 }

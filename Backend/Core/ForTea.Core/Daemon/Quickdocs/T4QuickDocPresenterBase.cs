@@ -6,41 +6,41 @@ using JetBrains.UI.RichText;
 
 namespace GammaJul.ForTea.Core.Daemon.Quickdocs
 {
-	public abstract class T4QuickDocPresenterBase<TExpandable> : IQuickDocPresenter where TExpandable : ITreeNode
-	{
-		[NotNull] private TExpandable Expandable { get; }
-		[NotNull] protected abstract string ExpandableName { get; }
+  public abstract class T4QuickDocPresenterBase<TExpandable> : IQuickDocPresenter where TExpandable : ITreeNode
+  {
+    [NotNull] private TExpandable Expandable { get; }
+    [NotNull] protected abstract string ExpandableName { get; }
 
-		protected T4QuickDocPresenterBase([NotNull] TExpandable expandable)
-		{
-			Expandable = expandable;
-		}
+    protected T4QuickDocPresenterBase([NotNull] TExpandable expandable)
+    {
+      Expandable = expandable;
+    }
 
-		public QuickDocTitleAndText GetHtml(PsiLanguageType presentationLanguage)
-		{
-			var expanded = Expand(Expandable) ?? "(unresolved)";
-			return new QuickDocTitleAndText(new RichText($"({ExpandableName}) {expanded}"), "T4 Quickdocs");
-		}
+    public QuickDocTitleAndText GetHtml(PsiLanguageType presentationLanguage)
+    {
+      var expanded = Expand(Expandable) ?? "(unresolved)";
+      return new QuickDocTitleAndText(new RichText($"({ExpandableName}) {expanded}"), "T4 Quickdocs");
+    }
 
-		[CanBeNull]
-		protected abstract string Expand([NotNull] TExpandable expandable);
+    [CanBeNull]
+    protected abstract string Expand([NotNull] TExpandable expandable);
 
-		public string GetId()
-		{
-			return "T4 Quickdoc Placeholder Id";
-		}
+    public string GetId()
+    {
+      return "T4 Quickdoc Placeholder Id";
+    }
 
-		public IQuickDocPresenter Resolve(string id)
-		{
-			return null;
-		}
+    public IQuickDocPresenter Resolve(string id)
+    {
+      return null;
+    }
 
-		public void OpenInEditor(string navigationId = "")
-		{
-		}
+    public void OpenInEditor(string navigationId = "")
+    {
+    }
 
-		public void ReadMore(string navigationId = "")
-		{
-		}
-	}
+    public void ReadMore(string navigationId = "")
+    {
+    }
+  }
 }

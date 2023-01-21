@@ -4,8 +4,8 @@ using JetBrains.Rider.Backend.Product;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
-	[ZoneMarker]
-	public class ZoneMarker : IRequire<IRiderFeatureZone>, IRequire<IRiderProductEnvironmentZone>
-	{
-	}
+  [ZoneMarker]
+  public class ZoneMarker : IRequire<IRiderFeatureZone>, IRequire<IRiderProductEnvironmentZone>
+  {
+  }
 }

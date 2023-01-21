@@ -10,54 +10,53 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-	/// <summary>
-	/// PSI for T4 files might depend on other T4 files.
-	/// To keep it up-to-date, we need to mark a file as dirty
-	/// whenever anything it depends on is changed in any way.
-	/// </summary>
-	[SolutionComponent]
-	public class T4FileDependencyInvalidator : T4IndirectFileChangeObserverBase
-	{
-		[NotNull] private readonly IShellLocks myLocks;
+  /// <summary>
+  /// PSI for T4 files might depend on other T4 files.
+  /// To keep it up-to-date, we need to mark a file as dirty
+  /// whenever anything it depends on is changed in any way.
+  /// </summary>
+  [SolutionComponent]
+  public class T4FileDependencyInvalidator : T4IndirectFileChangeObserverBase
+  {
+    [NotNull] private readonly IShellLocks myLocks;
 
-		[NotNull, ItemNotNull]
-		private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; set; } =
-			new HashSet<IPsiSourceFile>();
+    [NotNull, ItemNotNull]
+    private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; set; } =
+      new HashSet<IPsiSourceFile>();
 
-		public T4FileDependencyInvalidator(
-			Lifetime lifetime,
-			[NotNull] IT4FileGraphNotifier notifier,
-			[NotNull] IPsiServices services,
-			[NotNull] IPsiCachesState state,
-			[NotNull] IShellLocks locks
-		) : base(lifetime, notifier, services, state)
-		{
-			myLocks = locks;
-		}
+    public T4FileDependencyInvalidator(
+      Lifetime lifetime,
+      [NotNull] IT4FileGraphNotifier notifier,
+      [NotNull] IPsiServices services,
+      [NotNull] IPsiCachesState state,
+      [NotNull] IShellLocks locks
+    ) : base(lifetime, notifier, services, state)
+    {
+      myLocks = locks;
+    }
 
-		protected sealed override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
-		{
-			myLocks.ExecuteWithWriteLockWhenAvailable(Lifetime,
-				$"{nameof(T4FileDependencyInvalidator)} :: AfterCommitSync",
-				() =>
-				{
-					foreach (var file in indirectDependencies)
-					{
-						file.SetBeingIndirectlyUpdated(true);
-						Services.Caches.MarkAsDirty(file);
-						Services.Files.MarkAsDirty(file);
-					}
+    protected sealed override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
+    {
+      myLocks.ExecuteWithWriteLockWhenAvailable(Lifetime,
+        $"{nameof(T4FileDependencyInvalidator)} :: AfterCommitSync",
+        () =>
+        {
+          foreach (var file in indirectDependencies)
+          {
+            file.SetBeingIndirectlyUpdated(true);
+            Services.Caches.MarkAsDirty(file);
+            Services.Files.MarkAsDirty(file);
+          }
 
-					foreach (var file in PreviousIterationIndirectDependencies.Except(indirectDependencies))
-					{
-						file.SetBeingIndirectlyUpdated(false);
-					}
+          foreach (var file in PreviousIterationIndirectDependencies.Except(indirectDependencies))
+          {
+            file.SetBeingIndirectlyUpdated(false);
+          }
 
-					PreviousIterationIndirectDependencies = indirectDependencies;
+          PreviousIterationIndirectDependencies = indirectDependencies;
+        });
+    }
 
-				});
-		}
-
-		protected override string ActivityName => "T4 indirect dependencies invalidation";
-	}
+    protected override string ActivityName => "T4 indirect dependencies invalidation";
+  }
 }

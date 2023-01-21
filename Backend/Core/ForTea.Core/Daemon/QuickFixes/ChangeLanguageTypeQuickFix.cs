@@ -14,28 +14,28 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 {
-	[QuickFix]
-	public class ChangeLanguageTypeQuickFix : QuickFixBase
-	{
-		private NoSupportForVBWarning Highlighting { get; }
-		public ChangeLanguageTypeQuickFix(NoSupportForVBWarning highlighting) => Highlighting = highlighting;
+  [QuickFix]
+  public class ChangeLanguageTypeQuickFix : QuickFixBase
+  {
+    private NoSupportForVBWarning Highlighting { get; }
+    public ChangeLanguageTypeQuickFix(NoSupportForVBWarning highlighting) => Highlighting = highlighting;
 
-		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
-		{
-			var token = Highlighting.Value;
-			var newToken = T4ElementFactory.CreateAttributeValue(LanguageAttributeInfo.CSharpLanguageAttributeValue);
-			var file = token.GetContainingFile();
-			Assertion.AssertNotNull(file, "file != null");
+    protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+    {
+      var token = Highlighting.Value;
+      var newToken = T4ElementFactory.CreateAttributeValue(LanguageAttributeInfo.CSharpLanguageAttributeValue);
+      var file = token.GetContainingFile();
+      Assertion.AssertNotNull(file, "file != null");
 
-			using (WriteLockCookie.Create(file.IsPhysical()))
-			{
-				ModificationUtil.ReplaceChild(token, newToken);
-			}
+      using (WriteLockCookie.Create(file.IsPhysical()))
+      {
+        ModificationUtil.ReplaceChild(token, newToken);
+      }
 
-			return null;
-		}
+      return null;
+    }
 
-		public override string Text => "Set language to C#";
-		public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
-	}
+    public override string Text => "Set language to C#";
+    public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
+  }
 }

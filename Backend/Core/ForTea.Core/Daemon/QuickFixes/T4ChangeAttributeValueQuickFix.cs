@@ -13,36 +13,35 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 {
-	[QuickFix]
-	public class ChangeAttributeValueQuickFix : QuickFixBase
-	{
-		[NotNull]
-		private InvalidAttributeValueError Highlighting { get; }
+  [QuickFix]
+  public class ChangeAttributeValueQuickFix : QuickFixBase
+  {
+    [NotNull] private InvalidAttributeValueError Highlighting { get; }
 
-		[NotNull]
-		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
-		{
-			string text = Highlighting.Value.GetText();
-			DocumentRange range = Highlighting.Value.GetDocumentRange();
+    [NotNull]
+    protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+    {
+      string text = Highlighting.Value.GetText();
+      DocumentRange range = Highlighting.Value.GetDocumentRange();
 
-			// create a hotspot around the directive value, with basic completion invoked
-			return textControl =>
-				Shell.Instance
-					.GetComponent<LiveTemplatesManager>()
-					.CreateHotspotSessionAtopExistingText(
-						solution,
-						DocumentOffset.InvalidOffset,
-						textControl,
-						LiveTemplatesManager.EscapeAction.LeaveTextAndCaret,
-						HotspotHelper.CreateBasicCompletionHotspotInfo(text, range))
-					.ExecuteAndForget();
-		}
+      // create a hotspot around the directive value, with basic completion invoked
+      return textControl =>
+        Shell.Instance
+          .GetComponent<LiveTemplatesManager>()
+          .CreateHotspotSessionAtopExistingText(
+            solution,
+            DocumentOffset.InvalidOffset,
+            textControl,
+            LiveTemplatesManager.EscapeAction.LeaveTextAndCaret,
+            HotspotHelper.CreateBasicCompletionHotspotInfo(text, range))
+          .ExecuteAndForget();
+    }
 
-		public override string Text => "Change value";
+    public override string Text => "Change value";
 
-		public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
+    public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
 
-		public ChangeAttributeValueQuickFix([NotNull] InvalidAttributeValueError highlighting) =>
-			Highlighting = highlighting;
-	}
+    public ChangeAttributeValueQuickFix([NotNull] InvalidAttributeValueError highlighting) =>
+      Highlighting = highlighting;
+  }
 }

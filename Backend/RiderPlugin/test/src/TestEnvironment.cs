@@ -9,7 +9,6 @@ using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests
 {
-
 #if INDEPENDENT_BUILD
 	[SetUpFixture]
 	public sealed class TestEnvironment : T4ExtensionTestEnvironmentAssembly<T4TestsEnvZone> // HACK
@@ -21,14 +20,10 @@ namespace JetBrains.ForTea.Tests
 #pragma warning restore 169
 	}
 #else
-	[SetUpFixture]
-	public sealed class TestEnvironment : ExtensionTestEnvironmentAssembly<T4TestsEnvZone>
-	{
-		public override bool IsRunningTestsWithAsyncBehaviorProhibited => true;
-
-	}
+  [SetUpFixture]
+  public sealed class TestEnvironment : ExtensionTestEnvironmentAssembly<T4TestsEnvZone>
+  {
+    public override bool IsRunningTestsWithAsyncBehaviorProhibited => true;
+  }
 #endif
-	
-
-
 }

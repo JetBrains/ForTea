@@ -6,18 +6,16 @@ using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Tree
 {
-	public interface IT4DirectiveWithPath : IT4TreeNode
-	{
-		[NotNull, ItemNotNull]
-		IEnumerable<string> RawMacros { get; }
+  public interface IT4DirectiveWithPath : IT4TreeNode
+  {
+    [NotNull, ItemNotNull] IEnumerable<string> RawMacros { get; }
 
-		[NotNull]
-		T4ResolvedPath ResolvedPath { get; }
+    [NotNull] T4ResolvedPath ResolvedPath { get; }
 
-		void InitializeResolvedPath(
-			[NotNull] IReadOnlyDictionary<string, string> resolveResults,
-			[NotNull] IPsiSourceFile sourceFile,
-			[NotNull] IProjectFile projectFile
-		);
-	}
+    void InitializeResolvedPath(
+      [NotNull] IReadOnlyDictionary<string, string> resolveResults,
+      [NotNull] IPsiSourceFile sourceFile,
+      [NotNull] IProjectFile projectFile
+    );
+  }
 }

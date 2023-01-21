@@ -6,13 +6,17 @@ using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Highlighting.QuickFix
 {
-	[TestFixture]
-	[Category("T4")]
-	[TestFileExtension(T4FileExtensions.MainExtension)]
-	public sealed class T4ChangeLanguageTypeQuickFixTest : QuickFixTestBase<ChangeLanguageTypeQuickFix>
-	{
-		protected override string RelativeTestDataPath => @"Highlighting\QuickFix\ChangeLanguageType";
-		[Test] public void Test01() => DoNamedTest2();
-		[Test] public void Test02() => DoNamedTest2();
-	}
+  [TestFixture]
+  [Category("T4")]
+  [TestFileExtension(T4FileExtensions.MainExtension)]
+  public sealed class T4ChangeLanguageTypeQuickFixTest : QuickFixTestBase<ChangeLanguageTypeQuickFix>
+  {
+    protected override string RelativeTestDataPath => @"Highlighting\QuickFix\ChangeLanguageType";
+
+    [Test]
+    public void Test01() => DoNamedTest2();
+
+    [Test]
+    public void Test02() => DoNamedTest2();
+  }
 }

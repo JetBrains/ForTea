@@ -6,30 +6,29 @@ using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Parsing.Ranges
 {
-	[DebuggerDisplay("{DebuggerDisplay()}")]
-	public struct T4FileSector
-	{
-		public T4FileSector(TreeTextRange range, [CanBeNull] IT4IncludedFile include, int precedingIncludeLength)
-		{
-			Range = range;
-			Include = include;
-			PrecedingIncludeLength = precedingIncludeLength;
-		}
+  [DebuggerDisplay("{DebuggerDisplay()}")]
+  public struct T4FileSector
+  {
+    public T4FileSector(TreeTextRange range, [CanBeNull] IT4IncludedFile include, int precedingIncludeLength)
+    {
+      Range = range;
+      Include = include;
+      PrecedingIncludeLength = precedingIncludeLength;
+    }
 
-		public int PrecedingIncludeLength { get; }
-		public TreeTextRange Range { get; }
+    public int PrecedingIncludeLength { get; }
+    public TreeTextRange Range { get; }
 
-		[CanBeNull]
-		public IT4IncludedFile Include { get; }
+    [CanBeNull] public IT4IncludedFile Include { get; }
 
-		public bool IsValid() => Range.IsValid() && PrecedingIncludeLength >= 0;
-		public void AssertValid() => Assertion.Assert(IsValid(), "IsValid()");
+    public bool IsValid() => Range.IsValid() && PrecedingIncludeLength >= 0;
+    public void AssertValid() => Assertion.Assert(IsValid(), "IsValid()");
 
-		[NotNull]
-		private string DebuggerDisplay()
-		{
-			string destination = Include == null ? "in current file" : "in include";
-			return $"[{Range}, {destination}]";
-		}
-	}
+    [NotNull]
+    private string DebuggerDisplay()
+    {
+      string destination = Include == null ? "in current file" : "in include";
+      return $"[{Range}, {destination}]";
+    }
+  }
 }

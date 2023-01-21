@@ -7,34 +7,33 @@ using JetBrains.Annotations;
 using JetBrains.DataStructures;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Directives.Attributes {
+namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
+{
+  public class CultureDirectiveAttributeInfo : DirectiveAttributeInfo
+  {
+    [NotNull] [ItemNotNull] private readonly Lazy<JetHashSet<string>> _cultureCodes;
+    [CanBeNull] [ItemNotNull] private ImmutableArray<string>? _intellisenseValues;
 
-	public class CultureDirectiveAttributeInfo : DirectiveAttributeInfo {
+    [NotNull]
+    private static JetHashSet<string> CreateCultureCodes()
+    {
+      var set = CultureInfo
+        .GetCultures(CultureTypes.SpecificCultures)
+        .ToJetHashSet(info => info.Name, StringComparer.OrdinalIgnoreCase);
+      set.Add("");
+      return set;
+    }
 
-		[NotNull] [ItemNotNull] private readonly Lazy<JetHashSet<string>> _cultureCodes;
-		[CanBeNull] [ItemNotNull] private ImmutableArray<string>? _intellisenseValues;
+    public override bool IsValid(string value)
+      => _cultureCodes.Value.Contains(value);
 
-		[NotNull]
-		private static JetHashSet<string> CreateCultureCodes()
-		{
-			var set = CultureInfo
-				.GetCultures(CultureTypes.SpecificCultures)
-				.ToJetHashSet(info => info.Name, StringComparer.OrdinalIgnoreCase);
-			set.Add("");
-			return set;
-		}
+    public override ImmutableArray<string> IntelliSenseValues
+      => _intellisenseValues ?? (_intellisenseValues = _cultureCodes.Value.ToImmutableArray()).Value;
 
-		public override bool IsValid(string value)
-			=> _cultureCodes.Value.Contains(value);
-
-		public override ImmutableArray<string> IntelliSenseValues
-			=> _intellisenseValues ?? (_intellisenseValues = _cultureCodes.Value.ToImmutableArray()).Value;
-
-		public CultureDirectiveAttributeInfo([NotNull] string name, DirectiveAttributeOptions options)
-			: base(name, options) {
-			_cultureCodes = Lazy.Of(CreateCultureCodes, true);
-		}
-
-	}
-
+    public CultureDirectiveAttributeInfo([NotNull] string name, DirectiveAttributeOptions options)
+      : base(name, options)
+    {
+      _cultureCodes = Lazy.Of(CreateCultureCodes, true);
+    }
+  }
 }

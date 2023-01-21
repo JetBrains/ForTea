@@ -4,9 +4,9 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 {
-	public interface IT4LightWeightAssemblyReferenceResolver
-	{
-		[CanBeNull]
-		VirtualFileSystemPath TryResolve([NotNull] T4ResolvedPath path);
-	}
+  public interface IT4LightWeightAssemblyReferenceResolver
+  {
+    [CanBeNull]
+    VirtualFileSystemPath TryResolve([NotNull] T4ResolvedPath path);
+  }
 }

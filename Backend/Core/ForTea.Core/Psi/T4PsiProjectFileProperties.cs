@@ -3,18 +3,18 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl;
 
-namespace GammaJul.ForTea.Core.Psi {
-	
-	internal sealed class T4PsiProjectFileProperties : DefaultPsiProjectFileProperties {
+namespace GammaJul.ForTea.Core.Psi
+{
+  internal sealed class T4PsiProjectFileProperties : DefaultPsiProjectFileProperties
+  {
+    /// <summary>Indicates if this file should be parsed.</summary>
+    public override bool ShouldBuildPsi { get; }
 
-		/// <summary>Indicates if this file should be parsed.</summary>
-		public override bool ShouldBuildPsi { get; }
-
-		public T4PsiProjectFileProperties([NotNull] IProjectFile projectFile, [NotNull] IPsiSourceFile sourceFile, bool shouldBuildPsi)
-			: base(projectFile, sourceFile) {
-			ShouldBuildPsi = shouldBuildPsi;
-		}
-
-	}
-
+    public T4PsiProjectFileProperties([NotNull] IProjectFile projectFile, [NotNull] IPsiSourceFile sourceFile,
+      bool shouldBuildPsi)
+      : base(projectFile, sourceFile)
+    {
+      ShouldBuildPsi = shouldBuildPsi;
+    }
+  }
 }
