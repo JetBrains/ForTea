@@ -51,5 +51,8 @@
     }
 
     public static string BundledT4TemplateExecutor_Text => ResourceManager.GetString("BundledT4TemplateExecutor_Text");
+    public static string RunTemplate_Text => ResourceManager.GetString("RunTemplate_Text");
+    public static string DebugTemplate_Text => ResourceManager.GetString("DebugTemplate_Text");
+    public static string PreprocessTemplate_Text => ResourceManager.GetString("PreprocessTemplate_Text");
   }
 }

@@ -1,5 +1,5 @@
+using System.Collections.Immutable;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 
 namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
 {
@@ -10,11 +10,10 @@ namespace GammaJul.ForTea.Core.Psi.Directives.Attributes
 		[NotNull] public const string VBLanguageAttributeValue = "VB";
 
 		[NotNull, ItemNotNull]
-		public static ImmutableArray<string> PromotedValues { get; } = new[]
-		{
+		public static ImmutableArray<string> PromotedValues { get; } = ImmutableArray.Create(
 			CSharpLanguageAttributeValue,
 			NewCSharpLanguageAttributeValue
-		}.ToImmutableArray();
+		);
 
 		[NotNull, ItemNotNull]
 		private ImmutableArray<string> OtherValues { get; } = new[] {VBLanguageAttributeValue}.ToImmutableArray();

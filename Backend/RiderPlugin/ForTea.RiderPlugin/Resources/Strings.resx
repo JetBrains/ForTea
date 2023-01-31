@@ -21,4 +21,13 @@
     <data name="BundledT4TemplateExecutor_Text" xml:space="preserve">
         <value>Bundled T4 template executor</value>
     </data>
+    <data name="RunTemplate_Text" xml:space="preserve">
+        <value>Run Template</value>
+    </data>
+    <data name="DebugTemplate_Text" xml:space="preserve">
+        <value>Debug Template</value>
+    </data>
+    <data name="PreprocessTemplate_Text" xml:space="preserve">
+        <value>Preprocess Template</value>
+    </data>
 </root>

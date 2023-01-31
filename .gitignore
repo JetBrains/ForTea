@@ -19,3 +19,4 @@ Backend/.idea
 
 *.Generated.kt
 *.Generated.cs
+**/.nuke

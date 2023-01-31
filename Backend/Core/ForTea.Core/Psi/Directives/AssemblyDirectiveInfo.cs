@@ -1,8 +1,8 @@
+using System.Collections.Immutable;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
-using JetBrains.DataStructures;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Directives {
@@ -26,7 +26,7 @@ namespace GammaJul.ForTea.Core.Psi.Directives {
 				DirectiveAttributeOptions.Required | DirectiveAttributeOptions.DisplayInCodeStructure
 			);
 
-			SupportedAttributes = ImmutableArray.FromArguments(NameAttribute);
+			SupportedAttributes = ImmutableArray.Create(NameAttribute);
 		}
 
 	}
