@@ -1,6 +1,8 @@
 package com.jetbrains.fortea.configuration.impl
 
-import com.intellij.openapi.application.Application
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import com.intellij.util.application
 import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.T4BuildToolWindowFactory
 import com.jetbrains.fortea.configuration.toBuildResultKind
@@ -15,12 +17,8 @@ import com.jetbrains.rider.build.BuildToolWindowContext
 import com.jetbrains.rider.build.diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*
-import org.jetbrains.annotations.Nls
 
-class T4BuildSessionViewImpl(
-  private val windowFactory: T4BuildToolWindowFactory,
-  private val application: Application
-) : LifetimedService(), T4BuildSessionView {
+class T4BuildSessionViewImpl(private val project: Project) : LifetimedService(), T4BuildSessionView {
   override fun openWindow(message: String) = application.invokeLater {
     val context = initializeContext(ExecutingT4BuildHeader)
     context.clear()
@@ -56,7 +54,7 @@ class T4BuildSessionViewImpl(
   }.forEach(context::addBuildEvent)
 
   private fun initializeContext(windowHeader: String): BuildToolWindowContext {
-    val context = windowFactory.getOrCreateContext(windowHeader)
+    val context = project.service<T4BuildToolWindowFactory>().getOrCreateContext(windowHeader)
     if (!context.isActive) context.showToolWindowIfHidden(true)
     return context
   }
