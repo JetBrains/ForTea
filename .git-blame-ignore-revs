@@ -1,0 +1,15 @@
+# List of revisions that are hidden from git blame annotations.
+# This concerns massive code re-formatting, renaming, large changes
+# that were later reverted, etc.
+#
+# Configure your git so that it always ignores the revisions listed
+# in this file:
+#
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# When adding a new revision to the list, please put its commit message
+# in a comment above it.
+#
+
+# ForTea: reformat all the C# files according to the EditorConfig
+fff91ec393b713290391affe1e6553aeee50901b
