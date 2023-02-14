@@ -79,20 +79,17 @@
   <actions>
     <action
         class="com.jetbrains.fortea.configuration.T4ExecuteTemplateBackendAction"
-        id="ExecuteT4Template"
-        text="Run Template">
+        id="ExecuteT4Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
     <action
         class="com.jetbrains.fortea.configuration.T4DebugTemplateBackendAction"
-        id="DebugT4Template"
-        text="Debug Template">
+        id="DebugT4Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
     </action>
     <action
         class="com.jetbrains.fortea.configuration.T4PreprocessTemplateBackendAction"
-        id="PreprocessT4Template"
-        text="Preprocess Template">
+        id="PreprocessT4Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="DebugT4Template"/>
     </action>
     <action id="NewT4File" class="com.jetbrains.fortea.actions.CreateT4FileAction">
@@ -114,4 +111,5 @@
       <implementation-class>com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost</implementation-class>
     </component>
   </project-components>
+  <resource-bundle>messages.RiderT4Bundle</resource-bundle>
 </idea-plugin>
