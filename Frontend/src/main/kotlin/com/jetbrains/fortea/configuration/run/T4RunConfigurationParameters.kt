@@ -27,7 +27,7 @@ open class T4RunConfigurationParameters(
     useExternalConsole,
     envs + ("T4_ENVDTE_CLIENT_PORT" to envDTEPort.toString()),
     true,
-    { _, _ -> },
+    { _, _, _ -> },
     null,
     "",
     false
