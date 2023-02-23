@@ -96,6 +96,10 @@
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
   </actions>
+  <projectListeners>
+    <listener class="com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost$DocumentListener"
+              topic="com.jetbrains.rdclient.document.FrontendDocumentHostListener" />
+  </projectListeners>
   <project-components>
     <component>
       <interface-class>com.jetbrains.fortea.configuration.T4BuildSessionView</interface-class>
@@ -106,9 +110,6 @@
     </component>
     <component>
       <implementation-class>com.jetbrains.fortea.configuration.T4PreprocessNotificationManager</implementation-class>
-    </component>
-    <component>
-      <implementation-class>com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost</implementation-class>
     </component>
   </project-components>
   <resource-bundle>messages.RiderT4Bundle</resource-bundle>
