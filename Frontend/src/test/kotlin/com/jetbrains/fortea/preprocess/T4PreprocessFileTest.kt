@@ -1,11 +1,10 @@
 package com.jetbrains.fortea.preprocess
 
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.enums.ToolsetVersion
-import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.LATEST_STABLE)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class T4PreprocessFileTest : T4PreprocessFileTestBase() {
   @Test fun `test empty file in core project preprocessing`() = doTest(dumpCsproj = true)
   @Test fun `test empty file in classical project preprocessing`() = doTest(dumpCsproj = true)

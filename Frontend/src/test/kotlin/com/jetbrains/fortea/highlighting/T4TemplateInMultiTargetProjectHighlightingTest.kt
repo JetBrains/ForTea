@@ -1,11 +1,10 @@
 package com.jetbrains.fortea.highlighting
 
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.LATEST_STABLE)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class T4TemplateInMultiTargetProjectHighlightingTest : T4HighlightingTestBase() {
   override fun getSolutionDirectoryName() = "ProjectWithMultipleTargetFrameworks"
   override val testFilePath get() = "Project/$fileName"
