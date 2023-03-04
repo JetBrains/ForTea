@@ -4,7 +4,7 @@
     <IsIndependentBuild Condition="Exists('$(MSBuildThisFileDirectory)..\Frontend\build\DotNetSdkPath.generated.props')">True</IsIndependentBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Condition="'$(IsIndependentBuild)' == 'True'" Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
+    <PackageReference Condition="'$(IsIndependentBuild)' == 'True'" Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\Frontend\build\DotNetSdkPath.generated.props" Condition="'$(IsIndependentBuild)' == 'True'"/>
 </Project>
