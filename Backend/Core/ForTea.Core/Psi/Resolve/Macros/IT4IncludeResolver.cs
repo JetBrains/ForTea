@@ -5,12 +5,12 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros
 {
-	public interface IT4IncludeResolver
-	{
-		[NotNull]
-		VirtualFileSystemPath ResolvePath([NotNull] T4ResolvedPath path);
+  public interface IT4IncludeResolver
+  {
+    [NotNull]
+    VirtualFileSystemPath ResolvePath([NotNull] T4ResolvedPath path);
 
-		[CanBeNull]
-		IPsiSourceFile Resolve([NotNull] T4ResolvedPath path);
-	}
+    [CanBeNull]
+    IPsiSourceFile Resolve([NotNull] T4ResolvedPath path);
+  }
 }

@@ -9,238 +9,248 @@ namespace Microsoft.VisualStudio.TextTemplating
 #line default
 #line hidden
 
-	#region Base class
-	/// <summary>
-	/// Base class for this transformation
-	/// </summary>
-	public abstract class TextTransformation : IDisposable
-	{
-		#region Fields
-		private StringBuilder generationEnvironmentField;
-		private CompilerErrorCollection errorsField;
-		private List<int> indentLengthsField;
-		private string currentIndentField = "";
-		private bool endsWithNewline;
-		private IDictionary<string, object> sessionField;
-		#endregion
+  #region Base class
 
-		#region Properties
-		/// <summary>
-		/// The string builder that generation-time code is using to assemble generated output
-		/// </summary>
-		protected StringBuilder GenerationEnvironment
-		{
-			get
-			{
-				if (generationEnvironmentField == null)
-				{
-					generationEnvironmentField = new StringBuilder();
-				}
+  /// <summary>
+  /// Base class for this transformation
+  /// </summary>
+  public abstract class TextTransformation : IDisposable
+  {
+    #region Fields
 
-				return generationEnvironmentField;
-			}
-			set { generationEnvironmentField = value; }
-		}
+    private StringBuilder generationEnvironmentField;
+    private CompilerErrorCollection errorsField;
+    private List<int> indentLengthsField;
+    private string currentIndentField = "";
+    private bool endsWithNewline;
+    private IDictionary<string, object> sessionField;
 
-		/// <summary>
-		/// The error collection for the generation process
-		/// </summary>
-		public CompilerErrorCollection Errors
-		{
-			get
-			{
-				if (errorsField == null)
-				{
-					errorsField = new CompilerErrorCollection();
-				}
+    #endregion
 
-				return errorsField;
-			}
-		}
+    #region Properties
 
-		/// <summary>
-		/// A list of the lengths of each indent that was added with PushIndent
-		/// </summary>
-		private List<int> indentLengths =>
-			indentLengthsField ??= new List<int>();
+    /// <summary>
+    /// The string builder that generation-time code is using to assemble generated output
+    /// </summary>
+    protected StringBuilder GenerationEnvironment
+    {
+      get
+      {
+        if (generationEnvironmentField == null)
+        {
+          generationEnvironmentField = new StringBuilder();
+        }
 
-		/// <summary>
-		/// Gets the current indent we use when adding lines to the output
-		/// </summary>
-		public string CurrentIndent => currentIndentField;
+        return generationEnvironmentField;
+      }
+      set { generationEnvironmentField = value; }
+    }
 
-		/// <summary>
-		/// Current transformation session
-		/// </summary>
-		public virtual IDictionary<string, object> Session
-		{
-			get { return sessionField; }
-			set { sessionField = value; }
-		}
-		#endregion
+    /// <summary>
+    /// The error collection for the generation process
+    /// </summary>
+    public CompilerErrorCollection Errors
+    {
+      get
+      {
+        if (errorsField == null)
+        {
+          errorsField = new CompilerErrorCollection();
+        }
 
-		#region Transform-time helpers
-		/// <summary>
-		/// Write text directly into the generated output
-		/// </summary>
-		public void Write(string textToAppend)
-		{
-			if (string.IsNullOrEmpty(textToAppend))
-			{
-				return;
-			}
+        return errorsField;
+      }
+    }
 
-			// If we're starting off, or if the previous text ended with a newline,
-			// we have to append the current indent first.
-			if (GenerationEnvironment.Length == 0
-			    || endsWithNewline)
-			{
-				GenerationEnvironment.Append(currentIndentField);
-				endsWithNewline = false;
-			}
+    /// <summary>
+    /// A list of the lengths of each indent that was added with PushIndent
+    /// </summary>
+    private List<int> indentLengths =>
+      indentLengthsField ??= new List<int>();
 
-			// Check if the current text ends with a newline
-			if (textToAppend.EndsWith(Environment.NewLine, StringComparison.CurrentCulture))
-			{
-				endsWithNewline = true;
-			}
+    /// <summary>
+    /// Gets the current indent we use when adding lines to the output
+    /// </summary>
+    public string CurrentIndent => currentIndentField;
 
-			// This is an optimization. If the current indent is "", then we don't have to do any
-			// of the more complex stuff further down.
-			if (currentIndentField.Length == 0)
-			{
-				GenerationEnvironment.Append(textToAppend);
-				return;
-			}
+    /// <summary>
+    /// Current transformation session
+    /// </summary>
+    public virtual IDictionary<string, object> Session
+    {
+      get { return sessionField; }
+      set { sessionField = value; }
+    }
 
-			// Everywhere there is a newline in the text, add an indent after it
-			textToAppend = textToAppend.Replace(Environment.NewLine, Environment.NewLine + currentIndentField);
-			// If the text ends with a newline, then we should strip off the indent added at the very end
-			// because the appropriate indent will be added when the next time Write() is called
-			if (endsWithNewline)
-			{
-				GenerationEnvironment.Append(textToAppend, 0,
-					textToAppend.Length - currentIndentField.Length);
-			}
-			else
-			{
-				GenerationEnvironment.Append(textToAppend);
-			}
-		}
+    #endregion
 
-		/// <summary>
-		/// Write text directly into the generated output
-		/// </summary>
-		public void WriteLine(string textToAppend)
-		{
-			Write(textToAppend);
-			GenerationEnvironment.AppendLine();
-			endsWithNewline = true;
-		}
+    #region Transform-time helpers
 
-		/// <summary>
-		/// Write formatted text directly into the generated output
-		/// </summary>
-		public void Write(string format, params object[] args)
-		{
-			Write(string.Format(CultureInfo.CurrentCulture, format, args));
-		}
+    /// <summary>
+    /// Write text directly into the generated output
+    /// </summary>
+    public void Write(string textToAppend)
+    {
+      if (string.IsNullOrEmpty(textToAppend))
+      {
+        return;
+      }
 
-		/// <summary>
-		/// Write formatted text directly into the generated output
-		/// </summary>
-		public void WriteLine(string format, params object[] args)
-		{
-			WriteLine(string.Format(CultureInfo.CurrentCulture, format, args));
-		}
+      // If we're starting off, or if the previous text ended with a newline,
+      // we have to append the current indent first.
+      if (GenerationEnvironment.Length == 0
+          || endsWithNewline)
+      {
+        GenerationEnvironment.Append(currentIndentField);
+        endsWithNewline = false;
+      }
 
-		/// <summary>
-		/// Raise an error
-		/// </summary>
-		public void Error(string message)
-		{
-			CompilerError error = new CompilerError();
-			error.ErrorText = message;
-			Errors.Add(error);
-		}
+      // Check if the current text ends with a newline
+      if (textToAppend.EndsWith(Environment.NewLine, StringComparison.CurrentCulture))
+      {
+        endsWithNewline = true;
+      }
 
-		/// <summary>
-		/// Raise a warning
-		/// </summary>
-		public void Warning(string message)
-		{
-			CompilerError error = new CompilerError();
-			error.ErrorText = message;
-			error.IsWarning = true;
-			Errors.Add(error);
-		}
+      // This is an optimization. If the current indent is "", then we don't have to do any
+      // of the more complex stuff further down.
+      if (currentIndentField.Length == 0)
+      {
+        GenerationEnvironment.Append(textToAppend);
+        return;
+      }
 
-		/// <summary>
-		/// Increase the indent
-		/// </summary>
-		public void PushIndent(string indent)
-		{
-			if (indent == null)
-			{
-				throw new ArgumentNullException("indent");
-			}
+      // Everywhere there is a newline in the text, add an indent after it
+      textToAppend = textToAppend.Replace(Environment.NewLine, Environment.NewLine + currentIndentField);
+      // If the text ends with a newline, then we should strip off the indent added at the very end
+      // because the appropriate indent will be added when the next time Write() is called
+      if (endsWithNewline)
+      {
+        GenerationEnvironment.Append(textToAppend, 0,
+          textToAppend.Length - currentIndentField.Length);
+      }
+      else
+      {
+        GenerationEnvironment.Append(textToAppend);
+      }
+    }
 
-			currentIndentField = currentIndentField + indent;
-			indentLengths.Add(indent.Length);
-		}
+    /// <summary>
+    /// Write text directly into the generated output
+    /// </summary>
+    public void WriteLine(string textToAppend)
+    {
+      Write(textToAppend);
+      GenerationEnvironment.AppendLine();
+      endsWithNewline = true;
+    }
 
-		/// <summary>
-		/// Remove the last indent that was added with PushIndent
-		/// </summary>
-		public string PopIndent()
-		{
-			string returnValue = "";
-			if (indentLengths.Count > 0)
-			{
-				int indentLength = indentLengths[indentLengths.Count - 1];
-				indentLengths.RemoveAt(indentLengths.Count - 1);
-				if (indentLength > 0)
-				{
-					returnValue = currentIndentField.Substring(currentIndentField.Length - indentLength);
-					currentIndentField =
-						currentIndentField.Remove(currentIndentField.Length - indentLength);
-				}
-			}
+    /// <summary>
+    /// Write formatted text directly into the generated output
+    /// </summary>
+    public void Write(string format, params object[] args)
+    {
+      Write(string.Format(CultureInfo.CurrentCulture, format, args));
+    }
 
-			return returnValue;
-		}
+    /// <summary>
+    /// Write formatted text directly into the generated output
+    /// </summary>
+    public void WriteLine(string format, params object[] args)
+    {
+      WriteLine(string.Format(CultureInfo.CurrentCulture, format, args));
+    }
 
-		/// <summary>
-		/// Remove any indentation
-		/// </summary>
-		public void ClearIndent()
-		{
-			indentLengths.Clear();
-			currentIndentField = "";
-		}
-		#endregion
+    /// <summary>
+    /// Raise an error
+    /// </summary>
+    public void Error(string message)
+    {
+      CompilerError error = new CompilerError();
+      error.ErrorText = message;
+      Errors.Add(error);
+    }
 
-		#region Microsoft compatibility
-		public abstract string TransformText();
+    /// <summary>
+    /// Raise a warning
+    /// </summary>
+    public void Warning(string message)
+    {
+      CompilerError error = new CompilerError();
+      error.ErrorText = message;
+      error.IsWarning = true;
+      Errors.Add(error);
+    }
 
-		public virtual void Initialize()
-		{
-		}
+    /// <summary>
+    /// Increase the indent
+    /// </summary>
+    public void PushIndent(string indent)
+    {
+      if (indent == null)
+      {
+        throw new ArgumentNullException("indent");
+      }
 
-		~TextTransformation() => Dispose(false);
+      currentIndentField = currentIndentField + indent;
+      indentLengths.Add(indent.Length);
+    }
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+    /// <summary>
+    /// Remove the last indent that was added with PushIndent
+    /// </summary>
+    public string PopIndent()
+    {
+      string returnValue = "";
+      if (indentLengths.Count > 0)
+      {
+        int indentLength = indentLengths[indentLengths.Count - 1];
+        indentLengths.RemoveAt(indentLengths.Count - 1);
+        if (indentLength > 0)
+        {
+          returnValue = currentIndentField.Substring(currentIndentField.Length - indentLength);
+          currentIndentField =
+            currentIndentField.Remove(currentIndentField.Length - indentLength);
+        }
+      }
 
-		protected virtual void Dispose(bool disposing)
-		{
-			generationEnvironmentField = null;
-			errorsField = null;
-		}
-		#endregion
-	}
-	#endregion
+      return returnValue;
+    }
+
+    /// <summary>
+    /// Remove any indentation
+    /// </summary>
+    public void ClearIndent()
+    {
+      indentLengths.Clear();
+      currentIndentField = "";
+    }
+
+    #endregion
+
+    #region Microsoft compatibility
+
+    public abstract string TransformText();
+
+    public virtual void Initialize()
+    {
+    }
+
+    ~TextTransformation() => Dispose(false);
+
+    public void Dispose()
+    {
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+      generationEnvironmentField = null;
+      errorsField = null;
+    }
+
+    #endregion
+  }
+
+  #endregion
 }

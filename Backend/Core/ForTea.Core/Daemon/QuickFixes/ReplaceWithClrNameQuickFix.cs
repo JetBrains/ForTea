@@ -16,34 +16,33 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 {
-	[QuickFix]
-	public class ReplaceWithClrNameQuickFix : QuickFixBase
-	{
-		[NotNull]
-		private EscapedKeywordWarning Highlighting { get; }
+  [QuickFix]
+  public class ReplaceWithClrNameQuickFix : QuickFixBase
+  {
+    [NotNull] private EscapedKeywordWarning Highlighting { get; }
 
-		public ReplaceWithClrNameQuickFix([NotNull] EscapedKeywordWarning highlighting) =>
-			Highlighting = highlighting;
+    public ReplaceWithClrNameQuickFix([NotNull] EscapedKeywordWarning highlighting) =>
+      Highlighting = highlighting;
 
-		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
-		{
-			var node = Highlighting.Value;
-			string keyword = node.GetText();
-			Assertion.Assert(CSharpLexer.IsKeyword(keyword), "CSharpLexer.IsKeyword(text)");
-			
-			var qualified = CSharpTypeFactory.GetFullyQualifiedNameByKeyword(keyword, node.GetPsiModule()).NotNull();
-			var newNode = T4ElementFactory.CreateAttributeValue(qualified.FullName);
-			var file = node.GetContainingFile().NotNull();
-			
-			using (WriteLockCookie.Create(file.IsPhysical()))
-			{
-				ModificationUtil.ReplaceChild(node, newNode);
-			}
+    protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+    {
+      var node = Highlighting.Value;
+      string keyword = node.GetText();
+      Assertion.Assert(CSharpLexer.IsKeyword(keyword), "CSharpLexer.IsKeyword(text)");
 
-			return null;
-		}
+      var qualified = CSharpTypeFactory.GetFullyQualifiedNameByKeyword(keyword, node.GetPsiModule()).NotNull();
+      var newNode = T4ElementFactory.CreateAttributeValue(qualified.FullName);
+      var file = node.GetContainingFile().NotNull();
 
-		public override string Text => "Replace with CLR name";
-		public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
-	}
+      using (WriteLockCookie.Create(file.IsPhysical()))
+      {
+        ModificationUtil.ReplaceChild(node, newNode);
+      }
+
+      return null;
+    }
+
+    public override string Text => "Replace with CLR name";
+    public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
+  }
 }

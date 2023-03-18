@@ -16,96 +16,96 @@ using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference.Impl
 {
-	[SolutionComponent]
-	public sealed class T4LowLevelReferenceExtractionManager : IT4LowLevelReferenceExtractionManager
-	{
-		[NotNull]
-		private RoslynMetadataReferenceCache Cache { get; }
+  [SolutionComponent]
+  public sealed class T4LowLevelReferenceExtractionManager : IT4LowLevelReferenceExtractionManager
+  {
+    [NotNull] private RoslynMetadataReferenceCache Cache { get; }
 
-		[NotNull]
-		private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
-		
-		[NotNull]
-		private ISolution Solution { get; }
+    [NotNull] private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
 
-		public T4LowLevelReferenceExtractionManager(
-			Lifetime lifetime,
-			[NotNull] AssemblyInfoDatabase assemblyInfoDatabase,
-			[NotNull] ISolution solution
-		)
-		{
-			AssemblyInfoDatabase = assemblyInfoDatabase;
-			Solution = solution;
-			Cache = new RoslynMetadataReferenceCache(lifetime);
-		}
+    [NotNull] private ISolution Solution { get; }
 
-		// TODO: is this necessary?
-		[NotNull]
-		private static IAssemblyResolver ProtocolAssemblyResolver { get; } = new AssemblyResolverOnFolders(
-			typeof(Lifetime).Assembly.GetPath().ToVirtualFileSystemPath().Parent.Parent, // JetBrains.Lifetimes on .net core
-			typeof(IProtocol).Assembly.GetPath().ToVirtualFileSystemPath().Parent.Parent, // JetBrains.RdFramework on .net core
-			typeof(Lifetime).Assembly.GetPath().ToVirtualFileSystemPath().Parent, // JetBrains.Lifetimes
-			typeof(IProtocol).Assembly.GetPath().ToVirtualFileSystemPath().Parent // JetBrains.RdFramework
-		);
+    public T4LowLevelReferenceExtractionManager(
+      Lifetime lifetime,
+      [NotNull] AssemblyInfoDatabase assemblyInfoDatabase,
+      [NotNull] ISolution solution
+    )
+    {
+      AssemblyInfoDatabase = assemblyInfoDatabase;
+      Solution = solution;
+      Cache = new RoslynMetadataReferenceCache(lifetime);
+    }
 
-		public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
-			IList<VirtualFileSystemPath> directDependencies,
-			IModuleReferenceResolveContext resolveContext
-		)
-		{
-			var result = new List<T4AssemblyReferenceInfo>();
-			ResolveTransitiveDependencies(directDependencies.SelectNotNull(Resolve), resolveContext, result);
-			return result;
-		}
+    // TODO: is this necessary?
+    [NotNull]
+    private static IAssemblyResolver ProtocolAssemblyResolver { get; } = new AssemblyResolverOnFolders(
+      typeof(Lifetime).Assembly.GetPath().ToVirtualFileSystemPath().Parent.Parent, // JetBrains.Lifetimes on .net core
+      typeof(IProtocol).Assembly.GetPath().ToVirtualFileSystemPath().Parent
+        .Parent, // JetBrains.RdFramework on .net core
+      typeof(Lifetime).Assembly.GetPath().ToVirtualFileSystemPath().Parent, // JetBrains.Lifetimes
+      typeof(IProtocol).Assembly.GetPath().ToVirtualFileSystemPath().Parent // JetBrains.RdFramework
+    );
 
-		private T4AssemblyReferenceInfo? Resolve([NotNull] VirtualFileSystemPath path)
-		{
-			var info = AssemblyInfoDatabase.GetAssemblyName(path);
-			if (info == null) return null;
-			return new T4AssemblyReferenceInfo(info.FullName, path);
-		}
+    public IEnumerable<T4AssemblyReferenceInfo> ResolveTransitiveDependencies(
+      IList<VirtualFileSystemPath> directDependencies,
+      IModuleReferenceResolveContext resolveContext
+    )
+    {
+      var result = new List<T4AssemblyReferenceInfo>();
+      ResolveTransitiveDependencies(directDependencies.SelectNotNull(Resolve), resolveContext, result);
+      return result;
+    }
 
-		public MetadataReference ResolveMetadata(Lifetime lifetime, VirtualFileSystemPath path) =>
-			Cache.GetMetadataReference(lifetime, path.ToNativeFileSystemPath());
+    private T4AssemblyReferenceInfo? Resolve([NotNull] VirtualFileSystemPath path)
+    {
+      var info = AssemblyInfoDatabase.GetAssemblyName(path);
+      if (info == null) return null;
+      return new T4AssemblyReferenceInfo(info.FullName, path);
+    }
 
-		private void ResolveTransitiveDependencies(
-			[NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
-			[NotNull] IModuleReferenceResolveContext resolveContext,
-			[NotNull] IList<T4AssemblyReferenceInfo> destination
-		)
-		{
-			foreach (var directDependency in directDependencies)
-			{
-				if (destination.Any(it => it.FullName == directDependency.FullName)) continue;
-				destination.Add(directDependency);
-				var indirectDependencies = AssemblyInfoDatabase
-					.GetReferencedAssemblyNames(new AssemblyLocation(directDependency.Location))
-					.SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(
-						assemblyNameInfo =>
-						{
-							var resolver = BuildResolver(directDependency);
-							resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
-							if (path == null)
-							{
-								var assemblyFromSolution = Solution.GetAllAssemblies().FirstOrDefault(assembly => assembly.AssemblyName == assemblyNameInfo);
-								if (assemblyFromSolution == null) return null;
-								return new T4AssemblyReferenceInfo(
-									assemblyFromSolution.FullAssemblyName,
-									assemblyFromSolution.Location.AssemblyPhysicalPath.NotNull()
-								);
-							}
-							return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path.AssemblyPhysicalPath.NotNull());
-						}
-					);
-				ResolveTransitiveDependencies(indirectDependencies, resolveContext, destination);
-			}
-		}
+    public MetadataReference ResolveMetadata(Lifetime lifetime, VirtualFileSystemPath path) =>
+      Cache.GetMetadataReference(lifetime, path.ToNativeFileSystemPath());
 
-		[NotNull]
-		private static IAssemblyResolver BuildResolver(T4AssemblyReferenceInfo directDependency) =>
-			new CombiningAssemblyResolver(
-				new AssemblyResolverOnFolders(directDependency.Location.Parent),
-				ProtocolAssemblyResolver
-			);
-	}
+    private void ResolveTransitiveDependencies(
+      [NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
+      [NotNull] IModuleReferenceResolveContext resolveContext,
+      [NotNull] IList<T4AssemblyReferenceInfo> destination
+    )
+    {
+      foreach (var directDependency in directDependencies)
+      {
+        if (destination.Any(it => it.FullName == directDependency.FullName)) continue;
+        destination.Add(directDependency);
+        var indirectDependencies = AssemblyInfoDatabase
+          .GetReferencedAssemblyNames(new AssemblyLocation(directDependency.Location))
+          .SelectNotNull<AssemblyNameInfo, T4AssemblyReferenceInfo>(
+            assemblyNameInfo =>
+            {
+              var resolver = BuildResolver(directDependency);
+              resolver.ResolveAssembly(assemblyNameInfo, out var path, resolveContext);
+              if (path == null)
+              {
+                var assemblyFromSolution = Solution.GetAllAssemblies()
+                  .FirstOrDefault(assembly => assembly.AssemblyName == assemblyNameInfo);
+                if (assemblyFromSolution == null) return null;
+                return new T4AssemblyReferenceInfo(
+                  assemblyFromSolution.FullAssemblyName,
+                  assemblyFromSolution.Location.AssemblyPhysicalPath.NotNull()
+                );
+              }
+
+              return new T4AssemblyReferenceInfo(assemblyNameInfo.FullName, path.AssemblyPhysicalPath.NotNull());
+            }
+          );
+        ResolveTransitiveDependencies(indirectDependencies, resolveContext, destination);
+      }
+    }
+
+    [NotNull]
+    private static IAssemblyResolver BuildResolver(T4AssemblyReferenceInfo directDependency) =>
+      new CombiningAssemblyResolver(
+        new AssemblyResolverOnFolders(directDependency.Location.Parent),
+        ProtocolAssemblyResolver
+      );
+  }
 }

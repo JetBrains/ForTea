@@ -13,66 +13,71 @@ using JetBrains.ReSharper.Psi.Transactions;
 using JetBrains.Util;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
-namespace GammaJul.ForTea.Core.Psi {
+namespace GammaJul.ForTea.Core.Psi
+{
+  /// <summary>Module referencer that adds an assembly directive to a T4 file.</summary>
+  [ModuleReferencer(Priority = -10)]
+  public class T4ModuleReferencer : IModuleReferencer
+  {
+    [NotNull] private readonly IT4Environment _environment;
 
-	/// <summary>Module referencer that adds an assembly directive to a T4 file.</summary>
-	[ModuleReferencer(Priority = -10)]
-	public class T4ModuleReferencer : IModuleReferencer {
+    private bool CanReferenceModule([CanBeNull] IPsiModule module, [CanBeNull] IPsiModule moduleToReference)
+      => module is T4FilePsiModule t4PsiModule
+         && t4PsiModule.IsValid()
+         && moduleToReference != null
+         && moduleToReference.ContainingProjectModule is IAssembly assembly
+         && _environment.TargetFrameworkId.IsReferenceAllowed(assembly.TargetFrameworkId);
 
-		[NotNull] private readonly IT4Environment _environment;
+    public bool CanReferenceModule(IPsiModule module, IPsiModule moduleToReference, UserDataHolder userDataHolder)
+      => CanReferenceModule(module, moduleToReference);
 
-		private bool CanReferenceModule([CanBeNull] IPsiModule module, [CanBeNull] IPsiModule moduleToReference)
-			=> module is T4FilePsiModule t4PsiModule
-			&& t4PsiModule.IsValid()
-			&& moduleToReference != null
-			&& moduleToReference.ContainingProjectModule is IAssembly assembly
-			&& _environment.TargetFrameworkId.IsReferenceAllowed(assembly.TargetFrameworkId);
+    public bool ReferenceModule(IPsiModule module, IPsiModule moduleToReference)
+      => ReferenceModuleImpl(module, moduleToReference, null);
 
-		public bool CanReferenceModule(IPsiModule module, IPsiModule moduleToReference, UserDataHolder userDataHolder)
-			=> CanReferenceModule(module, moduleToReference);
+    public bool ReferenceModuleWithType(IPsiModule module, ITypeElement typeToReference)
+      => ReferenceModuleImpl(module, typeToReference.Module, typeToReference.GetContainingNamespace().QualifiedName);
 
-		public bool ReferenceModule(IPsiModule module, IPsiModule moduleToReference)
-			=> ReferenceModuleImpl(module, moduleToReference, null);
+    private bool ReferenceModuleImpl([NotNull] IPsiModule module, [NotNull] IPsiModule moduleToReference,
+      [CanBeNull] string ns)
+    {
+      if (!CanReferenceModule(module, moduleToReference))
+        return false;
 
-		public bool ReferenceModuleWithType(IPsiModule module, ITypeElement typeToReference)
-			=> ReferenceModuleImpl(module, typeToReference.Module, typeToReference.GetContainingNamespace().QualifiedName);
+      var t4PsiModule = (IT4FilePsiModule)module;
+      var assembly = (IAssembly)moduleToReference.ContainingProjectModule;
+      Assertion.AssertNotNull(assembly, "assembly != null");
 
-		private bool ReferenceModuleImpl([NotNull] IPsiModule module, [NotNull] IPsiModule moduleToReference, [CanBeNull] string ns) {
-			if (!CanReferenceModule(module, moduleToReference))
-				return false;
+      if (!(t4PsiModule.SourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File))
+        return false;
 
-			var t4PsiModule = (IT4FilePsiModule) module;
-			var assembly = (IAssembly) moduleToReference.ContainingProjectModule;
-			Assertion.AssertNotNull(assembly, "assembly != null");
+      Action action = () =>
+      {
+        // add assembly directive
+        t4File.AddDirective(T4DirectiveInfoManager.Assembly.CreateDirective(assembly.FullAssemblyName));
 
-			if (!(t4PsiModule.SourceFile.GetTheOnlyPsiFile(T4Language.Instance) is IT4File t4File))
-				return false;
+        // add import directive if necessary
+        if (!String.IsNullOrEmpty(ns)
+            && !t4File.GetDirectives(T4DirectiveInfoManager.Import).Any(d => String.Equals(ns,
+              d.GetAttributeValueByName(T4DirectiveInfoManager.Import.NamespaceAttribute.Name),
+              StringComparison.Ordinal)))
+          t4File.AddDirective(T4DirectiveInfoManager.Import.CreateDirective(ns));
+      };
 
-			Action action = () => {
+      return ExecuteTransaction(module, action);
+    }
 
-				// add assembly directive
-				t4File.AddDirective(T4DirectiveInfoManager.Assembly.CreateDirective(assembly.FullAssemblyName));
+    private static bool ExecuteTransaction([NotNull] IPsiModule module, [NotNull] Action action)
+    {
+      IPsiTransactions transactions = module.GetPsiServices().Transactions;
+      if (transactions.Current != null)
+      {
+        action();
+        return true;
+      }
 
-				// add import directive if necessary
-				if (!String.IsNullOrEmpty(ns)
-				&& !t4File.GetDirectives(T4DirectiveInfoManager.Import).Any(d => String.Equals(ns, d.GetAttributeValueByName(T4DirectiveInfoManager.Import.NamespaceAttribute.Name), StringComparison.Ordinal)))
-					t4File.AddDirective(T4DirectiveInfoManager.Import.CreateDirective(ns));
+      return transactions.Execute("T4 Assembly Reference", action).Succeded;
+    }
 
-			};
-
-			return ExecuteTransaction(module, action);
-		}
-
-		private static bool ExecuteTransaction([NotNull] IPsiModule module, [NotNull] Action action) {
-			IPsiTransactions transactions = module.GetPsiServices().Transactions;
-			if (transactions.Current != null) {
-				action();
-				return true;
-			}
-			return transactions.Execute("T4 Assembly Reference", action).Succeded;
-		}
-
-		public T4ModuleReferencer([NotNull] IT4Environment environment) => _environment = environment;
-	}
-
+    public T4ModuleReferencer([NotNull] IT4Environment environment) => _environment = environment;
+  }
 }

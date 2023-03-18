@@ -6,18 +6,17 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
-	[DaemonStage]
-	public class T4ProblemAnalyzerStage : T4DaemonStageBase
-	{
-		[NotNull]
-		private ElementProblemAnalyzerRegistrar Registrar { get; }
+  [DaemonStage]
+  public class T4ProblemAnalyzerStage : T4DaemonStageBase
+  {
+    [NotNull] private ElementProblemAnalyzerRegistrar Registrar { get; }
 
-		public T4ProblemAnalyzerStage([NotNull] ElementProblemAnalyzerRegistrar registrar) => Registrar = registrar;
+    public T4ProblemAnalyzerStage([NotNull] ElementProblemAnalyzerRegistrar registrar) => Registrar = registrar;
 
-		protected override IDaemonStageProcess CreateProcess(
-			IDaemonProcess process,
-			IT4File file,
-			IContextBoundSettingsStore settings
-		) => new T4ProblemAnalyzerProcess(file, process, Registrar, settings);
-	}
+    protected override IDaemonStageProcess CreateProcess(
+      IDaemonProcess process,
+      IT4File file,
+      IContextBoundSettingsStore settings
+    ) => new T4ProblemAnalyzerProcess(file, process, Registrar, settings);
+  }
 }

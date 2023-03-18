@@ -7,20 +7,20 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
 {
-	public interface IT4ProjectModelTemplateMetadataManager
-	{
-		void UpdateTemplateMetadata(
-			[NotNull] IProjectModelTransactionCookie cookie,
-			[NotNull] IProjectFile template,
-			T4TemplateKind kind,
-			[CanBeNull] VirtualFileSystemPath outputLocation = null);
+  public interface IT4ProjectModelTemplateMetadataManager
+  {
+    void UpdateTemplateMetadata(
+      [NotNull] IProjectModelTransactionCookie cookie,
+      [NotNull] IProjectFile template,
+      T4TemplateKind kind,
+      [CanBeNull] VirtualFileSystemPath outputLocation = null);
 
-		void UpdateGeneratedFileMetadata(
-			[NotNull] IProjectModelTransactionCookie cookie,
-			[NotNull] IProjectFile generatedFile,
-			[NotNull] IProjectFile template);
+    void UpdateGeneratedFileMetadata(
+      [NotNull] IProjectModelTransactionCookie cookie,
+      [NotNull] IProjectFile generatedFile,
+      [NotNull] IProjectFile template);
 
-		[NotNull, ItemNotNull]
-		IEnumerable<IProjectFile> FindLastGenOutput([NotNull] IProjectFile file);
-	}
+    [NotNull, ItemNotNull]
+    IEnumerable<IProjectFile> FindLastGenOutput([NotNull] IProjectFile file);
+  }
 }

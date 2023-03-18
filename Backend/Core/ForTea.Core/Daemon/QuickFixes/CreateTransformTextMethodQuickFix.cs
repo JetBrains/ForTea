@@ -18,76 +18,83 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Daemon.QuickFixes {
+namespace GammaJul.ForTea.Core.Daemon.QuickFixes
+{
+  [QuickFix]
+  public class CreateTransformTextMethodQuickFix : QuickFixBase
+  {
+    [NotNull] private readonly MissingTransformTextMethodError _highlighting;
 
-	[QuickFix]
-	public class CreateTransformTextMethodQuickFix : QuickFixBase {
+    public override bool IsAvailable(IUserDataHolder cache)
+      => GetTargetTypeDeclaration(_highlighting.BaseClass) != null;
 
-		[NotNull] private readonly MissingTransformTextMethodError _highlighting;
+    public override string Text
+      => string.Format(CultureInfo.InvariantCulture, "Create method '{0}'",
+        T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName);
 
-		public override bool IsAvailable(IUserDataHolder cache)
-			=> GetTargetTypeDeclaration(_highlighting.BaseClass) != null;
+    [CanBeNull]
+    private static ITypeDeclaration GetTargetTypeDeclaration([NotNull] ITypeElement baseClass)
+    {
+      if (!baseClass.IsValid())
+        return null;
 
-		public override string Text
-			=> string.Format(CultureInfo.InvariantCulture, "Create method '{0}'", T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName);
+      return baseClass
+        .GetDeclarations()
+        .OfType<ITypeDeclaration>()
+        .FirstOrDefault(
+          decl => LanguageManager.Instance.TryGetService<IntentionLanguageSpecific>(decl.Language) != null);
+    }
 
-		[CanBeNull]
-		private static ITypeDeclaration GetTargetTypeDeclaration([NotNull] ITypeElement baseClass) {
-			if (!baseClass.IsValid())
-				return null;
+    protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+    {
+      ITypeDeclaration typeDeclaration = GetTargetTypeDeclaration(_highlighting.BaseClass);
+      if (typeDeclaration == null) return null;
 
-			return baseClass
-				.GetDeclarations()
-				.OfType<ITypeDeclaration>()
-				.FirstOrDefault(decl => LanguageManager.Instance.TryGetService<IntentionLanguageSpecific>(decl.Language) != null);
-		}
+      MemberSignature signature = CreateTransformTextSignature(typeDeclaration);
+      TypeTarget target = CreateTarget(typeDeclaration);
 
-		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress) {
-			ITypeDeclaration typeDeclaration = GetTargetTypeDeclaration(_highlighting.BaseClass);
-			if (typeDeclaration == null) return null;
+      var context = new CreateMethodDeclarationContext
+      {
+        AccessRights = AccessRights.PUBLIC,
+        ExecuteTemplateOverMemberBody = false,
+        ExecuteTemplateOverName = false,
+        ExecuteTemplateOverParameters = false,
+        ExecuteTemplateOverReturnType = false,
+        IsAbstract = true,
+        IsStatic = false,
+        MethodSignatures = new[] { signature },
+        MethodName = T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName,
+        SourceReferenceExpressionReference = null,
+        Target = target,
+      };
 
-			MemberSignature signature = CreateTransformTextSignature(typeDeclaration);
-			TypeTarget target = CreateTarget(typeDeclaration);
+      IntentionResult intentionResult = MethodDeclarationBuilder.Create(context);
+      intentionResult.ExecuteTemplate();
+      return null;
+    }
 
-			var context = new CreateMethodDeclarationContext {
-				AccessRights = AccessRights.PUBLIC,
-				ExecuteTemplateOverMemberBody = false,
-				ExecuteTemplateOverName = false,
-				ExecuteTemplateOverParameters = false,
-				ExecuteTemplateOverReturnType = false,
-				IsAbstract = true,
-				IsStatic = false,
-				MethodSignatures = new[] { signature },
-				MethodName = T4CSharpIntermediateConverterBase.DefaultTransformTextMethodName,
-				SourceReferenceExpressionReference = null,
-				Target = target,
-			};
+    [NotNull]
+    private static MemberSignature CreateTransformTextSignature([NotNull] ITreeNode node)
+    {
+      var signatureProvider = new MemberSignatureProvider(node.GetPsiServices(), node.Language);
+      PredefinedType predefinedType = node.GetPredefinedType();
+      return signatureProvider.CreateFromTypes(predefinedType.String, EmptyList<Pair<IType, string>>.InstanceList,
+        node.GetSourceFile());
+    }
 
-			IntentionResult intentionResult = MethodDeclarationBuilder.Create(context);
-			intentionResult.ExecuteTemplate();
-			return null;
-		}
+    [NotNull]
+    private static TypeTarget CreateTarget([NotNull] ITypeDeclaration typeDeclaration)
+    {
+      ITypeElement typeElement = typeDeclaration.DeclaredElement;
+      Assertion.AssertNotNull(typeElement, "typeDeclaration.DeclaredElement != null");
+      var target = new TypeTarget(typeElement);
+      target.SetPart(typeDeclaration);
+      return target;
+    }
 
-		[NotNull]
-		private static MemberSignature CreateTransformTextSignature([NotNull] ITreeNode node) {
-			var signatureProvider = new MemberSignatureProvider(node.GetPsiServices(), node.Language);
-			PredefinedType predefinedType = node.GetPredefinedType();
-			return signatureProvider.CreateFromTypes(predefinedType.String, EmptyList<Pair<IType, string>>.InstanceList, node.GetSourceFile());
-		}
-
-		[NotNull]
-		private static TypeTarget CreateTarget([NotNull] ITypeDeclaration typeDeclaration) {
-			ITypeElement typeElement = typeDeclaration.DeclaredElement;
-			Assertion.AssertNotNull(typeElement, "typeDeclaration.DeclaredElement != null");
-			var target = new TypeTarget(typeElement);
-			target.SetPart(typeDeclaration);
-			return target;
-		}
-
-		public CreateTransformTextMethodQuickFix([NotNull] MissingTransformTextMethodError highlighting) {
-			_highlighting = highlighting;
-		}
-
-	}
-
+    public CreateTransformTextMethodQuickFix([NotNull] MissingTransformTextMethodError highlighting)
+    {
+      _highlighting = highlighting;
+    }
+  }
 }

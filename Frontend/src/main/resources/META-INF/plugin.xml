@@ -79,26 +79,27 @@
   <actions>
     <action
         class="com.jetbrains.fortea.configuration.T4ExecuteTemplateBackendAction"
-        id="ExecuteT4Template"
-        text="Run Template">
+        id="ExecuteT4Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="RiderPublish"/>
     </action>
     <action
         class="com.jetbrains.fortea.configuration.T4DebugTemplateBackendAction"
-        id="DebugT4Template"
-        text="Debug Template">
+        id="DebugT4Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="ExecuteT4Template"/>
     </action>
     <action
         class="com.jetbrains.fortea.configuration.T4PreprocessTemplateBackendAction"
-        id="PreprocessT4Template"
-        text="Preprocess Template">
+        id="PreprocessT4Template">
       <add-to-group group-id="SolutionExplorerPopupMenu" anchor="after" relative-to-action="DebugT4Template"/>
     </action>
     <action id="NewT4File" class="com.jetbrains.fortea.actions.CreateT4FileAction">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
   </actions>
+  <projectListeners>
+    <listener class="com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost$DocumentListener"
+              topic="com.jetbrains.rdclient.document.FrontendDocumentHostListener" />
+  </projectListeners>
   <project-components>
     <component>
       <interface-class>com.jetbrains.fortea.configuration.T4BuildSessionView</interface-class>
@@ -110,8 +111,6 @@
     <component>
       <implementation-class>com.jetbrains.fortea.configuration.T4PreprocessNotificationManager</implementation-class>
     </component>
-    <component>
-      <implementation-class>com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost</implementation-class>
-    </component>
   </project-components>
+  <resource-bundle>messages.RiderT4Bundle</resource-bundle>
 </idea-plugin>

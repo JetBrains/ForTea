@@ -14,30 +14,29 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 {
-	[QuickFix]
-	public sealed class T4ReplaceWithFeatureBlockQuickFix : QuickFixBase
-	{
-		[NotNull]
-		private StatementAfterFeatureError Highlighting { get; }
+  [QuickFix]
+  public sealed class T4ReplaceWithFeatureBlockQuickFix : QuickFixBase
+  {
+    [NotNull] private StatementAfterFeatureError Highlighting { get; }
 
-		public override string Text => "Replace with feature block";
+    public override string Text => "Replace with feature block";
 
-		public T4ReplaceWithFeatureBlockQuickFix([NotNull] StatementAfterFeatureError highlighting) =>
-			Highlighting = highlighting;
+    public T4ReplaceWithFeatureBlockQuickFix([NotNull] StatementAfterFeatureError highlighting) =>
+      Highlighting = highlighting;
 
-		protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
-		{
-			var node = Highlighting.BlockStart.GetParentOfType<IT4StatementBlock>().NotNull();
-			string code = node.GetParentOfType<IT4CodeBlock>().NotNull().Code.GetText();
-			var newNode = T4ElementFactory.CreateFeatureBlock(code);
-			using (WriteLockCookie.Create(node.IsPhysical()))
-			{
-				ModificationUtil.ReplaceChild(node, newNode);
-			}
+    protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+    {
+      var node = Highlighting.BlockStart.GetParentOfType<IT4StatementBlock>().NotNull();
+      string code = node.GetParentOfType<IT4CodeBlock>().NotNull().Code.GetText();
+      var newNode = T4ElementFactory.CreateFeatureBlock(code);
+      using (WriteLockCookie.Create(node.IsPhysical()))
+      {
+        ModificationUtil.ReplaceChild(node, newNode);
+      }
 
-			return null;
-		}
+      return null;
+    }
 
-		public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
-	}
+    public override bool IsAvailable(IUserDataHolder cache) => Highlighting.IsValid();
+  }
 }

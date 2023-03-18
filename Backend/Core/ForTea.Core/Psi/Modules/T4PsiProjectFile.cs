@@ -9,23 +9,23 @@ using JetBrains.ReSharper.Psi.Modules;
 
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
-	public class T4PsiProjectFile : PsiProjectFile, IIgnoredInSweaPsiSourceFile
-	{
-		public T4PsiProjectFile(
-			[NotNull] IPsiModule psiModule,
-			[NotNull] IProjectFile projectFile,
-			[NotNull] Func<IProjectFile, IPsiSourceFile, IPsiSourceFileProperties> propertiesProvider,
-			[NotNull] Func<IProjectFile, IPsiSourceFile, bool> validityChecks,
-			DocumentManager documentManager,
-			[NotNull] IModuleReferenceResolveContext resolveContext
-		) : base(psiModule,
-			projectFile,
-			propertiesProvider,
-			validityChecks,
-			documentManager,
-			resolveContext
-		)
-		{
-		}
-	}
+  public class T4PsiProjectFile : PsiProjectFile, IIgnoredInSweaPsiSourceFile
+  {
+    public T4PsiProjectFile(
+      [NotNull] IPsiModule psiModule,
+      [NotNull] IProjectFile projectFile,
+      [NotNull] Func<IProjectFile, IPsiSourceFile, IPsiSourceFileProperties> propertiesProvider,
+      [NotNull] Func<IProjectFile, IPsiSourceFile, bool> validityChecks,
+      DocumentManager documentManager,
+      [NotNull] IModuleReferenceResolveContext resolveContext
+    ) : base(psiModule,
+      projectFile,
+      propertiesProvider,
+      validityChecks,
+      documentManager,
+      resolveContext
+    )
+    {
+    }
+  }
 }

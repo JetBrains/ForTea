@@ -1,4 +1,5 @@
 ﻿#region License
+
 //    Copyright 2012 Julien Lebosquain
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +13,12 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
+
 #endregion
+
 using System.Reflection;
 
 #if INDEPENDENT_BUILD
-
 [assembly: AssemblyTitle("GammaJul.ReSharper.ForTea")]
 [assembly: AssemblyDescription("Provides support for editing T4 (.tt) files.")]
 [assembly: AssemblyConfiguration("")]

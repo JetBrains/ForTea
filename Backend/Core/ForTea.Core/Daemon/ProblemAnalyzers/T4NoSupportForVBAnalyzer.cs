@@ -6,16 +6,16 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-	[ElementProblemAnalyzer(typeof(IT4TemplateDirective), HighlightingTypes = new[] {typeof(NoSupportForVBWarning)})]
-	public sealed class T4NoSupportForVBAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4TemplateDirective>
-	{
-		protected override DirectiveAttributeInfo GetTargetAttribute() =>
-			T4DirectiveInfoManager.Template.LanguageAttribute;
+  [ElementProblemAnalyzer(typeof(IT4TemplateDirective), HighlightingTypes = new[] { typeof(NoSupportForVBWarning) })]
+  public sealed class T4NoSupportForVBAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4TemplateDirective>
+  {
+    protected override DirectiveAttributeInfo GetTargetAttribute() =>
+      T4DirectiveInfoManager.Template.LanguageAttribute;
 
-		protected override void DoRun(IT4AttributeValue element, IHighlightingConsumer consumer)
-		{
-			if (element.GetText() != "VB") return;
-			consumer.AddHighlighting(new NoSupportForVBWarning(element));
-		}
-	}
+    protected override void DoRun(IT4AttributeValue element, IHighlightingConsumer consumer)
+    {
+      if (element.GetText() != "VB") return;
+      consumer.AddHighlighting(new NoSupportForVBWarning(element));
+    }
+  }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 
 #if INDEPENDENT_BUILD
-
 [assembly: AssemblyTitle("ForTea.ReSharperPlugin")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]

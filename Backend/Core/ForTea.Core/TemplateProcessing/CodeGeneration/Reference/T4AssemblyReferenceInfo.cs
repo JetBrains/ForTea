@@ -4,19 +4,17 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference
 {
-	[DebuggerDisplay("{" + nameof(FullName) + "}")]
-	public readonly struct T4AssemblyReferenceInfo
-	{
-		[NotNull]
-		public string FullName { get; }
+  [DebuggerDisplay("{" + nameof(FullName) + "}")]
+  public readonly struct T4AssemblyReferenceInfo
+  {
+    [NotNull] public string FullName { get; }
 
-		[NotNull]
-		public VirtualFileSystemPath Location { get; }
+    [NotNull] public VirtualFileSystemPath Location { get; }
 
-		public T4AssemblyReferenceInfo([NotNull] string fullName, [NotNull] VirtualFileSystemPath location)
-		{
-			FullName = fullName;
-			Location = location;
-		}
-	}
+    public T4AssemblyReferenceInfo([NotNull] string fullName, [NotNull] VirtualFileSystemPath location)
+    {
+      FullName = fullName;
+      Location = location;
+    }
+  }
 }

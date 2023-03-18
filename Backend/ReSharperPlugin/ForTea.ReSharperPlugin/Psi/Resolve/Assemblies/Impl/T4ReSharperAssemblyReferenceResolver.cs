@@ -8,21 +8,20 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 {
-	[SolutionComponent]
-	public sealed class T4ReSharperAssemblyReferenceResolver : T4AssemblyReferenceResolver
-	{
-		[NotNull]
-		private T4LightWeightAssemblyResolutionCache Cache { get; }
+  [SolutionComponent]
+  public sealed class T4ReSharperAssemblyReferenceResolver : T4AssemblyReferenceResolver
+  {
+    [NotNull] private T4LightWeightAssemblyResolutionCache Cache { get; }
 
-		public T4ReSharperAssemblyReferenceResolver(
-			[NotNull] IModuleReferenceResolveManager resolveManager,
-			[NotNull] IT4LightWeightAssemblyReferenceResolver lightWeightResolver,
-			[NotNull] T4LightWeightAssemblyResolutionCache cache
-		) : base(resolveManager, lightWeightResolver) => Cache = cache;
+    public T4ReSharperAssemblyReferenceResolver(
+      [NotNull] IModuleReferenceResolveManager resolveManager,
+      [NotNull] IT4LightWeightAssemblyReferenceResolver lightWeightResolver,
+      [NotNull] T4LightWeightAssemblyResolutionCache cache
+    ) : base(resolveManager, lightWeightResolver) => Cache = cache;
 
-		public override VirtualFileSystemPath ResolveWithoutCaching(T4ResolvedPath path) =>
-			Cache.ResolveWithoutCaching(path)
-			?? ResolveAsAssemblyName(path)
-			?? ResolveAsAssemblyFile(path);
-	}
+    public override VirtualFileSystemPath ResolveWithoutCaching(T4ResolvedPath path) =>
+      Cache.ResolveWithoutCaching(path)
+      ?? ResolveAsAssemblyName(path)
+      ?? ResolveAsAssemblyFile(path);
+  }
 }

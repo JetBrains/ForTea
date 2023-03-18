@@ -5,12 +5,10 @@ using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
-	public interface IT4FilePsiModule : IProjectPsiModule
-	{
-		[NotNull]
-		IPsiSourceFile SourceFile { get; }
+  public interface IT4FilePsiModule : IProjectPsiModule
+  {
+    [NotNull] IPsiSourceFile SourceFile { get; }
 
-		[CanBeNull]
-		TargetFrameworkId OriginalTargetFrameworkId { get; }
-	}
+    [CanBeNull] TargetFrameworkId OriginalTargetFrameworkId { get; }
+  }
 }

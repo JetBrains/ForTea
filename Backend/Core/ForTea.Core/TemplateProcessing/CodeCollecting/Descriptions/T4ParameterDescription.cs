@@ -9,93 +9,87 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
 {
-	public sealed class T4ParameterDescription
-	{
-		[NotNull]
-		private ITreeNode TypeToken { get; }
+  public sealed class T4ParameterDescription
+  {
+    [NotNull] private ITreeNode TypeToken { get; }
 
-		[NotNull]
-		private ITreeNode NameToken { get; }
+    [NotNull] private ITreeNode NameToken { get; }
 
-		[NotNull]
-		public string FieldNameString { get; }
+    [NotNull] public string FieldNameString { get; }
 
-		[NotNull]
-		public string PropertyNameString { get; }
+    [NotNull] public string PropertyNameString { get; }
 
-		[NotNull]
-		public string TypeString { get; }
+    [NotNull] public string TypeString { get; }
 
-		[NotNull]
-		public string TypeFqnString { get; }
+    [NotNull] public string TypeFqnString { get; }
 
-		private T4ParameterDescription(
-			[NotNull] ITreeNode typeToken,
-			[NotNull] ITreeNode nameToken,
-			[NotNull] string nameString
-		)
-		{
-			TypeToken = typeToken;
-			NameToken = nameToken;
-			FieldNameString = $"_{nameString}Field";
-			PropertyNameString = nameString;
-			TypeString = GetTypeString();
-			TypeFqnString = GetTypeFqnString();
-		}
+    private T4ParameterDescription(
+      [NotNull] ITreeNode typeToken,
+      [NotNull] ITreeNode nameToken,
+      [NotNull] string nameString
+    )
+    {
+      TypeToken = typeToken;
+      NameToken = nameToken;
+      FieldNameString = $"_{nameString}Field";
+      PropertyNameString = nameString;
+      TypeString = GetTypeString();
+      TypeFqnString = GetTypeFqnString();
+    }
 
-		public void AppendName([NotNull] T4CSharpCodeGenerationResult result)
-		{
-			if (CSharpLexer.IsKeyword(NameToken.GetText())) result.Append("@");
-			result.AppendMapped(NameToken);
-		}
+    public void AppendName([NotNull] T4CSharpCodeGenerationResult result)
+    {
+      if (CSharpLexer.IsKeyword(NameToken.GetText())) result.Append("@");
+      result.AppendMapped(NameToken);
+    }
 
-		public void AppendTypeMapped([NotNull] T4CSharpCodeGenerationResult result)
-		{
-			string typeText = TypeToken.GetText();
-			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(typeText), TypeToken.GetPsiModule());
-			if (keyword != null)
-			{
-				result.Append(keyword);
-				return;
-			}
+    public void AppendTypeMapped([NotNull] T4CSharpCodeGenerationResult result)
+    {
+      string typeText = TypeToken.GetText();
+      string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(typeText), TypeToken.GetPsiModule());
+      if (keyword != null)
+      {
+        result.Append(keyword);
+        return;
+      }
 
-			result.Append("global::");
-			if (CSharpLexer.IsKeyword(typeText)) result.Append("@");
-			result.AppendMapped(TypeToken);
-		}
+      result.Append("global::");
+      if (CSharpLexer.IsKeyword(typeText)) result.Append("@");
+      result.AppendMapped(TypeToken);
+    }
 
-		[NotNull]
-		private string GetTypeString()
-		{
-			string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(TypeToken.GetText()), TypeToken.GetPsiModule());
-			if (keyword != null)
-			{
-				return keyword;
-			}
+    [NotNull]
+    private string GetTypeString()
+    {
+      string keyword = CSharpTypeFactory.GetTypeKeyword(new ClrTypeName(TypeToken.GetText()), TypeToken.GetPsiModule());
+      if (keyword != null)
+      {
+        return keyword;
+      }
 
-			return "global::" + GetTypeFqnString();
-		}
+      return "global::" + GetTypeFqnString();
+    }
 
-		[NotNull]
-		private string GetTypeFqnString()
-		{
-			string typeText = TypeToken.GetText();
-			if (CSharpLexer.IsKeyword(typeText)) return $"@{typeText}";
-			return typeText;
-		}
+    [NotNull]
+    private string GetTypeFqnString()
+    {
+      string typeText = TypeToken.GetText();
+      if (CSharpLexer.IsKeyword(typeText)) return $"@{typeText}";
+      return typeText;
+    }
 
-		public void AppendType([NotNull] T4CSharpCodeGenerationResult result) => result.Append(TypeString);
+    public void AppendType([NotNull] T4CSharpCodeGenerationResult result) => result.Append(TypeString);
 
-		[CanBeNull]
-		public static T4ParameterDescription FromDirective([NotNull] IT4Directive directive)
-		{
-			var typeToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.TypeAttribute.Name);
-			string typeText = typeToken?.GetText();
-			var nameToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.NameAttribute.Name);
-			string nameText = nameToken?.GetText();
-			if (string.IsNullOrEmpty(typeText)) return null;
-			if (string.IsNullOrEmpty(nameText)) return null;
-			return new T4ParameterDescription(typeToken, nameToken, nameText);
-		}
-	}
+    [CanBeNull]
+    public static T4ParameterDescription FromDirective([NotNull] IT4Directive directive)
+    {
+      var typeToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.TypeAttribute.Name);
+      string typeText = typeToken?.GetText();
+      var nameToken = directive.GetAttributeValueToken(T4DirectiveInfoManager.Parameter.NameAttribute.Name);
+      string nameText = nameToken?.GetText();
+      if (string.IsNullOrEmpty(typeText)) return null;
+      if (string.IsNullOrEmpty(nameText)) return null;
+      return new T4ParameterDescription(typeToken, nameToken, nameText);
+    }
+  }
 }

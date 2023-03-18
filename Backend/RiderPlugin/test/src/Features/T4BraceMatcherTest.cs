@@ -6,17 +6,17 @@ using NUnit.Framework;
 
 namespace JetBrains.ForTea.Tests.Features
 {
-	[Category("T4"), Category("MatchingBraces")]
-	[TestFileExtension(T4FileExtensions.MainExtension)]
-	public class T4BraceMatcherTest : ContextHighlighterTestBase
-	{
-		protected override string ExtraPath => @"BracesMatcher";
+  [Category("T4"), Category("MatchingBraces")]
+  [TestFileExtension(T4FileExtensions.MainExtension)]
+  public class T4BraceMatcherTest : ContextHighlighterTestBase
+  {
+    protected override string ExtraPath => @"BracesMatcher";
 
-		[TestCase("T4BlockEndMatching")]
-		[TestCase("CSharpBraceMatching")]
-		[TestCase("Macro")]
-		[TestCase("EnvironmentVariable")]
-		[TestCase("DirectiveAttribute")]
-		public void TestBraceMatcher([NotNull] string name) => DoOneTest(name);
-	}
+    [TestCase("T4BlockEndMatching")]
+    [TestCase("CSharpBraceMatching")]
+    [TestCase("Macro")]
+    [TestCase("EnvironmentVariable")]
+    [TestCase("DirectiveAttribute")]
+    public void TestBraceMatcher([NotNull] string name) => DoOneTest(name);
+  }
 }

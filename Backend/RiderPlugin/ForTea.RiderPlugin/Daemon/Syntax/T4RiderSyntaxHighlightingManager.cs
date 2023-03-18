@@ -5,9 +5,9 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.RiderPlugin.Daemon.Syntax
 {
-	[Language(typeof(T4Language))]
-	public class T4SyntaxHighlightingManager : SyntaxHighlightingManager
-	{
-		public override SyntaxHighlightingProcessor CreateProcessor() => new T4SyntaxHighlightingProcessor();
-	}
+  [Language(typeof(T4Language))]
+  public class T4SyntaxHighlightingManager : SyntaxHighlightingManager
+  {
+    public override SyntaxHighlightingProcessor CreateProcessor() => new T4SyntaxHighlightingProcessor();
+  }
 }

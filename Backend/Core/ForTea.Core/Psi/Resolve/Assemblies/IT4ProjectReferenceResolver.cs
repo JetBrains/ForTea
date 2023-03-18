@@ -6,12 +6,12 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies
 {
-	public interface IT4ProjectReferenceResolver
-	{
-		[NotNull, ItemNotNull]
-		IEnumerable<IProject> GetProjectDependencies([NotNull] IT4File file);
+  public interface IT4ProjectReferenceResolver
+  {
+    [NotNull, ItemNotNull]
+    IEnumerable<IProject> GetProjectDependencies([NotNull] IT4File file);
 
-		[CanBeNull]
-		IProject TryResolveProject([NotNull] VirtualFileSystemPath path);
-	}
+    [CanBeNull]
+    IProject TryResolveProject([NotNull] VirtualFileSystemPath path);
+  }
 }

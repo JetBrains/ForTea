@@ -4,22 +4,20 @@ using JetBrains.Annotations;
 
 namespace GammaJul.ForTea.Core.Psi.Directives
 {
-	public sealed class IncludeDirectiveInfo : DirectiveInfo
-	{
-		[NotNull]
-		public DirectiveAttributeInfo FileAttribute { get; }
+  public sealed class IncludeDirectiveInfo : DirectiveInfo
+  {
+    [NotNull] public DirectiveAttributeInfo FileAttribute { get; }
 
-		[NotNull]
-		public DirectiveAttributeInfo OnceAttribute { get; }
+    [NotNull] public DirectiveAttributeInfo OnceAttribute { get; }
 
-		public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+    public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
-		public IncludeDirectiveInfo() : base("include")
-		{
-			FileAttribute = new DirectiveAttributeInfo("file",
-				DirectiveAttributeOptions.Required | DirectiveAttributeOptions.DisplayInCodeStructure);
-			OnceAttribute = new BooleanDirectiveAttributeInfo("once", DirectiveAttributeOptions.None);
-			SupportedAttributes = ImmutableArray.Create(FileAttribute, OnceAttribute);
-		}
-	}
+    public IncludeDirectiveInfo() : base("include")
+    {
+      FileAttribute = new DirectiveAttributeInfo("file",
+        DirectiveAttributeOptions.Required | DirectiveAttributeOptions.DisplayInCodeStructure);
+      OnceAttribute = new BooleanDirectiveAttributeInfo("once", DirectiveAttributeOptions.None);
+      SupportedAttributes = ImmutableArray.Create(FileAttribute, OnceAttribute);
+    }
+  }
 }

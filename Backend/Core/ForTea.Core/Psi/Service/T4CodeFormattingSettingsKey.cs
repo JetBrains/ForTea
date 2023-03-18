@@ -5,9 +5,9 @@ using JetBrains.ReSharper.Psi.Format;
 
 namespace GammaJul.ForTea.Core.Psi.Service
 {
-	[SettingsKey(typeof(CodeFormattingSettingsKey), "Code formatting in T4")]
-	[EditorConfigKey("T4")]
-	public sealed class T4CodeFormattingSettingsKey : FormatSettingsKeyBase
-	{
-	}
+  [SettingsKey(typeof(CodeFormattingSettingsKey), "Code formatting in T4")]
+  [EditorConfigKey("T4")]
+  public sealed class T4CodeFormattingSettingsKey : FormatSettingsKeyBase
+  {
+  }
 }

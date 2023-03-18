@@ -12,65 +12,64 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
-	/// <summary>Provides <see cref="IT4FilePsiModule"/> for T4 files opened inside the solution.</summary>
-	internal sealed class T4ProjectPsiModuleHandler : DelegatingProjectPsiModuleHandler
-	{
-		[NotNull] private readonly T4PsiModuleProvider _t4PsiModuleProvider;
+  /// <summary>Provides <see cref="IT4FilePsiModule"/> for T4 files opened inside the solution.</summary>
+  internal sealed class T4ProjectPsiModuleHandler : DelegatingProjectPsiModuleHandler
+  {
+    [NotNull] private readonly T4PsiModuleProvider _t4PsiModuleProvider;
 
-		[NotNull]
-		private IT4TemplateKindProvider TemplateKindProvider { get; }
+    [NotNull] private IT4TemplateKindProvider TemplateKindProvider { get; }
 
-		public override IList<IPsiModule> GetAllModules()
-		{
-			var modules = new List<IPsiModule>(base.GetAllModules());
-			modules.AddRange(_t4PsiModuleProvider.GetModules());
-			return modules;
-		}
+    public override IList<IPsiModule> GetAllModules()
+    {
+      var modules = new List<IPsiModule>(base.GetAllModules());
+      modules.AddRange(_t4PsiModuleProvider.GetModules());
+      return modules;
+    }
 
-		public override void OnProjectFileChanged(
-			IProjectFile projectFile,
-			VirtualFileSystemPath oldLocation,
-			PsiModuleChange.ChangeType changeType,
-			PsiModuleChangeBuilder changeBuilder
-		)
-		{
-			var requestedChange = _t4PsiModuleProvider.OnProjectFileChanged(projectFile, changeType, changeBuilder);
-			if (requestedChange == null) return;
-			base.OnProjectFileChanged(projectFile, oldLocation, requestedChange.Value, changeBuilder);
-		}
+    public override void OnProjectFileChanged(
+      IProjectFile projectFile,
+      VirtualFileSystemPath oldLocation,
+      PsiModuleChange.ChangeType changeType,
+      PsiModuleChangeBuilder changeBuilder
+    )
+    {
+      var requestedChange = _t4PsiModuleProvider.OnProjectFileChanged(projectFile, changeType, changeBuilder);
+      if (requestedChange == null) return;
+      base.OnProjectFileChanged(projectFile, oldLocation, requestedChange.Value, changeBuilder);
+    }
 
-		public override IEnumerable<IPsiSourceFile> GetPsiSourceFilesFor(IProjectFile projectFile)
-			=> base.GetPsiSourceFilesFor(projectFile).Concat(_t4PsiModuleProvider.GetPsiSourceFilesFor(projectFile));
+    public override IEnumerable<IPsiSourceFile> GetPsiSourceFilesFor(IProjectFile projectFile)
+      => base.GetPsiSourceFilesFor(projectFile).Concat(_t4PsiModuleProvider.GetPsiSourceFilesFor(projectFile));
 
-		public T4ProjectPsiModuleHandler(
-			Lifetime lifetime,
-			[NotNull] IProjectPsiModuleHandler handler,
-			[NotNull] ChangeManager changeManager,
-			[NotNull] IT4Environment t4Environment,
-			[NotNull] IProject project,
-			[NotNull] IT4TemplateKindProvider templateKindProvider
-		) : base(handler)
-		{
-			TemplateKindProvider = templateKindProvider;
-			_t4PsiModuleProvider = new T4PsiModuleProvider(
-				lifetime,
-				project.Locks,
-				changeManager,
-				t4Environment,
-				templateKindProvider,
-				handler.PrimaryModule?.TargetFrameworkId
-			);
-		}
+    public T4ProjectPsiModuleHandler(
+      Lifetime lifetime,
+      [NotNull] IProjectPsiModuleHandler handler,
+      [NotNull] ChangeManager changeManager,
+      [NotNull] IT4Environment t4Environment,
+      [NotNull] IProject project,
+      [NotNull] IT4TemplateKindProvider templateKindProvider
+    ) : base(handler)
+    {
+      TemplateKindProvider = templateKindProvider;
+      _t4PsiModuleProvider = new T4PsiModuleProvider(
+        lifetime,
+        project.Locks,
+        changeManager,
+        t4Environment,
+        templateKindProvider,
+        handler.PrimaryModule?.TargetFrameworkId
+      );
+    }
 
-		public override bool InternalsVisibleTo(IPsiModule moduleTo, IPsiModule moduleFrom)
-		{
-			if (!(moduleTo is T4FilePsiModule t4Module)) return base.InternalsVisibleTo(moduleTo, moduleFrom);
-			if (moduleFrom is IAssemblyPsiModule) return false;
-			if (!(moduleFrom is IProjectPsiModule projectModule)) return false;
-			var sourceFile = t4Module.SourceFile;
-			var root = sourceFile.GetSolution().GetComponent<IT4FileDependencyGraph>().FindBestRoot(sourceFile);
-			if (!TemplateKindProvider.IsPreprocessedTemplate(root)) return false;
-			return Equals(root.GetProject(), projectModule.Project);
-		}
-	}
+    public override bool InternalsVisibleTo(IPsiModule moduleTo, IPsiModule moduleFrom)
+    {
+      if (!(moduleTo is T4FilePsiModule t4Module)) return base.InternalsVisibleTo(moduleTo, moduleFrom);
+      if (moduleFrom is IAssemblyPsiModule) return false;
+      if (!(moduleFrom is IProjectPsiModule projectModule)) return false;
+      var sourceFile = t4Module.SourceFile;
+      var root = sourceFile.GetSolution().GetComponent<IT4FileDependencyGraph>().FindBestRoot(sourceFile);
+      if (!TemplateKindProvider.IsPreprocessedTemplate(root)) return false;
+      return Equals(root.GetProject(), projectModule.Project);
+    }
+  }
 }

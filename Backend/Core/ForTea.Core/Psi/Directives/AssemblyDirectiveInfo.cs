@@ -5,30 +5,27 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Util;
 
-namespace GammaJul.ForTea.Core.Psi.Directives {
+namespace GammaJul.ForTea.Core.Psi.Directives
+{
+  public class AssemblyDirectiveInfo : DirectiveInfo
+  {
+    [NotNull] public DirectiveAttributeInfo NameAttribute { get; }
 
-	public class AssemblyDirectiveInfo : DirectiveInfo {
+    public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
 
-		[NotNull]
-		public DirectiveAttributeInfo NameAttribute { get; }
+    [NotNull]
+    public IT4Directive CreateDirective([NotNull] string assemblyName)
+      => T4ElementFactory.CreateDirective(Name, Pair.Of(NameAttribute.Name, assemblyName));
 
-		public override ImmutableArray<DirectiveAttributeInfo> SupportedAttributes { get; }
+    public AssemblyDirectiveInfo()
+      : base("assembly")
+    {
+      NameAttribute = new DirectiveAttributeInfo(
+        "name",
+        DirectiveAttributeOptions.Required | DirectiveAttributeOptions.DisplayInCodeStructure
+      );
 
-		[NotNull]
-		public IT4Directive CreateDirective([NotNull] string assemblyName)
-			=> T4ElementFactory.CreateDirective(Name, Pair.Of(NameAttribute.Name, assemblyName));
-
-		public AssemblyDirectiveInfo()
-			: base("assembly") {
-
-			NameAttribute = new DirectiveAttributeInfo(
-				"name",
-				DirectiveAttributeOptions.Required | DirectiveAttributeOptions.DisplayInCodeStructure
-			);
-
-			SupportedAttributes = ImmutableArray.Create(NameAttribute);
-		}
-
-	}
-
+      SupportedAttributes = ImmutableArray.Create(NameAttribute);
+    }
+  }
 }

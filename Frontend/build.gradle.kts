@@ -120,6 +120,7 @@ tasks {
           .toList()
         + File("${setupDependencies.get().idea.get().classes}/lib/3rd-party-rt.jar")
         + File("${setupDependencies.get().idea.get().classes}/lib/util.jar")
+        + File("${setupDependencies.get().idea.get().classes}/lib/util-8.jar")
       )
     } else {
       logger.lifecycle("Use ant compiler artifacts from maven")

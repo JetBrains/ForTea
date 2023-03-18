@@ -4,8 +4,8 @@ using JetBrains.Rider.Backend.Product;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.TestFramework
 {
-	[ZoneMarker]
-	public class ZoneMarker : IRequire<IRiderCoreTestingZone>, IRequire<IRiderProductEnvironmentZone>
-	{
-	}
+  [ZoneMarker]
+  public class ZoneMarker : IRequire<IRiderCoreTestingZone>, IRequire<IRiderProductEnvironmentZone>
+  {
+  }
 }
