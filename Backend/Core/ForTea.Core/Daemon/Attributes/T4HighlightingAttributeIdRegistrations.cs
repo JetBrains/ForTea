@@ -1,3 +1,4 @@
+using GammaJul.ForTea.Core.Resources;
 using JetBrains.ReSharper.Feature.Services.Daemon.Attributes;
 using JetBrains.ReSharper.Feature.Services.Daemon.Attributes.Idea;
 using JetBrains.TextControl.DocumentMarkup;
@@ -9,32 +10,32 @@ namespace GammaJul.ForTea.Core.Daemon.Attributes
      EffectType = EffectType.TEXT,
      GroupId = T4HighlightingAttributeGroup.ID,
      FallbackAttributeId = DefaultLanguageAttributeIds.KEYWORD,
-     RiderPresentableName = "Macro"
+     RiderPresentableNameResourceName = nameof(Strings.T4HighlighterMacro_Text)
    ),
    RegisterHighlighter(
      ENVIRONMENT_VARIABLE,
      EffectType = EffectType.TEXT,
      GroupId = T4HighlightingAttributeGroup.ID,
      FallbackAttributeId = DefaultLanguageAttributeIds.NUMBER,
-     RiderPresentableName = "Environment Variable"
+     RiderPresentableNameResourceName = nameof(Strings.T4HighlighterEnvironmentVariable_Text)
    ), RegisterHighlighter(
      ATTRIBUTE_VALUE,
      EffectType = EffectType.TEXT,
      GroupId = T4HighlightingAttributeGroup.ID,
      FallbackAttributeId = IdeaXmlHighlighterColorsAttributeIds.XML_ATTRIBUTE_VALUE,
-     RiderPresentableName = "Attribute Value"
+     RiderPresentableNameResourceName = nameof(Strings.T4HighlighterAttributeValue_Text)
    ), RegisterHighlighter(
      DIRECTIVE,
      EffectType = EffectType.TEXT,
      GroupId = T4HighlightingAttributeGroup.ID,
      FallbackAttributeId = IdeaXmlHighlighterColorsAttributeIds.XML_TAG,
-     RiderPresentableName = "Directive Name"
+     RiderPresentableNameResourceName = nameof(Strings.T4HihglighterDirectiveName_Text)
    ), RegisterHighlighter(
      DIRECTIVE_ATTRIBUTE,
      EffectType = EffectType.TEXT,
      GroupId = T4HighlightingAttributeGroup.ID,
      FallbackAttributeId = IdeaXmlHighlighterColorsAttributeIds.XML_ATTRIBUTE_NAME,
-     RiderPresentableName = "Attribute Name"
+     RiderPresentableNameResourceName = nameof(Strings.T4highlighterAttributeName_Text)
    )]
   public static partial class T4HighlightingAttributeIds
   {

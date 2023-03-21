@@ -39,6 +39,11 @@
     <CsLex Include="Parsing\Lexing\T4Lexer.lex" References="Parsing\Lexing\T4Rules.lex" />
     <ParserGen Include="Parsing\T4.psi" />
     <None Include="Parsing\T4.psi" />
+    <Compile Update="Resources\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <_UnmanagedRegistrationCache Remove="obj\ForTea.Core.csproj.UnmanagedRegistration.cache" />
@@ -81,6 +86,20 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="mscorlib" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Resources\Strings.resx" />
+    <EmbeddedResource Include="Resources\Strings.resx">
+      <Generator>JetResourceGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\Strings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_Web_Core.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_Web_Core.Props')" />
