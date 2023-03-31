@@ -43,13 +43,13 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
     {
       switch (Environment.Platform)
       {
-        case PlatformUtil.Platform.Windows:
+        case JetPlatform.Windows:
           result.Add("Platform", "Win32");
           break;
-        case PlatformUtil.Platform.MacOsX:
+        case JetPlatform.MacOsX:
           result.Add("Platform", "MacOsX");
           break;
-        case PlatformUtil.Platform.Linux:
+        case JetPlatform.Linux:
           result.Add("Platform", "Linux");
           break;
       }
