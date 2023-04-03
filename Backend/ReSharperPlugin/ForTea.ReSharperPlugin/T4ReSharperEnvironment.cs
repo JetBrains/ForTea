@@ -6,9 +6,9 @@ using GammaJul.ForTea.Core.Services;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.platforms;
-using JetBrains.Platform.VisualStudio.Protocol.Common.Shell;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util;
+using JetBrains.Util.DevEnv;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 using Microsoft.Win32;
 
