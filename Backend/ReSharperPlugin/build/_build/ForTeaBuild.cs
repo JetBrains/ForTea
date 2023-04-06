@@ -20,7 +20,7 @@ internal class ForTeaBuild : NukeBuild
   [Parameter] public string WaveVersion;
   [Parameter] public readonly string NuGetSource = "https://plugins.jetbrains.com/";
   [Parameter] public readonly string NuGetApiKey;
-  [Solution] private readonly Solution Solution;
+  [Solution("../ForTea.ReSharper.sln")] private readonly Solution Solution;
   private const string MainProjectName = "ForTea.ReSharperPlugin";
   private AbsolutePath OutputDirectory => RootDirectory / "artifacts" / Configuration;
 
