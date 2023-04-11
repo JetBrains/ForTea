@@ -1,7 +1,7 @@
 using GammaJul.ForTea.Core;
 using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.Environment;
-using JetBrains.Platform.VisualStudio.SinceVs10.Shell.Zones;
+using JetBrains.Platform.VisualStudio.SinceVs10.Zones;
 
 #pragma warning disable CheckNamespace
 
