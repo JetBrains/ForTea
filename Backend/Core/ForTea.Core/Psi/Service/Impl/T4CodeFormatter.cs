@@ -55,7 +55,8 @@ namespace GammaJul.ForTea.Core.Psi.Service.Impl
       AdditionalFormatterParameters parameters = null
     ) => null;
 
-    public override void FormatInsertedNodes(ITreeNode nodeFirst, ITreeNode nodeLast, bool formatSurround)
+    public override void FormatInsertedNodes(ITreeNode nodeFirst, ITreeNode nodeLast, bool formatSurround,
+      bool indentSurround = false)
     {
     }
 
