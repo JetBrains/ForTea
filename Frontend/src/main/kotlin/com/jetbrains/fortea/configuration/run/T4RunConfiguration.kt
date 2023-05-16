@@ -4,9 +4,9 @@ import com.intellij.execution.Executor
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.rd.util.startOnUiAsync
 import com.jetbrains.fortea.configuration.run.execution.T4ExecutorFactory
 import com.jetbrains.rd.platform.util.lifetime
-import com.jetbrains.rd.platform.util.startOnUiAsync
 import com.jetbrains.rd.platform.util.toPromise
 import com.jetbrains.rider.debugger.IRiderDebuggable
 import com.jetbrains.rider.run.configurations.AsyncRunConfiguration
