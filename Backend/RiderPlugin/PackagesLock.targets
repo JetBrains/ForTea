@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <PackageLock Include="JetBrains.EnvDTE.Client" Version="20220221.47.0" />
-    <PackageLock Include="JetBrains.EnvDTE.Host" Version="20220221.47.0" />
+    <PackageLock Include="JetBrains.EnvDTE.Client" Version="20230531.48.0" />
+    <PackageLock Include="JetBrains.EnvDTE.Host" Version="20230531.48.0" />
     <PackageLock Include="NUnit.Console" Version="3.12.0" />
     <PackageLock Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageLock Include="NUnit.ConsoleRunner" Version="3.12.0" />
