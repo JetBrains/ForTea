@@ -13,7 +13,7 @@ import com.jetbrains.fortea.model.T4PreprocessingResult
 import com.jetbrains.fortea.utils.RiderT4Bundle
 import com.jetbrains.rd.platform.util.idea.LifetimedService
 import com.jetbrains.rd.util.reactive.ViewableMap
-import com.jetbrains.rider.build.BuildToolWindowContext
+import com.jetbrains.rider.build.ui.old.BuildToolWindowContext
 import com.jetbrains.rider.build.diagnostics.BuildDiagnostic
 import com.jetbrains.rider.build.diagnostics.DiagnosticKind
 import com.jetbrains.rider.model.*

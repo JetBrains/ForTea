@@ -11,9 +11,9 @@ import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
 import com.jetbrains.rd.platform.util.idea.LifetimedService
-import com.jetbrains.rider.build.BuildToolWindowContext
+import com.jetbrains.rider.build.ui.old.BuildToolWindowContext
 import com.jetbrains.rider.build.BuildToolWindowFactory
-import com.jetbrains.rider.build.redesign.BuildToolwindowWidget
+import com.jetbrains.rider.build.ui.old.BuildResultPanel
 import com.jetbrains.rider.util.idea.getService
 import java.awt.BorderLayout
 import javax.swing.JPanel
@@ -33,13 +33,13 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
     val contentManager = toolWindow.contentManager
     toolWindow.setIcon(AllIcons.Toolwindows.ToolWindowBuild)
     // Required for hiding window without content
-    val panel = BuildToolwindowWidget(project, serviceLifetime) //BuildResultPanel(project, serviceLifetime)
+    val panel = BuildResultPanel(project, serviceLifetime)
     val toolWindowContent = contentManager.factory.createContent(null, windowHeader, true).apply {
       StatusBarUtil.setStatusBarInfo(project, "")
       component = panel
       isCloseable = false
     }
-    //panel.toolbar = createToolbarPanel(panel, contentManager, toolWindowContent)
+    panel.toolbar = createToolbarPanel(panel, contentManager, toolWindowContent)
 
     contentManager.addContent(toolWindowContent)
     val ctx = BuildToolWindowContext(toolWindow, toolWindowContent, panel)
@@ -48,7 +48,7 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
   }
 
   private fun createToolbarPanel(
-    buildResultPanel: BuildToolwindowWidget,
+    buildResultPanel: BuildResultPanel,
     contentManager: ContentManager,
     toolWindowContent: Content
   ): JPanel {
@@ -63,7 +63,7 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
           context = null
         }
       })
-      //TODO[sbe] ? buildResultPanel.showEvents()
+      buildResultPanel.showEvents()
     }
     return JPanel(BorderLayout()).apply {
       add(
