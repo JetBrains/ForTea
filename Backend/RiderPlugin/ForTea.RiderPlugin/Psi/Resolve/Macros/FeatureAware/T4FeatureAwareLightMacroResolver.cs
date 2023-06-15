@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl;
+using JetBrains.HabitatDetector;
 using JetBrains.Platform.MsBuildHost.Autodetect.Advanced;
 using JetBrains.ProjectModel;
 using JetBrains.RdBackend.Common.Features.Processes;
@@ -43,13 +44,13 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
     {
       switch (Environment.Platform)
       {
-        case PlatformUtil.Platform.Windows:
+        case JetPlatform.Windows:
           result.Add("Platform", "Win32");
           break;
-        case PlatformUtil.Platform.MacOsX:
+        case JetPlatform.MacOsX:
           result.Add("Platform", "MacOsX");
           break;
-        case PlatformUtil.Platform.Linux:
+        case JetPlatform.Linux:
           result.Add("Platform", "Linux");
           break;
       }

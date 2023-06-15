@@ -3,19 +3,19 @@ import com.jetbrains.rd.generator.gradle.RdGenTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.grammarkit.tasks.GenerateParserTask
-import org.jetbrains.intellij.tasks.IntelliJInstrumentCodeTask
+import org.jetbrains.intellij.tasks.InstrumentCodeTask
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.11.0"
+  id("org.jetbrains.intellij") version "1.13.3"
   id("org.jetbrains.grammarkit") version "2021.2.2"
-  id("me.filippov.gradle.jvm.wrapper") version "0.11.0"
+  id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
   // Version is configured in gradle.properties
   id("com.jetbrains.rdgen")
-  kotlin("jvm") version "1.8.0"
+  kotlin("jvm") version "1.8.20"
 }
 
 apply {
@@ -40,7 +40,7 @@ dependencies {
   testImplementation(kotlin("test"))
 }
 
-val baseVersion = "2023.1"
+val baseVersion = "2023.2"
 val buildCounter = buildNumber ?: "9999"
 version = "$baseVersion.$buildCounter"
 
@@ -110,7 +110,7 @@ tasks {
     return@lazy sdkPath
   }
 
-  withType<IntelliJInstrumentCodeTask> {
+  withType<InstrumentCodeTask>().configureEach {
     val bundledMavenArtifacts = file("build/maven-artifacts")
     if (bundledMavenArtifacts.exists()) {
       logger.lifecycle("Use ant compiler artifacts from local folder: $bundledMavenArtifacts")
@@ -127,13 +127,13 @@ tasks {
     }
   }
 
-  withType<RunIdeTask> {
+  withType<RunIdeTask>().configureEach {
     // IDEs from SDK are launched with 512mb by default, which is not enough for Rider.
     // Rider uses this value when launched not from SDK
     maxHeapSize = "1500m"
   }
 
-  withType<PrepareSandboxTask> {
+  withType<PrepareSandboxTask>().configureEach {
     val files = (pluginFiles + libraryFiles).map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
     val paths = files.map { File(backendPluginPath, it) }
 
@@ -190,13 +190,13 @@ tasks {
     this.pathToPsiRoot.set("fakePathToPsiRoot") // same
   }
 
-  withType<KotlinCompile> {
+  withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = "17"
     this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
     dependsOn(generateLexer, generateT4Parser)
   }
 
-  withType<Test> {
+  withType<Test>().configureEach {
     useTestNG()
 
     environment("NO_FS_ROOTS_ACCESS_CHECK", true)
@@ -208,7 +208,7 @@ tasks {
     ignoreFailures = true
   }
 
-  create("writeDotNetSdkPathProps") {
+  register("writeDotNetSdkPathProps") {
     group = riderForTeaTargetsGroup
     doLast {
       dotNetSdkPathPropsPath.writeTextIfChanged("""<Project>
@@ -221,7 +221,7 @@ tasks {
     }
   }
 
-  create("writeNuGetConfig") {
+  register("writeNuGetConfig") {
     group = riderForTeaTargetsGroup
     doLast {
       nugetConfigPath.writeTextIfChanged(
@@ -238,14 +238,14 @@ tasks {
     }
   }
 
-  getByName("assemble") {
+  named("assemble").configure {
     doLast {
       logger.lifecycle("Plugin version: $version")
       logger.lifecycle("##teamcity[buildNumber '$version']")
     }
   }
 
-  create<RdGenTask>("rdgenMonorepo") {
+  register<RdGenTask>("rdgenMonorepo") {
     doFirst {
       configure<RdGenExtension> {
         val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
@@ -278,7 +278,7 @@ tasks {
     }
   }
 
-  create<RdGenTask>("rdgenIndependent") {
+  register<RdGenTask>("rdgenIndependent") {
     doFirst {
       configure<RdGenExtension> {
         val csOutput = File(riderBackendPluginPath, "Model")
@@ -315,26 +315,26 @@ tasks {
     }
   }
 
-  create("pwc") {
+  register("pwc") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgenMonorepo")
   }
 
-  create("prepare") {
+  register("prepare") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
   }
 
-  create("prepareMonorepo") {
+  register("prepareMonorepo") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgenMonorepo", generateT4LexerMonorepo, generateT4ParserMonorepo)
   }
 
-  getByName("buildPlugin") {
+  named("buildPlugin").configure {
     dependsOn("prepare")
   }
 
-  getByName("test") {
+  named("test").configure {
     // A fix for https://github.com/JetBrains/gradle-intellij-plugin/issues/743.
     // Remove after it is publicly available
     dependsOn("prepareTestingSandbox")

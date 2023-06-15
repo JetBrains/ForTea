@@ -14,7 +14,8 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.Util;
-using JetBrains.VsIntegration.Shell;
+using JetBrains.VsIntegration.Interop;
+using JetBrains.VsIntegration.Util;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl

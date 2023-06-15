@@ -6,6 +6,8 @@ pluginManagement {
     if (rdVersion == "SNAPSHOT")
       mavenLocal()
     gradlePluginPortal()
+
+    maven { setUrl("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") }
     maven { setUrl("https://cache-redirector.jetbrains.com/plugins.gradle.org") }
     // This is for snapshot version of 'org.jetbrains.intellij' plugin
     maven { setUrl("https://oss.sonatype.org/content/repositories/snapshots/") }

@@ -1,4 +1,4 @@
-﻿using JetBrains.VsIntegration.Shell;
+﻿using JetBrains.VsIntegration.Interop;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 
