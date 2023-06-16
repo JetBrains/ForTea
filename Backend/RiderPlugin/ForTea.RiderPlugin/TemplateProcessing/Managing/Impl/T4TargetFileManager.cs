@@ -46,7 +46,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
       var project = projectFile?.GetProject();
       if (project == null) return VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext);
       var relativePath = projectFile.Location.MakeRelativeTo(project.Location.Parent);
-      var ttLocation = project.GetIntermediateDirectory(project.GetCurrentTargetFrameworkId())
+      var ttLocation = VirtualFileSystemDefinition.GetTempPath(InteractionContext.SolutionContext)
         .Combine("TextTemplating")
         .Combine(relativePath);
       return ttLocation.Parent.Combine(ttLocation.Name.WithoutExtension()).Combine("GeneratedTransformation.exe");
