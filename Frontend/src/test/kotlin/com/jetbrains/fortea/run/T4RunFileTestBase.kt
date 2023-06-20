@@ -2,7 +2,7 @@ package com.jetbrains.fortea.run
 
 import com.intellij.execution.ExecutionManager
 import com.intellij.execution.impl.ExecutionManagerImpl
-import com.intellij.workspaceModel.ide.WorkspaceModel
+import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.fortea.configuration.execution.impl.T4SynchronousRunConfigurationExecutor
 import com.jetbrains.fortea.utils.T4TestHelper
 import com.jetbrains.rdclient.util.idea.toVirtualFile
