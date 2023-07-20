@@ -246,6 +246,9 @@ tasks {
   }
 
   register<RdGenTask>("rdgenMonorepo") {
+    val riderModelClassPathFile: String by project
+    val classPathLines = File(riderModelClassPathFile).readLines()
+
     doFirst {
       configure<RdGenExtension> {
         val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
@@ -254,7 +257,8 @@ tasks {
         verbose = true
         hashFolder = "build/rdgen"
         logger.info("Configuring rdgen params")
-        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"), File("$productsHome/Rider/Frontend/rider/model/sources"), File("$productsHome/Rider/ultimate/remote-dev/rd-ide-model-sources"))
+        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
+        classpath(classPathLines)
 
         packages = "model"
         generator {
