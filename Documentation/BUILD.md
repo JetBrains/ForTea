@@ -32,7 +32,7 @@ To build R# plugin, run
 ```bash
 cd Frontend
 gradlew :prepare
-cd ../Backend
+cd ../Backend/ReSharperPlugin
 ./build.ps1 pack
 ```
 The build script will ask for build configuration.
