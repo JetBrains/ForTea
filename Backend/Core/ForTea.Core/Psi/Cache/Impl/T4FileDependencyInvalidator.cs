@@ -43,6 +43,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
         {
           foreach (var file in indirectDependencies)
           {
+            if (!file.IsValid()) return;
             file.SetBeingIndirectlyUpdated(true);
             Services.Caches.MarkAsDirty(file);
             Services.Files.MarkAsDirty(file);
