@@ -186,6 +186,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
     }
 
     private void ShowNotification() => NotificationsModel.Notification(new NotificationModel(
+      Solution.GetRdProjectId(),
       "Could not execute T4 file",
       "Execution is already running",
       true,
