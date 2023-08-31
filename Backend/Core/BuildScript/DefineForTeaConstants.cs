@@ -18,7 +18,9 @@ namespace GammaJul.ForTea.BuildScript.Core
 			return constants.SelectMany(s => new []
 			{
 				new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\ForTea\\Backend\\Core"), s),
-				new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\ForTea\\Backend\\RiderPlugin"), s),
+				new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\ForTea\\Backend\\RiderPlugin\\ForTea.RiderPlugin"), s),
+				new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\ForTea\\Backend\\RiderPlugin\\JetBrains.TextTemplating"), s),
+				new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\ForTea\\Backend\\RiderPlugin\\test"), s),
 				new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\ForTea\\Backend\\ReSharperPlugin"), s),
 			});
 		}

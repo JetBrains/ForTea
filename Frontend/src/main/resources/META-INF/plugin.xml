@@ -39,7 +39,7 @@
         implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy"/>
     <lang.documentationProvider
         language="T4"
-        implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
+        implementationClass="com.jetbrains.rider.quickDoc.FrontendDocumentationProvider"/>
     <backend.typedHandler
         language="T4"
         implementationClass="com.jetbrains.rider.editorActions.FrontendTypedHandler"/>
