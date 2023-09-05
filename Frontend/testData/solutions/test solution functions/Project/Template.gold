@@ -5,4 +5,4 @@ Full name exists: True
 Item(1): JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectImplementation
 Count: 3
 Projects: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectsImplementation
-Enumerator: System.Linq.Enumerable+WhereSelectListIterator`2[JetBrains.Rider.Model.ProjectModel,JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectImplementation]
+Enumerator: System.Linq.Enumerable+SelectListIterator`2[JetBrains.Rider.Model.ProjectModel,JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectImplementation]
