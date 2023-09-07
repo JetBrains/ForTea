@@ -21,13 +21,13 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
   public sealed class T4CSharpExecutableIntermediateConverter : T4CSharpRealIntermediateConverter
   {
     [NotNull] private const string SuffixResource =
-      "GammaJul.ForTea.Core.Resources.TemplateBaseFullExecutableSuffix.cs";
+      "GammaJul.ForTea.Core.Resources.TemplateBaseFullExecutableSuffix.cs.template";
 
     [NotNull] private const string HostspecificSuffixResource =
-      "GammaJul.ForTea.Core.Resources.HostspecificTemplateBaseFullExecutableSuffix.cs";
+      "GammaJul.ForTea.Core.Resources.HostspecificTemplateBaseFullExecutableSuffix.cs.template";
 
     [NotNull] private const string AssemblyRegisteringResource =
-      "GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs";
+      "GammaJul.ForTea.Core.Resources.AssemblyRegistering.cs.template";
 
     [NotNull] private IT4ReferenceExtractionManager ReferenceExtractionManager { get; }
 
