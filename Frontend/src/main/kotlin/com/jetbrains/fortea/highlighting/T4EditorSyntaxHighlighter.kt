@@ -16,7 +16,7 @@ import com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost.Companion.getT
 import com.jetbrains.fortea.psi.T4ElementTypes
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.document.getFirstEditor
-import com.jetbrains.rider.rdctShared.ideaInterop.fileTypes.csharp.CSharpFileType
+import com.jetbrains.rider.languages.fileTypes.csharp.CSharpFileType
 
 class T4EditorSyntaxHighlighter(
   private val project: Project,
