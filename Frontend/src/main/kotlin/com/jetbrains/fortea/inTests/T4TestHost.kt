@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.inTests
 
-import com.jetbrains.rdclient.protocol.IProtocolHost
-import com.jetbrains.rdclient.protocol.ProtocolComponent
+import com.jetbrains.rider.protocol.IProtocolHost
+import com.jetbrains.rider.protocol.ProtocolComponent
 import com.jetbrains.rdclient.util.idea.callSynchronously
 import com.jetbrains.rider.inTests.InTestsConstants
 import com.jetbrains.fortea.model.T4FileLocation
