@@ -6,5 +6,6 @@
         <SubplatformReference Name="Plugins\ForTea\Backend\Core" />
         <SubplatformReference Name="Plugins\ForTea\Backend\RiderPlugin\JetBrains.TextTemplating" IsRuntimeOnly="true" />
         <SubplatformReference Name="Plugins\_ForTea.Pregenerated\BackendModel" />
+        <SubplatformReference Name="Platform\Sdk" />
     </SubplatformInfo.SubplatformReferences>
 </SubplatformInfo>
