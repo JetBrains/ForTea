@@ -19,6 +19,9 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="JetBrains.Platform.Lib.VisualStudio.AnyVs.ShellInterop.PrivateBuild" />
     <PackageReference Include="JetBrains.Vs.SinceVs10.Text" />
     <PackageReference Include="JetBrains.Vs.SinceVs10.CoreUtility" />
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
