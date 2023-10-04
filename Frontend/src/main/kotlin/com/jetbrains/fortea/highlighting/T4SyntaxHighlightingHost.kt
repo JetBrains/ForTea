@@ -4,11 +4,11 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.getOrCreateUserData
 import com.jetbrains.fortea.model.T4RdDocumentModel
 import com.jetbrains.fortea.model.t4RdDocumentModel
 import com.jetbrains.rd.ide.model.RdDocumentId
 import com.jetbrains.rd.ide.model.RdDocumentModel
-import com.jetbrains.rd.platform.util.idea.getOrCreateUserData
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.put
 import com.jetbrains.rdclient.document.FrontendDocumentHostListener
