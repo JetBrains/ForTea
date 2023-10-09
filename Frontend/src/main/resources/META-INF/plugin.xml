@@ -96,10 +96,10 @@
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
   </actions>
-  <projectListeners>
+  <applicationListeners>
     <listener class="com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost$DocumentListener"
               topic="com.jetbrains.rdclient.document.FrontendDocumentHostListener" />
-  </projectListeners>
+  </applicationListeners>
   <project-components>
     <component>
       <interface-class>com.jetbrains.fortea.configuration.T4BuildSessionView</interface-class>
