@@ -82,6 +82,12 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="mscorlib" />
+
+    <!-- CsLex task -->
+    <PackageReference Include="JetBrains.Build.Platform.DistributedCache" />
+    <!-- ParserGen task -->
+    <PackageReference Include="Antlr2.Runtime" />
+    <PackageReference Include="NVelocity" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Remove="Resources\Strings.resx" />
