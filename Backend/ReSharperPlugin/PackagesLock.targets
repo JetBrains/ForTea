@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <PackageLock Include="JetBrains.Annotations" Version="2023.3.0-dev-dm-001" />
+    <PackageLock Include="JetBrains.Annotations" Version="2023.3.0-dev-dm-002" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2023.3.0" />
     <PackageLock Include="JetBrains.Platform.Lib.VisualStudio.AnyVs.ShellInterop.PrivateBuild" Version="2.0.20141005.1" />
     <PackageLock Include="JetBrains.Vs.SinceVs10.Text" Version="3.0.20210902.1" IsDevelopmentDependency="True" />
