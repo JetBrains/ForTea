@@ -1,6 +1,6 @@
 package com.jetbrains.fortea.highlighting
 
-import com.intellij.openapi.components.service
+import com.intellij.openapi.client.ClientAppSession
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -12,6 +12,7 @@ import com.jetbrains.rd.ide.model.RdDocumentId
 import com.jetbrains.rd.ide.model.RdDocumentModel
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.put
+import com.jetbrains.rdclient.client.protocol
 import com.jetbrains.rdclient.document.FrontendDocumentHostListener
 import com.jetbrains.rider.protocol.toProject
 
@@ -31,11 +32,11 @@ class T4SyntaxHighlightingHost {
 
   class DocumentListener : FrontendDocumentHostListener {
     override fun documentBound(lifetime: Lifetime,
-                               protocol: IProtocol,
+                               session: ClientAppSession,
                                documentId: RdDocumentId,
                                documentModel: RdDocumentModel,
                                document: Document) {
-      putT4RdDocumentModel(lifetime, protocol, document, documentModel.t4RdDocumentModel)
+      putT4RdDocumentModel(lifetime, session.protocol, document, documentModel.t4RdDocumentModel)
     }
   }
 }
