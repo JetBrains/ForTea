@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.source.PsiFileImpl
 import com.intellij.psi.templateLanguages.TemplateLanguageFileViewProvider
-import com.jetbrains.rider.ideaInterop.fileTypes.csharp.CSharpLanguage
+import com.jetbrains.rider.languages.fileTypes.csharp.CSharpLanguage
 
 class T4FileViewProvider(
   file: VirtualFile,
