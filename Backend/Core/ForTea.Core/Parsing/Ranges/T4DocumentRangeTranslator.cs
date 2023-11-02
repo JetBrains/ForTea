@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.Util.dataStructures;
 
 namespace GammaJul.ForTea.Core.Parsing.Ranges
 {
@@ -19,7 +20,9 @@ namespace GammaJul.ForTea.Core.Parsing.Ranges
     }
 
     public DocumentRange Translate(TreeTextRange range) => TreeToDocumentTranslator.Translate(range);
-    public DocumentRange[] GetIntersectedOriginalRanges(TreeTextRange range) => new[] { Translate(range) };
+    public FrugalLocalList<DocumentRange> GetIntersectedOriginalRanges(TreeTextRange range)
+      => FrugalLocalList<DocumentRange>.Of(Translate(range));
+    
     public TreeTextRange Translate(DocumentRange range) => DocumentToTreeTranslator.Translate(range);
   }
 }
