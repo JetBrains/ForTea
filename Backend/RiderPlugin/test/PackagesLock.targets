@@ -5,7 +5,7 @@
     <PackageLock Include="JetBrains.Lifetimes" Version="2023.3.0" />
     <PackageLock Include="NUnit" Version="3.13.2" />
     <PackageLock Include="NUnit.Console" Version="3.12.0" />
-    <PackageLock Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageLock Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageLock Include="NUnit.ConsoleRunner" Version="3.12.0" />
     <PackageLock Include="NUnit.Extension.NUnitProjectLoader" Version="3.6.0" />
     <PackageLock Include="NUnit.Extension.VSProjectLoader" Version="3.8.0" />
