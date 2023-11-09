@@ -2,17 +2,12 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.Application.BuildScript.Application.Zones;
-using JetBrains.Application.CommandProcessing;
-using JetBrains.Application.Settings;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CSharp.TypingAssist;
-using JetBrains.ReSharper.Feature.Services.StructuralRemove;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Feature.Services.Web.TypingAssist;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CachingLexers;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.TextControl;
@@ -53,29 +48,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 
     public T4CSharpTypingAssist(
       Lifetime lifetime,
-      [NotNull] ISolution solution,
-      [NotNull] ICommandProcessor commandProcessor,
-      [NotNull] SkippingTypingAssist skippingTypingAssist,
-      [NotNull] CachingLexerService cachingLexerService,
-      [NotNull] ISettingsStore settingsStore,
-      [NotNull] ITypingAssistManager typingAssistManager,
-      [NotNull] IPsiServices psiServices,
-      [NotNull] IExternalIntellisenseHost externalIntellisenseHost,
-      [NotNull] LastTypingAction lastTypingAction,
-      [NotNull] StructuralRemoveManager structuralRemoveManager
-    ) : base(
-      lifetime,
-      solution,
-      commandProcessor,
-      skippingTypingAssist,
-      cachingLexerService,
-      settingsStore,
-      typingAssistManager,
-      psiServices,
-      externalIntellisenseHost,
-      lastTypingAction,
-      structuralRemoveManager
-    )
+      [NotNull] TypingAssistDependencies dependencies
+    ) : base(lifetime, dependencies)
     {
     }
   }
