@@ -2,8 +2,11 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
 using JetBrains.Application.BuildScript.Application.Zones;
+using JetBrains.Application.Components;
+using JetBrains.DocumentModel.Transactions;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CSharp.TypingAssist;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Feature.Services.Web.TypingAssist;
@@ -48,8 +51,10 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 
     public T4CSharpTypingAssist(
       Lifetime lifetime,
-      [NotNull] TypingAssistDependencies dependencies
-    ) : base(lifetime, dependencies)
+      [NotNull] TypingAssistDependencies dependencies,
+      [NotNull] DocumentTransactionManager documentTransactionManager,
+      [NotNull] IOptional<ICodeCompletionSessionManager> codeCompletionSessionManager
+    ) : base(lifetime, dependencies, documentTransactionManager, codeCompletionSessionManager)
     {
     }
   }
