@@ -6,7 +6,7 @@
     <PackageLock Include="JetBrains.HabitatDetector" Version="1.0.2" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2023.3.0" />
     <PackageLock Include="JetBrains.RdFramework" Version="2023.3.0" />
-    <PackageLock Include="JetBrains.Roslyn.References.Repack" Version="42.42.20230915.160538" />
+    <PackageLock Include="JetBrains.Roslyn.References.Repack" Version="42.42.20231117.162457" />
     <PackageLock Include="System.Collections.Immutable" Version="7.0.0" />
   </ItemGroup>
 </Project>
