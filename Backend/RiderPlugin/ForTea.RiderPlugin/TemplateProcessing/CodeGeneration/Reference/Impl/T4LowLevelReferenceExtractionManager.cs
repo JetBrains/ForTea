@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
@@ -11,7 +12,6 @@ using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Metadata.Utils;
 using JetBrains.ProjectModel;
 using JetBrains.Rd;
-using JetBrains.Roslyn.Worker.Metadata;
 using JetBrains.Util;
 using Microsoft.CodeAnalysis;
 
@@ -20,8 +20,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
   [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4LowLevelReferenceExtractionManager : IT4LowLevelReferenceExtractionManager
   {
-    [NotNull] private RoslynMetadataReferenceCache Cache { get; }
-
     [NotNull] private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
 
     [NotNull] private ISolution Solution { get; }
@@ -34,7 +32,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
     {
       AssemblyInfoDatabase = assemblyInfoDatabase;
       Solution = solution;
-      Cache = new RoslynMetadataReferenceCache(lifetime);
     }
 
     // TODO: is this necessary?
@@ -65,7 +62,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
     }
 
     public MetadataReference ResolveMetadata(Lifetime lifetime, VirtualFileSystemPath path) =>
-      Cache.GetMetadataReference(lifetime, path.ToNativeFileSystemPath());
+      throw new NotImplementedException("");  //TODO : @kugushev!!! ((RoslynMetadataReferenceCache)Cache).GetMetadataReference(lifetime, path.ToNativeFileSystemPath());
 
     private void ResolveTransitiveDependencies(
       [NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,
