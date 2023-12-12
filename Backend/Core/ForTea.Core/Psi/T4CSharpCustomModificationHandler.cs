@@ -79,7 +79,8 @@ namespace GammaJul.ForTea.Core.Psi
     protected override bool CreateAndMapUsingNode(bool before, ITreeNode anchorNode, ITreeNode usingDirective,
       IFile originalFile)
     {
-      if (!(anchorNode is IT4Directive anchor)) return false;
+      var anchor = anchorNode as IT4Directive;
+      if (anchorNode != null && anchor == null) return false;
       
       var t4File = (IT4File)originalFile;
       string ns = GetNamespaceFromUsingDirective(usingDirective);
