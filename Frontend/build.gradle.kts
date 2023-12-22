@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("org.jetbrains.intellij") version "1.13.3"
-  id("org.jetbrains.grammarkit") version "2021.2.2"
+  id("org.jetbrains.grammarkit") version "2022.3.2.1"
   id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
   // Version is configured in gradle.properties
   id("com.jetbrains.rdgen")
@@ -160,14 +160,14 @@ tasks {
   val parserSource = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
 
   generateLexer.configure {
-    source.set(lexerSource)
+    sourceFile.set(file(lexerSource))
     targetDir.set("src/main/java/com/jetbrains/fortea/lexer")
     targetClass.set("_T4Lexer")
     purgeOldFiles.set(true)
   }
 
   val generateT4Parser = task<GenerateParserTask>("generateT4Parser") {
-    source.set(parserSource)
+    sourceFile.set(file(parserSource))
     this.targetRoot.set("src/main/java")
     purgeOldFiles.set(true)
     this.pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
@@ -175,7 +175,7 @@ tasks {
   }
 
   val generateT4LexerMonorepo = task<GenerateLexerTask>("generateT4LexerMonorepo") {
-    source.set(lexerSource)
+    sourceFile.set(file(lexerSource))
     targetDir.set( pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer").canonicalPath)
     purgeOldFiles.set(true)
     targetClass.set("_T4Lexer")
@@ -183,7 +183,7 @@ tasks {
   }
 
   val generateT4ParserMonorepo = task<GenerateParserTask>("generateT4ParserMonorepo") {
-    source.set(parserSource)
+    sourceFile.set(file(parserSource))
     this.targetRoot.set(pregeneratedMonorepoPath.resolve("Frontend/src/").canonicalPath)
     purgeOldFiles.set(true)
     this.pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
