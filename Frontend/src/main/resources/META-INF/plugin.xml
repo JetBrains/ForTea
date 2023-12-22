@@ -39,7 +39,7 @@
         implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy"/>
     <lang.documentationProvider
         language="T4"
-        implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
+        implementationClass="com.jetbrains.rider.quickDoc.FrontendDocumentationProvider"/>
     <backend.typedHandler
         language="T4"
         implementationClass="com.jetbrains.rider.editorActions.FrontendTypedHandler"/>
@@ -66,7 +66,7 @@
         implementationClass="com.jetbrains.rider.intentions.RiderAutoImportSupportPolicy"/>
     <lang.altEnter
         language="T4"
-        implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperBulbMenuModelFactory"/>
+        implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterMenuModelFactory"/>
     <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
     <protocolComponentFactory implementation="com.jetbrains.fortea.inTests.T4TestHostFactory" />
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
@@ -96,10 +96,10 @@
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
     </action>
   </actions>
-  <projectListeners>
+  <applicationListeners>
     <listener class="com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost$DocumentListener"
               topic="com.jetbrains.rdclient.document.FrontendDocumentHostListener" />
-  </projectListeners>
+  </applicationListeners>
   <project-components>
     <component>
       <interface-class>com.jetbrains.fortea.configuration.T4BuildSessionView</interface-class>

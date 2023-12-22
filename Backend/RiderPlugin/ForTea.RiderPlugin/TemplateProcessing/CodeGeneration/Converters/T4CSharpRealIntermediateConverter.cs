@@ -32,7 +32,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
     {
     }
 
-    protected sealed override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs";
+    protected sealed override string BaseClassResourceName => "GammaJul.ForTea.Core.Resources.TemplateBaseFull.cs.template";
 
     protected sealed override void AppendParameterInitialization(
       IReadOnlyCollection<T4ParameterDescription> descriptions,

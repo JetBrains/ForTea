@@ -76,9 +76,12 @@ namespace GammaJul.ForTea.Core.Psi
     /// <param name="usingDirective">The C# using directive.</param>
     /// <param name="originalFile">The original T4 file where the directive must be created.</param>
     /// <returns>A <see cref="TreeTextRange"/> corresponding to the namespace in the newly created directive.</returns>
-    protected override bool CreateAndMapUsingNode(bool before, IT4Directive anchor, ITreeNode usingDirective,
+    protected override bool CreateAndMapUsingNode(bool before, ITreeNode anchorNode, ITreeNode usingDirective,
       IFile originalFile)
     {
+      var anchor = anchorNode as IT4Directive;
+      if (anchorNode != null && anchor == null) return false;
+      
       var t4File = (IT4File)originalFile;
       string ns = GetNamespaceFromUsingDirective(usingDirective);
       var directive = T4DirectiveInfoManager.Import.CreateDirective(ns);
@@ -112,6 +115,24 @@ namespace GammaJul.ForTea.Core.Psi
     /// <returns>A <see cref="TreeTextRange"/> corresponding to the namespace in <paramref name="usingDirective"/>.</returns>
     protected override TreeTextRange GetNameRange(ITreeNode usingDirective) =>
       GetUsedNamespaceNode(usingDirective as IUsingDirective).GetTreeTextRange();
+
+    protected override bool TryGetGeneratedUsingDirectiveTreeTextRange(ITreeNode treeNode, out TreeTextRange textRange)
+    {
+      if (treeNode is IUsingDirective)
+      {
+        textRange = GetNameRange(treeNode);
+        return true;
+      }
+
+      textRange = TreeTextRange.InvalidRange;
+      return false;
+    }
+
+    protected override bool TryGetGeneratedCommentTreeTextRange(ITreeNode treeNode, out TreeTextRange textRange)
+    {
+      textRange = TreeTextRange.InvalidRange;
+      return false;
+    }
 
     /// <summary>Removes an import directive.</summary>
     /// <param name="originalFile">The original T4 file where the directive must be removed.</param>

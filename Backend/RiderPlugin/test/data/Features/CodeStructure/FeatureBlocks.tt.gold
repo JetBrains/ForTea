@@ -1,7 +1,7 @@
 ﻿File: FeatureBlocks.tt
  template
- Foo():void
+ Foo() : void
  Inner1
-  Bar(int):void
+  Bar(int) : void
  Inner2
-  Bar(int):void
+  Bar(int) : void

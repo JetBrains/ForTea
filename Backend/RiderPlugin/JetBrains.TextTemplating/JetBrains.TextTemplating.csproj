@@ -4,7 +4,7 @@
     <InternalBuild Condition="Exists('ManagedProject.Generated.Targets')">True</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
   </PropertyGroup>
-  <Import Project="Sdk.props" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
+  <Import Project="Sdk.props" Sdk="JetBrains.Toolset.MainSolution.Sdk" Version="20200625.1.1.2" Condition="$(InternalBuild)" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
   
   <PropertyGroup>
@@ -20,8 +20,10 @@
   </PropertyGroup>
   <Import Project="$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props" Condition="Exists('$(DotNetSdkPath)\Build\PackageReference.JetBrains.EnvDTE.Props')" />
   <ItemGroup>
+    <PackageReference Include="JetBrains.EnvDTE" />
     <PackageReference Include="JetBrains.EnvDTE.Client" />
     <PackageReference Include="JetBrains.EnvDTE.Host" />
+    <PackageReference Include="JetBrains.Lifetimes" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
   <ItemGroup>
@@ -29,6 +31,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
-  <Import Project="Sdk.targets" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
+  <Import Project="Sdk.targets" Sdk="JetBrains.Toolset.MainSolution.Sdk" Version="20200625.1.1.2" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
 </Project>

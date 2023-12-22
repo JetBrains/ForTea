@@ -1,5 +1,6 @@
 package com.jetbrains.fortea.run
 
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Ignore
@@ -66,10 +67,15 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test default references`() = doTest(dumpCsproj = false)
   @Ignore
   @Test fun `test host specific template references`() = doTest(dumpCsproj = false)
+  @Mute("RIDER-98455")
   @Test fun `test that host specific template can access EnvDTE`() = doTest(dumpCsproj = false)
+  @Mute("RIDER-98455")
   @Test fun `test basic DTE functions`() = doTest(dumpCsproj = false)
+  @Mute("RIDER-98455")
   @Test fun `test solution functions`() = doTest(dumpCsproj = false)
+  @Mute("RIDER-98455")
   @Test fun `test project functions`() = doTest(dumpCsproj = false)
+  @Mute("RIDER-98455")
   @Test fun `test AST functions`() = doTest(dumpCsproj = false)
   // https://youtrack.jetbrains.com/issue/RIDER-69121
   @Test fun `test namespace of generate class 1`() = doTest(dumpCsproj = false)

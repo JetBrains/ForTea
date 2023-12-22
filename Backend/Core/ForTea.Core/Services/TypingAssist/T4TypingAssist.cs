@@ -352,31 +352,14 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 
     public T4TypingAssist(
       Lifetime lifetime,
-      [NotNull] ISolution solution,
-      [NotNull] ISettingsStore settingsStore,
-      [NotNull] CachingLexerService cachingLexerService,
-      [NotNull] ICommandProcessor commandProcessor,
-      [NotNull] IPsiServices psiServices,
-      [NotNull] IExternalIntellisenseHost externalIntellisenseHost,
-      [NotNull] SkippingTypingAssist skippingTypingAssist,
-      [NotNull] ITypingAssistManager typingAssistManager,
-      [NotNull] ICodeCompletionSessionManager codeCompletionSessionManager,
-      [NotNull] LastTypingAction lastTypingAction,
-      [NotNull] StructuralRemoveManager structuralRemoveManager
-    ) : base(
-      solution,
-      settingsStore,
-      cachingLexerService,
-      commandProcessor,
-      psiServices,
-      externalIntellisenseHost,
-      skippingTypingAssist,
-      lastTypingAction,
-      structuralRemoveManager
+      [NotNull] TypingAssistDependencies dependencies,
+      [NotNull] ICodeCompletionSessionManager codeCompletionSessionManager) : base(
+      dependencies
     )
     {
       _codeCompletionSessionManager = codeCompletionSessionManager;
 
+      var typingAssistManager = dependencies.TypingAssistManager;
       typingAssistManager.AddTypingHandler(lifetime, '=', this, OnEqualTyped, IsTypingSmartParenthesisHandlerAvailable);
       typingAssistManager.AddTypingHandler(lifetime, '"', this, OnQuoteTyped, IsTypingSmartParenthesisHandlerAvailable);
       typingAssistManager.AddTypingHandler(lifetime, '#', this, OnOctothorpeTyped,
