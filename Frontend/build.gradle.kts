@@ -91,6 +91,8 @@ val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 
 val riderForTeaTargetsGroup = "T4"
 
+val parentGradle = gradle.parent
+
 fun File.writeTextIfChanged(content: String) {
   val bytes = content.toByteArray()
 
@@ -248,75 +250,40 @@ tasks {
     }
   }
 
-  register<RdGenTask>("rdgenMonorepo") {
-    val riderModelClassPathFile: String by project
-    val classPathLines = File(riderModelClassPathFile).readLines()
+  if (parentGradle == null) {
+    register<RdGenTask>("rdgenIndependent") {
+      doFirst {
+        configure<RdGenExtension> {
+          val csOutput = File(riderBackendPluginPath, "Model")
+          val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
 
-    doFirst {
-      configure<RdGenExtension> {
-        val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
-        val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
+          verbose = true
+          hashFolder = "build/rdgen"
+          logger.info("Configuring rdgen params")
+          classpath({
+            logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.orNull?.idea?.orNull}")
+            val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
+            val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
+            "$rdLibDirectory/rider-model.jar"
+          })
+          sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
+          packages = "model"
 
-        verbose = true
-        hashFolder = "build/rdgen"
-        logger.info("Configuring rdgen params")
-        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
-        classpath(classPathLines)
+          generator {
+            language = "kotlin"
+            transform = "asis"
+            root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+            namespace = "com.jetbrains.rider.model"
+            directory = "$ktOutput"
+          }
 
-        packages = "model"
-        generator {
-          language = "csharp"
-          transform = "reversed"
-          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-          namespace = "JetBrains.Rider.Model"
-          directory = "$csOutput"
-          generatedFileSuffix = ".Pregenerated"
-        }
-
-        generator {
-          language = "kotlin"
-          transform = "asis"
-          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-          namespace = "com.jetbrains.rider.model"
-          directory = "$ktOutput"
-          generatedFileSuffix = ".Pregenerated"
-        }
-      }
-    }
-  }
-
-  register<RdGenTask>("rdgenIndependent") {
-    doFirst {
-      configure<RdGenExtension> {
-        val csOutput = File(riderBackendPluginPath, "Model")
-        val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
-
-        verbose = true
-        hashFolder = "build/rdgen"
-        logger.info("Configuring rdgen params")
-        classpath({
-                    logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.orNull?.idea?.orNull}")
-                    val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
-                    val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-                    "$rdLibDirectory/rider-model.jar"
-                  })
-        sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
-        packages = "model"
-
-        generator {
-          language = "kotlin"
-          transform = "asis"
-          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-          namespace = "com.jetbrains.rider.model"
-          directory = "$ktOutput"
-        }
-
-        generator {
-          language = "csharp"
-          transform = "reversed"
-          root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-          namespace = "JetBrains.Rider.Model"
-          directory = "$csOutput"
+          generator {
+            language = "csharp"
+            transform = "reversed"
+            root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+            namespace = "JetBrains.Rider.Model"
+            directory = "$csOutput"
+          }
         }
       }
     }
@@ -346,6 +313,53 @@ tasks {
     // Remove after it is publicly available
     dependsOn("prepareTestingSandbox")
   }
+}
+
+if (parentGradle != null) {
+    val riderModelProject = parentGradle.rootProject.project("rider-model")
+
+    configurations.register("riderModel")
+    dependencies {
+        add("riderModel", riderModelProject)
+    }
+
+    tasks.register<RdGenTask>("rdgenMonorepo") {
+        val riderModelConfiguration = configurations.getByName("riderModel")
+
+        dependsOn(riderModelConfiguration)
+
+        doFirst {
+            configure<RdGenExtension> {
+                val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
+                val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
+
+                verbose = true
+                hashFolder = "build/rdgen"
+                logger.info("Configuring rdgen params")
+                sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
+                classpath(riderModelConfiguration.resolve())
+
+                packages = "model"
+                generator {
+                    language = "csharp"
+                    transform = "reversed"
+                    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+                    namespace = "JetBrains.Rider.Model"
+                    directory = "$csOutput"
+                    generatedFileSuffix = ".Pregenerated"
+                }
+
+                generator {
+                    language = "kotlin"
+                    transform = "asis"
+                    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+                    namespace = "com.jetbrains.rider.model"
+                    directory = "$ktOutput"
+                    generatedFileSuffix = ".Pregenerated"
+                }
+            }
+        }
+    }
 }
 
 defaultTasks("prepare")
