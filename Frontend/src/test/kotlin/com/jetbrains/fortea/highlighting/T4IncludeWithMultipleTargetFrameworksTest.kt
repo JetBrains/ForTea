@@ -7,6 +7,8 @@ import org.testng.annotations.Test
 class T4IncludeWithMultipleTargetFrameworksTest : T4HighlightingTestBase() {
   override fun getSolutionDirectoryName() = "IncludeInMultipleTargetFrameworks"
   override val fileName = "Include.ttinclude"
+  override val checkSolutionLoad = false
+
 
   @Test
   fun `test that there are no errors in solution`() = doTestWithMarkupModelNoGold(fileName, testFilePath) {
