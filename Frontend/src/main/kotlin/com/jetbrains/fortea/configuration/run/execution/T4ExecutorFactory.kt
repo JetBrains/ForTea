@@ -22,6 +22,7 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
   fun createAsync(executorId: String, environment: ExecutionEnvironment): RunProfileState {
     val dotNetExecutable = parameters.toDotNetExecutable()
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
+      environment.project,
       riderDotNetActiveRuntimeHost,
       dotNetExecutable.exePath,
       dotNetExecutable.runtimeType,
