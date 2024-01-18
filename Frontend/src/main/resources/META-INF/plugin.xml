@@ -70,7 +70,6 @@
     <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
     <protocolComponentFactory implementation="com.jetbrains.fortea.inTests.T4TestHostFactory" />
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
-    <projectService serviceImplementation="com.jetbrains.fortea.configuration.T4BuildToolWindowFactory"/>
 
     <internalFileTemplate name="T4 File"/>
     <internalFileTemplate name="T4 Include"/>

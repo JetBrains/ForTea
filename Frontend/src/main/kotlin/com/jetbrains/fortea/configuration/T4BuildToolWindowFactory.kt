@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
@@ -18,6 +19,7 @@ import com.jetbrains.rider.util.idea.getService
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
+@Service(Service.Level.PROJECT)
 class T4BuildToolWindowFactory(private val project: Project) : LifetimedService() {
   private val lock = Any()
   private var context: BuildToolWindowContext? = null
