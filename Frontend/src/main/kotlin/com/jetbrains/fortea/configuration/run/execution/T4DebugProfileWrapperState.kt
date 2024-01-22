@@ -31,13 +31,13 @@ class T4DebugProfileWrapperState(
     }
   }
 
-  override fun execute(
+  override suspend fun execute(
     executor: Executor,
     runner: ProgramRunner<*>,
     workerProcessHandler: DebuggerWorkerProcessHandler
   ) = listen { wrappee.execute(executor, runner, workerProcessHandler) }
 
-  override fun execute(
+  override suspend fun execute(
     executor: Executor,
     runner: ProgramRunner<*>,
     workerProcessHandler: DebuggerWorkerProcessHandler,
