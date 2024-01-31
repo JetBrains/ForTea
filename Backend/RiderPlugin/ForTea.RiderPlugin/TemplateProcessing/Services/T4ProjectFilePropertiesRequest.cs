@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using JetBrains.Application;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel.Properties;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
 {
-  [ShellComponent]
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)]
   public class T4ProjectFilePropertiesRequest : IProjectFilePropertiesRequest
   {
     public const string AutoGenProperty = "AutoGen";
