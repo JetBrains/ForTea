@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree.Impl;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -12,7 +13,7 @@ using JetBrains.Util.Text;
 
 namespace GammaJul.ForTea.Core.Psi.Service.Impl
 {
-  [Language(typeof(T4Language))]
+  [Language(typeof(T4Language), InstantiationEx.DemandAnyThreadNotSafeBecauseOfCalculatedSettingsSchema)]
   internal class T4CodeFormatter : CodeFormatterBase<T4CodeFormattingSettingsKey>, IT4CodeFormatter
   {
     public T4CodeFormatter(PsiLanguageType languageType, CodeFormatterRequirements requirements) : base(
