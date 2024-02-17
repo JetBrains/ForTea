@@ -1,6 +1,6 @@
 package com.jetbrains.fortea.configuration.run.execution
 
-import com.intellij.execution.DefaultExecutionResult
+import com.intellij.execution.ExecutionResult
 import com.intellij.execution.Executor
 import com.intellij.execution.runners.ProgramRunner
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
@@ -14,24 +14,46 @@ class T4DebugProfileWrapperState(
   private val model: T4ProtocolModel,
   private val parameters: T4RunConfigurationParameters
 ) : IDotNetDebugProfileState by wrappee {
-  override fun execute(executor: Executor?, runner: ProgramRunner<*>) =
-    listen(wrappee.execute(executor, runner) as DefaultExecutionResult)
+  override fun execute(executor: Executor?, runner: ProgramRunner<*>): ExecutionResult? {
+    val listener = T4PostProcessorProcessListener(model, parameters)
+    try {
+      val result = wrappee.execute(executor, runner)
+      if (result == null) {
+        listener.notifyBackendAboutProcessCompletion(false)
+        return null
+      }
+      result.processHandler.addProcessListener(listener)
+      return result
+    }
+    catch (e: Exception) {
+      listener.notifyBackendAboutProcessCompletion(false)
+      throw e
+    }
+  }
 
   override fun execute(
     executor: Executor,
     runner: ProgramRunner<*>,
     workerProcessHandler: DebuggerWorkerProcessHandler
-  ) = listen(wrappee.execute(executor, runner, workerProcessHandler) as DefaultExecutionResult)
+  ) = listen { wrappee.execute(executor, runner, workerProcessHandler) }
 
   override fun execute(
     executor: Executor,
     runner: ProgramRunner<*>,
     workerProcessHandler: DebuggerWorkerProcessHandler,
     lifetime: Lifetime
-  ) = listen(wrappee.execute(executor, runner, workerProcessHandler, lifetime) as DefaultExecutionResult)
+  ) = listen { wrappee.execute(executor, runner, workerProcessHandler, lifetime) }
 
-  private fun listen(result: DefaultExecutionResult): DefaultExecutionResult {
-    result.processHandler.addProcessListener(T4PostProcessorProcessListener(model, parameters))
-    return result
+  private fun listen(startExecution: () -> ExecutionResult): ExecutionResult {
+    val listener = T4PostProcessorProcessListener(model, parameters)
+    try {
+      val result = startExecution()
+      result.processHandler.addProcessListener(listener)
+      return result
+    }
+    catch (e: Exception) {
+      listener.notifyBackendAboutProcessCompletion(false)
+      throw e
+    }
   }
 }

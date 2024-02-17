@@ -14,8 +14,10 @@ class T4PostProcessorProcessListener(
   override fun onTextAvailable(p0: ProcessEvent, p1: Key<*>) {
   }
 
-  override fun processTerminated(p0: ProcessEvent) {
-    val call = if (p0.exitCode == 0) model.executionSucceeded else model.executionFailed
+  override fun processTerminated(p0: ProcessEvent) = notifyBackendAboutProcessCompletion(p0.exitCode == 0)
+
+  fun notifyBackendAboutProcessCompletion(success: Boolean) {
+    val call = if (success) model.executionSucceeded else model.executionFailed
     call.handleEndOfExecution(parameters.request.location)
   }
 

@@ -43,6 +43,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
           .SelectNotNull(file => provider(file)?.Includers
             .Select(path => Selector.FindMostSuitableFile(path, file)))
           .SelectMany(it => it)
+          .SelectNotNull(it => it)
           .Where(path =>
           {
             bool canProcess = guard.CanProcess(path.GetLocation());
