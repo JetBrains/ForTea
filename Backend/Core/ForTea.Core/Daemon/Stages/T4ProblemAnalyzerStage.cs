@@ -6,7 +6,8 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
-  [DaemonStage]
+  [DaemonStage(
+    StagesBefore = new[] { typeof(GlobalFileStructureCollectorStage) })]
   public class T4ProblemAnalyzerStage : T4DaemonStageBase
   {
     [NotNull] private ElementProblemAnalyzerRegistrar Registrar { get; }
