@@ -44,7 +44,7 @@ class T4DebugProfileWrapperState(
     lifetime: Lifetime
   ) = listen { wrappee.execute(executor, runner, workerProcessHandler, lifetime) }
 
-  private fun listen(startExecution: () -> ExecutionResult): ExecutionResult {
+  private suspend fun listen(startExecution: suspend () -> ExecutionResult): ExecutionResult {
     val listener = T4PostProcessorProcessListener(model, parameters)
     try {
       val result = startExecution()
