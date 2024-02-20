@@ -10,12 +10,12 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.13.3"
+  id("org.jetbrains.intellij") version "1.17.1"
   id("org.jetbrains.grammarkit") version "2022.3.2.1"
   id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
   // Version is configured in gradle.properties
   id("com.jetbrains.rdgen")
-  kotlin("jvm") version "1.8.20"
+  kotlin("jvm") version "1.9.22"
 }
 
 apply {
@@ -110,6 +110,10 @@ tasks {
     return@lazy sdkPath
   }
 
+  withType<GenerateParserTask> {
+    classpath(setupDependencies.flatMap { it.idea.map { idea -> idea.classes.resolve("lib/opentelemetry.jar") } })
+  }
+
   withType<InstrumentCodeTask>().configureEach {
     val bundledMavenArtifacts = file("build/maven-artifacts")
     if (bundledMavenArtifacts.exists()) {
@@ -192,7 +196,6 @@ tasks {
 
   withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = "17"
-    this.kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
     dependsOn(generateLexer, generateT4Parser)
   }
 
