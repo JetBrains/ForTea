@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Feature.Services.BulbActions;
 using JetBrains.ReSharper.Feature.Services.Intentions;
 using JetBrains.ReSharper.Feature.Services.Intentions.CreateDeclaration;
 using JetBrains.ReSharper.Feature.Services.Intentions.DataProviders;
@@ -21,7 +22,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
 {
   [QuickFix]
-  public class CreateTransformTextMethodQuickFix : QuickFixBase
+  public class CreateTransformTextMethodQuickFix : ModernQuickFixBase
   {
     [NotNull] private readonly MissingTransformTextMethodError _highlighting;
 
@@ -45,7 +46,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
           decl => LanguageManager.Instance.TryGetService<IntentionLanguageSpecific>(decl.Language) != null);
     }
 
-    protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
+    protected override IBulbActionCommand ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
     {
       ITypeDeclaration typeDeclaration = GetTargetTypeDeclaration(_highlighting.BaseClass);
       if (typeDeclaration == null) return null;
@@ -69,8 +70,7 @@ namespace GammaJul.ForTea.Core.Daemon.QuickFixes
       };
 
       IntentionResult intentionResult = MethodDeclarationBuilder.Create(context);
-      intentionResult.ExecuteTemplate();
-      return null;
+      return intentionResult.ToHotspotSessionBulbActionCommand();
     }
 
     [NotNull]
