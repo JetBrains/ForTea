@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.Daemon.Processes;
 using GammaJul.ForTea.Core.Psi;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Daemon.CSharp.Stages;
 using JetBrains.ReSharper.Feature.Services.CSharp.Daemon;
@@ -9,7 +10,7 @@ using JetBrains.ReSharper.Psi.CSharp.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
-  [DaemonStage(StagesBefore = new[] { typeof(CSharpErrorStage) })]
+  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = new[] { typeof(CSharpErrorStage) })]
   public class T4CSharpErrorStage : CSharpDaemonStageBase
   {
     protected override bool IsSupported(IPsiSourceFile sourceFile)

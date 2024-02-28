@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using GammaJul.ForTea.Core.Services;
 using JetBrains.Application;
+using JetBrains.Application.Parts;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util;
@@ -10,7 +11,7 @@ using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace JetBrains.ForTea.RiderPlugin
 {
-  [ShellComponent]
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4RiderEnvironment : T4DefaultEnvironment
   {
     public override TargetFrameworkId TargetFrameworkId =>

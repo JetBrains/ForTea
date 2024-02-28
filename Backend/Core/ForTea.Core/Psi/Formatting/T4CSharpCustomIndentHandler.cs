@@ -7,6 +7,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.BuildScript.Application.Zones;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -25,7 +26,7 @@ using BlockNavigator = JetBrains.ReSharper.Psi.CSharp.Tree.BlockNavigator;
 
 namespace GammaJul.ForTea.Core.Psi.Formatting
 {
-  [ShellComponent]
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)]
   [ZoneMarker(typeof(IWebPsiLanguageZone))]
   public sealed class T4CSharpCustomIndentHandler : ICustomIndentHandler
   {

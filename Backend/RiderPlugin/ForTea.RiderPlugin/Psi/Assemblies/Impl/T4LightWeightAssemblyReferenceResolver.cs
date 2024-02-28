@@ -1,11 +1,12 @@
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Assemblies.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4LightWeightAssemblyReferenceResolver : T4BasicLightWeightAssemblyReferenceResolver
   {
     public override VirtualFileSystemPath TryResolve(T4ResolvedPath path)

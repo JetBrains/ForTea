@@ -5,6 +5,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Services;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Application.Parts;
 using JetBrains.Application.platforms;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util;
@@ -15,7 +16,7 @@ using Microsoft.Win32;
 namespace JetBrains.ForTea.ReSharperPlugin
 {
   /// <summary>Contains environment-dependent information.</summary>
-  [ShellComponent]
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4ReSharperEnvironment : T4DefaultEnvironment
   {
     // temporary solution until that constant is added into the SDK

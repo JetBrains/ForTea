@@ -1,13 +1,14 @@
 using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Properties;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.Managing.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4TargetFileChecker : IT4TargetFileChecker
   {
     public bool IsPreprocessResult(IProjectFile suspect) => IsActionResult(suspect, T4TemplateKind.Preprocessed);

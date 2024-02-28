@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel.DataContext;
 using JetBrains.ProjectModel;
@@ -15,7 +16,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.Quickdocs
 {
-  [QuickDocProvider(-100)]
+  [QuickDocProvider(-100, Instantiation.DemandAnyThreadSafe)]
   public class T4QuickDocProvider : IQuickDocProvider
   {
     public bool CanNavigate(IDataContext context)

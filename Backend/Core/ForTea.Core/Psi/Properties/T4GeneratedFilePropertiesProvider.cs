@@ -1,11 +1,12 @@
 using GammaJul.ForTea.Core.TemplateProcessing.Managing;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules.MsBuild;
 
 namespace GammaJul.ForTea.Core.Psi.Properties
 {
-  [PsiSharedComponent]
+  [PsiSharedComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4GeneratedFilePropertiesProvider :
     IMsbuildGeneratedFilePropertiesProvider,
     IPsiSourceFilePropertiesProvider

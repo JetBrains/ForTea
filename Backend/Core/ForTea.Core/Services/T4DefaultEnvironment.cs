@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using JetBrains.Application;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core.Services
 {
-  [ShellComponent]
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)]
   public class T4DefaultEnvironment : IT4Environment
   {
     public virtual TargetFrameworkId TargetFrameworkId { get; } = TargetFrameworkId.Default;

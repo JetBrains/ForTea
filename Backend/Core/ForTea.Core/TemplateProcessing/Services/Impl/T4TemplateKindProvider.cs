@@ -1,10 +1,11 @@
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Properties;
 using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.TemplateProcessing.Services.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4TemplateKindProvider : IT4TemplateKindProvider
   {
     public T4TemplateKind GetTemplateKind(IPsiSourceFile file) => GetTemplateKind(file?.ToProjectFile());

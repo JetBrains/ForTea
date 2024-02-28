@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
+  [DerivedComponentsInstantiationRequirement(InstantiationRequirement.None)]
   public class T4BasicMacroResolver : IT4MacroResolver
   {
     [NotNull]
