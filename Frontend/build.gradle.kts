@@ -1,5 +1,3 @@
-import com.jetbrains.rd.generator.gradle.RdGenExtension
-import com.jetbrains.rd.generator.gradle.RdGenTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.grammarkit.tasks.GenerateParserTask
@@ -63,12 +61,10 @@ intellij {
 }
 
 val backendPluginFolderName = "Backend"
-val riderBackedPluginName = "ForTea.RiderPlugin"
 val backendPluginSolutionName = "ForTea.Backend.sln"
 
 val repoRoot = projectDir.parentFile!!
 val backendPluginPath = File(repoRoot, backendPluginFolderName)
-val riderBackendPluginPath = File(repoRoot, "$backendPluginFolderName/RiderPlugin/$riderBackedPluginName")
 val backendPluginSolutionPath = File(backendPluginPath, backendPluginSolutionName)
 val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
@@ -91,8 +87,6 @@ val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 
 val riderForTeaTargetsGroup = "T4"
 
-val parentGradle = gradle.parent
-
 fun File.writeTextIfChanged(content: String) {
   val bytes = content.toByteArray()
 
@@ -103,6 +97,13 @@ fun File.writeTextIfChanged(content: String) {
 }
 
 tasks {
+    extra["rdLibDirectory"] = {
+        logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.orNull?.idea?.orNull}")
+        val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
+        val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
+        "$rdLibDirectory/rider-model.jar"
+    }
+
   val dotNetSdkPath by lazy {
     val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes?.resolve("lib")?.resolve("DotNetSdkForRdPlugins")
       ?: error("intellij.ideaDependency.classes is null")
@@ -250,45 +251,6 @@ tasks {
     }
   }
 
-  if (parentGradle == null) {
-    register<RdGenTask>("rdgenIndependent") {
-      doFirst {
-        configure<RdGenExtension> {
-          val csOutput = File(riderBackendPluginPath, "Model")
-          val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
-
-          verbose = true
-          hashFolder = "build/rdgen"
-          logger.info("Configuring rdgen params")
-          classpath({
-            logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.orNull?.idea?.orNull}")
-            val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
-            val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-            "$rdLibDirectory/rider-model.jar"
-          })
-          sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
-          packages = "model"
-
-          generator {
-            language = "kotlin"
-            transform = "asis"
-            root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-            namespace = "com.jetbrains.rider.model"
-            directory = "$ktOutput"
-          }
-
-          generator {
-            language = "csharp"
-            transform = "reversed"
-            root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-            namespace = "JetBrains.Rider.Model"
-            directory = "$csOutput"
-          }
-        }
-      }
-    }
-  }
-
   register("pwc") {
     group = riderForTeaTargetsGroup
     dependsOn("rdgenMonorepo")
@@ -296,7 +258,7 @@ tasks {
 
   register("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
+    dependsOn("protocol:rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
   }
 
   register("prepareMonorepo") {
@@ -313,53 +275,6 @@ tasks {
     // Remove after it is publicly available
     dependsOn("prepareTestingSandbox")
   }
-}
-
-if (parentGradle != null) {
-    val riderModelProject = parentGradle.rootProject.project("rider-model")
-
-    configurations.register("riderModel")
-    dependencies {
-        add("riderModel", riderModelProject)
-    }
-
-    tasks.register<RdGenTask>("rdgenMonorepo") {
-        val riderModelConfiguration = configurations.getByName("riderModel")
-
-        dependsOn(riderModelConfiguration)
-
-        doFirst {
-            configure<RdGenExtension> {
-                val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
-                val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
-
-                verbose = true
-                hashFolder = "build/rdgen"
-                logger.info("Configuring rdgen params")
-                sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
-                classpath(riderModelConfiguration.resolve())
-
-                packages = "model"
-                generator {
-                    language = "csharp"
-                    transform = "reversed"
-                    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-                    namespace = "JetBrains.Rider.Model"
-                    directory = "$csOutput"
-                    generatedFileSuffix = ".Pregenerated"
-                }
-
-                generator {
-                    language = "kotlin"
-                    transform = "asis"
-                    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-                    namespace = "com.jetbrains.rider.model"
-                    directory = "$ktOutput"
-                    generatedFileSuffix = ".Pregenerated"
-                }
-            }
-        }
-    }
 }
 
 defaultTasks("prepare")

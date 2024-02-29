@@ -1,5 +1,7 @@
 rootProject.name = "ForTea"
 
+include("protocol")
+
 pluginManagement {
   val rdVersion: String by settings
   repositories {
