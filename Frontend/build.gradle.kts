@@ -25,13 +25,15 @@ apply {
 val buildNumber = ext.properties["build.number"]
 val onTC = buildNumber != null
 
-repositories {
-  mavenCentral()
+allprojects {
+    repositories {
+        mavenCentral()
 
-  if (onTC) {
-    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-    maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
-  }
+        if (onTC) {
+            maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+            maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
+        }
+    }
 }
 
 dependencies {
@@ -87,6 +89,11 @@ val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 
 val riderForTeaTargetsGroup = "T4"
 
+val buildScriptFiles = project.buildscript.configurations.getByName("classpath").files
+for (file in buildScriptFiles) {
+    println("buildScriptFiles: $file")
+}
+
 fun File.writeTextIfChanged(content: String) {
   val bytes = content.toByteArray()
 
@@ -97,7 +104,7 @@ fun File.writeTextIfChanged(content: String) {
 }
 
 tasks {
-    extra["rdLibDirectory"] = {
+    extra["riderModelJar"] = {
         logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.orNull?.idea?.orNull}")
         val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
         val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
