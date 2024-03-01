@@ -52,6 +52,9 @@
     <completion.contributor
         language="T4"
         implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor"/>
+    <completion.contributor
+        language="T4"
+        implementationClass="com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor"/>
     <backend.markup.adapterFactory
         language="T4"
         implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory"/>
