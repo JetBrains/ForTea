@@ -182,11 +182,15 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
       AppendIndent();
       Result.AppendLine();
       AppendClassSummary();
-      AppendIndent();
-      Result.AppendLine();
-      AppendIndent();
-      File.AssertContainsNoIncludeContext();
-      Result.AppendLine($"#line 1 \"{File.PhysicalPsiSourceFile.GetLocation()}\"");
+      if (intermediateResult.UseLinePragmas)
+      {
+        AppendIndent();
+        Result.AppendLine();
+        AppendIndent();
+        File.AssertContainsNoIncludeContext();
+        Result.AppendLine($"#line 1 \"{File.PhysicalPsiSourceFile.GetLocation()}\"");
+      }
+
       AppendIndent();
       Result.AppendLine(GeneratedCodeAttribute);
       base.AppendClass(intermediateResult);
@@ -194,7 +198,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
     protected override void AppendTransformMethod(T4CSharpCodeGenerationIntermediateResult intermediateResult)
     {
-      Result.AppendLine("#line hidden");
+      if (intermediateResult.UseLinePragmas) Result.AppendLine("#line hidden");
       AppendIndent();
       Result.AppendLine("/// <summary>");
       AppendIndent();
@@ -299,9 +303,9 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
     }
 
     protected override string BaseClassDescription =>
-      $@"    #line default
+      $@"    {(ShouldUseLineDirectives? @"#line default
     #line hidden
-    #region Base class
+    " : "")}#region Base class
     /// <summary>
     /// Base class for this transformation
     /// </summary>
@@ -333,6 +337,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
     public override void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
     {
+      if (!ShouldUseLineDirectives) return;
+      destination.Append(Indent);
       var sourceFile = node.FindLogicalPsiSourceFile();
       int offset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node).Offset;
       int line = (int)sourceFile.Document.GetCoordsByOffset(offset).Line;

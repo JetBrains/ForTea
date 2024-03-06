@@ -16,4 +16,8 @@ class T4PreprocessFileTest : T4PreprocessFileTestBase() {
   @Test fun `test file with include preprocessing`() = doTest()
   // https://youtrack.jetbrains.com/issue/RIDER-69121
   @Test fun `test namespace of preprocessed class 1`() = doTest()
+  // https://youtrack.jetbrains.com/issue/RIDER-55555
+  @Test fun `test file without linePragmas`() = doTest()
+  @Test fun `test file with linePragmas false`() = doTest()
+  @Test fun `test file with linePragmas true`() = doTest()
 }

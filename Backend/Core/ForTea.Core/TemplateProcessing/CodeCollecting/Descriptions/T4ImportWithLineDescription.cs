@@ -26,7 +26,6 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
       IT4ElementAppendFormatProvider provider
     )
     {
-      destination.Append(provider.Indent);
       provider.AppendLineDirective(destination, Source);
       provider.AppendCompilationOffset(destination, Source);
       destination.Append("using ");

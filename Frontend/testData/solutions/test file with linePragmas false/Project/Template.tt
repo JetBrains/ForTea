@@ -1,0 +1,13 @@
+<#@ template linePragmas="False" #>
+<#@ parameter name="PARAMETER_NAME" type="System.String" #>
+Hello, world!
+Hello, <# Foo(); #>
+
+<#+
+    void Foo()
+    {
+#>
+Foo called.
+<#+
+    }
+#>

@@ -24,8 +24,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
     {
       if (FirstNode != null)
       {
-        destination.AppendLine(provider.Indent);
-        destination.Append(provider.Indent);
+        if (provider.ShouldUseLineDirectives) destination.AppendLine(provider.Indent);
         provider.AppendLineDirective(destination, FirstNode);
       }
       else
@@ -41,11 +40,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
       if (FirstNode != null)
       {
         destination.AppendLine();
-        destination.AppendLine(provider.Indent);
-        destination.Append(provider.Indent);
-        destination.AppendLine("#line default");
-        destination.Append(provider.Indent);
-        destination.AppendLine("#line hidden");
+        if (provider.ShouldUseLineDirectives)
+        {
+          destination.AppendLine(provider.Indent);
+          destination.Append(provider.Indent);
+          destination.AppendLine("#line default");
+          destination.Append(provider.Indent);
+          destination.AppendLine("#line hidden");
+        }
       }
     }
 

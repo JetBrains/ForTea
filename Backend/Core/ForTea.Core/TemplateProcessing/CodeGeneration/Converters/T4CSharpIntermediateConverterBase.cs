@@ -42,6 +42,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
       [NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult
     )
     {
+      ShouldUseLineDirectives = intermediateResult.UseLinePragmas;
       string ns = GeneratorKind.ProvideTemplateNamespace(File);
       bool hasNamespace = !string.IsNullOrEmpty(ns);
       if (hasNamespace)
@@ -70,8 +71,13 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
     protected virtual void AppendClasses([NotNull] T4CSharpCodeGenerationIntermediateResult intermediateResult)
     {
       AppendClass(intermediateResult);
-      AppendIndent();
-      Result.AppendLine();
+      if (ShouldUseLineDirectives)
+      {
+        // VS compatibility
+        AppendIndent();
+        Result.AppendLine();
+      }
+
       AppendBaseClass(intermediateResult);
     }
 
@@ -113,10 +119,14 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
         AppendFeatures(intermediateResult);
         if (!intermediateResult.ParameterDescriptions.IsEmpty())
         {
-          AppendIndent();
-          Result.AppendLine();
-          AppendIndent();
-          Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
+          if (ShouldUseLineDirectives)
+          {
+            AppendIndent();
+            Result.AppendLine();
+            AppendIndent();
+            Result.AppendLine($"#line 1 \"{File.LogicalPsiSourceFile.GetLocation()}\"");
+          }
+
           Result.AppendLine();
         }
 
@@ -130,12 +140,15 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
         {
           Result.AppendLine();
           Result.AppendLine();
-          AppendIndent();
-          Result.AppendLine();
-          AppendIndent();
-          Result.AppendLine("#line default");
-          AppendIndent();
-          Result.AppendLine("#line hidden");
+          if (ShouldUseLineDirectives)
+          {
+            AppendIndent();
+            Result.AppendLine();
+            AppendIndent();
+            Result.AppendLine("#line default");
+            AppendIndent();
+            Result.AppendLine("#line hidden");
+          }
         }
       }
     }
@@ -328,6 +341,7 @@ public virtual void Initialize()");
     public abstract string ExpressionCommentEnd { get; }
     public abstract string Indent { get; }
     public abstract bool ShouldBreakExpressionWithLineDirective { get; }
+    public bool ShouldUseLineDirectives { get; private set; }
     public abstract void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
     public abstract void AppendLineDirective(T4CSharpCodeGenerationResult destination, IT4TreeNode node);
     public abstract void AppendMappedIfNeeded(T4CSharpCodeGenerationResult destination, IT4Code code);

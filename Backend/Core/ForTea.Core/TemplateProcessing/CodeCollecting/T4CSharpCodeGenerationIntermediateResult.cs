@@ -41,6 +41,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
     public IT4InfoCollectorState State { get; private set; }
     public bool FeatureStarted => State.FeatureStarted;
     public bool HasHost { get; private set; }
+    public bool UseLinePragmas { get; private set; } = true;
     private AccessRights AccessRights { get; set; }
 
     [NotNull]
@@ -62,6 +63,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
 
     public void AdvanceState([NotNull] IT4TreeNode element) => State = State.GetNextState(element);
     public void RequireHost() => HasHost = true;
+    public void ProhibitLinePragmas() => UseLinePragmas = false;
     public bool HasBaseClass => !CollectedBaseClass.IsEmpty;
 
     public T4CSharpCodeGenerationIntermediateResult(
@@ -103,6 +105,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
       MyParameterDescriptions.AddRange(other.ParameterDescriptions);
       // 'feature started' is intentionally ignored
       HasHost = HasHost || other.HasHost;
+      UseLinePragmas = UseLinePragmas || other.UseLinePragmas;
     }
   }
 }

@@ -16,18 +16,20 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Descriptions
       IT4ElementAppendFormatProvider provider
     )
     {
-      destination.AppendLine(provider.Indent);
-      destination.Append(provider.Indent);
+      if (provider.ShouldUseLineDirectives) destination.AppendLine(provider.Indent);
       provider.AppendLineDirective(destination, Source);
       provider.AppendCompilationOffset(destination, Source);
       destination.Append(provider.CodeCommentStart);
       destination.AppendMapped(Source);
       destination.AppendLine(provider.CodeCommentEnd);
-      destination.AppendLine(provider.Indent);
-      destination.Append(provider.Indent);
-      destination.AppendLine("#line default");
-      destination.Append(provider.Indent);
-      destination.AppendLine("#line hidden");
+      if (provider.ShouldUseLineDirectives)
+      {
+        destination.AppendLine(provider.Indent);
+        destination.Append(provider.Indent);
+        destination.AppendLine("#line default");
+        destination.Append(provider.Indent);
+        destination.AppendLine("#line hidden");
+      }
     }
   }
 }

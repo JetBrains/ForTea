@@ -145,6 +145,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting
         .GetAttributeValueByName(T4DirectiveInfoManager.Template.HostSpecificAttribute.Name);
       if (bool.TrueString.Equals(hostSpecific, StringComparison.OrdinalIgnoreCase)) Result.RequireHost();
 
+      var linePragmas = templateDirectiveParam.GetAttributeValueByName(T4DirectiveInfoManager.Template.LinePragmasAttribute.Name);
+      if (bool.FalseString.Equals(linePragmas, StringComparison.OrdinalIgnoreCase)) Result.ProhibitLinePragmas();
+
       string access = templateDirectiveParam
         .GetAttributeValueByName(T4DirectiveInfoManager.Template.VisibilityAttribute.Name);
       if (access != null) Result.AccessRightsText = access;

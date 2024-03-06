@@ -15,6 +15,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
     string ExpressionCommentEnd { get; }
     string Indent { get; }
     bool ShouldBreakExpressionWithLineDirective { get; }
+    bool ShouldUseLineDirectives { get; }
 
     void AppendCompilationOffset(
       [NotNull] T4CSharpCodeGenerationResult destination,
