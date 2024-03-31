@@ -33,7 +33,7 @@ namespace GammaJul.ForTea.Core.Daemon.Processes
     {
       var consumer = new FilteringHighlightingConsumer(DaemonProcess.SourceFile, File, Settings);
       File.ProcessThisAndDescendants(new Processor(this, consumer));
-      committer.Invoke(consumer.Highlightings);
+      committer.Invoke(consumer.CollectHighlightings());
     }
 
     private void Process([NotNull] ITreeNode element, [NotNull] IHighlightingConsumer context)

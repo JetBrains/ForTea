@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Attributes;
 using GammaJul.ForTea.Core.Daemon.Syntax;
@@ -34,13 +35,11 @@ namespace JetBrains.ForTea.ReSharperPlugin.Daemon.Processes
     {
       var sourceFile = File.PhysicalPsiSourceFile;
       if (sourceFile == null) return;
+
       var consumer = new DefaultHighlightingConsumer(sourceFile);
       File.ProcessDescendants(this, consumer);
-      var solution = File.GetSolution();
-      var relevantHighlightings = consumer
-        .Highlightings
-        .Where(info => info.Range.Document.GetPsiSourceFile(solution) == sourceFile);
-      commiter(new DaemonStageResult(relevantHighlightings.ToArray()));
+
+      commiter(new DaemonStageResult(consumer.CollectHighlightings()));
     }
 
     public void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer consumer)
