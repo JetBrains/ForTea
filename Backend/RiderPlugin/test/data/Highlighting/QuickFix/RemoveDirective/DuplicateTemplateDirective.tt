@@ -1,2 +1,2 @@
-<#@ template language="C#" #>
-<#@ template language="F#{caret}" hostspecific="true" #>
+<#@ template language="F#" #>
+<#@ template language="C#{caret}" hostspecific="true" #>

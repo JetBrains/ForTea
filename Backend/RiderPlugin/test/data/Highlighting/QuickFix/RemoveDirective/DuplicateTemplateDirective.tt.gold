@@ -1,2 +1,2 @@
-<#@ template language="C#" #>
+﻿<#@ template language="F#" #>
 {caret}
