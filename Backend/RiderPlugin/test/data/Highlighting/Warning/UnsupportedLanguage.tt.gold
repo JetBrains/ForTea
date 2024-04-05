@@ -1,6 +1,5 @@
 ﻿<#@ template language="|VB|(0)" #>
-|<#@ template language="F#" #>|(1)
+<#@ template language="F#" #>
 
 ---------------------------------------------------------
 (0): ReSharper Warning: Visual Basic is not supported yet
-(1): ReSharper Dead Code: The directive will be ignored and can be safely removed
