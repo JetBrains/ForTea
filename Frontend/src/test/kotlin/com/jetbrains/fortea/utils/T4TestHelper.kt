@@ -7,6 +7,7 @@ import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.framework.combine
+import com.jetbrains.rider.test.framework.compareXml
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.flushQueues
 import com.jetbrains.rider.test.scriptingApi.waitAllCommandsFinished
@@ -41,9 +42,10 @@ open class T4TestHelper(val project: Project) {
     VfsWriteOperationsHost.getInstance(project).waitRefreshIsFinished()
   }
 
-  fun dumpCsprojContents() = executeWithGold(csprojFile.path) {
-    it.print(csprojFile.readText())
-  }
+  fun dumpCsprojContents() = executeWithGold(csprojFile,
+    action = { it.print(csprojFile.readText()) },
+    comparator = { goldFile, tempFile -> compareXml("", goldFile, tempFile, "") }
+  )
 
   private fun findOutputFile(resultExtension: String?): File {
     return if (resultExtension == null) outputFileCandidates.single {
@@ -56,7 +58,7 @@ open class T4TestHelper(val project: Project) {
     }
   }
 
-  fun dumpExecutionResult(resultExtension: String? = null, printer: ((String) -> String)? = null) = executeWithGold(t4File.path) {
+  fun dumpExecutionResult(resultExtension: String? = null, printer: ((String) -> String)? = null) = executeWithGold(t4File) {
     val text = Files.readString(findOutputFile(resultExtension).toPath())
       .replace("\\r\\n", "\\n").replace("\uFEFF", "")
     it.print(printer?.let { printer(text) } ?: text)
