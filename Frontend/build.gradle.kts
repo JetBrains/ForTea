@@ -103,14 +103,25 @@ fun File.writeTextIfChanged(content: String) {
   }
 }
 
-tasks {
-    extra["riderModelJar"] = {
-        logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.orNull?.idea?.orNull}")
-        val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes ?: error("intellij.ideaDependency.classes is null")
-        val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-        "$rdLibDirectory/rider-model.jar"
-    }
+val riderModel: Configuration by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+}
 
+artifacts {
+    add(riderModel.name, provider {
+        val sdkRoot = tasks.setupDependencies.get().idea.get().classes
+        sdkRoot.resolve("lib/rd/rider-model.jar").also {
+            check(it.isFile) {
+                "rider-model.jar is not found at $riderModel"
+            }
+        }
+    }) {
+        builtBy(tasks.setupDependencies)
+    }
+}
+
+tasks {
   val dotNetSdkPath by lazy {
     val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes?.resolve("lib")?.resolve("DotNetSdkForRdPlugins")
       ?: error("intellij.ideaDependency.classes is null")

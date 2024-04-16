@@ -5,10 +5,7 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 plugins {
   // Version is configured in gradle.properties
   id("com.jetbrains.rdgen")
-}
-
-apply {
-  plugin("com.jetbrains.rdgen")
+  id("org.jetbrains.kotlin.jvm")
 }
 
 val backendPluginFolderName = "Backend"
@@ -23,7 +20,15 @@ val pregeneratedMonorepoPath = File(productsHome, "Plugins/_ForTea.Pregenerated"
 
 val riderForTeaTargetsGroup = "T4"
 
-val parentGradle = gradle.parent
+val isMonorepo = rootProject.projectDir != projectDir.parentFile
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
+        }
+    }
+}
 
 fun File.writeTextIfChanged(content: String) {
   val bytes = content.toByteArray()
@@ -34,13 +39,8 @@ fun File.writeTextIfChanged(content: String) {
   }
 }
 
-fun RdGenExtension.configureRdGen(csOutput: File, ktOutput: File, classPath: Any, suffix: String? = null) {
+fun RdGenExtension.configureRdGen(csOutput: File, ktOutput: File, suffix: String? = null) {
     verbose = true
-    hashFolder = "build/rdgen"
-
-    logger.info("Configuring rdgen params")
-    sources(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
-    classpath(classPath)
 
     packages = "model"
 
@@ -63,48 +63,41 @@ fun RdGenExtension.configureRdGen(csOutput: File, ktOutput: File, classPath: Any
     }
 }
 
-if (parentGradle == null) {
+if (isMonorepo) {
     dependencies {
-        val rdLibs = rootProject.buildscript.configurations.getByName("classpath").files.filter {
-            it.name.contains("rd-")
-        }
-        for (rdLib in rdLibs) {
-            println("lib2: $rdLib")
-        }
-
-        rdGenConfiguration(files(rdLibs))
-    }
-
-    tasks.register<RdGenTask>("rdgenIndependent") {
-        doFirst {
-            configure<RdGenExtension> {
-                val csOutput = File(riderBackendPluginPath, "Model")
-                val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
-                val riderModelJar: () -> String by rootProject.extra
-                configureRdGen(csOutput, ktOutput, riderModelJar)
-            }
-        }
-    }
-} else {
-    val riderModelProject = parentGradle.rootProject.project("rider-model")
-
-    configurations.register("riderModel")
-    dependencies {
-        add("riderModel", riderModelProject)
+        implementation(project(":rider-model"))
     }
 
     tasks.register<RdGenTask>("rdgenMonorepo") {
-        val riderModelConfiguration = configurations.getByName("riderModel")
+        dependsOn(sourceSets["main"].runtimeClasspath)
+        classpath(sourceSets["main"].runtimeClasspath)
 
-        dependsOn(riderModelConfiguration)
+        configure<RdGenExtension> {
+            val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
+            val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
+            configureRdGen(csOutput, ktOutput, suffix = ".Pregenerated")
+        }
+    }
+} else {
+    val rdVersion: String by project
+    val rdKotlinVersion: String by project
 
-        doFirst {
-            configure<RdGenExtension> {
-                val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
-                val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
-                val classPath = riderModelConfiguration.resolve()
-                configureRdGen(csOutput, ktOutput, classPath, suffix = ".Pregenerated")
-            }
+    dependencies {
+        implementation("com.jetbrains.rd:rd-gen:$rdVersion")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:$rdKotlinVersion")
+        implementation(project(mapOf(
+            "path" to ":",
+            "configuration" to "riderModel")))
+    }
+
+    tasks.register<RdGenTask>("rdgenIndependent") {
+        classpath(sourceSets["main"].runtimeClasspath)
+        dependsOn(sourceSets["main"].runtimeClasspath)
+
+        configure<RdGenExtension> {
+            val csOutput = File(riderBackendPluginPath, "Model")
+            val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
+            configureRdGen(csOutput, ktOutput)
         }
     }
 }
