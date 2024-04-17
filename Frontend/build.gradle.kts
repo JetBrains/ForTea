@@ -13,7 +13,7 @@ plugins {
   id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
   // Version is configured in gradle.properties
   id("com.jetbrains.rdgen")
-  kotlin("jvm") version "1.9.22"
+  kotlin("jvm")
 }
 
 apply {
@@ -22,19 +22,14 @@ apply {
   plugin("org.jetbrains.grammarkit")
 }
 
-val buildNumber = ext.properties["build.number"]
-val onTC = buildNumber != null
-
-allprojects {
-    repositories {
-        mavenCentral()
-
-        if (onTC) {
-            maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-            maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
-        }
-    }
+repositories {
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://cache-redirector.jetbrains.com/intellij-repository/releases")
+    maven("https://cache-redirector.jetbrains.com/intellij-repository/snapshots")
+    maven("https://cache-redirector.jetbrains.com/maven-central")
 }
+
+val buildNumber = ext.properties["build.number"]
 
 dependencies {
   testImplementation(kotlin("test"))
@@ -88,11 +83,6 @@ val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 
 val riderForTeaTargetsGroup = "T4"
-
-val buildScriptFiles = project.buildscript.configurations.getByName("classpath").files
-for (file in buildScriptFiles) {
-    println("buildScriptFiles: $file")
-}
 
 fun File.writeTextIfChanged(content: String) {
   val bytes = content.toByteArray()
@@ -276,12 +266,12 @@ tasks {
 
   register("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn("protocol:rdgenIndependent", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
+    dependsOn(":protocol:rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
   }
 
   register("prepareMonorepo") {
     group = riderForTeaTargetsGroup
-    dependsOn("rdgenMonorepo", generateT4LexerMonorepo, generateT4ParserMonorepo)
+    dependsOn(":protocol:rdgen", generateT4LexerMonorepo, generateT4ParserMonorepo)
   }
 
   named("buildPlugin").configure {
@@ -292,6 +282,10 @@ tasks {
     // A fix for https://github.com/JetBrains/gradle-intellij-plugin/issues/743.
     // Remove after it is publicly available
     dependsOn("prepareTestingSandbox")
+  }
+  wrapper {
+    gradleVersion = "8.7"
+    distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
   }
 }
 

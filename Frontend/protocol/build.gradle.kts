@@ -1,47 +1,48 @@
-import com.jetbrains.rd.generator.gradle.RdGenExtension
 import com.jetbrains.rd.generator.gradle.RdGenTask
-import org.jetbrains.kotlin.daemon.common.toHexString
 
 plugins {
-  // Version is configured in gradle.properties
-  id("com.jetbrains.rdgen")
-  id("org.jetbrains.kotlin.jvm")
+    // Version is configured in gradle.properties
+    id("com.jetbrains.rdgen")
+    id("org.jetbrains.kotlin.jvm")
 }
 
-val backendPluginFolderName = "Backend"
-val riderBackedPluginName = "ForTea.RiderPlugin"
-val backendPluginSolutionName = "ForTea.Backend.sln"
-
-val repoRoot = projectDir.resolve("../..")
-val riderBackendPluginPath = File(repoRoot, "$backendPluginFolderName/RiderPlugin/$riderBackedPluginName")
-val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
-val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
-val pregeneratedMonorepoPath = File(productsHome, "Plugins/_ForTea.Pregenerated")
-
-val riderForTeaTargetsGroup = "T4"
+repositories {
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://cache-redirector.jetbrains.com/maven-central")
+}
 
 val isMonorepo = rootProject.projectDir != projectDir.parentFile
+val forTeaRepoRoot: File = projectDir.parentFile.parentFile
 
 sourceSets {
     main {
         kotlin {
-            srcDir(File(repoRoot, "Frontend/protocol/src/main/kotlin/model"))
+            srcDir(File(forTeaRepoRoot, "Frontend/protocol/src/main/kotlin/model"))
         }
     }
 }
 
-fun File.writeTextIfChanged(content: String) {
-  val bytes = content.toByteArray()
+val pair = if (isMonorepo) {
+    val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
+    val pregeneratedMonorepoPath = productsHome.resolve("Plugins/_ForTea.Pregenerated")
+    pregeneratedMonorepoPath.resolve("BackendModel") to
+            pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
+} else {
+    val riderBackendPluginPath = forTeaRepoRoot.resolve("Backend/RiderPlugin/ForTea.RiderPlugin")
+    riderBackendPluginPath.resolve("Model") to
+            forTeaRepoRoot.resolve("Frontend/src/main/kotlin/com/jetbrains/fortea/model")
+}
+val csOutput = pair.first
+val ktOutput = pair.second
 
-  if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
-    println("Writing $path")
-    writeBytes(bytes)
-  }
+val suffix = if (isMonorepo) {
+    ".Pregenerated"
+} else {
+    ""
 }
 
-fun RdGenExtension.configureRdGen(csOutput: File, ktOutput: File, suffix: String? = null) {
+rdgen {
     verbose = true
-
     packages = "model"
 
     generator {
@@ -49,8 +50,8 @@ fun RdGenExtension.configureRdGen(csOutput: File, ktOutput: File, suffix: String
         transform = "asis"
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
         namespace = "com.jetbrains.rider.model"
-        directory = "$ktOutput"
-        generatedFileSuffix = suffix ?: ""
+        directory = ktOutput.absolutePath
+        generatedFileSuffix = suffix
     }
 
     generator {
@@ -58,46 +59,32 @@ fun RdGenExtension.configureRdGen(csOutput: File, ktOutput: File, suffix: String
         transform = "reversed"
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
         namespace = "JetBrains.Rider.Model"
-        directory = "$csOutput"
-        generatedFileSuffix = suffix ?: ""
+        directory = csOutput.absolutePath
+        generatedFileSuffix = suffix
     }
 }
 
-if (isMonorepo) {
-    dependencies {
+tasks.withType<RdGenTask> {
+    dependsOn(sourceSets["main"].runtimeClasspath)
+    classpath(sourceSets["main"].runtimeClasspath)
+}
+
+dependencies {
+    if (isMonorepo) {
         implementation(project(":rider-model"))
-    }
+    } else {
+        val rdVersion: String by project
+        val rdKotlinVersion: String by project
 
-    tasks.register<RdGenTask>("rdgenMonorepo") {
-        dependsOn(sourceSets["main"].runtimeClasspath)
-        classpath(sourceSets["main"].runtimeClasspath)
-
-        configure<RdGenExtension> {
-            val csOutput = pregeneratedMonorepoPath.resolve("BackendModel")
-            val ktOutput = pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
-            configureRdGen(csOutput, ktOutput, suffix = ".Pregenerated")
-        }
-    }
-} else {
-    val rdVersion: String by project
-    val rdKotlinVersion: String by project
-
-    dependencies {
         implementation("com.jetbrains.rd:rd-gen:$rdVersion")
         implementation("org.jetbrains.kotlin:kotlin-stdlib:$rdKotlinVersion")
-        implementation(project(mapOf(
-            "path" to ":",
-            "configuration" to "riderModel")))
-    }
-
-    tasks.register<RdGenTask>("rdgenIndependent") {
-        classpath(sourceSets["main"].runtimeClasspath)
-        dependsOn(sourceSets["main"].runtimeClasspath)
-
-        configure<RdGenExtension> {
-            val csOutput = File(riderBackendPluginPath, "Model")
-            val ktOutput = File(repoRoot, "Frontend/src/main/kotlin/com/jetbrains/fortea/model")
-            configureRdGen(csOutput, ktOutput)
-        }
+        implementation(
+            project(
+                mapOf(
+                    "path" to ":",
+                    "configuration" to "riderModel"
+                )
+            )
+        )
     }
 }
