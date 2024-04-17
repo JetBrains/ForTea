@@ -25,9 +25,9 @@ sourceSets {
 data class ForTeaGeneratorSettings(val csOutput: File, val ktOutput: File, val suffix: String)
 
 val generatorOutputSettings = if (isMonorepo) {
-    val productsHome =
+    val monorepoRoot =
         buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
-    val pregeneratedMonorepoPath = productsHome.resolve("Plugins/_ForTea.Pregenerated")
+    val pregeneratedMonorepoPath = monorepoRoot.resolve("Plugins/_ForTea.Pregenerated")
     ForTeaGeneratorSettings(
         pregeneratedMonorepoPath.resolve("BackendModel"),
         pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model"),

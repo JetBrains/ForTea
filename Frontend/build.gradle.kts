@@ -1,6 +1,4 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.grammarkit.tasks.GenerateLexerTask
-import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.intellij.tasks.InstrumentCodeTask
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.tasks.RunIdeTask
@@ -55,15 +53,12 @@ intellij {
   plugins.set(listOf("rider.intellij.plugin.appender"))
 }
 
-val backendPluginFolderName = "Backend"
-val backendPluginSolutionName = "ForTea.Backend.sln"
-
-val repoRoot = projectDir.parentFile!!
-val backendPluginPath = File(repoRoot, backendPluginFolderName)
-val backendPluginSolutionPath = File(backendPluginPath, backendPluginSolutionName)
-val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
+val repoRoot: File = projectDir.parentFile
+val backendPluginPath = repoRoot.resolve("Backend")
+val backendPluginSolutionPath = backendPluginPath.resolve("ForTea.Backend.sln")
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
-val pregeneratedMonorepoPath = File(productsHome, "Plugins/_ForTea.Pregenerated")
+
+val isMonorepo = rootProject.projectDir != projectDir
 
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
@@ -119,10 +114,6 @@ tasks {
     return@lazy sdkPath
   }
 
-  withType<GenerateParserTask> {
-    classpath(setupDependencies.flatMap { it.idea.map { idea -> idea.classes.resolve("lib/opentelemetry.jar") } })
-  }
-
   withType<InstrumentCodeTask>().configureEach {
     val bundledMavenArtifacts = file("build/maven-artifacts")
     if (bundledMavenArtifacts.exists()) {
@@ -172,40 +163,41 @@ tasks {
   val lexerSource = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
   val parserSource = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
 
+  data class ForTeaGeneratorSettings(val parserOutput: File, val lexerOutput: File)
+
+  val forTeaGeneratorSettings = if (isMonorepo) {
+      val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
+      val pregeneratedMonorepoPath = File(monoRepoRoot, "Plugins/_ForTea.Pregenerated")
+      ForTeaGeneratorSettings(
+          pregeneratedMonorepoPath.resolve("Frontend/src"),
+          pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer")
+          )
+  } else {
+      ForTeaGeneratorSettings(
+          repoRoot.resolve("src/main/java"),
+          repoRoot.resolve("src/main/java/com/jetbrains/fortea/lexer")
+      )
+  }
+
+  generateParser.configure {
+    sourceFile.set(file(parserSource))
+    targetRoot.set(forTeaGeneratorSettings.parserOutput.absolutePath)
+    purgeOldFiles.set(true)
+    pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
+    pathToPsiRoot.set("fakePathToPsiRoot") // same
+    classpath(setupDependencies.flatMap { it.idea.map { idea -> idea.classes.resolve("lib/opentelemetry.jar") } })
+  }
+
   generateLexer.configure {
     sourceFile.set(file(lexerSource))
-    targetDir.set("src/main/java/com/jetbrains/fortea/lexer")
+    targetDir.set(forTeaGeneratorSettings.lexerOutput.absolutePath)
     targetClass.set("_T4Lexer")
     purgeOldFiles.set(true)
-  }
-
-  val generateT4Parser = task<GenerateParserTask>("generateT4Parser") {
-    sourceFile.set(file(parserSource))
-    this.targetRoot.set("src/main/java")
-    purgeOldFiles.set(true)
-    this.pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
-    this.pathToPsiRoot.set("fakePathToPsiRoot") // same
-  }
-
-  val generateT4LexerMonorepo = task<GenerateLexerTask>("generateT4LexerMonorepo") {
-    sourceFile.set(file(lexerSource))
-    targetDir.set( pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer").canonicalPath)
-    purgeOldFiles.set(true)
-    targetClass.set("_T4Lexer")
-    purgeOldFiles.set(true)
-  }
-
-  val generateT4ParserMonorepo = task<GenerateParserTask>("generateT4ParserMonorepo") {
-    sourceFile.set(file(parserSource))
-    this.targetRoot.set(pregeneratedMonorepoPath.resolve("Frontend/src/").canonicalPath)
-    purgeOldFiles.set(true)
-    this.pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
-    this.pathToPsiRoot.set("fakePathToPsiRoot") // same
   }
 
   withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = "17"
-    dependsOn(generateLexer, generateT4Parser)
+    dependsOn(generateLexer, generateParser)
   }
 
   withType<Test>().configureEach {
@@ -264,12 +256,7 @@ tasks {
 
   register("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn(":protocol:rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", generateLexer, generateT4Parser)
-  }
-
-  register("prepareMonorepo") {
-    group = riderForTeaTargetsGroup
-    dependsOn(":protocol:rdgen", generateT4LexerMonorepo, generateT4ParserMonorepo)
+    dependsOn(":protocol:rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", generateParser, generateLexer)
   }
 
   named("buildPlugin").configure {
