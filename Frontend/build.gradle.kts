@@ -12,13 +12,11 @@ plugins {
   id("org.jetbrains.grammarkit") version "2022.3.2.1"
   id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
   // Version is configured in gradle.properties
-  id("com.jetbrains.rdgen")
   kotlin("jvm")
 }
 
 apply {
   plugin("kotlin")
-  plugin("com.jetbrains.rdgen")
   plugin("org.jetbrains.grammarkit")
 }
 
