@@ -53,12 +53,11 @@ intellij {
   plugins.set(listOf("rider.intellij.plugin.appender"))
 }
 
+val isMonorepo = rootProject.projectDir != projectDir
 val repoRoot: File = projectDir.parentFile
 val backendPluginPath = repoRoot.resolve("Backend")
 val backendPluginSolutionPath = backendPluginPath.resolve("ForTea.Backend.sln")
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
-
-val isMonorepo = rootProject.projectDir != projectDir
 
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
@@ -166,8 +165,8 @@ tasks {
   data class ForTeaGeneratorSettings(val parserOutput: File, val lexerOutput: File)
 
   val forTeaGeneratorSettings = if (isMonorepo) {
-      val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile
-      val pregeneratedMonorepoPath = File(monoRepoRoot, "Plugins/_ForTea.Pregenerated")
+      val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+      val pregeneratedMonorepoPath = monoRepoRoot.resolve("Plugins/_ForTea.Pregenerated")
       ForTeaGeneratorSettings(
           pregeneratedMonorepoPath.resolve("Frontend/src"),
           pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer")
