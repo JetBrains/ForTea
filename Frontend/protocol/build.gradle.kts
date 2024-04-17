@@ -22,23 +22,24 @@ sourceSets {
     }
 }
 
-val pair = if (isMonorepo) {
-    val productsHome = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
+data class ForTeaGeneratorSettings(val csOutput: File, val ktOutput: File, val suffix: String)
+
+val generatorOutputSettings = if (isMonorepo) {
+    val productsHome =
+        buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
     val pregeneratedMonorepoPath = productsHome.resolve("Plugins/_ForTea.Pregenerated")
-    pregeneratedMonorepoPath.resolve("BackendModel") to
-            pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model")
+    ForTeaGeneratorSettings(
+        pregeneratedMonorepoPath.resolve("BackendModel"),
+        pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model"),
+        ".Pregenerated"
+    )
 } else {
     val riderBackendPluginPath = forTeaRepoRoot.resolve("Backend/RiderPlugin/ForTea.RiderPlugin")
-    riderBackendPluginPath.resolve("Model") to
-            forTeaRepoRoot.resolve("Frontend/src/main/kotlin/com/jetbrains/fortea/model")
-}
-val csOutput = pair.first
-val ktOutput = pair.second
-
-val suffix = if (isMonorepo) {
-    ".Pregenerated"
-} else {
-    ""
+    ForTeaGeneratorSettings(
+        riderBackendPluginPath.resolve("Model"),
+        forTeaRepoRoot.resolve("Frontend/src/main/kotlin/com/jetbrains/fortea/model"),
+        ""
+    )
 }
 
 rdgen {
@@ -50,8 +51,8 @@ rdgen {
         transform = "asis"
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
         namespace = "com.jetbrains.rider.model"
-        directory = ktOutput.absolutePath
-        generatedFileSuffix = suffix
+        directory = generatorOutputSettings.ktOutput.absolutePath
+        generatedFileSuffix = generatorOutputSettings.suffix
     }
 
     generator {
@@ -59,8 +60,8 @@ rdgen {
         transform = "reversed"
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
         namespace = "JetBrains.Rider.Model"
-        directory = csOutput.absolutePath
-        generatedFileSuffix = suffix
+        directory = generatorOutputSettings.csOutput.absolutePath
+        generatedFileSuffix = generatorOutputSettings.suffix
     }
 }
 
