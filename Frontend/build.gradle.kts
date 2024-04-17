@@ -165,7 +165,7 @@ tasks {
   data class ForTeaGeneratorSettings(val parserOutput: File, val lexerOutput: File)
 
   val forTeaGeneratorSettings = if (isMonorepo) {
-      val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+      val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
       val pregeneratedMonorepoPath = monoRepoRoot.resolve("Plugins/_ForTea.Pregenerated")
       ForTeaGeneratorSettings(
           pregeneratedMonorepoPath.resolve("Frontend/src"),
