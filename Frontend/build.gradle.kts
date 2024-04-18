@@ -166,6 +166,9 @@ tasks {
 
   val forTeaGeneratorSettings = if (isMonorepo) {
       val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+      check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
+          error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
+      }
       val pregeneratedMonorepoPath = monoRepoRoot.resolve("Plugins/_ForTea.Pregenerated")
       ForTeaGeneratorSettings(
           pregeneratedMonorepoPath.resolve("Frontend/src"),

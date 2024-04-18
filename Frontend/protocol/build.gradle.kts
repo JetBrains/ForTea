@@ -26,7 +26,10 @@ data class ForTeaGeneratorSettings(val csOutput: File, val ktOutput: File, val s
 
 val generatorOutputSettings = if (isMonorepo) {
     val monorepoRoot =
-        buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
+        buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
+    check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
+        error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
+    }
     val pregeneratedMonorepoPath = monorepoRoot.resolve("Plugins/_ForTea.Pregenerated")
     ForTeaGeneratorSettings(
         pregeneratedMonorepoPath.resolve("BackendModel"),
