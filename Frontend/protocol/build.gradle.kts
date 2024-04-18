@@ -30,7 +30,7 @@ val generatorOutputSettings = if (isMonorepo) {
     check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
         error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
     }
-    val pregeneratedMonorepoPath = monorepoRoot.resolve("Plugins/_ForTea.Pregenerated")
+    val pregeneratedMonorepoPath = monorepoRoot.resolve("dotnet/Plugins/_ForTea.Pregenerated")
     ForTeaGeneratorSettings(
         pregeneratedMonorepoPath.resolve("BackendModel"),
         pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/model"),
