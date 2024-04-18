@@ -31,4 +31,4 @@ pluginManagement {
     }
 }
 
-include("protocol")
+include(":protocol")

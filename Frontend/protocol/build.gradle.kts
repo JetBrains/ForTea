@@ -17,7 +17,7 @@ val forTeaRepoRoot: File = projectDir.parentFile.parentFile
 sourceSets {
     main {
         kotlin {
-            srcDir(File(forTeaRepoRoot, "Frontend/protocol/src/main/kotlin/model"))
+            srcDir(forTeaRepoRoot.resolve("Frontend/protocol/src/main/kotlin/model"))
         }
     }
 }
