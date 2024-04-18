@@ -6,10 +6,10 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.jetbrains.intellij") version "1.17.1"
-  id("org.jetbrains.grammarkit") version "2022.3.2.1"
-  id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
   // Version is configured in gradle.properties
+  id("me.filippov.gradle.jvm.wrapper")
+  id("org.jetbrains.grammarkit")
+  id("org.jetbrains.intellij")
   kotlin("jvm")
 }
 
@@ -165,11 +165,11 @@ tasks {
   data class ForTeaGeneratorSettings(val parserOutput: File, val lexerOutput: File)
 
   val forTeaGeneratorSettings = if (isMonorepo) {
-      val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+      val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
       check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
           error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
       }
-      val pregeneratedMonorepoPath = monoRepoRoot.resolve("Plugins/_ForTea.Pregenerated")
+      val pregeneratedMonorepoPath = monorepoRoot.resolve("Plugins/_ForTea.Pregenerated")
       ForTeaGeneratorSettings(
           pregeneratedMonorepoPath.resolve("Frontend/src"),
           pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer")
@@ -270,6 +270,7 @@ tasks {
     // Remove after it is publicly available
     dependsOn("prepareTestingSandbox")
   }
+
   wrapper {
     gradleVersion = "8.7"
     distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
