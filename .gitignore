@@ -20,3 +20,6 @@ Backend/.idea
 *.Generated.kt
 *.Generated.cs
 **/.nuke
+
+Frontend/src/generated/
+Backend/RiderPlugin/ForTea.RiderPlugin/Model/

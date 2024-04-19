@@ -8,14 +8,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   // Version is configured in gradle.properties
   id("me.filippov.gradle.jvm.wrapper")
-  id("org.jetbrains.grammarkit")
   id("org.jetbrains.intellij")
   kotlin("jvm")
 }
 
 apply {
   plugin("kotlin")
-  plugin("org.jetbrains.grammarkit")
 }
 
 repositories {
@@ -59,6 +57,17 @@ val backendPluginPath = repoRoot.resolve("Backend")
 val backendPluginSolutionPath = backendPluginPath.resolve("ForTea.Backend.sln")
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
+if (!isMonorepo) {
+    sourceSets.getByName("main") {
+        java {
+            srcDir(repoRoot.resolve("Frontend/src/generated/java"))
+        }
+        kotlin {
+            srcDir(repoRoot.resolve("Frontend/src/generated/kotlin"))
+        }
+    }
+}
+
 val pluginFiles = listOf(
   "output/ForTea.Core/$buildConfiguration/ForTea.Core",
   "output/ForTea.RiderPlugin/$buildConfiguration/ForTea.RiderPlugin",
@@ -84,6 +93,7 @@ fun File.writeTextIfChanged(content: String) {
     writeBytes(bytes)
   }
 }
+
 
 val riderModel: Configuration by configurations.creating {
     isCanBeConsumed = true
@@ -159,47 +169,9 @@ tasks {
     }
   }
 
-  val lexerSource = "src/main/kotlin/com/jetbrains/fortea/lexer/_T4Lexer.flex"
-  val parserSource = "src/main/kotlin/com/jetbrains/fortea/parser/T4.bnf"
-
-  data class ForTeaGeneratorSettings(val parserOutput: File, val lexerOutput: File)
-
-  val forTeaGeneratorSettings = if (isMonorepo) {
-      val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
-      check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
-          error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
-      }
-      val pregeneratedMonorepoPath = monorepoRoot.resolve("Plugins/_ForTea.Pregenerated")
-      ForTeaGeneratorSettings(
-          pregeneratedMonorepoPath.resolve("Frontend/src"),
-          pregeneratedMonorepoPath.resolve("Frontend/src/com/jetbrains/fortea/lexer")
-          )
-  } else {
-      ForTeaGeneratorSettings(
-          repoRoot.resolve("src/main/java"),
-          repoRoot.resolve("src/main/java/com/jetbrains/fortea/lexer")
-      )
-  }
-
-  generateParser.configure {
-    sourceFile.set(file(parserSource))
-    targetRoot.set(forTeaGeneratorSettings.parserOutput.absolutePath)
-    purgeOldFiles.set(true)
-    pathToParser.set("fakePathToParser") // I have no idea what should be inserted here, but this works
-    pathToPsiRoot.set("fakePathToPsiRoot") // same
-    classpath(setupDependencies.flatMap { it.idea.map { idea -> idea.classes.resolve("lib/opentelemetry.jar") } })
-  }
-
-  generateLexer.configure {
-    sourceFile.set(file(lexerSource))
-    targetDir.set(forTeaGeneratorSettings.lexerOutput.absolutePath)
-    targetClass.set("_T4Lexer")
-    purgeOldFiles.set(true)
-  }
-
   withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = "17"
-    dependsOn(generateLexer, generateParser)
+    dependsOn(":grammarkit:generateLexer", ":grammarkit:generateParser")
   }
 
   withType<Test>().configureEach {
@@ -258,7 +230,7 @@ tasks {
 
   register("prepare") {
     group = riderForTeaTargetsGroup
-    dependsOn(":protocol:rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", generateParser, generateLexer)
+    dependsOn(":protocol:rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", ":grammarkit:generateLexer", ":grammarkit:generateParser")
   }
 
   named("buildPlugin").configure {

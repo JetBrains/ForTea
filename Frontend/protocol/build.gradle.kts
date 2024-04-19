@@ -40,7 +40,7 @@ val generatorOutputSettings = if (isMonorepo) {
     val riderBackendPluginPath = forTeaRepoRoot.resolve("Backend/RiderPlugin/ForTea.RiderPlugin")
     ForTeaGeneratorSettings(
         riderBackendPluginPath.resolve("Model"),
-        forTeaRepoRoot.resolve("Frontend/src/main/kotlin/com/jetbrains/fortea/model"),
+        forTeaRepoRoot.resolve("Frontend/src/generated/kotlin/com/jetbrains/fortea/model"),
         ""
     )
 }

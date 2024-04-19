@@ -39,3 +39,4 @@ pluginManagement {
 }
 
 include(":protocol")
+include(":grammarkit")
