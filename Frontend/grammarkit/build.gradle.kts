@@ -8,7 +8,10 @@ repositories {
     maven("https://cache-redirector.jetbrains.com/maven-central")
 }
 
-intellij.version.set("2024.1")
+intellij {
+    version.set("2024.1")
+    type.set("RD")
+}
 
 val isMonorepo = rootProject.projectDir != projectDir.parentFile
 val forTeaRepoRoot: File = projectDir.parentFile.parentFile
