@@ -134,7 +134,7 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
       .PrevTokens()
       .Where(token => !token.IsWhitespaceToken())
       .Select(token => token.GetTreeTextRange())
-      .Select(rangeTranslator.GeneratedToOriginal)
+      .Select(range => rangeTranslator.GeneratedToOriginal(range))
       .Where(originalRange => originalRange.IsValid())
       .SelectNotNull(rangeTranslator.OriginalFile.FindNodeAt)
       .Any(it => it.GetParentOfType<IT4StatementBlock>() != null);
