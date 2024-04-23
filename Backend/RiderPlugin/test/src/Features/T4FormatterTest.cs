@@ -63,7 +63,7 @@ namespace JetBrains.ForTea.Tests.Features
         var selectionRange = textControl.Selection.OneDocRangeWithCaret();
         codeCleanup.Run(file, selectionRange.Length > 0
           ? new DocumentRange(textControl.Document, selectionRange)
-          : DocumentRange.InvalidRange, profile, NullProgressIndicator.Create());
+          : DocumentRange.InvalidRange, profile, NullProgressIndicator.Create().CreateCodeCleanupProgressIndicator(Solution));
         return document.GetText();
       }
     }
