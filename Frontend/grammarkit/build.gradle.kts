@@ -8,8 +8,9 @@ repositories {
     maven("https://cache-redirector.jetbrains.com/maven-central")
 }
 
+val riderVersion: String by project
 intellij {
-    version.set("2024.1")
+    version.set("$riderVersion-SNAPSHOT")
     type.set("RD")
 }
 

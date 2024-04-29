@@ -29,9 +29,9 @@ dependencies {
   testImplementation(kotlin("test"))
 }
 
-val baseVersion = "2024.2"
+val riderVersion: String by project
 val buildCounter = buildNumber ?: "9999"
-version = "$baseVersion.$buildCounter"
+version = "$riderVersion.$buildCounter"
 
 intellij {
   type.set("RD")
@@ -41,7 +41,7 @@ intellij {
     localPath.set(dir.absolutePath)
   } else {
     logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-    version.set("$baseVersion-SNAPSHOT")
+    version.set("$riderVersion-SNAPSHOT")
   }
 
   downloadSources.set(false)
