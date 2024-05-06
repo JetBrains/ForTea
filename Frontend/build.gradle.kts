@@ -1,14 +1,16 @@
+import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.intellij.tasks.InstrumentCodeTask
-import org.jetbrains.intellij.tasks.PrepareSandboxTask
-import org.jetbrains.intellij.tasks.RunIdeTask
+import org.jetbrains.intellij.platform.gradle.Constants
+import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
+import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.io.path.*
 
 plugins {
-  // Version is configured in gradle.properties
+  // Versions are configured in gradle.properties
   id("me.filippov.gradle.jvm.wrapper")
-  id("org.jetbrains.intellij")
+  id("org.jetbrains.intellij.platform")
   kotlin("jvm")
 }
 
@@ -21,34 +23,42 @@ repositories {
     maven("https://cache-redirector.jetbrains.com/intellij-repository/releases")
     maven("https://cache-redirector.jetbrains.com/intellij-repository/snapshots")
     maven("https://cache-redirector.jetbrains.com/maven-central")
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 val buildNumber = ext.properties["build.number"]
 
 dependencies {
-  testImplementation(kotlin("test"))
+    testImplementation(kotlin("test"))
 }
 
 val riderVersion: String by project
 val buildCounter = buildNumber ?: "9999"
 version = "$riderVersion.$buildCounter"
 
-intellij {
-  type.set("RD")
-  val dir = file("build/rider")
-  if (dir.exists()) {
-    logger.lifecycle("*** Using Rider SDK from local path " + dir.absolutePath)
-    localPath.set(dir.absolutePath)
-  } else {
-    logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-    version.set("$riderVersion-SNAPSHOT")
-  }
+dependencies {
+    intellijPlatform {
+        with(file("build/rider")) {
+            when {
+                exists() -> {
+                    logger.lifecycle("*** Using Rider SDK from local path $this")
+                    local(this)
+                }
 
-  downloadSources.set(false)
-  updateSinceUntilBuild.set(false)
+                else -> {
+                    logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
+                    rider("$riderVersion-SNAPSHOT")
+                }
+            }
+        }
 
-  // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-  plugins.set(listOf("rider.intellij.plugin.appender"))
+        instrumentationTools()
+
+        // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
+        bundledPlugin("rider.intellij.plugin.appender")
+    }
 }
 
 val isMonorepo = rootProject.projectDir != projectDir
@@ -56,6 +66,10 @@ val repoRoot: File = projectDir.parentFile
 val backendPluginPath = repoRoot.resolve("Backend")
 val backendPluginSolutionPath = backendPluginPath.resolve("ForTea.Backend.sln")
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
+
+intellijPlatform {
+    buildSearchableOptions = buildConfiguration == "Release"
+}
 
 if (!isMonorepo) {
     sourceSets.getByName("main") {
@@ -100,45 +114,44 @@ val riderModel: Configuration by configurations.creating {
     isCanBeResolved = false
 }
 
+val platformLibConfiguration: Configuration by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+}
+
+val platformLibFile = project.layout.buildDirectory.file("platform.lib.txt")
+val resolvePlatformLibPath = tasks.create("resolvePlatformLibPath") {
+    dependsOn(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
+    outputs.file(platformLibFile)
+    doLast {
+        platformLibFile.get().asFile.writeTextIfChanged(intellijPlatform.platformPath.resolve("lib").absolutePathString())
+    }
+}
+
 artifacts {
     add(riderModel.name, provider {
-        val sdkRoot = tasks.setupDependencies.get().idea.get().classes
-        sdkRoot.resolve("lib/rd/rider-model.jar").also {
+        intellijPlatform.platformPath.resolve("lib/rd/rider-model.jar").also {
             check(it.isFile) {
                 "rider-model.jar is not found at $riderModel"
             }
         }
     }) {
-        builtBy(tasks.setupDependencies)
+      builtBy(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
+    }
+
+    add(platformLibConfiguration.name, provider { resolvePlatformLibPath.outputs.files.singleFile }) {
+        builtBy(resolvePlatformLibPath)
     }
 }
 
 tasks {
-  val dotNetSdkPath by lazy {
-    val sdkPath = setupDependencies.orNull?.idea?.orNull?.classes?.resolve("lib")?.resolve("DotNetSdkForRdPlugins")
-      ?: error("intellij.ideaDependency.classes is null")
-    if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
+    val dotNetSdkPath by lazy {
+        val sdkPath = intellijPlatform.platformPath.resolve("lib/DotNetSdkForRdPlugins").absolute()
+        if (sdkPath.isDirectory().not()) error("$sdkPath does not exist or not a directory")
 
-    println("SDK path: $sdkPath")
-    return@lazy sdkPath
-  }
-
-  withType<InstrumentCodeTask>().configureEach {
-    val bundledMavenArtifacts = file("build/maven-artifacts")
-    if (bundledMavenArtifacts.exists()) {
-      logger.lifecycle("Use ant compiler artifacts from local folder: $bundledMavenArtifacts")
-      compilerClassPathFromMaven.set(
-        bundledMavenArtifacts.walkTopDown()
-          .filter { it.extension == "jar" && !it.name.endsWith("-sources.jar") }
-          .toList()
-        + File("${setupDependencies.get().idea.get().classes}/lib/3rd-party-rt.jar")
-        + File("${setupDependencies.get().idea.get().classes}/lib/util.jar")
-        + File("${setupDependencies.get().idea.get().classes}/lib/util-8.jar")
-      )
-    } else {
-      logger.lifecycle("Use ant compiler artifacts from maven")
+        println("SDK path: $sdkPath")
+        return@lazy sdkPath
     }
-  }
 
   withType<RunIdeTask>().configureEach {
     // IDEs from SDK are launched with 512mb by default, which is not enough for Rider.
@@ -152,11 +165,11 @@ tasks {
 
     paths.forEach {
       from(it) {
-        into("${intellij.pluginName.get()}/dotnet")
+        into("${intellijPlatform.projectName.get()}/dotnet")
       }
     }
 
-    into("${intellij.pluginName.get()}/projectTemplates") {
+    into("${intellijPlatform.projectName.get()}/projectTemplates") {
       from("projectTemplates")
     }
 
@@ -164,7 +177,7 @@ tasks {
       paths.forEach {
         val file = file(it)
         if (!file.exists()) throw RuntimeException("File $file does not exist")
-        logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName.get()}/dotnet")
+        logger.warn("$name: ${file.name} -> $destinationDir/${intellijPlatform.projectName.get()}/dotnet")
       }
     }
   }
