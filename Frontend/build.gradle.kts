@@ -34,9 +34,9 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-val riderVersion: String by project
+val riderBaseVersion: String by project
 val buildCounter = buildNumber ?: "9999"
-version = "$riderVersion.$buildCounter"
+version = "$riderBaseVersion.$buildCounter"
 
 dependencies {
     intellijPlatform {
@@ -49,7 +49,7 @@ dependencies {
 
                 else -> {
                     logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-                    rider("$riderVersion-SNAPSHOT")
+                    rider("$riderBaseVersion-SNAPSHOT")
                 }
             }
         }
