@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
@@ -15,7 +16,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
   /// This resolver is capable of resolving everything its parent can,
   /// and it is additionally capable of resolving EnvDTE.
   /// </summary>
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThread)]
   public sealed class T4DteAwareAssemblyReferenceResolver : T4AssemblyReferenceResolver
   {
     public T4DteAwareAssemblyReferenceResolver(
