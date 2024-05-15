@@ -18,7 +18,10 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="T4HighlighterMacro_Text" xml:space="preserve">
+	<data name="T4Errors_Text" xml:space="preserve">
+		<value>T4 Errors</value>
+	</data>
+	<data name="T4HighlighterMacro_Text" xml:space="preserve">
         <value>Macro</value>
     </data>
     <data name="T4HighlighterEnvironmentVariable_Text" xml:space="preserve">

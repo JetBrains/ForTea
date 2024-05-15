@@ -60,6 +60,14 @@ namespace GammaJul.ForTea.Core.Resources
         return string.Format(formatter, format, args);
     }
 
+    public static string Choice(string format, params object[] args)
+    {
+        var formatter = ResourceManager.ChoiceFormatter;
+        if (formatter == null) return "???";
+        return string.Format(formatter, format, args);
+    }
+
+    public static string T4Errors_Text => ResourceManager.GetString("T4Errors_Text");
     public static string T4HighlighterMacro_Text => ResourceManager.GetString("T4HighlighterMacro_Text");
     public static string T4HighlighterEnvironmentVariable_Text => ResourceManager.GetString("T4HighlighterEnvironmentVariable_Text");
     public static string T4HighlighterAttributeValue_Text => ResourceManager.GetString("T4HighlighterAttributeValue_Text");
