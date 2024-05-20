@@ -25,6 +25,7 @@ repositories {
     maven("https://cache-redirector.jetbrains.com/maven-central")
     intellijPlatform {
         defaultRepositories()
+        jetbrainsRuntime()
     }
 }
 
@@ -53,6 +54,8 @@ dependencies {
                 }
             }
         }
+
+        jetbrainsRuntime()
 
         instrumentationTools()
 
@@ -184,7 +187,7 @@ tasks {
 
   withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = "17"
-    dependsOn(":grammarkit:generateLexer", ":grammarkit:generateParser")
+    dependsOn(":protocol:rdgen", ":grammarkit:generateLexer", ":grammarkit:generateParser")
   }
 
   withType<Test>().configureEach {
