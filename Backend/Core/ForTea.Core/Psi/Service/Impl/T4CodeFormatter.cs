@@ -13,7 +13,7 @@ using JetBrains.Util.Text;
 
 namespace GammaJul.ForTea.Core.Psi.Service.Impl
 {
-  [Language(typeof(T4Language), InstantiationEx.DemandAnyThreadNotSafeBecauseOfCalculatedSettingsSchema)]
+  [Language(typeof(T4Language), InstantiationEx.DemandAnyThreadNotSafeBecauseOfEditorConfigSchema)]
   internal class T4CodeFormatter : CodeFormatterBase<T4CodeFormattingSettingsKey>, IT4CodeFormatter
   {
     public T4CodeFormatter(PsiLanguageType languageType, CodeFormatterRequirements requirements) : base(
