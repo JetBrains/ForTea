@@ -21,7 +21,7 @@ namespace JetBrains.ForTea.RiderPlugin.Debugger
     public IEnumerable<string> GetSupportedFileExtensions() => T4ProjectFileType.AllExtensions.ToList();
 
     [CanBeNull]
-    public IEnumerable<IBreakpoint> GetBreakpointVariants(
+    public IReadOnlyList<IBreakpoint> GetBreakpointVariants(
       [NotNull] IProjectFile file,
       int line,
       [NotNull] ISolution solution
