@@ -15,6 +15,7 @@
         name="T4"
         language="T4"
         implementationClass="com.jetbrains.fortea.language.T4FileType"
+        fieldName="INSTANCE"
         extensions="tt;t4;ttinclude"/>
     <lang.parserDefinition
         language="T4"
