@@ -20,6 +20,6 @@ abstract class T4BackendAction(backendActionId: String, icon: Icon? = null) :
   }
 }
 
-class T4ExecuteTemplateBackendAction : T4BackendAction("T4.ExecuteFromContext", RunTest)
-class T4DebugTemplateBackendAction : T4BackendAction("T4.DebugFromContext", Debug)
-class T4PreprocessTemplateBackendAction : T4BackendAction("T4.PreprocessFromContext")
+class T4ExecuteTemplateBackendAction : T4BackendAction("T4ExecuteTemplate", RunTest)
+class T4DebugTemplateBackendAction : T4BackendAction("T4DebugTemplate", Debug)
+class T4PreprocessTemplateBackendAction : T4BackendAction("T4PreprocessTemplate")
