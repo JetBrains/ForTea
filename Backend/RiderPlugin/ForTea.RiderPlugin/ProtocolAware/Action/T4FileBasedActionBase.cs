@@ -19,9 +19,12 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
     public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
     {
       var solution = FindSolution(context);
-      if (solution == null) return false;
       var psiSourceFile = context.GetData(PsiDataConstants.SOURCE_FILE);
-      if (psiSourceFile == null) return false;
+      if (solution == null || psiSourceFile == null)
+      {
+        presentation.Visible = false;
+        return false;
+      }
       return DoUpdate(psiSourceFile, solution);
     }
 

@@ -4,7 +4,7 @@ using JetBrains.ForTea.RiderPlugin.Resources;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
-  [Action(T4ActionIdBundle.Run, nameof(Strings.RunTemplate_Text))]
+  [Action(typeof(Strings), nameof(Strings.RunTemplate_Text))]
   public sealed class T4ExecuteTemplateAction : T4ExecuteTemplateActionBase
   {
     protected override void Execute(IT4TemplateExecutionManager executionManager, IT4File file) =>
@@ -13,7 +13,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
     protected override string ActionId => T4StatisticIdBundle.RunFromContextMenu;
   }
 
-  [Action(T4ActionIdBundle.Debug, nameof(Strings.DebugTemplate_Text))]
+  [Action(typeof(Strings), nameof(Strings.DebugTemplate_Text))]
   public sealed class T4DebugTemplateAction : T4ExecuteTemplateActionBase
   {
     protected override void Execute(IT4TemplateExecutionManager executionManager, IT4File file) =>

@@ -6,12 +6,11 @@ using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Services;
 using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ProjectModel;
-using JetBrains.RdBackend.Common.Features;
 using JetBrains.ReSharper.Feature.Services.Protocol;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
-  [Action(T4ActionIdBundle.Preprocess, nameof(Strings.DebugTemplate_Text))]
+  [Action(typeof(Strings), nameof(Strings.DebugTemplate_Text))]
   public sealed class T4PreprocessTemplateAction : T4FileBasedActionBase
   {
     public override void Execute(IDataContext context, DelegateExecute nextExecute)
