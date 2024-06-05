@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Feature.Services.Protocol;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
 {
-  [Action(typeof(Strings), nameof(Strings.DebugTemplate_Text))]
+  [Action(typeof(Strings), nameof(Strings.PreprocessTemplate_Text))]
   public sealed class T4PreprocessTemplateAction : T4FileBasedActionBase
   {
     public override void Execute(IDataContext context, DelegateExecute nextExecute)
