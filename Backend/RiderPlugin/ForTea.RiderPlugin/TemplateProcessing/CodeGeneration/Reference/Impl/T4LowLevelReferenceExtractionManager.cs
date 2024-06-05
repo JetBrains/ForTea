@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
@@ -20,6 +21,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
   [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4LowLevelReferenceExtractionManager : IT4LowLevelReferenceExtractionManager
   {
+    [NotNull] private Dictionary<string, WeakReference<MetadataReference>> MetadataReferencesCache { get; }
+
     [NotNull] private AssemblyInfoDatabase AssemblyInfoDatabase { get; }
 
     [NotNull] private ISolution Solution { get; }
@@ -32,6 +35,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
     {
       AssemblyInfoDatabase = assemblyInfoDatabase;
       Solution = solution;
+      MetadataReferencesCache = new Dictionary<string, WeakReference<MetadataReference>>();
     }
 
     // TODO: is this necessary?
@@ -61,8 +65,21 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
       return new T4AssemblyReferenceInfo(info.FullName, path);
     }
 
-    public MetadataReference ResolveMetadata(Lifetime lifetime, VirtualFileSystemPath path) =>
-      throw new NotImplementedException("");  //TODO : @kugushev!!! ((RoslynMetadataReferenceCache)Cache).GetMetadataReference(lifetime, path.ToNativeFileSystemPath());
+    public MetadataReference ResolveMetadata(Lifetime lifetime, VirtualFileSystemPath filePath)
+    {
+      var path = filePath.ToNativeFileSystemPath().FullPath;
+
+      if (MetadataReferencesCache.TryGetValue(path, out var weakRef) &&
+          weakRef.TryGetTarget(out var cached))
+        return cached;
+
+      var reference = MetadataReference.CreateFromFile(path,
+        new MetadataReferenceProperties(kind: MetadataImageKind.Assembly));
+
+      MetadataReferencesCache[path] = new WeakReference<MetadataReference>(reference);
+
+      return reference;
+    }
 
     private void ResolveTransitiveDependencies(
       [NotNull] IEnumerable<T4AssemblyReferenceInfo> directDependencies,

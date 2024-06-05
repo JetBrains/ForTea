@@ -17,6 +17,6 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Referen
     );
 
     [CanBeNull]
-    MetadataReference ResolveMetadata(Lifetime lifetime, [NotNull] VirtualFileSystemPath path);
+    MetadataReference ResolveMetadata(Lifetime lifetime, [NotNull] VirtualFileSystemPath filePath);
   }
 }
