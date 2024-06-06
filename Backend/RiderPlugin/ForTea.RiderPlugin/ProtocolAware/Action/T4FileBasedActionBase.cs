@@ -20,7 +20,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
     {
       var solution = FindSolution(context);
       var psiSourceFile = context.GetData(PsiDataConstants.SOURCE_FILE);
-      if (solution == null || psiSourceFile == null)
+      if (solution == null || psiSourceFile == null || FindT4File(psiSourceFile) == null)
       {
         presentation.Visible = false;
         return false;
@@ -36,11 +36,13 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Action
     protected static IT4File FindT4File([NotNull] IDataContext context, [NotNull] ISolution solution)
     {
       solution.GetComponent<IPsiFiles>().CommitAllDocuments();
-      return context
-        .GetData(PsiDataConstants.SOURCE_FILE)
-        ?.GetPsiFiles<T4Language>()
-        .OfType<IT4File>()
-        .SingleItem();
+      return FindT4File(context.GetData(PsiDataConstants.SOURCE_FILE));
+    }
+
+    [CanBeNull]
+    private static IT4File FindT4File([CanBeNull] IPsiSourceFile psiSourceFile)
+    {
+      return psiSourceFile?.GetPsiFiles<T4Language>().OfType<IT4File>().SingleItem();
     }
 
     [CanBeNull]
