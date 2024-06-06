@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
+using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -34,7 +35,7 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt
       node.GetSolution().Locks.AssertReadAccessAllowed();
       var file = FindSuitableSourceFile(node);
       var offset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node);
-      var coords = offset.Document.GetCoordsByOffset(offset.Offset);
+      var coords = offset.ToDocumentCoords();
       return new T4FailureRawData((int)coords.Line, (int)coords.Column, file, message);
     }
 

@@ -6,15 +6,13 @@ using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Services.CodeCompletion;
 using JetBrains.Annotations;
 using JetBrains.Application.CommandProcessing;
-using JetBrains.Application.Settings;
 using JetBrains.Application.UI.ActionSystem.Text;
+using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
-using JetBrains.ReSharper.Feature.Services.StructuralRemove;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.CachingLexers;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.TextControl;
@@ -51,8 +49,10 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 
       // get the token type before =
       CachingLexer cachingLexer = GetCachingLexer(textControl);
-      int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
-      if (cachingLexer == null || offset <= 0 || !cachingLexer.FindTokenAt(offset - 1))
+      if (cachingLexer == null)
+        return false;
+      var offset = textControl.Caret.DocumentOffset();
+      if (!cachingLexer.FindTokenAt(offset.Offset - 1))
         return false;
 
       // do nothing if we're not after an attribute name
@@ -90,8 +90,9 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
     {
       var textControl = context.TextControl;
       var cachingLexer = GetCachingLexer(textControl);
-      int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
-      if (cachingLexer == null || offset <= 0 || !cachingLexer.FindTokenAt(offset)) return false;
+      if (cachingLexer == null) return false;
+      var offset = textControl.Caret.DocumentOffset();
+      if (!cachingLexer.FindTokenAt(offset.Offset)) return false;
       var tokenType = cachingLexer.TokenType;
 
       // C# is handled by T4CSharpTypingAssist. Text tokens are handled by the platform
@@ -142,7 +143,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
     private void InsertBlock([NotNull] ITypingContext context)
     {
       var textControl = context.TextControl;
-      int offset = textControl.GetOffset();
+      var offset = textControl.Caret.DocumentOffset();
       InsertOctothorpe(textControl);
       context.QueueCommand(() =>
       {
@@ -161,8 +162,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
       var textControl = context.TextControl;
       var lexer = GetCachingLexer(textControl);
       if (lexer == null) return false;
-      int offset = textControl.GetOffset();
-      if (!lexer.FindTokenAt(offset - 1)) return false;
+      var offset = textControl.Caret.DocumentOffset();
+      if (!lexer.FindTokenAt(offset.Offset - 1)) return false;
       string tokenText = lexer.GetTokenText();
       return tokenText.EndsWith("<", StringComparison.Ordinal)
              && !tokenText.EndsWith("\\<", StringComparison.Ordinal);
@@ -171,7 +172,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
     private void InsertBlockEnd([NotNull] ITypingContext context)
     {
       var textControl = context.TextControl;
-      int offset = textControl.GetOffset();
+      var offset = textControl.Caret.DocumentOffset();
       InsertOctothorpe(textControl);
       context.QueueCommand(() =>
       {
@@ -190,8 +191,8 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
       var textControl = context.TextControl;
       var lexer = GetCachingLexer(textControl);
       if (lexer == null) return false;
-      int offset = textControl.GetOffset();
-      var previousToken = FindPreviousToken(GetCachingLexer(textControl), offset);
+      var offset = textControl.Caret.DocumentOffset();
+      var previousToken = FindPreviousToken(GetCachingLexer(textControl), offset.Offset);
       switch (previousToken)
       {
         case null:
@@ -204,7 +205,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 
     private static void InsertOctothorpe(ITextControl textControl)
     {
-      int offset = textControl.GetOffset();
+      var offset = textControl.Caret.DocumentOffset();
       textControl.Selection.Delete();
       textControl.FillVirtualSpaceUntilCaret();
       textControl.Document.InsertText(offset, "#");
@@ -235,7 +236,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
       if (!CheckAndDeleteSelectionIfNeeded(textControl,
             selection =>
             {
-              charPos = TextControlToLexer(textControl, selection.StartOffset);
+              charPos = TextControlToLexer(textControl, selection.StartOffset.DocOffset());
               if (charPos <= 0) return false;
               if (!lexer.FindTokenAt(charPos - 1)) return false;
               if (!IsBlockStart(lexer)) return false;
@@ -244,7 +245,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
               return true;
             })
          ) return false;
-      int offset = textControl.GetOffset();
+      var offset = textControl.Caret.DocumentOffset();
       var psiSourceFile = textControl.Document.GetPsiSourceFile(Solution);
       // Only insert one newline, as another gets inserted automatically
       textControl.Document.InsertText(offset, GetNewLineText(psiSourceFile));
@@ -264,7 +265,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
       var textControl = context.TextControl;
       if (!IsInAttributeValue(textControl)) return false;
 
-      int offset = textControl.GetOffset();
+      var offset = textControl.Caret.DocumentOffset();
       textControl.Selection.Delete();
       textControl.Document.InsertText(offset, "$");
       textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible);
@@ -284,13 +285,14 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
     private bool IsInAttributeValue([NotNull] ITextControl textControl)
     {
       var lexer = GetCachingLexer(textControl);
-      int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
-      if (lexer == null || offset <= 1) return false;
-      if (!lexer.FindTokenAt(offset - 1)) return false;
+      if (lexer == null) return false;
+      var offset = textControl.Caret.DocumentOffset();
+      if (offset.Offset <= 1) return false;
+      if (!lexer.FindTokenAt(offset.Offset - 1)) return false;
       var tokenType = lexer.TokenType;
       if (AttributeValueTokens.Contains(tokenType)) return true;
       if (tokenType != T4TokenNodeTypes.QUOTE) return false;
-      if (!lexer.FindTokenAt(offset)) return false;
+      if (!lexer.FindTokenAt(offset.Offset)) return false;
       return tokenType == T4TokenNodeTypes.QUOTE || tokenType == T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE;
     }
 
@@ -302,8 +304,9 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
 
       // get the token type after %
       var lexer = GetCachingLexer(textControl);
-      int offset = textControl.Selection.OneDocRangeWithCaret().GetMinOffset();
-      if (lexer == null || offset <= 0 || !lexer.FindTokenAt(offset)) return false;
+      if (lexer == null) return false;
+      var offset = textControl.Caret.DocumentOffset();
+      if (!lexer.FindTokenAt(offset.Offset)) return false;
 
       // If there is already another percent after the %, swallow the typing
       var tokenType = lexer.TokenType;

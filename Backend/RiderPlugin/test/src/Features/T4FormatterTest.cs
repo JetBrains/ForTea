@@ -47,7 +47,7 @@ namespace JetBrains.ForTea.Tests.Features
       var textControl = OpenTextControl(lifetime);
       var document = textControl.Document;
       string newDocumentText = GetTextAfterFormatting(document, textControl);
-      document.ReplaceText(document.DocumentRange, newDocumentText);
+      document.ReplaceText(document.GetDocumentRange(), newDocumentText);
       CheckTextControl(textControl);
     }
 

@@ -9,6 +9,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.ClassNam
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters.GeneratorKind;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Converters
@@ -340,8 +341,8 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
       if (!ShouldUseLineDirectives) return;
       destination.Append(Indent);
       var sourceFile = node.FindLogicalPsiSourceFile();
-      int offset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node).Offset;
-      int line = (int)sourceFile.Document.GetCoordsByOffset(offset).Line;
+      var offset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node);
+      int line = (int)offset.ToDocumentCoords().Line;
       destination.AppendLine($"#line {line + 1} \"{sourceFile.GetLocation()}\"");
     }
 

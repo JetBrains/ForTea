@@ -157,11 +157,11 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Convert
 
     public override void AppendCompilationOffset(T4CSharpCodeGenerationResult destination, IT4TreeNode node)
     {
-      int documentOffset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node).Offset;
-      var lineOffset = node
+      var documentOffset = T4UnsafeManualRangeTranslationUtil.GetDocumentStartOffset(node);
+      IDocument tempQualifier = node
         .FindLogicalPsiSourceFile()
-        .Document
-        .GetCoordsByOffset(documentOffset)
+        .Document;
+      var lineOffset = documentOffset.ToDocumentCoords()
         .Column;
       for (var i = Int32<DocColumn>.O; i < lineOffset; i++)
       {
