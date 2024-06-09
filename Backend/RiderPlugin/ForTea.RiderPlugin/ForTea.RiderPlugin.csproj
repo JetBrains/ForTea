@@ -32,9 +32,6 @@
     <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="JetBrains.Roslyn.References.Repack" />
     <PackageReference Include="System.Collections.Immutable" />
-    <Reference Include="System.Core" />
-    <Reference Include="System" />
-    <Reference Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />

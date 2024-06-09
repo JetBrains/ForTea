@@ -26,10 +26,6 @@
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
     <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
