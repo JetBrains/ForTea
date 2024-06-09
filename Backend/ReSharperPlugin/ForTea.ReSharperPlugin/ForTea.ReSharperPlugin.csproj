@@ -27,19 +27,19 @@
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
     <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" />
-    <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
     <Reference Include="PresentationCore" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
+    <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup Label="T4">
     <None Update="Daemon\Attributes\T4MefDefinitions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4MefDefinitions.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Daemon\Attributes\T4MefDefinitions.cs">
       <DependentUpon>T4MefDefinitions.tt</DependentUpon>
     </Compile>

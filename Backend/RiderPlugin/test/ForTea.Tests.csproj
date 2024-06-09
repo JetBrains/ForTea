@@ -16,9 +16,13 @@
     <LangVersion>9.0</LangVersion>
     <JetTestProject>true</JetTestProject>
   </PropertyGroup>
+  <ItemGroup Label="EmbeddedResource">
+    <Compile Remove="data\**" />
+    <None Remove="data\**" />
+    <EmbeddedResource Remove="data\**" />
+    <Compile Remove="src\IT4TestEnvZone.cs" />
+  </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
-    <ProjectReference Include="..\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <PackageReference Include="JetBrains.Annotations" />
@@ -35,11 +39,9 @@
     <PackageReference Include="NUnit.Extension.NUnitV2Driver" />
     <PackageReference Include="NUnit.Extension.TeamCityEventListener" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="data\**" />
-    <None Remove="data\**" />
-    <EmbeddedResource Remove="data\**" />
-    <Compile Remove="src\IT4TestEnvZone.cs" />
+  <ItemGroup Label="ProjectReference">
+    <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
+    <ProjectReference Include="..\ForTea.RiderPlugin\ForTea.RiderPlugin.csproj" />
   </ItemGroup>
   <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">
     <RemoveDir Directories="obj" />

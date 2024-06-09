@@ -18,6 +18,13 @@
     <AssemblyName>ForTea.RiderPlugin</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
+  <ItemGroup Label="EmbeddedResource">
+    <EmbeddedResource Remove="Resources\Strings.resx" />
+    <EmbeddedResource Include="Resources\Strings.resx">
+      <Generator>JetResourceGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.EnvDTE.Host" />
@@ -26,19 +33,14 @@
     <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="JetBrains.Roslyn.References.Repack" />
     <PackageReference Include="System.Collections.Immutable" />
-    <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
     <Reference Include="System.Core" />
     <Reference Include="System" />
     <Reference Include="System.Threading.Tasks" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="Resources\Strings.resx" />
-    <EmbeddedResource Include="Resources\Strings.resx">
-      <Generator>JetResourceGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+  <ItemGroup Label="ProjectReference">
+    <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="Recources">
     <Compile Update="Resources\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
