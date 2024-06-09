@@ -73,16 +73,14 @@
       <OutputFile>Daemon\Highlightings\T4Warnings.Generated.cs</OutputFile>
     </ErrorsGen>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
+    <PackageReference Include="Antlr2.Runtime" />
     <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="JetBrains.Build.Platform.DistributedCache" />
     <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="NVelocity" />
     <PackageReference Include="System.Collections.Immutable" />
     <PackageReference Include="System.Memory" />
-    <!-- CsLex task -->
-    <PackageReference Include="JetBrains.Build.Platform.DistributedCache" />
-    <!-- ParserGen task -->
-    <PackageReference Include="Antlr2.Runtime" />
-    <PackageReference Include="NVelocity" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Remove="Resources\Strings.resx" />

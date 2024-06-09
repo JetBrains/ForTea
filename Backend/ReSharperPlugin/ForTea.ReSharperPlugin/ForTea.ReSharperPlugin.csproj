@@ -17,15 +17,15 @@
     <AssemblyName>ForTea.ReSharperPlugin</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="JetBrains.Platform.Lib.VisualStudio.AnyVs.ShellInterop.PrivateBuild" />
-    <PackageReference Include="JetBrains.Vs.SinceVs10.Text" />
     <PackageReference Include="JetBrains.Vs.SinceVs10.CoreUtility" />
-    <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
+    <PackageReference Include="JetBrains.Vs.SinceVs10.Text" />
     <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
+    <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />

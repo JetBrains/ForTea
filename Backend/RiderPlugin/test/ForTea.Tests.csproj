@@ -21,19 +21,18 @@
     <EmbeddedResource Remove="data\**" />
     <Compile Remove="src\IT4TestEnvZone.cs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit.Console" />
-    <PackageReference Include="NUnit3TestAdapter" />
-    <!-- Just For Pwc: PWC can't resolve package dependencies transitively -->
     <PackageReference Include="NUnit.ConsoleRunner" />
     <PackageReference Include="NUnit.Extension.NUnitProjectLoader" />
-    <PackageReference Include="NUnit.Extension.VSProjectLoader" />
-    <PackageReference Include="NUnit.Extension.NUnitV2ResultWriter" />
     <PackageReference Include="NUnit.Extension.NUnitV2Driver" />
+    <PackageReference Include="NUnit.Extension.NUnitV2ResultWriter" />
     <PackageReference Include="NUnit.Extension.TeamCityEventListener" />
+    <PackageReference Include="NUnit.Extension.VSProjectLoader" />
+    <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
