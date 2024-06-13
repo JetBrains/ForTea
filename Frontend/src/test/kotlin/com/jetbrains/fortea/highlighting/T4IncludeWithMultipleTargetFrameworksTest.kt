@@ -13,6 +13,6 @@ class T4IncludeWithMultipleTargetFrameworksTest : T4HighlightingTestBase() {
   @Test
   fun `test that there are no errors in solution`() = doTestWithMarkupModelNoGold(fileName, testFilePath) {
     waitForDaemon()
-     checkSwea(project!!, 0)
+    checkSwea(project!!, 0)
   }
 }
