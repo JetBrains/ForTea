@@ -213,7 +213,11 @@ namespace GammaJul.ForTea.Core.Psi.Modules
       _modules.Remove(projectFile);
       changeBuilder.AddFileChange(moduleWrapper.Module.SourceFile, PsiModuleChange.ChangeType.Removed);
       changeBuilder.AddModuleChange(moduleWrapper.Module, PsiModuleChange.ChangeType.Removed);
-      moduleWrapper.LifetimeDefinition.Terminate();
+
+      _changeManager.ExecuteAfterChange(() =>
+      {
+        moduleWrapper.LifetimeDefinition.Terminate();
+      });
     }
 
     private static void ModifyFile([NotNull] PsiModuleChangeBuilder changeBuilder, ModuleWrapper moduleWrapper)

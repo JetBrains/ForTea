@@ -79,8 +79,13 @@ namespace GammaJul.ForTea.Core.Psi.Modules
       ChangeManager = changeManager;
       ShellLocks = shellLocks;
       ChangeProvider = new T4WriteOnlyChangeProvider();
-      changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
-      changeManager.AddDependency(lifetime, PsiModules, ChangeProvider);
+
+      changeManager.ExecuteAfterChange(() =>
+      {
+        changeManager.RegisterChangeProvider(lifetime, ChangeProvider);
+        changeManager.AddDependency(lifetime, PsiModules, source: ChangeProvider);
+      });
+
       TargetFrameworkId = t4Environment.SelectTargetFrameworkId(primaryTargetFrameworkId, projectFile);
       Project = ProjectFile.GetProject().NotNull();
       var resolveContext = Project.IsMiscFilesProject()
