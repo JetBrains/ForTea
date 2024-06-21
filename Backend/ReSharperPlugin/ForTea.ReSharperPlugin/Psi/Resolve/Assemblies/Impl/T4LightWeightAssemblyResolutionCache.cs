@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
@@ -24,7 +25,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
   /// In R#, it is only possible to perform T4-specific assembly resolution on the main thread,
   /// so we have to cache them to be able to access them from the daemon
   /// </summary>
-  [PsiComponent]
+  [PsiComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4LightWeightAssemblyResolutionCache :
     T4PsiAwareCacheBase<T4LightWeightAssemblyResolutionRequest, T4LightWeightAssemblyResolutionData>
   {
