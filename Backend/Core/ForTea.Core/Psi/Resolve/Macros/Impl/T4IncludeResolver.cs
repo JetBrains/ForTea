@@ -1,13 +1,14 @@
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4IncludeResolver : IT4IncludeResolver
   {
     [NotNull] private IT4PsiFileSelector Selector { get; }

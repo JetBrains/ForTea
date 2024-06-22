@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Feature.Services.Navigation;
 using JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders;
 using JetBrains.ReSharper.Features.Navigation.Core.Navigation;
 
 namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 {
-  [NavigationProvider]
+  [NavigationProvider(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4OutsideSolutionNavigationProvider : INavigationProvider<T4OutsideSolutionNavigationInfo>
   {
     [NotNull] private FileSystemPathNavigator Navigator { get; }

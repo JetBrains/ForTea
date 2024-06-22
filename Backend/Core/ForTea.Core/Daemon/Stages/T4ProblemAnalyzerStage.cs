@@ -1,12 +1,13 @@
 using GammaJul.ForTea.Core.Daemon.Processes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
-  [DaemonStage(StagesBefore = new[] { typeof(GlobalFileStructureCollectorStage) })]
+  [DaemonStage(Instantiation.DemandAnyThreadUnsafe, StagesBefore = new[] { typeof(GlobalFileStructureCollectorStage) })]
   public class T4ProblemAnalyzerStage : T4DaemonStageBase
   {
     [NotNull] private ElementProblemAnalyzerRegistrar Registrar { get; }

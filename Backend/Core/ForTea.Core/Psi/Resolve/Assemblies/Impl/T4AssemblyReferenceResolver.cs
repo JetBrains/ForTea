@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Utils;
@@ -14,7 +15,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
   {
     [NotNull] private IT4LightWeightAssemblyReferenceResolver LightWeightResolver { get; }

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Utils;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4GraphSinkSearcher
   {
     [NotNull] private IT4PsiFileSelector Selector { get; }

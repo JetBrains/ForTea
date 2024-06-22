@@ -2,6 +2,7 @@ using System;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
+using JetBrains.Application.Parts;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.Modules;
@@ -9,7 +10,7 @@ using JetBrains.ReSharper.Psi.Modules;
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
   /// <summary>Provides a <see cref="T4ProjectPsiModuleHandler"/> for a given project.</summary>
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   sealed class T4ProjectPsiModuleProviderFilter : IProjectPsiModuleProviderFilter
   {
     [NotNull] private readonly ChangeManager _changeManager;

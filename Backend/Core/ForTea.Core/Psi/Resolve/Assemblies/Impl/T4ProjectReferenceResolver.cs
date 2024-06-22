@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Build;
@@ -12,7 +13,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public class T4ProjectReferenceResolver : IT4ProjectReferenceResolver
   {
     [NotNull] private IPsiModules PsiModules { get; }

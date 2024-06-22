@@ -2,13 +2,14 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(typeof(IT4Macro), HighlightingTypes = new[] { typeof(UnresolvedMacroError) })]
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4Macro), HighlightingTypes = new[] { typeof(UnresolvedMacroError) })]
   public class T4UnresolvedMacroAnalyzer : ElementProblemAnalyzer<IT4Macro>
   {
     [NotNull] private IT4MacroResolver Resolver { get; }

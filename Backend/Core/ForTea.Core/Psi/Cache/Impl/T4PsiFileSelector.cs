@@ -2,13 +2,14 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Modules;
 using GammaJul.ForTea.Core.Psi.OutsideSolution;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4PsiFileSelector : IT4PsiFileSelector
   {
     [NotNull] private T4OutsideSolutionSourceFileManager OutsideSolutionManager { get; }

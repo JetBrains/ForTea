@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4IndirectIncludeTransitiveClosureSearcher
   {
     [NotNull] private IT4PsiFileSelector Selector { get; }

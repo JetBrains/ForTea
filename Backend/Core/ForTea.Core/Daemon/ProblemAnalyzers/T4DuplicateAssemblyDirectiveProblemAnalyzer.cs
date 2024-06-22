@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Psi.Resolve.Assemblies;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Tree;
@@ -10,7 +11,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
   [ElementProblemAnalyzer(
-    typeof(IT4AssemblyDirective),
+    Instantiation.DemandAnyThreadUnsafe, typeof(IT4AssemblyDirective),
     HighlightingTypes = new[] { typeof(RedundantAssemblyWarning) }
   )]
   public sealed class T4DuplicateAssemblyDirectiveProblemAnalyzer : ElementProblemAnalyzer<IT4AssemblyDirective>

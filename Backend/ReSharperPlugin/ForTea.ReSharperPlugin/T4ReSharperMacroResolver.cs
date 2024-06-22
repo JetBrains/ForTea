@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros;
 using JetBrains.ProjectModel;
@@ -11,7 +12,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.ReSharperPlugin
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4ReSharperMacroResolver : T4BasicMacroResolver
   {
     [NotNull] private T4MacroResolutionCache Cache { get; }

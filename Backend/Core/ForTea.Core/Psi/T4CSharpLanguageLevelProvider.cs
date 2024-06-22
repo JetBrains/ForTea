@@ -1,6 +1,7 @@
 using System;
 using GammaJul.ForTea.Core.Psi.Modules;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel.Properties;
 using JetBrains.ProjectModel.Properties.CSharp;
 using JetBrains.ReSharper.Psi;
@@ -10,7 +11,7 @@ using JetBrains.ReSharper.Psi.Modules;
 
 namespace GammaJul.ForTea.Core.Psi
 {
-  [SolutionFeaturePart]
+  [SolutionFeaturePart(Instantiation.DemandAnyThreadUnsafe)]
   public class T4CSharpLanguageLevelProvider : CSharpLanguageLevelProvider
   {
     [NotNull] private readonly IT4Environment _t4Environment;
