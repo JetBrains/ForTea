@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Psi.Modules;
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
   /// <summary>Provides a <see cref="T4ProjectPsiModuleHandler"/> for a given project.</summary>
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   sealed class T4ProjectPsiModuleProviderFilter : IProjectPsiModuleProviderFilter
   {
     [NotNull] private readonly ChangeManager _changeManager;
