@@ -6,7 +6,9 @@ import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import kotlin.io.path.*
+import kotlin.io.path.absolute
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.isDirectory
 
 plugins {
   // Versions are configured in gradle.properties
@@ -159,6 +161,13 @@ tasks {
         return@lazy sdkPath
     }
 
+    val compileBackend by registering(Exec::class) {
+        dependsOn("prepare")
+        workingDir = backendPluginPath
+        executable = "dotnet"
+        args(listOf("build", backendPluginSolutionPath))
+    }
+
   withType<RunIdeTask>().configureEach {
     // IDEs from SDK are launched with 512mb by default, which is not enough for Rider.
     // Rider uses this value when launched not from SDK
@@ -166,6 +175,8 @@ tasks {
   }
 
   withType<PrepareSandboxTask>().configureEach {
+      dependsOn(compileBackend)
+
     val files = (pluginFiles + libraryFiles).map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
     val paths = files.map { File(backendPluginPath, it) }
 
@@ -250,16 +261,6 @@ tasks {
   register("prepare") {
     group = riderForTeaTargetsGroup
     dependsOn(":protocol:rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", ":grammarkit:generateLexer", ":grammarkit:generateParser")
-  }
-
-  named("buildPlugin").configure {
-    dependsOn("prepare")
-  }
-
-  named("test").configure {
-    // A fix for https://github.com/JetBrains/gradle-intellij-plugin/issues/743.
-    // Remove after it is publicly available
-    dependsOn("prepareTestingSandbox")
   }
 
   wrapper {
