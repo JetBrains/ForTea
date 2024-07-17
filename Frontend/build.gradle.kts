@@ -11,14 +11,14 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.isDirectory
 
 plugins {
-  // Versions are configured in gradle.properties
-  id("me.filippov.gradle.jvm.wrapper")
-  id("org.jetbrains.intellij.platform")
-  kotlin("jvm")
+    // Versions are configured in gradle.properties
+    id("me.filippov.gradle.jvm.wrapper")
+    id("org.jetbrains.intellij.platform")
+    kotlin("jvm")
 }
 
 apply {
-  plugin("kotlin")
+    plugin("kotlin")
 }
 
 repositories {
@@ -91,15 +91,15 @@ if (!isMonorepo) {
 }
 
 val pluginFiles = listOf(
-  "output/ForTea.Core/$buildConfiguration/ForTea.Core",
-  "output/ForTea.RiderPlugin/$buildConfiguration/ForTea.RiderPlugin",
-  "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.TextTemplating"
+    "output/ForTea.Core/$buildConfiguration/ForTea.Core",
+    "output/ForTea.RiderPlugin/$buildConfiguration/ForTea.RiderPlugin",
+    "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.TextTemplating"
 )
 
 // We don't need to pack EnvDTE interface assemblies, because they're already referenced in ReSharperHost
 val libraryFiles = listOf(
-  "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.EnvDTE.Client",
-  "output/ForTea.RiderPlugin/$buildConfiguration/JetBrains.EnvDTE.Host"
+    "output/JetBrains.TextTemplating/$buildConfiguration/JetBrains.EnvDTE.Client",
+    "output/ForTea.RiderPlugin/$buildConfiguration/JetBrains.EnvDTE.Host"
 )
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
@@ -108,12 +108,12 @@ val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 val riderForTeaTargetsGroup = "T4"
 
 fun File.writeTextIfChanged(content: String) {
-  val bytes = content.toByteArray()
+    val bytes = content.toByteArray()
 
-  if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
-    println("Writing $path")
-    writeBytes(bytes)
-  }
+    if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
+        println("Writing $path")
+        writeBytes(bytes)
+    }
 }
 
 
@@ -132,7 +132,9 @@ val resolvePlatformLibPath = tasks.create("resolvePlatformLibPath") {
     dependsOn(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     outputs.file(platformLibFile)
     doLast {
-        platformLibFile.get().asFile.writeTextIfChanged(intellijPlatform.platformPath.resolve("lib").absolutePathString())
+        platformLibFile.get().asFile.writeTextIfChanged(
+            intellijPlatform.platformPath.resolve("lib").absolutePathString()
+        )
     }
 }
 
@@ -144,7 +146,7 @@ artifacts {
             }
         }
     }) {
-      builtBy(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
+        builtBy(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     }
 
     add(platformLibConfiguration.name, provider { resolvePlatformLibPath.outputs.files.singleFile }) {
@@ -168,72 +170,73 @@ tasks {
         args(listOf("build", backendPluginSolutionPath))
     }
 
-  withType<RunIdeTask>().configureEach {
-    // IDEs from SDK are launched with 512mb by default, which is not enough for Rider.
-    // Rider uses this value when launched not from SDK
-    maxHeapSize = "1500m"
-  }
-
-  withType<PrepareSandboxTask>().configureEach {
-      dependsOn(compileBackend)
-
-    val files = (pluginFiles + libraryFiles).map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
-    val paths = files.map { File(backendPluginPath, it) }
-
-    paths.forEach {
-      from(it) {
-        into("${intellijPlatform.projectName.get()}/dotnet")
-      }
+    withType<RunIdeTask>().configureEach {
+        // IDEs from SDK are launched with 512mb by default, which is not enough for Rider.
+        // Rider uses this value when launched not from SDK
+        maxHeapSize = "1500m"
     }
 
-    into("${intellijPlatform.projectName.get()}/projectTemplates") {
-      from("projectTemplates")
+    withType<PrepareSandboxTask>().configureEach {
+        dependsOn(compileBackend)
+
+        val files = (pluginFiles + libraryFiles).map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
+        val paths = files.map { File(backendPluginPath, it) }
+
+        paths.forEach {
+            from(it) {
+                into("${intellijPlatform.projectName.get()}/dotnet")
+            }
+        }
+
+        into("${intellijPlatform.projectName.get()}/projectTemplates") {
+            from("projectTemplates")
+        }
+
+        doLast {
+            paths.forEach {
+                val file = file(it)
+                if (!file.exists()) throw RuntimeException("File $file does not exist")
+                logger.warn("$name: ${file.name} -> $destinationDir/${intellijPlatform.projectName.get()}/dotnet")
+            }
+        }
     }
 
-    doLast {
-      paths.forEach {
-        val file = file(it)
-        if (!file.exists()) throw RuntimeException("File $file does not exist")
-        logger.warn("$name: ${file.name} -> $destinationDir/${intellijPlatform.projectName.get()}/dotnet")
-      }
+    withType<KotlinCompile>().configureEach {
+        kotlinOptions.jvmTarget = "17"
+        dependsOn(":protocol:rdgen", ":grammarkit:generateLexer", ":grammarkit:generateParser")
     }
-  }
 
-  withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "17"
-    dependsOn(":protocol:rdgen", ":grammarkit:generateLexer", ":grammarkit:generateParser")
-  }
+    withType<Test>().configureEach {
+        useTestNG()
 
-  withType<Test>().configureEach {
-    useTestNG()
-
-    environment("NO_FS_ROOTS_ACCESS_CHECK", true)
-    testLogging {
-      showStandardStreams = true
-      exceptionFormat = TestExceptionFormat.FULL
+        environment("NO_FS_ROOTS_ACCESS_CHECK", true)
+        testLogging {
+            showStandardStreams = true
+            exceptionFormat = TestExceptionFormat.FULL
+        }
+        outputs.upToDateWhen { false }
+        ignoreFailures = true
     }
-    outputs.upToDateWhen { false }
-    ignoreFailures = true
-  }
 
-  register("writeDotNetSdkPathProps") {
-    group = riderForTeaTargetsGroup
-    doLast {
-      dotNetSdkPathPropsPath.writeTextIfChanged("""<Project>
+    register("writeDotNetSdkPathProps") {
+        group = riderForTeaTargetsGroup
+        doLast {
+            dotNetSdkPathPropsPath.writeTextIfChanged(
+                """<Project>
   <PropertyGroup>
     <DotNetSdkPath>$dotNetSdkPath</DotNetSdkPath>
   </PropertyGroup>
 </Project>
 """
-      )
+            )
+        }
     }
-  }
 
-  register("writeNuGetConfig") {
-    group = riderForTeaTargetsGroup
-    doLast {
-      nugetConfigPath.writeTextIfChanged(
-        """<?xml version="1.0" encoding="utf-8"?>
+    register("writeNuGetConfig") {
+        group = riderForTeaTargetsGroup
+        doLast {
+            nugetConfigPath.writeTextIfChanged(
+                """<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
     <add key="resharper-sdk" value="$dotNetSdkPath" />
@@ -242,31 +245,38 @@ tasks {
   </packageSources>
 </configuration>
 """
-      )
+            )
+        }
     }
-  }
 
-  named("assemble").configure {
-    doLast {
-      logger.lifecycle("Plugin version: $version")
-      logger.lifecycle("##teamcity[buildNumber '$version']")
+    named("assemble").configure {
+        doLast {
+            logger.lifecycle("Plugin version: $version")
+            logger.lifecycle("##teamcity[buildNumber '$version']")
+        }
     }
-  }
 
-  register("pwc") {
-    group = riderForTeaTargetsGroup
-    dependsOn("rdgenMonorepo")
-  }
+    register("pwc") {
+        group = riderForTeaTargetsGroup
+        dependsOn("rdgenMonorepo")
+    }
 
-  register("prepare") {
-    group = riderForTeaTargetsGroup
-    dependsOn(":protocol:rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps", ":grammarkit:generateLexer", ":grammarkit:generateParser")
-  }
+    register("prepare") {
+        group = riderForTeaTargetsGroup
+        dependsOn(
+            ":protocol:rdgen",
+            "writeNuGetConfig",
+            "writeDotNetSdkPathProps",
+            ":grammarkit:generateLexer",
+            ":grammarkit:generateParser"
+        )
+    }
 
-  wrapper {
-    gradleVersion = "8.7"
-    distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
-  }
+    wrapper {
+        gradleVersion = "8.7"
+        distributionUrl =
+            "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
+    }
 }
 
 defaultTasks("prepare")
