@@ -5,7 +5,7 @@ import com.jetbrains.rider.test.annotations.Mute
 import org.testng.annotations.Test
 
 class T4ExecutableFileInSubfolderHighlightingTest : T4HighlightingTestBase() {
-  override fun getSolutionDirectoryName() = "testHostSpecificFileWithIncludeAndReference"
+  override val testSolution = "testHostSpecificFileWithIncludeAndReference"
   override val testFilePath get() = "Project/Subdirectory/$fileName"
 
   @Test fun testHostAssemblyInclude() = doTest(HighlightSeverity.ERROR)

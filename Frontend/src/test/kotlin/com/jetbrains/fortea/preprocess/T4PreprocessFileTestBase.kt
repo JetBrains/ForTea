@@ -14,7 +14,7 @@ import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 
 abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
-  override fun getSolutionDirectoryName() = testMethod.name
+  override val testSolution = testMethod.name
   private var helper: T4TestHelper? = null
 
   protected fun doTest(dumpCsproj: Boolean = false) {

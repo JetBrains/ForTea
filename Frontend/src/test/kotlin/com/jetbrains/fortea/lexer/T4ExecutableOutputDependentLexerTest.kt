@@ -3,7 +3,7 @@ package com.jetbrains.fortea.lexer
 import org.testng.annotations.Test
 
 class T4ExecutableOutputDependentLexerTest : T4OutputDependentLexerTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithT4"
+  override val testSolution = "ProjectWithT4"
 
   @Test fun `test basic C# highlighting`() = doTest()
   @Test fun `test basic HTML highlighting`() = doTest()

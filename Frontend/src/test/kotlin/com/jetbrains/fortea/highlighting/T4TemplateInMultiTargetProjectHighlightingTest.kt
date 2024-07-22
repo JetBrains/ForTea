@@ -6,7 +6,7 @@ import org.testng.annotations.Test
 
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class T4TemplateInMultiTargetProjectHighlightingTest : T4HighlightingTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithMultipleTargetFrameworks"
+  override val testSolution = "ProjectWithMultipleTargetFrameworks"
   override val testFilePath get() = "Project/$fileName"
 
   @Test fun testSimpleFile() = doTestErrors()

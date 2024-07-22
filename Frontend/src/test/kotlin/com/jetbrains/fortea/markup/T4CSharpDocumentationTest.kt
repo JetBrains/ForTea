@@ -10,7 +10,7 @@ import org.testng.annotations.Test
 
 @Ignore
 class T4CSharpDocumentationTest : DocumentationTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithT4"
+  override val testSolution = "ProjectWithT4"
 
   @Test
   fun testCSharpVarToolTip() {

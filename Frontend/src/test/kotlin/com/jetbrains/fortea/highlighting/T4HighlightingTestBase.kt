@@ -8,10 +8,9 @@ import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
 
 abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
-  abstract override fun getSolutionDirectoryName(): String
   protected open val fileName get() = "Template.tt"
   protected open val goldFileName get() = "$fileName.gold"
-  protected open val testFilePath get() = "${getSolutionDirectoryName()}/$fileName"
+  protected open val testFilePath get() = "$testSolution/$fileName"
 
   fun doTest(attributeId: String) = doTestWithMarkupModel {
     waitForDaemon()

@@ -10,7 +10,7 @@ import org.testng.annotations.Test
 
 @Ignore("Broken")
 class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexerTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithT4AndIncluder"
+  override val testSolution = "ProjectWithT4AndIncluder"
 
   @Test
   fun `test that extension in include defines highlighting in includer`() {

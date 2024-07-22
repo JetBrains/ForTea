@@ -3,7 +3,7 @@ package com.jetbrains.fortea.highlighting
 import org.testng.annotations.Test
 
 class T4PreprocessedTemplateHighlightingTest : T4HighlightingTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithPreprocessedT4"
+  override val testSolution = "ProjectWithPreprocessedT4"
 
   @Test fun testPartials() = doTestErrors()
   @Test fun `test that default base class has no TransformText`() = doTestErrors()

@@ -6,7 +6,7 @@ import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
 class T4CompletionInPreprocessedTest : CompletionTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithPreprocessedT4"
+  override val testSolution = "ProjectWithPreprocessedT4"
 
   @Test
   fun testClassName() = doTest("Templa", "Template")

@@ -8,7 +8,7 @@ import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
 class T4CSharpTemplatesTest : CompletionTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithT4"
+  override val testSolution = "ProjectWithT4"
 
   @Test
   fun testForeach() {

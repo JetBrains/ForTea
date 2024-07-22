@@ -8,7 +8,7 @@ import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
 class T4CompletionInExecutableTest : CompletionTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithT4"
+  override val testSolution = "ProjectWithT4"
 
   @Ignore("broken")
   @Test

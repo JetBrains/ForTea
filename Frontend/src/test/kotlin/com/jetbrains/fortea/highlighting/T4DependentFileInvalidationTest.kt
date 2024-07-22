@@ -29,7 +29,7 @@ import java.io.PrintStream
  */
 @Ignore("Broken")
 class T4DependentFileInvalidationTest : EditorTestBase() {
-  override fun getSolutionDirectoryName() = "ProjectWithManyTemplates"
+  override val testSolution = "ProjectWithManyTemplates"
   private val projectName = "ProjectWithManyTemplates"
 
   override val traceCategories = listOf("#com.jetbrains.rider.daemon", "JetBrains.ReSharper.Host.Features.Daemon")
