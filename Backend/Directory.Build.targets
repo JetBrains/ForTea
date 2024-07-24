@@ -1,0 +1,6 @@
+﻿<Project>
+    <ItemGroup>
+        <!-- Work around a problem in Microsoft.Identity.Client.NativeInterop.targets -->
+        <EmbeddedFiles Remove="$(GeneratedAssemblyInfoFile)" />
+    </ItemGroup>
+</Project>
