@@ -2,18 +2,21 @@ package com.jetbrains.fortea.highlighting
 
 import com.intellij.openapi.client.ClientAppSession
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.getOrCreateUserData
 import com.jetbrains.fortea.model.T4RdDocumentModel
 import com.jetbrains.fortea.model.t4RdDocumentModel
 import com.jetbrains.rd.framework.IProtocol
-import com.jetbrains.rd.ide.model.RdDocumentId
-import com.jetbrains.rd.ide.model.RdDocumentModel
+import com.jetbrains.rd.ide.model.TextControlId
+import com.jetbrains.rd.ide.model.TextControlModel
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.put
 import com.jetbrains.rdclient.client.protocol
-import com.jetbrains.rdclient.document.FrontendDocumentHostListener
+import com.jetbrains.rdclient.document.FrontendDocumentHost
+import com.jetbrains.rdclient.document.getDocumentId
+import com.jetbrains.rdclient.editors.FrontendTextControlHostListener
 import com.jetbrains.rider.protocol.toProject
 
 class T4SyntaxHighlightingHost {
@@ -30,13 +33,19 @@ class T4SyntaxHighlightingHost {
     }
   }
 
-  class DocumentListener : FrontendDocumentHostListener {
-    override fun documentBound(lifetime: Lifetime,
-                               session: ClientAppSession,
-                               documentId: RdDocumentId,
-                               documentModel: RdDocumentModel,
-                               document: Document) {
-      putT4RdDocumentModel(lifetime, session.protocol, document, documentModel.t4RdDocumentModel)
+  class TextControlHostListener : FrontendTextControlHostListener {
+    override fun editorBound(
+      lifetime: Lifetime,
+      appSession: ClientAppSession,
+      textControlId: TextControlId,
+      editorModel: TextControlModel,
+      editor: Editor,
+    ) {
+      val documentId = editor.document.getDocumentId(appSession)
+      if (documentId != null) {
+        val synchronizer = FrontendDocumentHost.getInstance(appSession).getSynchronizer(documentId)!!
+        putT4RdDocumentModel(lifetime, appSession.protocol, editor.document, synchronizer.modelDocument.t4RdDocumentModel)
+      }
     }
   }
 }
