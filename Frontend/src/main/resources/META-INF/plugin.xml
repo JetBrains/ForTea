@@ -75,7 +75,6 @@
         language="T4"
         implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterMenuModelFactory"/>
     <lineIndentProvider implementation="com.jetbrains.fortea.psi.features.T4DummyLineIndentProvider"/>
-    <protocolComponentFactory implementation="com.jetbrains.fortea.inTests.T4TestHostFactory" />
     <!-- <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.XamlCodeStyleSettingsProvider"/>-->
 
     <internalFileTemplate name="T4 File"/>

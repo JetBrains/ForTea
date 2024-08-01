@@ -2,8 +2,8 @@ package com.jetbrains.fortea.highlighting
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.impl.EditorImpl
-import com.jetbrains.fortea.inTests.T4TestHost
-import com.jetbrains.rider.protocol.protocolHost
+import com.jetbrains.fortea.inTests.waitForIndirectInvalidation
+import com.jetbrains.rider.protocol.protocol
 import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
 
@@ -19,7 +19,7 @@ abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
   }
 
   fun doTest(severity: HighlightSeverity) = doTestWithMarkupModel {
-    T4TestHost.getInstance(project!!.protocolHost).waitForIndirectInvalidation()
+    project.protocol.waitForIndirectInvalidation()
     waitForDaemon()
     dumpHighlightersTree(severity)
   }
