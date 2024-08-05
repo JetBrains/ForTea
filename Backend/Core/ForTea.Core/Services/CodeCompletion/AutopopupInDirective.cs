@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
@@ -14,7 +15,7 @@ using JetBrains.TextControl;
 
 namespace GammaJul.ForTea.Core.Services.CodeCompletion
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class AutopopupInDirective : IAutomaticCodeCompletionStrategy
   {
     [NotNull] private readonly SettingsScalarEntry _settingsEntry;

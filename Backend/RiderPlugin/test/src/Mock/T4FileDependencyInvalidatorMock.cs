@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Psi.Cache.Impl;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -13,7 +14,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.Tests.Mock
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4FileDependencyInvalidatorMock : T4FileDependencyInvalidator
   {
     [NotNull, ItemNotNull] private ISet<IPsiSourceFile> IndirectDependencies { get; } = new HashSet<IPsiSourceFile>();

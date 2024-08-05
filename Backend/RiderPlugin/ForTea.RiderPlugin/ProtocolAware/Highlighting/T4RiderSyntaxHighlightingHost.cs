@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.Psi.FileType;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.DocumentModel;
 using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl;
@@ -14,7 +15,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4RiderSyntaxHighlightingHost
   {
     [NotNull] private ILogger Logger { get; }

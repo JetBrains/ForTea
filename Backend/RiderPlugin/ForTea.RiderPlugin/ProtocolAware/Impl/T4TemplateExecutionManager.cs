@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
@@ -19,7 +20,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4TemplateExecutionManager : IT4TemplateExecutionManager
   {
     [NotNull] private IDictionary<VirtualFileSystemPath, T4EnvDTEHost> RunningFiles { get; }

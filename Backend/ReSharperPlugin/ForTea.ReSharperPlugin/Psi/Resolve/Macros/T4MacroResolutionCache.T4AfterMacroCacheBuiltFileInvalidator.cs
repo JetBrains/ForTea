@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -9,7 +10,7 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4AfterMacroCacheBuiltFileInvalidator
   {
     private Lifetime Lifetime { get; }

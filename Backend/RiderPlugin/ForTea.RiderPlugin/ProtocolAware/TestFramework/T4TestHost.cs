@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Psi.Cache.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Core;
 using JetBrains.Diagnostics;
@@ -18,7 +19,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.TestFramework
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4TestHost
   {
     public T4TestHost(

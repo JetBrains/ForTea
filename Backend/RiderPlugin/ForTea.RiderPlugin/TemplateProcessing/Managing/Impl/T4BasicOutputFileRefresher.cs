@@ -1,4 +1,5 @@
 using JetBrains.Application.changes;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -8,7 +9,7 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class T4BasicOutputFileRefresher : IT4OutputFileRefresher
   {
     protected ISolution Solution { get; }

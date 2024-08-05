@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -15,7 +16,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
   /// To keep it up-to-date, we need to mark a file as dirty
   /// whenever anything it depends on is changed in any way.
   /// </summary>
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class T4FileDependencyInvalidator : T4IndirectFileChangeObserverBase
   {
     [NotNull] private readonly IShellLocks myLocks;

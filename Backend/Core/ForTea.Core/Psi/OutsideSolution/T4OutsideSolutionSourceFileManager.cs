@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using JetBrains.Annotations;
 using JetBrains.Application.FileSystemTracker;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers;
 using JetBrains.DocumentModel;
@@ -17,7 +18,7 @@ using JetBrains.Util.DataStructures;
 namespace GammaJul.ForTea.Core.Psi.OutsideSolution
 {
   /// <summary>A component that manages <see cref="IDocument"/>s for files outside the solution.</summary>
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4OutsideSolutionSourceFileManager : IPsiModuleFactory, IDisposable
   {
     // This might cause some memory leaks on IPsiSourceFile.

@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Core;
 using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ProjectModel;
@@ -14,7 +15,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4ModelInteractionHelper : IT4ModelInteractionHelper
   {
     [NotNull] private ProjectModelViewHost Host { get; }

@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class T4RiderMacroResolver : T4BasicMacroResolver
   {
     [NotNull] protected ISolution Solution { get; }

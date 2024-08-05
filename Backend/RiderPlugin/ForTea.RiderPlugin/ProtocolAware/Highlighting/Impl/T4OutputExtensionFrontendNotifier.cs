@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.DocumentManagers;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -14,7 +15,7 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Highlighting.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4OutputExtensionFrontendNotifier : T4IndirectFileChangeObserverBase
   {
     [NotNull] private DocumentManager DocumentManager { get; }

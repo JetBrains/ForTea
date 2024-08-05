@@ -6,6 +6,7 @@ using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Services.CodeCompletion;
 using JetBrains.Annotations;
 using JetBrains.Application.CommandProcessing;
+using JetBrains.Application.Parts;
 using JetBrains.Application.UI.ActionSystem.Text;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
@@ -19,7 +20,7 @@ using JetBrains.TextControl;
 
 namespace GammaJul.ForTea.Core.Services.TypingAssist
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class T4TypingAssist : TypingAssistLanguageBase<T4Language>, ITypingHandler
   {
     private static IReadOnlySet<TokenNodeType> AttributeValueTokens { get; } = new JetHashSet<TokenNodeType>

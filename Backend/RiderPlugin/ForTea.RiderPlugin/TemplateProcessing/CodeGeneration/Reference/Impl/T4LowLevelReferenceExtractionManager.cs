@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Reference;
 using JetBrains.Annotations;
 using JetBrains.Application.Infra;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Metadata.Reader.API;
@@ -16,7 +17,7 @@ using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4LowLevelReferenceExtractionManager : IT4LowLevelReferenceExtractionManager
   {
     [NotNull] private RoslynMetadataReferenceCache Cache { get; }

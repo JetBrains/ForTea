@@ -4,6 +4,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing.CodeCollecting.Interrupt;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ProjectModel;
@@ -15,7 +16,7 @@ using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4BuildMessageConverter : IT4BuildMessageConverter
   {
     [CanBeNull] private ProjectModelViewHost Host { get; }

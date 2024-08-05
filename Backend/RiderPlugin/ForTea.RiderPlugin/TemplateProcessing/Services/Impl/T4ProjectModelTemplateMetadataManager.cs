@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.TemplateProcessing.Managing;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.DocumentManagers.Transactions;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Properties;
@@ -10,7 +11,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4ProjectModelTemplateMetadataManager : IT4ProjectModelTemplateMetadataManager
   {
     [NotNull] private IT4TargetFileChecker TargetFileChecker { get; }

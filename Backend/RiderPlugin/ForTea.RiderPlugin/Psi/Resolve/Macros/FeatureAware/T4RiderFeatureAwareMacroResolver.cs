@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
+using JetBrains.Application.Parts;
 using JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl;
 using JetBrains.Platform.MsBuildHost.ProjectModel;
 using JetBrains.ProjectModel;
@@ -12,7 +13,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4RiderFeatureAwareMacroResolver : T4RiderMacroResolver
   {
     [NotNull] private ILogger Logger { get; }

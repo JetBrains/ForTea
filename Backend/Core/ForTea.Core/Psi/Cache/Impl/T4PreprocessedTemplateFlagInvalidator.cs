@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
@@ -14,7 +15,7 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4PreprocessedTemplateFlagInvalidator : T4IndirectFileChangeObserverBase
   {
     [NotNull] private IT4RootTemplateKindProvider RootTemplateKindProvider { get; }

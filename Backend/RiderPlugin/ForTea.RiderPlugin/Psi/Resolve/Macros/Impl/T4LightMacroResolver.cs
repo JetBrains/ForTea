@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.MSBuild;
 using JetBrains.ProjectModel.Properties;
@@ -9,7 +10,7 @@ using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class T4LightMacroResolver : IT4LightMacroResolver
   {
     [NotNull] private ISolution Solution { get; }

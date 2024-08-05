@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.TemplateProcessing;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers.Transactions;
@@ -16,7 +17,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4TargetFileManager : IT4TargetFileManager
   {
     [NotNull] private ISolution Solution { get; }
