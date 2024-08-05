@@ -2,9 +2,9 @@ package com.jetbrains.fortea.preprocess
 
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.fortea.inTests.preprocessFile
+import com.jetbrains.fortea.model.T4FileLocation
 import com.jetbrains.fortea.utils.T4TestHelper
 import com.jetbrains.rdclient.util.idea.toVirtualFile
-import com.jetbrains.fortea.model.T4FileLocation
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.protocol.protocol
@@ -14,7 +14,8 @@ import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 
 abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
-  override val testSolution = testMethod.name
+  override val testSolution
+    get() = testMethod.name
   private var helper: T4TestHelper? = null
 
   protected fun doTest(dumpCsproj: Boolean = false) {
