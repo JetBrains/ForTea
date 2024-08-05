@@ -19,7 +19,8 @@ import org.testng.annotations.BeforeMethod
 
 abstract class T4RunFileTestBase : BaseTestWithSolution() {
   override val waitForCaches = true
-  override val testSolution = testMethod.name
+  override val testSolution
+    get() = testMethod.name
 
   protected lateinit var helper: T4TestHelper
 
