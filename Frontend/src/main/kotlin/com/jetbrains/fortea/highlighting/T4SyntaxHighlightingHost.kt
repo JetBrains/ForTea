@@ -1,6 +1,7 @@
 package com.jetbrains.fortea.highlighting
 
 import com.intellij.openapi.client.ClientAppSession
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -43,7 +44,11 @@ class T4SyntaxHighlightingHost {
     ) {
       val documentId = editor.document.getDocumentId(appSession)
       if (documentId != null) {
-        val synchronizer = FrontendDocumentHost.getInstance(appSession).getSynchronizer(documentId)!!
+        val synchronizer = FrontendDocumentHost.getInstance(appSession).getSynchronizer(documentId)
+        if (synchronizer == null) {
+          logger<TextControlHostListener>().error("Failed to acquire a document synchronizer. T4 protocol initialization failed")
+          return
+        }
         putT4RdDocumentModel(lifetime, appSession.protocol, editor.document, synchronizer.modelDocument.t4RdDocumentModel)
       }
     }
