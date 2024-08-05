@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.ContentModel;
 using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
@@ -23,26 +24,35 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
       Lifetime lifetime,
       [NotNull] IPsiServices services,
       [NotNull] IPsiCachesState state,
-      [NotNull] T4MacroResolutionCache cache
-    )
+      [NotNull] T4MacroResolutionCache cache)
     {
       Lifetime = lifetime;
       Services = services;
       services.Files.ObserveAfterCommit(lifetime, QueueAfterCommit);
+
       state.IsInitialUpdateFinished.Change.Advise(lifetime, args =>
       {
-        if (!args.HasNew || !args.New) return;
-        QueueAfterCommit();
+        if (args.HasNew && args.New)
+        {
+          QueueAfterCommit();
+        }
       });
+
       cache.OnFileMarkedForInvalidation.Advise(lifetime, FilesToInvalidate.Add);
     }
 
-    private void QueueAfterCommit() => Services.Locks.ExecuteOrQueue(Lifetime,
-      "T4 file invalidation caused by a change in macros in that file", () =>
-      {
-        AfterCommitSync(FilesToInvalidate);
-        FilesToInvalidate = new();
-      });
+    private void QueueAfterCommit()
+    {
+      if (ContentModelFork.IsCurrentlyForked)
+        return; // no forks support
+
+      Services.Locks.ExecuteOrQueue(Lifetime,
+        "T4 file invalidation caused by a change in macros in that file", () =>
+        {
+          AfterCommitSync(FilesToInvalidate);
+          FilesToInvalidate = new();
+        });
+    }
 
     private void AfterCommitSync([NotNull] IEnumerable<IPsiSourceFile> filesToInvalidate)
     {
