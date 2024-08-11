@@ -12,9 +12,9 @@ import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
 import com.jetbrains.rd.platform.util.idea.LifetimedService
-import com.jetbrains.rider.build.ui.old.BuildToolWindowContext
 import com.jetbrains.rider.build.BuildToolWindowFactory
 import com.jetbrains.rider.build.ui.old.BuildResultPanel
+import com.jetbrains.rider.build.ui.old.BuildToolWindowContext
 import com.jetbrains.rider.util.idea.getService
 import java.awt.BorderLayout
 import javax.swing.JPanel
@@ -56,10 +56,6 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
   ): JPanel {
     val buildActionGroup = DefaultActionGroup().apply {
       add(object : CloseTabToolbarAction() {
-        override fun update(e: AnActionEvent) {
-          e.presentation.isEnabled = true
-        }
-
         override fun actionPerformed(e: AnActionEvent) {
           contentManager.removeContent(toolWindowContent, true)
           context = null
