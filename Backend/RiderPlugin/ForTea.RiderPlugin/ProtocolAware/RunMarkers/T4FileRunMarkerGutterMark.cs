@@ -9,6 +9,7 @@ using JetBrains.ForTea.RiderPlugin.Model;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Services;
 using JetBrains.ForTea.RiderPlugin.Resources;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.Protocol;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
@@ -26,7 +27,7 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.RunMarkers
     [ItemNotNull]
     public override IEnumerable<BulbMenuItem> GetBulbMenuItems(IHighlighter highlighter)
     {
-      if (!(highlighter.UserData is T4RunMarkerHighlighting highlighting)) yield break;
+      if (!(highlighter.GetHighlighting() is T4RunMarkerHighlighting highlighting)) yield break;
       var directive = highlighting.Directive;
       yield return new BulbMenuItem(
         CreateRunFileExecutableItem(
