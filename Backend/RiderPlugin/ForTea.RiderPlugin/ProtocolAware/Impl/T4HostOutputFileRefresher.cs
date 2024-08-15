@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
 using JetBrains.IDE.PerClientComponents;
 using JetBrains.ProjectModel;
@@ -10,7 +11,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-  [SolutionPerClientComponent]
+  [SolutionPerClientComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4HostOutputFileRefresher : T4BasicOutputFileRefresher
   {
     public T4HostOutputFileRefresher(ISolution solution) : base(solution)
