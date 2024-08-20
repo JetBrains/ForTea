@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Lifetimes;
@@ -17,7 +18,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache
   /// Cache holding <see cref="T4DeclaredAssembliesInfo"/> for each T4 file.
   /// It cannot be implemented like ordinary cache because it needs PSI to build.
   /// </summary>
-  [PsiComponent]
+  [PsiComponent(InstantiationEx.LegacyDefault)]
   public class T4DeclaredAssembliesManager
   {
     [NotNull] private IPsiFiles PsiFiles { get; }

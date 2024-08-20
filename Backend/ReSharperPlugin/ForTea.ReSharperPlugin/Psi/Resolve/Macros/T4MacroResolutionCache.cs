@@ -5,6 +5,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Cache;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
@@ -23,7 +24,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
   /// In R#, it is only possible to resolve macros on the main thread,
   /// so we have to cache them to be able to access them from the daemon
   /// </summary>
-  [PsiComponent]
+  [PsiComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4MacroResolutionCache : T4PsiAwareCacheBase<T4MacroResolutionRequest, T4MacroResolutionData>
   {
     [NotNull] public Signal<IPsiSourceFile> OnFileMarkedForInvalidation { get; }

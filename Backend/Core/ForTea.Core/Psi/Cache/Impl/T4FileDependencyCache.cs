@@ -4,6 +4,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Collections;
@@ -22,7 +23,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
   /// whenever a file is marked as dirty and its include list changes,
   /// this cache marks all the former dependencies and all the new dependencies as dirty.
   /// </summary>
-  [PsiComponent]
+  [PsiComponent(InstantiationEx.LegacyDefault)]
   public sealed class T4FileDependencyCache : T4PsiAwareCacheBase<T4IncludeData, T4FileDependencyData>,
     IT4FileDependencyGraph, IT4FileGraphNotifier
   {
