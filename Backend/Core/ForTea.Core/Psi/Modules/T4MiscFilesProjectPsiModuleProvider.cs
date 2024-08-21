@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
 using JetBrains.Application.changes;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -12,7 +13,7 @@ using JetBrains.Util;
 namespace GammaJul.ForTea.Core.Psi.Modules
 {
   /// <summary>Provides <see cref="IT4FilePsiModule"/> for T4 files opened outside of the solution.</summary>
-  [MiscFilesProjectPsiModuleProvider]
+  [MiscFilesProjectPsiModuleProvider(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4MiscFilesProjectPsiModuleProvider : IMiscFilesProjectPsiModuleProvider
   {
     [NotNull] private readonly T4PsiModuleProvider _t4PsiModuleProvider;
