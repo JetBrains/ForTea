@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.Impl
 {
-  [SolutionComponent(InstantiationEx.LegacyDefault)]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public class T4LightMacroResolver : IT4LightMacroResolver
   {
     [NotNull] private ISolution Solution { get; }

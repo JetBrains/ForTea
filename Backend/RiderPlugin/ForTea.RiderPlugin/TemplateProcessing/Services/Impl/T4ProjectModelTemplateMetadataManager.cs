@@ -11,7 +11,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services.Impl
 {
-  [SolutionComponent(InstantiationEx.LegacyDefault)]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4ProjectModelTemplateMetadataManager : IT4ProjectModelTemplateMetadataManager
   {
     [NotNull] private IT4TargetFileChecker TargetFileChecker { get; }

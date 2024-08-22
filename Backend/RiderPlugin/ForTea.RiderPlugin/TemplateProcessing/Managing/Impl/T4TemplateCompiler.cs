@@ -20,7 +20,7 @@ using Microsoft.CodeAnalysis.Emit;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
-  [SolutionComponent(InstantiationEx.LegacyDefault)]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4TemplateCompiler : IT4TemplateCompiler
   {
     [NotNull] private IShellLocks Locks { get; }

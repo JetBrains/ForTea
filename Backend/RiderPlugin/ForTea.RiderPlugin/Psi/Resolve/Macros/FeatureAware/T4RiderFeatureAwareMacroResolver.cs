@@ -13,7 +13,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 {
-  [SolutionComponent(InstantiationEx.LegacyDefault)]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4RiderFeatureAwareMacroResolver : T4RiderMacroResolver
   {
     [NotNull] private ILogger Logger { get; }

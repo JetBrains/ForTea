@@ -20,7 +20,7 @@ using JetBrains.Util.dataStructures;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Services.Impl
 {
-  [SolutionComponent(InstantiationEx.LegacyDefault)]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4TemplatePreprocessingManager : IT4TemplatePreprocessingManager
   {
     private DateTime PreviousExecutedFileWriteTime { get; set; }

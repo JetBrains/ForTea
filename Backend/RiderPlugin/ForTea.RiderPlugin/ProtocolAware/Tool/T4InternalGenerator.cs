@@ -5,6 +5,7 @@ using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.ForTea.RiderPlugin.ProtocolAware.Services;
@@ -22,7 +23,7 @@ using UsageStatisticsNew = JetBrains.Application.ActivityTrackingNew.UsageStatis
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 {
-  [ShellComponent] // This class cannot be made a solution component
+  [ShellComponent(Instantiation.DemandAnyThreadUnsafe)] // This class cannot be made a solution component
   public sealed class T4InternalGenerator : ISingleFileCustomTool
   {
     public string Name => Strings.BundledT4TemplateExecutor_Text;

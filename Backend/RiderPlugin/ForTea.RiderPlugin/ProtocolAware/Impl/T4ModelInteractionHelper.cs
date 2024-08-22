@@ -15,7 +15,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-  [SolutionComponent(InstantiationEx.LegacyDefault)]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class T4ModelInteractionHelper : IT4ModelInteractionHelper
   {
     [NotNull] private ProjectModelViewHost Host { get; }

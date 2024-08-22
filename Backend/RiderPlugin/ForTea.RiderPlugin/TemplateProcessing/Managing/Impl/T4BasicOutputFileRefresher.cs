@@ -9,7 +9,7 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
-  [SolutionComponent(InstantiationEx.LegacyDefault)]
+  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
   public class T4BasicOutputFileRefresher : IT4OutputFileRefresher
   {
     protected ISolution Solution { get; }
