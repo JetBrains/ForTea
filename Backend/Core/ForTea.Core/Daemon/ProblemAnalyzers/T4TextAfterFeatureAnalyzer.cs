@@ -3,13 +3,14 @@ using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(typeof(IT4Token), HighlightingTypes = new[] { typeof(TextAfterFeatureError) })]
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4Token), HighlightingTypes = new[] { typeof(TextAfterFeatureError) })]
   public sealed class T4TextAfterFeatureAnalyzer : ElementProblemAnalyzer<IT4Token>
   {
     protected override void Run(

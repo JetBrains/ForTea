@@ -1,12 +1,12 @@
 using System;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Tree;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(
-    typeof(IT4EnvironmentVariable),
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4EnvironmentVariable),
     HighlightingTypes = new[] { typeof(UnresolvedEnvironmentVariableError) }
   )]
   public class T4UnresolvedEnvironmentVariableAnalyzer : ElementProblemAnalyzer<IT4EnvironmentVariable>

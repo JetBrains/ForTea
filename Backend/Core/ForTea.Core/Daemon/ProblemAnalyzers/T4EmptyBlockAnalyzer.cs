@@ -1,11 +1,12 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.Tree;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(typeof(IT4CodeBlock),
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4CodeBlock),
     HighlightingTypes = new[] { typeof(EmptyExpressionBlockError) })]
   public class T4EmptyBlockAnalyzer : ElementProblemAnalyzer<IT4CodeBlock>
   {

@@ -1,6 +1,7 @@
 using GammaJul.ForTea.Core.Daemon.Highlightings;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using GammaJul.ForTea.Core.Tree;
+using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -22,14 +23,14 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
     }
   }
 
-  [ElementProblemAnalyzer(typeof(IT4AssemblyDirective), HighlightingTypes =
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4AssemblyDirective), HighlightingTypes =
     new[] { typeof(IgnoredDirectiveWarning) })]
   public sealed class T4IgnoredAssemblyDirectiveAnalyzer :
     T4IgnoredDirectiveInPreprocessedTemplateAnalyzer<IT4AssemblyDirective>
   {
   }
 
-  [ElementProblemAnalyzer(typeof(IT4OutputDirective), HighlightingTypes =
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4OutputDirective), HighlightingTypes =
     new[] { typeof(IgnoredDirectiveWarning) })]
   public sealed class T4IgnoredOutputDirectiveAnalyzer :
     T4IgnoredDirectiveInPreprocessedTemplateAnalyzer<IT4OutputDirective>

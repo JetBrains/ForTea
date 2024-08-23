@@ -8,12 +8,13 @@ using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(typeof(IT4Directive), HighlightingTypes =
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4Directive), HighlightingTypes =
     new[] { typeof(MissingRequiredAttributeError) })]
   public sealed class T4MissingRequiredAttributeAnalyzer : ElementProblemAnalyzer<IT4Directive>
   {

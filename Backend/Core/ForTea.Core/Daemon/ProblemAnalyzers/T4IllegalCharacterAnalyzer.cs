@@ -4,6 +4,7 @@ using GammaJul.ForTea.Core.Psi.Directives;
 using GammaJul.ForTea.Core.Psi.Directives.Attributes;
 using GammaJul.ForTea.Core.Tree;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.Tree;
@@ -11,7 +12,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(typeof(IT4OutputDirective), HighlightingTypes = new[] { typeof(IllegalCharacterError) })]
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4OutputDirective), HighlightingTypes = new[] { typeof(IllegalCharacterError) })]
   public class T4IllegalCharacterAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4OutputDirective>
   {
     [NotNull] private static IReadOnlyList<char> AllowedCharacters { get; } = new[] { '.' };
