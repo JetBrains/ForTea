@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4AttributeValue), HighlightingTypes =
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4AttributeValue), HighlightingTypes =
     new[] { typeof(InvalidAttributeValueError) })]
   public sealed class T4InvalidAttributeValueAnalyzer : ElementProblemAnalyzer<IT4AttributeValue>
   {

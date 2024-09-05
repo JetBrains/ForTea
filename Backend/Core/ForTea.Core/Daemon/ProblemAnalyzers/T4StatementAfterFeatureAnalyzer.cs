@@ -9,7 +9,7 @@ using JetBrains.ReSharper.Psi.Html;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4StatementBlock), HighlightingTypes = new[] { typeof(StatementAfterFeatureError) })]
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4StatementBlock), HighlightingTypes = new[] { typeof(StatementAfterFeatureError) })]
   [ZoneMarker(typeof(ILanguageHtmlZone))]
   public sealed class T4StatementAfterFeatureAnalyzer : ElementProblemAnalyzer<IT4StatementBlock>
   {

@@ -23,14 +23,14 @@ namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
     }
   }
 
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4AssemblyDirective), HighlightingTypes =
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4AssemblyDirective), HighlightingTypes =
     new[] { typeof(IgnoredDirectiveWarning) })]
   public sealed class T4IgnoredAssemblyDirectiveAnalyzer :
     T4IgnoredDirectiveInPreprocessedTemplateAnalyzer<IT4AssemblyDirective>
   {
   }
 
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4OutputDirective), HighlightingTypes =
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4OutputDirective), HighlightingTypes =
     new[] { typeof(IgnoredDirectiveWarning) })]
   public sealed class T4IgnoredOutputDirectiveAnalyzer :
     T4IgnoredDirectiveInPreprocessedTemplateAnalyzer<IT4OutputDirective>

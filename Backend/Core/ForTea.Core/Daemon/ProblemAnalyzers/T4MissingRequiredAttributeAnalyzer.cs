@@ -14,7 +14,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4Directive), HighlightingTypes =
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4Directive), HighlightingTypes =
     new[] { typeof(MissingRequiredAttributeError) })]
   public sealed class T4MissingRequiredAttributeAnalyzer : ElementProblemAnalyzer<IT4Directive>
   {

@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4EnvironmentVariable),
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4EnvironmentVariable),
     HighlightingTypes = new[] { typeof(UnresolvedEnvironmentVariableError) }
   )]
   public class T4UnresolvedEnvironmentVariableAnalyzer : ElementProblemAnalyzer<IT4EnvironmentVariable>

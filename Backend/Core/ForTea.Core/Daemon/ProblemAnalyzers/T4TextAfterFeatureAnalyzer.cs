@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4Token), HighlightingTypes = new[] { typeof(TextAfterFeatureError) })]
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4Token), HighlightingTypes = new[] { typeof(TextAfterFeatureError) })]
   public sealed class T4TextAfterFeatureAnalyzer : ElementProblemAnalyzer<IT4Token>
   {
     protected override void Run(

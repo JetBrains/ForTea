@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi.CSharp.Parsing;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4ParameterDirective), HighlightingTypes = new[] { typeof(EscapedKeywordWarning) })]
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4ParameterDirective), HighlightingTypes = new[] { typeof(EscapedKeywordWarning) })]
   public sealed class T4EscapedKeywordAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4ParameterDirective>
   {
     protected override DirectiveAttributeInfo GetTargetAttribute() =>

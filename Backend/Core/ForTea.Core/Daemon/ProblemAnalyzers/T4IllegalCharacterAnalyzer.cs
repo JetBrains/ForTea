@@ -12,7 +12,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4OutputDirective), HighlightingTypes = new[] { typeof(IllegalCharacterError) })]
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4OutputDirective), HighlightingTypes = new[] { typeof(IllegalCharacterError) })]
   public class T4IllegalCharacterAnalyzer : T4AttributeValueProblemAnalyzerBase<IT4OutputDirective>
   {
     [NotNull] private static IReadOnlyList<char> AllowedCharacters { get; } = new[] { '.' };

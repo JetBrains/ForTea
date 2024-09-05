@@ -12,7 +12,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Macros.FeatureAware
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4FeatureAwareLightMacroResolver : T4LightMacroResolver
   {
     [NotNull] private IBuildToolWellKnownPropertiesStore MsBuildProperties { get; }

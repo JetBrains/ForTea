@@ -6,7 +6,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
-  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadUnsafe, typeof(IT4CodeBlock),
+  [ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, typeof(IT4CodeBlock),
     HighlightingTypes = new[] { typeof(EmptyExpressionBlockError) })]
   public class T4EmptyBlockAnalyzer : ElementProblemAnalyzer<IT4CodeBlock>
   {
