@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.getOrCreateUserData
+import com.intellij.openapi.util.getOrCreateUserDataUnsafe
 import com.jetbrains.fortea.model.T4RdDocumentModel
 import com.jetbrains.fortea.model.t4RdDocumentModel
 import com.jetbrains.rd.framework.IProtocol
@@ -29,7 +30,7 @@ class T4SyntaxHighlightingHost {
       project.getUserData(T4_DOCUMENT_EDITABLE_ENTRY_KEY)?.get(this)
 
     private fun putT4RdDocumentModel(lifetime: Lifetime, protocol: IProtocol, document: Document, model: T4RdDocumentModel) {
-      val map = protocol.toProject.getOrCreateUserData(T4_DOCUMENT_EDITABLE_ENTRY_KEY) { mutableMapOf() }
+      val map = protocol.toProject.getOrCreateUserDataUnsafe(T4_DOCUMENT_EDITABLE_ENTRY_KEY) { mutableMapOf() }
       map.put(lifetime, document, model)
     }
   }
