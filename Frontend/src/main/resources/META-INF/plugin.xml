@@ -102,8 +102,8 @@
     </action>
   </actions>
   <applicationListeners>
-    <listener topic="com.jetbrains.rdclient.editors.FrontendTextControlHostListener"
-              class="com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost$TextControlHostListener" />
+      <listener class="com.jetbrains.fortea.highlighting.T4SyntaxHighlightingHost$TextControlHostListener"
+                topic="com.jetbrains.rdclient.document.FrontendDocumentHostListener" />
   </applicationListeners>
   <project-components>
     <component>

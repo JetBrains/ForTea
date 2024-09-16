@@ -9,14 +9,12 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.getOrCreateUserDataUnsafe
 import com.jetbrains.fortea.model.T4RdDocumentModel
 import com.jetbrains.fortea.model.t4RdDocumentModel
-import com.jetbrains.rd.ide.model.TextControlId
-import com.jetbrains.rd.ide.model.TextControlModel
+import com.jetbrains.rd.ide.model.RdDocumentId
+import com.jetbrains.rd.ide.model.RdDocumentModel
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.put
 import com.jetbrains.rdclient.client.frontendProjectSession
-import com.jetbrains.rdclient.document.FrontendDocumentHost
-import com.jetbrains.rdclient.document.getDocumentId
-import com.jetbrains.rdclient.editors.FrontendTextControlHostListener
+import com.jetbrains.rdclient.document.FrontendDocumentHostListener
 
 class T4SyntaxHighlightingHost {
   companion object {
@@ -32,23 +30,15 @@ class T4SyntaxHighlightingHost {
     }
   }
 
-  class TextControlHostListener : FrontendTextControlHostListener {
-    override fun editorBound(
+  class TextControlHostListener : FrontendDocumentHostListener {
+    override fun documentBound(
       lifetime: Lifetime,
-      appSession: ClientAppSession,
-      textControlId: TextControlId,
-      editorModel: TextControlModel,
-      editor: Editor,
+      session: ClientAppSession,
+      documentId: RdDocumentId,
+      documentModel: RdDocumentModel,
+      document: Document,
     ) {
-      val documentId = editor.document.getDocumentId(appSession)
-      if (documentId != null) {
-        val synchronizer = FrontendDocumentHost.getInstance(appSession).getSynchronizer(documentId)
-        if (synchronizer == null) {
-          logger<TextControlHostListener>().error("Failed to acquire a document synchronizer. T4 protocol initialization failed")
-          return
-        }
-        putT4RdDocumentModel(lifetime, appSession, editor.document, synchronizer.modelDocument.t4RdDocumentModel)
-      }
+      putT4RdDocumentModel(lifetime, session, document, documentModel.t4RdDocumentModel)
     }
   }
 }
