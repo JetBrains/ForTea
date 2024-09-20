@@ -21,7 +21,7 @@ namespace GammaJul.ForTea.Core.Psi
   /// <summary>This class will generate a C# code-behind from a T4 file.</summary>
   [GeneratedDocumentService(typeof(T4ProjectFileType))]
   [ZoneMarker(typeof(IWebPsiLanguageZone))]
-  public sealed class T4CSharpGeneratedDocumentService : GeneratedDocumentServiceBase
+  public sealed class T4CSharpGeneratedDocumentService : GeneratedDocumentServiceBase, ISecondaryLexerFactory
   {
     private static IEnumerable<PsiLanguageType> PsiLanguageTypes => new PsiLanguageType[] { CSharpLanguage.Instance };
 
@@ -55,7 +55,7 @@ namespace GammaJul.ForTea.Core.Psi
     /// <param name="mixedLexer">The mixed lexer.</param>
     /// <param name="sourceFile">The source file.</param>
     /// <returns>An instance of <see cref="ISecondaryLexingProcess"/> used to lex the code behind file.</returns>
-    public override ISecondaryLexingProcess CreateSecondaryLexingService(
+    public ISecondaryLexingProcess CreateSecondaryLexingService(
       ISolution solution,
       MixedLexer mixedLexer,
       IPsiSourceFile sourceFile = null
@@ -64,7 +64,7 @@ namespace GammaJul.ForTea.Core.Psi
     /// <summary>Gets a lexer factory capable of handling preprocessor directives.</summary>
     /// <param name="primaryLanguage">The primary language.</param>
     /// <returns>Always <c>null</c> since there is no preprocessor directives in T4 files.</returns>
-    public override ILexerFactory LexerFactoryWithPreprocessor(PsiLanguageType primaryLanguage)
+    public ILexerFactory LexerFactoryWithPreprocessor(PsiLanguageType primaryLanguage)
       => null;
 
     /// <summary>Reparses the original T4 file.</summary>
