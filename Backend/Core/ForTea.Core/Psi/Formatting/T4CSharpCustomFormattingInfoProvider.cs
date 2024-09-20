@@ -3,6 +3,7 @@ using System.Linq;
 using GammaJul.ForTea.Core.Psi.FileType;
 using GammaJul.ForTea.Core.Psi.Formatting.SpaceTypeProviders;
 using JetBrains.Annotations;
+using JetBrains.Application.Components;
 using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.CSharp.CodeStyle.FormatSettings;
@@ -14,9 +15,9 @@ namespace GammaJul.ForTea.Core.Psi.Formatting
   [ProjectFileType(typeof(T4ProjectFileType))]
   internal sealed class T4CSharpCustomFormattingInfoProvider : DummyCSharpCustomFormattingInfoProvider
   {
-    private IEnumerable<IT4BlockSpaceTypeProvider> Providers { get; }
+    private IImmutableEnumerable<IT4BlockSpaceTypeProvider> Providers { get; }
 
-    public T4CSharpCustomFormattingInfoProvider(IEnumerable<IT4BlockSpaceTypeProvider> providers) =>
+    public T4CSharpCustomFormattingInfoProvider(IImmutableEnumerable<IT4BlockSpaceTypeProvider> providers) =>
       Providers = providers;
 
     public override bool NeedsOldEngine => true;
