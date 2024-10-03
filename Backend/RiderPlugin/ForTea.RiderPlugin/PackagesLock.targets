@@ -7,6 +7,6 @@
     <PackageLock Include="JetBrains.Lifetimes" Version="2024.1.0" />
     <PackageLock Include="JetBrains.RdFramework" Version="2024.1.0" />
     <PackageLock Include="JetBrains.Roslyn.References.Repack" Version="42.42.20240223.153841" />
-    <PackageLock Include="System.Collections.Immutable" Version="7.0.0" />
+    <PackageLock Include="System.Collections.Immutable" Version="8.0.0" />
   </ItemGroup>
 </Project>
