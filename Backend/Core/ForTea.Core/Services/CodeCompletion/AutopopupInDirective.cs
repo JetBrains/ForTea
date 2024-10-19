@@ -15,7 +15,7 @@ using JetBrains.TextControl;
 
 namespace GammaJul.ForTea.Core.Services.CodeCompletion
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public class AutopopupInDirective : IAutomaticCodeCompletionStrategy
   {
     [NotNull] private readonly SettingsScalarEntry _settingsEntry;
