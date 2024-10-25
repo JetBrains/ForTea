@@ -23,7 +23,7 @@ using UsageStatisticsNew = JetBrains.Application.ActivityTrackingNew.UsageStatis
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Tool
 {
-  [ShellComponent(Instantiation.DemandAnyThreadUnsafe)] // This class cannot be made a solution component
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)] // This class cannot be made a solution component
   public sealed class T4InternalGenerator : ISingleFileCustomTool
   {
     public string Name => Strings.BundledT4TemplateExecutor_Text;
