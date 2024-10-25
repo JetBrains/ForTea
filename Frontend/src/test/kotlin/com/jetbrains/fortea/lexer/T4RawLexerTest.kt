@@ -1,6 +1,6 @@
 package com.jetbrains.fortea.lexer
 
-import com.jetbrains.rider.test.RiderFrontendLexerTest
+import com.jetbrains.rider.test.cases.psi.lexer.RiderFrontendLexerTest
 import org.testng.annotations.Test
 
 class T4RawLexerTest : RiderFrontendLexerTest("tt") {
