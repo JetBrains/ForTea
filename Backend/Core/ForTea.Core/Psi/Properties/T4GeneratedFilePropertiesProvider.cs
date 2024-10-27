@@ -10,7 +10,7 @@ namespace GammaJul.ForTea.Core.Psi.Properties
     IMsbuildGeneratedFilePropertiesProvider,
     IPsiSourceFilePropertiesProvider
   {
-    public double Order => 1;
+    public double Priority => 1;
 
     public IPsiSourceFileProperties GetPsiProperties(
       IPsiSourceFileProperties prevProperties,
