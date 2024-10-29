@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.markup
 
 import com.intellij.openapi.util.TextRange
-import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.daemon.generated.ReSharperAttributesIds
 import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.scriptingApi.`is`

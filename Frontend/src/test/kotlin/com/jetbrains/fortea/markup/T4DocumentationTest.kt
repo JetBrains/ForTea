@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.markup
 
 import com.jetbrains.fortea.daemon.T4HighlightingAttributeIds
-import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.scriptingApi.`is`
 import org.testng.annotations.Ignore
