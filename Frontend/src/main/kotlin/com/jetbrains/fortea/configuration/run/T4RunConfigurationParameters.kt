@@ -18,7 +18,7 @@ open class T4RunConfigurationParameters(
   false,
   false
 ) {
-  fun toDotNetExecutable() = DotNetExecutable(
+  override fun toDotNetExecutable() = DotNetExecutable(
     exePath,
     null,
     workingDirectory,
