@@ -2,7 +2,7 @@ using System;
 using GammaJul.ForTea.Core.Psi.Modules;
 using JetBrains.Annotations;
 using JetBrains.Application.Parts;
-using JetBrains.ProjectModel.Properties;
+using JetBrains.DocumentManagers.PropertyModifiers;
 using JetBrains.ProjectModel.Properties.CSharp;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
