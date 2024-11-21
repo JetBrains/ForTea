@@ -3,6 +3,7 @@ using GammaJul.ForTea.Core.Parsing;
 using GammaJul.ForTea.Core.Parsing.Lexing;
 using GammaJul.ForTea.Core.Psi.Cache;
 using JetBrains.Annotations;
+using JetBrains.Application.Components;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -80,7 +81,7 @@ namespace GammaJul.ForTea.Core.Psi.Service
 
     public T4LanguageService(
       [NotNull] T4Language t4Language,
-      [NotNull] IConstantValueService constantValueService,
+      [NotNull] ILazy<IConstantValueService> constantValueService,
       [NotNull] ILogger logger
     ) : base(t4Language, constantValueService) => Logger = logger;
   }
