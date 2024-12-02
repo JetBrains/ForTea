@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.Util;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace GammaJul.ForTea.Core
 {
+  [DerivedComponentsInstantiationRequirement(InstantiationRequirement.DeadlockSafe)]
   public interface IT4Environment
   {
     /// <summary>Gets the target framework ID.</summary>
