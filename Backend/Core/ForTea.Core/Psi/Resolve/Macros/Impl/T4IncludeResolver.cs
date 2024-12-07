@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Macros.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4IncludeResolver : IT4IncludeResolver
   {
     [NotNull] private IT4PsiFileSelector Selector { get; }

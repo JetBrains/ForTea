@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4IndirectIncludeTransitiveClosureSearcher
   {
     [NotNull] private IT4PsiFileSelector Selector { get; }

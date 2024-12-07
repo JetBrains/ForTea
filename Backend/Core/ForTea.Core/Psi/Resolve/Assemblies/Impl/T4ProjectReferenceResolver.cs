@@ -13,7 +13,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public class T4ProjectReferenceResolver : IT4ProjectReferenceResolver
   {
     [NotNull] private IPsiModules PsiModules { get; }

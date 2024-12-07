@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4GraphSinkSearcher
   {
     [NotNull] private IT4PsiFileSelector Selector { get; }

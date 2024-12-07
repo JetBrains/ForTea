@@ -1,5 +1,6 @@
 using GammaJul.ForTea.Core.Psi.Resolve.Macros;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.DataFlow;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Psi;
@@ -9,7 +10,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve
 {
-  [ReferenceProviderFactory]
+  [ReferenceProviderFactory(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4ReferenceProviderFactory : IReferenceProviderFactory
   {
     public ISignal<IReferenceProviderFactory> Changed { get; }
