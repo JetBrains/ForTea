@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve
 {
-  [ReferenceProviderFactory(Instantiation.DemandAnyThreadSafe)]
+  [ReferenceProviderFactory]
   public sealed class T4ReferenceProviderFactory : IReferenceProviderFactory
   {
     public ISignal<IReferenceProviderFactory> Changed { get; }
