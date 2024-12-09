@@ -22,6 +22,7 @@ $DotNetChannel = "Current"
 
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = 1
+$env:DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE = 1
 $env:DOTNET_MULTILEVEL_LOOKUP = 0
 
 ###########################################################################
