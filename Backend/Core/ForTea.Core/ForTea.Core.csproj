@@ -11,7 +11,7 @@
     <AssemblyName>ForTea.Core</AssemblyName>
     <DefineConstants Condition="!$(InternalBuild)">INDEPENDENT_BUILD</DefineConstants>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <OutputPath Condition="!$(InternalBuild)">..\..\output\ForTea.Core\$(Configuration)</OutputPath>
     <RootNamespace>GammaJul.ForTea.Core</RootNamespace>
     <TargetFramework>net472</TargetFramework>

@@ -10,7 +10,7 @@
     <AssemblyName>JetBrains.ForTea.Tests</AssemblyName>
     <DefineConstants Condition="!$(InternalBuild)">INDEPENDENT_BUILD</DefineConstants>
     <JetTestProject>true</JetTestProject>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <RootNamespace>JetBrains.ForTea.Tests</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
