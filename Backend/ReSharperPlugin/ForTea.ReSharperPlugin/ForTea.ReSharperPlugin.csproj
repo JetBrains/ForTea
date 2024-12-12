@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <UseWpf>true</UseWpf>
     <InternalBuild Condition="'$(SolutionFileName)' != 'ForTea.All.sln' and '$(SolutionFileName)' != 'ForTea.Backend.sln' and '$(SolutionFileName)' != 'ForTea.ReSharper.sln'">True</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
   </PropertyGroup>
