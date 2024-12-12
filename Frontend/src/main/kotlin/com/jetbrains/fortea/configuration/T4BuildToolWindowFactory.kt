@@ -13,6 +13,7 @@ import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
 import com.jetbrains.rd.platform.util.idea.LifetimedService
 import com.jetbrains.rider.build.BuildToolWindowFactory
+import com.jetbrains.rider.build.BuildToolWindowService
 import com.jetbrains.rider.build.ui.old.BuildResultPanel
 import com.jetbrains.rider.build.ui.old.BuildToolWindowContext
 import com.jetbrains.rider.util.idea.getService
@@ -31,7 +32,7 @@ class T4BuildToolWindowFactory(private val project: Project) : LifetimedService(
   }
 
   private fun create(windowHeader: String): BuildToolWindowContext {
-    val toolWindow = BuildToolWindowFactory.getInstance(project).getOrRegisterToolWindow(project)
+    val toolWindow = BuildToolWindowService.getInstance(project).getOrRegisterToolWindow(project)
     val contentManager = toolWindow.contentManager
     toolWindow.setIcon(AllIcons.Toolwindows.ToolWindowBuild)
     // Required for hiding window without content
