@@ -19,7 +19,7 @@ Backend/.idea
 
 *.Generated.kt
 *.Generated.cs
-**/.nuke
+**/.nuke/temp
 
 Frontend/src/generated/
 Backend/RiderPlugin/ForTea.RiderPlugin/Model/
