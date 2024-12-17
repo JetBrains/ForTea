@@ -4,16 +4,13 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Nuke.Common;
-using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.NuGet.NuGetTasks;
 
-[CheckBuildProjectConfigurations]
 internal class ForTeaBuild : NukeBuild
 {
   [Parameter] public string Configuration;
@@ -88,17 +85,6 @@ internal class ForTeaBuild : NukeBuild
       .SetProperty("configuration", Configuration)
       .SetProperty("wave", WaveVersion)
       .EnableNoPackageAnalysis()));
-
-  [NotNull]
-  public Target Push => target => target
-    .DependsOn(Pack)
-    .Requires(() => NuGetApiKey)
-    .Requires(() => "Release".Equals(Configuration))
-    .Requires(() => GlobFiles(OutputDirectory, "*.nupkg").Count == 1)
-    .Executes(() => NuGetPush(settings => settings
-      .SetTargetPath(GlobFiles(OutputDirectory, "*.nupkg").Single())
-      .SetSource(NuGetSource)
-      .SetApiKey(NuGetApiKey)));
 
   [NotNull]
   private string GetJetBrainsYearSpan()
