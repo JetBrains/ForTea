@@ -20,7 +20,7 @@ using Microsoft.CodeAnalysis;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.CodeGeneration.Reference.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4ReferenceExtractionManager : IT4ReferenceExtractionManager
   {
     [NotNull] private IT4AssemblyReferenceResolver AssemblyReferenceResolver { get; }

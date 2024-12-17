@@ -11,7 +11,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace GammaJul.ForTea.Core.Daemon.ProblemAnalyzers
 {
   [ElementProblemAnalyzer(
-    Instantiation.DemandAnyThreadUnsafe, typeof(IT4AssemblyDirective),
+    Instantiation.DemandAnyThreadSafe, typeof(IT4AssemblyDirective),
     HighlightingTypes = new[] { typeof(RedundantAssemblyWarning) }
   )]
   public sealed class T4DuplicateAssemblyDirectiveProblemAnalyzer : ElementProblemAnalyzer<IT4AssemblyDirective>

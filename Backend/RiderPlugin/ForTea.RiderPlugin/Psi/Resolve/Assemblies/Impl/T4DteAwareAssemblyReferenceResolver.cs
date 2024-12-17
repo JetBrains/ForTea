@@ -16,7 +16,7 @@ namespace JetBrains.ForTea.RiderPlugin.Psi.Resolve.Assemblies.Impl
   /// This resolver is capable of resolving everything its parent can,
   /// and it is additionally capable of resolving EnvDTE.
   /// </summary>
-  [SolutionComponent(Instantiation.DemandAnyThread)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4DteAwareAssemblyReferenceResolver : T4AssemblyReferenceResolver
   {
     public T4DteAwareAssemblyReferenceResolver(

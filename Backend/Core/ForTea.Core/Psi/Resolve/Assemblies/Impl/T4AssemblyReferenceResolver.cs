@@ -15,7 +15,7 @@ using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Psi.Resolve.Assemblies.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public class T4AssemblyReferenceResolver : IT4AssemblyReferenceResolver
   {
     [NotNull] private IT4LightWeightAssemblyReferenceResolver LightWeightResolver { get; }

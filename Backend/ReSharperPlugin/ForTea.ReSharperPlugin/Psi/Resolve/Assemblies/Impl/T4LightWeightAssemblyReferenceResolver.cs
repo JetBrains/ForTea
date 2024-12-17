@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4LightWeightAssemblyReferenceResolver : T4BasicLightWeightAssemblyReferenceResolver
   {
     [NotNull] private T4LightWeightAssemblyResolutionCache Cache { get; }
