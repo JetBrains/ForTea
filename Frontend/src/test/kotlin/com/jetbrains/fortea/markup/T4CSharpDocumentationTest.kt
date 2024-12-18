@@ -18,7 +18,7 @@ class T4CSharpDocumentationTest : DocumentationTestBase() {
       waitForDaemon()
       dumpHighlightersTree({
         it `is` ReSharperAttributesIds.CSHARP_KEYWORD &&
-          "var" == document.getText(TextRange(it.startOffset, it.endOffset))
+          "var" == document.getText(it.textRange)
       }, {
         generateBackendHoverDoc(it.startOffset)
       })
