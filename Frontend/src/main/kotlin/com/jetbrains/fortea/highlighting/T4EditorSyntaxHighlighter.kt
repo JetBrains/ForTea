@@ -18,7 +18,7 @@ import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.document.getFirstEditor
 import com.jetbrains.rider.languages.fileTypes.csharp.CSharpFileType
 
-class T4EditorSyntaxHighlighter(
+internal class T4EditorSyntaxHighlighter(
   private val project: Project,
   private val virtualFile: VirtualFile,
   colors: EditorColorsScheme
