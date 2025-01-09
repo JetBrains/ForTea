@@ -18,6 +18,7 @@ open class T4RunConfigurationParameters(
   false,
   false
 ) {
+  @Deprecated("Use the suspending variant")
   override fun toDotNetExecutable() = DotNetExecutable(
     exePath,
     null,

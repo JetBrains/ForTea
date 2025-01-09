@@ -3,20 +3,23 @@ package com.jetbrains.fortea.configuration.run
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.rd.util.withUiContext
+import com.intellij.openapi.rd.util.lifetime
 import com.jetbrains.fortea.configuration.run.execution.T4ExecutorFactory
 import com.jetbrains.rider.debugger.IRiderDebuggable
 import com.jetbrains.rider.run.RiderRunBundle
 import com.jetbrains.rider.run.configurations.AsyncRunConfiguration
-import com.jetbrains.rider.run.configurations.RiderRunConfiguration
+import com.jetbrains.rider.run.configurations.RiderAsyncRunConfiguration
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.concurrency.Promise
 
 class T4RunConfiguration(
   name: String,
   project: Project,
   val parameters: T4RunConfigurationParameters
-) : RiderRunConfiguration(
+) : RiderAsyncRunConfiguration(
   name,
   project,
   T4RunConfigurationFactory,
@@ -25,8 +28,8 @@ class T4RunConfiguration(
 ), IRiderDebuggable, AsyncRunConfiguration {
 
   override suspend fun getRunProfileStateAsync(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
-    return withUiContext {
-      (executorFactory as T4ExecutorFactory).createAsync(executor.id, environment)
+    return withContext(Dispatchers.EDT) {
+      (executorFactory as T4ExecutorFactory).create(executor.id, environment, environment.project.lifetime)
     }
   }
 

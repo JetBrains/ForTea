@@ -37,6 +37,8 @@
         implementation="com.jetbrains.fortea.configuration.run.task.T4BuildProjectsBeforeRunTaskProvider"
         order="before CompileT4"/>
 
+    <programRunner implementation="com.jetbrains.fortea.configuration.run.T4ProgramRunner"/>
+    <programRunner implementation="com.jetbrains.fortea.configuration.run.T4DebugRunner"/>
     <!-- delegation to backend -->
     <rider.debuggerSupportPolicy
         language="T4"

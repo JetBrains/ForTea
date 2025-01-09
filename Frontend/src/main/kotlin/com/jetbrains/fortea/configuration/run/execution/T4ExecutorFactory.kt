@@ -9,18 +9,21 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.rd.platform.util.getComponent
+import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.run.configurations.AsyncExecutorFactory
 import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 
-class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : IExecutorFactory {
+class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigurationParameters) : AsyncExecutorFactory {
   private val riderDotNetActiveRuntimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
-  override fun create(executorId: String, environment: ExecutionEnvironment) =
-    createAsync(executorId, environment)
-
-  fun createAsync(executorId: String, environment: ExecutionEnvironment): RunProfileState {
-    val dotNetExecutable = parameters.toDotNetExecutable()
+  override suspend fun create(
+    executorId: String,
+    environment: ExecutionEnvironment,
+    lifetime: Lifetime,
+  ): RunProfileState {
+    val dotNetExecutable = parameters.toDotNetExecutableSuspending()
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
       environment.project,
       riderDotNetActiveRuntimeHost,
