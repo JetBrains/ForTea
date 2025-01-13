@@ -1,14 +1,12 @@
 package com.jetbrains.fortea.highlighting
 
-import com.intellij.openapi.editor.XmlHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.fortea.lexer.T4Lexer
 import com.jetbrains.fortea.psi.T4ElementTypes
 
-object T4SyntaxHighlighter : SyntaxHighlighterBase() {
+internal object T4SyntaxHighlighter : SyntaxHighlighterBase() {
   private val BLOCK_MARKER_KEYS = arrayOf(T4TextAttributeKeys.T4_BLOCK_MARKER)
   private val EQUAL_KEYS = arrayOf(T4TextAttributeKeys.T4_DIRECTIVE_EQ_SIGN)
   private val QUOTE_KEYS = arrayOf(T4TextAttributeKeys.T4_DIRECTIVE_QUOTE)
