@@ -11,7 +11,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
 {
-  [SolutionPerClientComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionPerClientComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4HostOutputFileRefresher : T4BasicOutputFileRefresher
   {
     public T4HostOutputFileRefresher(ISolution solution) : base(solution)

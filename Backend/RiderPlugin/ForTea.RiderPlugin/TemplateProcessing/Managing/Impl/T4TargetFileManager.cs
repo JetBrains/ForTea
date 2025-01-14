@@ -17,7 +17,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
 {
-  [SolutionComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public sealed class T4TargetFileManager : IT4TargetFileManager
   {
     [NotNull] private ISolution Solution { get; }
