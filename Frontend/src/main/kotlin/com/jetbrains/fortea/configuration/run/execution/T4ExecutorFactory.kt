@@ -12,7 +12,6 @@ import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.AsyncExecutorFactory
-import com.jetbrains.rider.run.configurations.IExecutorFactory
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 

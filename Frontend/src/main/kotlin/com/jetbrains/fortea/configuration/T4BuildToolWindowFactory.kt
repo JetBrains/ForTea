@@ -12,7 +12,6 @@ import com.intellij.openapi.wm.impl.status.StatusBarUtil
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
 import com.jetbrains.rd.platform.util.idea.LifetimedService
-import com.jetbrains.rider.build.BuildToolWindowFactory
 import com.jetbrains.rider.build.BuildToolWindowService
 import com.jetbrains.rider.build.ui.old.BuildResultPanel
 import com.jetbrains.rider.build.ui.old.BuildToolWindowContext

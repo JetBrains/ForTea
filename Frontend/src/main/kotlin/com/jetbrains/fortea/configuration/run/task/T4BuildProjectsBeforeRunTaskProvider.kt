@@ -15,7 +15,6 @@ import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.RiderT4Bundle
 import com.jetbrains.fortea.utils.handleEndOfExecution
-import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters
 import com.jetbrains.rider.model.BuildResultKind
