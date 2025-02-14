@@ -12,6 +12,7 @@ import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.AsyncExecutorFactory
+import com.jetbrains.rider.run.configurations.exe.ProcessExecutionDetails
 import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 
@@ -22,7 +23,7 @@ class T4ExecutorFactory(project: Project, private val parameters: T4RunConfigura
     environment: ExecutionEnvironment,
     lifetime: Lifetime,
   ): RunProfileState {
-    val dotNetExecutable = parameters.toDotNetExecutableSuspending()
+    val dotNetExecutable = parameters.toDotNetExecutableSuspending(ProcessExecutionDetails.Default)
     val runtimeToExecute = DotNetRuntime.detectRuntimeForExeOrThrow(
       environment.project,
       riderDotNetActiveRuntimeHost,
