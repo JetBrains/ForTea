@@ -110,6 +110,9 @@
         "NuGetSource": {
           "type": "string"
         },
+        "PluginVersion": {
+          "type": "string"
+        },
         "Solution": {
           "type": "string",
           "description": "Path to a solution file that is automatically loaded"

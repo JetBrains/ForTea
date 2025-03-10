@@ -15,6 +15,7 @@ internal class ForTeaBuild : NukeBuild
 {
   [Parameter] public string Configuration;
   [Parameter] public string WaveVersion;
+  [Parameter] public string PluginVersion;
   [Parameter] public readonly string NuGetSource = "https://plugins.jetbrains.com/";
   [Parameter] public readonly string NuGetApiKey;
   [Solution] private readonly Solution Solution;
@@ -84,6 +85,7 @@ internal class ForTeaBuild : NukeBuild
       .SetProperty("releaseNotes", GetLatestReleaseNotes())
       .SetProperty("configuration", Configuration)
       .SetProperty("wave", WaveVersion)
+      .SetProperty("pluginVersion", PluginVersion)
       .EnableNoPackageAnalysis()));
 
   [NotNull]

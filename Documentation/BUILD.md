@@ -32,8 +32,8 @@ To build R# plugin, run
 ```bash
 cd Frontend
 gradlew :prepare
-cd ../Backend
-./build.ps1 pack
+cd ..\Backend
+.\build.cmd pack
 ```
 The build script will ask for build configuration.
 You most likely want to select the 'Debug' configuration.  

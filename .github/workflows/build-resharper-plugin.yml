@@ -1,0 +1,33 @@
+on:
+  workflow_dispatch:
+    inputs:
+      wave:
+        description: 'ReSharper Wave (e.g. 243 for 2024.3.x)'
+        required: true
+        default: '100'
+        type: string
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Prepare environment
+      working-directory: Frontend
+      run: ./gradlew :prepare
+      shell: bash
+
+    - name: Build ReSharper plugin
+      working-directory: Backend/ReSharperPlugin
+      run: |
+        $wave = '${{ github.event.inputs.wave }}'
+        ./build.ps1 pack -Configuration Release -WaveVersion $wave
+      shell: pwsh
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: resharper-plugin
+        path: Backend/ReSharperPlugin/artifacts/Release/
