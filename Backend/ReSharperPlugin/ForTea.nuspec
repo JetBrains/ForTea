@@ -2,18 +2,18 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>JetBrains.ForTea</id>
-		<version>2023.1.0</version>
+		<version>$pluginVersion$</version>
 		<title>ForTea</title>
-		<authors>Kirill Glazyrin, JetBrains; Julien Lebosquain</authors>
+		<authors>JetBrains; Kirill Glazyrin; Julien Lebosquain</authors>
 		<description>Adds support for editing T4 text templating files (.tt)</description>
 		<releaseNotes>$releaseNotes$</releaseNotes>
 		<projectUrl>https://github.com/jetbrains/fortea/</projectUrl>
 		<iconUrl>https://raw.github.com/MrJul/ForTea/master/Logo/ForTea%20128x128.png</iconUrl>
 		<licenseUrl>https://github.com/jetbrains/fortea/blob/master/LICENSE</licenseUrl>
-		<copyright>Copyright &#x00A9; 2012-2019 Julien Lebosquain; Copyright &#x00A9; $jetBrainsYearSpan$ Kirill Glazyrin, JetBrains</copyright>
+		<copyright>Copyright &#x00A9; 2012-2019 Julien Lebosquain; Copyright &#x00A9;  2019-2025 Kirill Glazyrin; Copyright &#x00A9; $jetBrainsYearSpan$ JetBrains</copyright>
 		<tags>T4 Text Templating Template .tt</tags>
 		<dependencies>
-			<dependency id="Wave" version="[$wave$]" />
+			<dependency id="Wave" version="$wave$" />
 		</dependencies>
 	</metadata>
 	<files>
