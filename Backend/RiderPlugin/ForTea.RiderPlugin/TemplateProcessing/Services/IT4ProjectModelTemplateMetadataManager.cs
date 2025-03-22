@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using GammaJul.ForTea.Core.TemplateProcessing.Services;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.DocumentManagers.Transactions;
 using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Services
 {
+  [DerivedComponentsInstantiationRequirement(InstantiationRequirement.DeadlockSafe)]
   public interface IT4ProjectModelTemplateMetadataManager
   {
     void UpdateTemplateMetadata(
