@@ -77,6 +77,7 @@ val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
 intellijPlatform {
     buildSearchableOptions = buildConfiguration == "Release"
+    instrumentCode = false
 }
 
 if (!isMonorepo) {
