@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-#if NUNIT_ATTRIBUTE_WRAPPERS
+#if FALSE
 global using TestAttribute = JetBrains.TestFramework.TestAttribute;
 global using TestCaseAttribute = JetBrains.TestFramework.TestCaseAttribute;
 global using TestCaseSourceAttribute = JetBrains.TestFramework.TestCaseSourceAttribute;
