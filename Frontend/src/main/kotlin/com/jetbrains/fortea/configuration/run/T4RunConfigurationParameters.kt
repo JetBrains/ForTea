@@ -30,7 +30,8 @@ open class T4RunConfigurationParameters(
     { _, _, _ -> },
     null,
     "",
-    false
+    false,
+    mixedModeDebugging = false
   )
 
   override fun validate() {
