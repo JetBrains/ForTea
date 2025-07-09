@@ -14,8 +14,8 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
   public static class T4PreprocessedTemplateFlagUtils
   {
     private static Key<object> PreprocessedKey { get; } = new Key<object>("T4_INCLUDED_INTO_PREPROCESSED_FILE_KEY");
-    public static void FlagAsPreprocessed([NotNull] this IProjectFile thіs) => thіs.PutKey(PreprocessedKey);
-    public static void FlagAsExecutable([NotNull] this IProjectFile thіs) => thіs.RemoveKey(PreprocessedKey);
-    public static bool IsFlaggedAsPreprocessed([NotNull] this IProjectFile thіs) => thіs.HasKey(PreprocessedKey);
+    public static void FlagAsPreprocessed([NotNull] this IProjectFile projectFile) => projectFile.PutKey(PreprocessedKey);
+    public static void FlagAsExecutable([NotNull] this IProjectFile projectFile) => projectFile.RemoveKey(PreprocessedKey);
+    public static bool IsFlaggedAsPreprocessed([NotNull] this IProjectFile projectFile) => projectFile.HasKey(PreprocessedKey);
   }
 }

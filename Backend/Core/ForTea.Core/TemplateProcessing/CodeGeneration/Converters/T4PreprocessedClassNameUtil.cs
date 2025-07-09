@@ -7,9 +7,9 @@ namespace GammaJul.ForTea.Core.TemplateProcessing.CodeGeneration.Converters
   public static class T4PreprocessedClassNameUtil
   {
     [NotNull]
-    public static string CreateGeneratedClassName([NotNull] this IPsiSourceFile thіs)
+    public static string CreateGeneratedClassName([NotNull] this IPsiSourceFile sourceFile)
     {
-      string fileName = thіs.Name.WithoutExtension();
+      string fileName = sourceFile.Name.WithoutExtension();
       if (ValidityChecker.IsValidIdentifier(fileName)) return fileName;
       return T4CSharpIntermediateConverterBase.GeneratedClassNameString;
     }
