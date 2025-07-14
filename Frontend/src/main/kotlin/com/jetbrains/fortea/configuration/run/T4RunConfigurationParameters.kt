@@ -16,15 +16,13 @@ open class T4RunConfigurationParameters(
   workingDirectory,
   emptyMap(),
   false,
-  false
 ) {
   override fun createDotNetExecutableTemplate(): DotNetExecutable = DotNetExecutable(
     exePath,
     null,
     workingDirectory,
     programParameters,
-    false,
-    useExternalConsole,
+    terminalMode,
     envs + ("T4_ENVDTE_CLIENT_PORT" to envDTEPort.toString()),
     true,
     { _, _, _ -> },
