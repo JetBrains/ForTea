@@ -2,7 +2,7 @@ package com.jetbrains.fortea.run
 
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
