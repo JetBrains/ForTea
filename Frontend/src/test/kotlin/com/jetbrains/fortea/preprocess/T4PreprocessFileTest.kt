@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.preprocess
 
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import org.testng.annotations.Test
 
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
