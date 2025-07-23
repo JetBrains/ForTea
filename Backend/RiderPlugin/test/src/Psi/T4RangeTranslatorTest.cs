@@ -5,6 +5,7 @@ using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers;
 using JetBrains.DocumentModel;
 using JetBrains.IDE;
+using JetBrains.IDE.Common;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
