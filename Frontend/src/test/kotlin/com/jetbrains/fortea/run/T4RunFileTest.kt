@@ -1,14 +1,14 @@
 package com.jetbrains.fortea.run
 
 import com.jetbrains.rider.test.annotations.Mute
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
 // Note: due to Windows path length restriction
 // test method name cannot be longer than 60 symbols
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class T4RunFileTest : T4RunFileTestBase() {
   @Test fun testThatFileCanBeExecuted() = doTest()
   @Test fun testThatHostSpecificTemplateCanBeExecuted() = doTest()
