@@ -203,7 +203,7 @@ tasks {
     }
 
     withType<KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "21"
         dependsOn(":protocol:rdgen", ":grammarkit:generateLexer", ":grammarkit:generateParser")
     }
 
