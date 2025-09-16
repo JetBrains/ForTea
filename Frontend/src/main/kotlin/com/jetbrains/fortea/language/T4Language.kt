@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.language
 
-import com.jetbrains.rider.ideaInterop.fileTypes.RiderLanguageBase
+import com.intellij.lang.Language
 
-object T4Language : RiderLanguageBase("T4", "T4") {
+object T4Language : Language("T4") {
   override fun isCaseSensitive(): Boolean = true
 }
