@@ -20,6 +20,7 @@
         implementationClass="com.jetbrains.fortea.language.T4FileType"
         fieldName="INSTANCE"
         extensions="tt;t4;ttinclude"/>
+    <rd.languageAssociation backendLanguage="T4" frontendLanguage="T4" />
     <lang.parserDefinition
         language="T4"
         implementationClass="com.jetbrains.fortea.parser.T4ParserDefinition"/>
