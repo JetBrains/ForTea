@@ -67,7 +67,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
       var oldParentItem = file.GetProject();
       var projectFile = file.ToProjectFile().NotNull();
       var changeDelta = new ProjectItemChange(
-        ProjectModelChange.EMPTY_DELTAS, projectFile, oldParentItem,
+        [], projectFile, oldParentItem,
         ProjectModelChangeType.UNKNOWN, projectFile.Location,
         ExternalChangeType.NONE, projectFile.GetPersistentID()).Propagate();
       ProjectModelChangeUtil.OnChange(Solution.BatchChangeManager, changeDelta);
