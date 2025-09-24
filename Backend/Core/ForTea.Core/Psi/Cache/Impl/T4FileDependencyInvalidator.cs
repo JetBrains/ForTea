@@ -38,7 +38,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
     protected sealed override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
     {
-      myLocks.ExecuteWithWriteLockWhenAvailable(Lifetime,
+      myLocks.ExecuteWithWriteLockOrQueueAsync(Lifetime,
         $"{nameof(T4FileDependencyInvalidator)} :: AfterCommitSync",
         () =>
         {
