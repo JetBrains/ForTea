@@ -5,7 +5,7 @@ using JetBrains.Rider.Backend.Product;
 namespace JetBrains.ForTea.RiderPlugin.ProtocolAware
 {
   [ZoneMarker]
-  public class ZoneMarker : IRequire<IRiderFeatureZone>, IRequire<IRiderProductEnvironmentZone>
+  public class ZoneMarker : IRequire<IRiderFullFeatureZone> /*todo should we enable this for lightweigh?*/, IRequire<IRiderProductFullEnvironmentZone>
   {
   }
 }

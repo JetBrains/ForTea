@@ -8,7 +8,7 @@ using JetBrains.Rider.Backend.Env;
 namespace JetBrains.ForTea.RiderPluginActivator
 {
   [ZoneActivator]
-  [ZoneMarker(typeof(IRiderBackendFeatureEnvironmentZone))]
+  [ZoneMarker(typeof(IRiderBackendFullFeatureEnvironmentZone))]
   public class RiderT4PluginActivator : IActivate<IT4Zone>
   {
   }
