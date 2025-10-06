@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Application.Parts;
 using JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl;
+using JetBrains.IDE;
 using JetBrains.IDE.PerClientComponents;
 using JetBrains.ProjectModel;
 using JetBrains.RdBackend.Common.Features.Documents;
@@ -32,6 +33,6 @@ namespace JetBrains.ForTea.RiderPlugin.ProtocolAware.Impl
       .GetProtocolSolution()
       .GetFileSystemModel()
       .RefreshPaths
-      .Start(new RdFsRefreshRequest(new List<string> { destinationLocation.FullPath }, true));
+      .Start(new RdFsRefreshRequest(new List<RdPath> { destinationLocation.ToRd() }, true));
   }
 }
