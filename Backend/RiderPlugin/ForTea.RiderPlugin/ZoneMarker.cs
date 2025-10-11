@@ -6,7 +6,7 @@ using JetBrains.RdBackend.Common.Env;
 namespace JetBrains.ForTea.RiderPlugin
 {
   [ZoneMarker]
-  public class ZoneMarker : IRequire<IT4Zone>, IRequire<IReSharperHostNetFullFeatureZone>
+  public class ZoneMarker : IRequire<IT4Zone>, IRequire<IReSharperHostNetFeatureZone>
   {
   }
 }
