@@ -1,3 +1,16 @@
-﻿# 1 ITEM #
+﻿Completion: Basic
+Prefix: "myCustomIndexVaria"
+Count: 1
+Focus: Hard
+Range: "#><#= myCustomIndexVaria♦ #><#"
+              ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-+ myCustomIndexVariable    int
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, PrefixMatch, LocalVariablesAndParameters, NotObsolete, ObsoleteRuleApplied, NormalSelectionPriority, Other]
+ṃỵC̣ụṣṭọṃỊṇḍẹx̣Ṿạṛịạble       int    <==
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+ṃỵC̣ụṣṭọṃỊṇḍẹx̣Ṿạṛịạble       int    <==
