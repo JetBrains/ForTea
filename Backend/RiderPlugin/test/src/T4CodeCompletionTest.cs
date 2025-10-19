@@ -10,7 +10,7 @@ namespace JetBrains.ForTea.Tests
   [Ignore("Broken after qx added an assert")]
   public sealed class T4CodeCompletionTest : CodeCompletionTestBase
   {
-    protected override CodeCompletionTestType TestType => CodeCompletionTestType.List;
+    protected override CodeCompletionTestType TestType => CodeCompletionTestType.ModernList;
     protected override string RelativeTestDataPath => @"CodeCompletion";
 
     [TestCase("Directive")]

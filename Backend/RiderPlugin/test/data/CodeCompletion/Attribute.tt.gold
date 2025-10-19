@@ -1,10 +1,28 @@
-﻿# 8 ITEMS #
+﻿Completion: Basic
+Count: 8
+Focus: SoftWhenEmpty
+Range: "<#@ template ♦ #>"
 
-+ compilerOptions
-+ culture
-+ debug
-+ hostspecific
-+ inherits
-+ language
-+ linePragmas
-+ visibility
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, NormalSelectionPriority, Other]
+compilerOptions             <==
+culture
+debug
+hostspecific
+inherits
+language
+linePragmas
+visibility
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+compilerOptions             <==
+culture
+debug
+hostspecific
+inherits
+language
+linePragmas
+visibility

@@ -1,8 +1,24 @@
-﻿# 6 ITEMS #
+﻿Completion: Basic
+Count: 6
+Focus: SoftWhenEmpty
+Range: "<#@ ♦ #>"
 
-+ assembly
-+ import
-+ include
-+ output
-+ parameter
-+ template
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, NormalSelectionPriority, Other]
+assembly                    <==
+import
+include
+output
+parameter
+template
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+assembly                    <==
+import
+include
+output
+parameter
+template

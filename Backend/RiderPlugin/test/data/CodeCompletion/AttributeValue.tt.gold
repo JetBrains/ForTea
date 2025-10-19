@@ -1,4 +1,16 @@
-# 2 ITEMS #
+﻿Completion: Basic
+Count: 2
+Focus: SoftWhenEmpty
+Range: "<#@ template language="♦""
 
-+ C#
-+ C#v3.5
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, NormalSelectionPriority, Other]
+C#                          <==
+C#v3.5
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+C#                          <==
+C#v3.5
