@@ -57,24 +57,37 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
     {
       var request = (T4LightWeightAssemblyResolutionRequest)builtPart;
       var projectFile = sourceFile.ToProjectFile().NotNull();
-      using var _ = Prepare(projectFile);
-      var response = new Dictionary<string, VirtualFileSystemPath>();
-      foreach (var path in request.NotNull().AssembliesToResolve)
-      {
-        var resolved = TryResolve(path);
-        if (resolved == null) continue;
-        response[path.ResolvedPath] = resolved;
-      }
 
-      var data = new T4LightWeightAssemblyResolutionData(response);
-      base.Merge(sourceFile, data);
+      using (Prepare(projectFile))
+      {
+        var response = new Dictionary<string, VirtualFileSystemPath>();
+        foreach (var path in request.NotNull().AssembliesToResolve)
+        {
+          var resolved = TryResolve(path);
+          if (resolved == null) continue;
+
+          response[path.ResolvedPath] = resolved;
+        }
+
+        var data = new T4LightWeightAssemblyResolutionData(response);
+        base.Merge(sourceFile, data);
+      }
+    }
+
+    [CanBeNull]
+    public T4LightWeightAssemblyResolutionData TryGetValue(IPsiSourceFile sourceFile)
+    {
+      base.TryGetValue(sourceFile, out var value);
+      return value;
     }
 
     [CanBeNull]
     public VirtualFileSystemPath ResolveWithoutCaching([NotNull] T4ResolvedPath path)
     {
-      using var _ = Prepare(path.ProjectFile);
-      return TryResolve(path);
+      using (Prepare(path.ProjectFile))
+      {
+        return TryResolve(path);
+      }
     }
 
     [CanBeNull]
@@ -82,10 +95,13 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
     {
       var asAbsolute = resolvedPath.TryResolveAbsolutePath();
       if (asAbsolute != null) return asAbsolute;
-      string resolved = Components.Value.CanBeNull?.Host?.ResolveAssemblyReference(resolvedPath.ResolvedPath);
+
+      var resolved = Components.Value.CanBeNull?.Host?.ResolveAssemblyReference(resolvedPath.ResolvedPath);
       if (resolved == null) return null;
+
       var path = VirtualFileSystemPath.Parse(resolved, InteractionContext.SolutionContext);
       if (path.IsAbsolute) return path;
+
       return null;
     }
 
@@ -95,8 +111,9 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
       var hierarchy = T4ResolutionUtils.TryGetVsHierarchy(file);
       var components = Components.Value.CanBeNull;
       if (components == null) return Disposable.Empty;
-      object oldHierarchy = components.Hierarchy;
-      string oldInputFileName = components.InputFile;
+
+      var oldHierarchy = components.Hierarchy;
+      var oldInputFileName = components.InputFile;
       return Disposable.CreateBracket(
         () =>
         {
@@ -108,8 +125,7 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
           components.Hierarchy = oldHierarchy;
           components.InputFile = oldInputFileName;
         },
-        false
-      );
+        trapExceptions: false);
     }
   }
 }

@@ -63,11 +63,17 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros
       }
     }
 
+    [CanBeNull]
+    public T4MacroResolutionData TryGetValue(IPsiSourceFile sourceFile)
+    {
+      base.TryGetValue(sourceFile, out var value);
+      return value;
+    }
+
     [NotNull]
     private IReadOnlyDictionary<string, string> ResolveHeavyMacros(
       [NotNull] IEnumerable<string> macros,
-      [NotNull] IProjectFile file
-    )
+      [NotNull] IProjectFile file)
     {
       var result = new Dictionary<string, string>();
       Lazy<IVsBuildMacroInfo> vsBuildMacroInfo = Lazy.Of(() => TryGetVsBuildMacroInfo(file), false);
