@@ -18,7 +18,8 @@ namespace JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Assemblies.Impl
     public override VirtualFileSystemPath TryResolve(T4ResolvedPath path)
     {
       VirtualFileSystemPath result = null;
-      Cache.Map.TryGetValue(path.SourceFile)?.ResolvedAssemblies.TryGetValue(path.ResolvedPath, out result);
+      var resolutionData = Cache.TryGetValue(path.SourceFile);
+      resolutionData?.ResolvedAssemblies.TryGetValue(path.ResolvedPath, out result);
       return result;
     }
   }

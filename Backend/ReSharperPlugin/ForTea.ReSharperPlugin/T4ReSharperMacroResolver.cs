@@ -8,7 +8,6 @@ using JetBrains.ForTea.ReSharperPlugin.Psi.Resolve.Macros;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.EditorConfig;
 using JetBrains.ReSharper.Psi;
-using JetBrains.Util;
 
 namespace JetBrains.ForTea.ReSharperPlugin
 {
@@ -17,15 +16,17 @@ namespace JetBrains.ForTea.ReSharperPlugin
   {
     [NotNull] private T4MacroResolutionCache Cache { get; }
 
-    public T4ReSharperMacroResolver([NotNull] T4MacroResolutionCache cache) => Cache = cache;
+    public T4ReSharperMacroResolver([NotNull] T4MacroResolutionCache cache)
+    {
+      Cache = cache;
+    }
 
     public override IReadOnlyDictionary<string, string> ResolveHeavyMacros(
-      IEnumerable<string> macros,
-      IProjectFile file
-    ) => Cache
-      .Map.TryGetValue(file.ToSourceFile().NotNull())
-      ?.ResolvedMacros
-      .Where(it => macros.Contains(it.Key))
-      .ToDictionary() ?? ourEmptyDictionary;
+      IEnumerable<string> macros, IProjectFile file)
+    {
+      var resolutionData = Cache.TryGetValue(file.ToSourceFile().NotNull());
+      return resolutionData?.ResolvedMacros.Where(it => macros.Contains(it.Key)).ToDictionary()
+             ?? ourEmptyDictionary;
+    }
   }
 }
