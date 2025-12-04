@@ -5,6 +5,7 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
@@ -203,7 +204,9 @@ tasks {
     }
 
     withType<KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "21"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
         dependsOn(":protocol:rdgen", ":grammarkit:generateLexer", ":grammarkit:generateParser")
     }
 
