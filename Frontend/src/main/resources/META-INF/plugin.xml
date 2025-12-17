@@ -10,6 +10,11 @@
   <!--suppress PluginXmlValidity -->
   <idea-version since-build="223"/>
 
+  <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
+  <dependencies>
+    <module name="intellij.rd.client"/>
+  </dependencies>
+  <!-- endregion -->
   <depends>com.intellij.modules.rider</depends>
 
   <extensions defaultExtensionNs="com.intellij">
