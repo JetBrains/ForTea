@@ -4,7 +4,7 @@ namespace GammaJul.ForTea.Core.Tree.Impl
 {
   public abstract class T4CompositeNodeType : CompositeNodeType
   {
-    protected T4CompositeNodeType(string s, int index) : base(s, index)
+    protected T4CompositeNodeType(string s, int index, NodeTypeFlags flags) : base(s, index, flags)
     {
     }
   }
