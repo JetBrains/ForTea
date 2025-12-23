@@ -1,10 +1,13 @@
+using GammaJul.ForTea.Core.Psi;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using static GammaJul.ForTea.Core.Parsing.T4TokenNodeFlag;
 
 namespace GammaJul.ForTea.Core.Parsing
 {
-  public static partial class T4TokenNodeTypes
+  [Language(typeof(T4Language))]
+  public partial class T4TokenNodeTypes : INodeTypesInitializer
   {
     [NotNull] public static readonly T4TokenNodeType DIRECTIVE_START
       = new T4TokenNodeType("DIRECTIVE_START", DIRECTIVE_START_NODE_TYPE_INDEX, "<#@", Tag);
