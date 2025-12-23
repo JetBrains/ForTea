@@ -6,6 +6,9 @@ options {
   parserPackage="GammaJul.ForTea.Core.Parser";
   parserClassName="T4ParserGenerated";
 
+  // Language type
+  languageType="GammaJul.ForTea.Core.Psi.T4Language";
+
   // Strongly type the lexer we're using. ILexer<int> is the caching lexer instance
   "lexerClassName"="JetBrains.ReSharper.Psi.Parsing.ILexer";
 

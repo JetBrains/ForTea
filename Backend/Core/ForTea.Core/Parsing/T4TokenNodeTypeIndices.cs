@@ -1,6 +1,6 @@
 namespace GammaJul.ForTea.Core.Parsing
 {
-  public static partial class T4TokenNodeTypes
+  public partial class T4TokenNodeTypes
   {
     public const int RAW_TEXT_NODE_TYPE_INDEX = 1000;
     public const int STATEMENT_BLOCK_START_NODE_TYPE_INDEX = 1001;
