@@ -70,7 +70,7 @@ options {
   "objectClassFQName"="System.Object";
 }
 
-errorhandling file options { stubBase="T4FileBase"; customParseFunction; elementTypeFlags="File"; }
+errorhandling file options { stubBase="T4FileBase"; customParseFunction; }
 :
     (block<BLOCK, Blocks> | RAW_TEXT<RAW_TEXT, RawTexts> | NEW_LINE<NEW_LINE, NewLines>)*
 ;
