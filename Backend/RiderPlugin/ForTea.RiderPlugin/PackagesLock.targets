@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <PackageLock Include="JetBrains.Annotations" Version="2025.2.0" />
-    <PackageLock Include="JetBrains.EnvDTE.Host" Version="20240403.51.0" />
+    <PackageLock Include="JetBrains.EnvDTE.Host" Version="20260105.57.0" />
     <PackageLock Include="JetBrains.HabitatDetector" Version="1.4.5" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2025.3.1" />
     <PackageLock Include="JetBrains.RdFramework" Version="2025.3.1" />
