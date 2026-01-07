@@ -83,7 +83,7 @@ namespace GammaJul.ForTea.Core.Tree
     /// <returns>An instance of <see cref="T"/>, or <c>null</c> if no container for <paramref name="cSharpNode"/> can be found.</returns>
     [CanBeNull]
     public static T GetT4ContainerFromCSharpNode<T>([CanBeNull] this ITreeNode cSharpNode)
-      where T : ITreeNode
+      where T : class, ITreeNode
     {
       ISecondaryRangeTranslator secondaryRangeTranslator =
         (cSharpNode?.GetContainingFile() as IFileImpl)?.SecondaryRangeTranslator;
