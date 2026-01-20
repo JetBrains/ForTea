@@ -225,7 +225,7 @@ namespace GammaJul.ForTea.Core.Psi.Modules
 
     public void Dispose()
     {
-      using (WriteLockCookie.Create())
+      using(_shellLocks.UsingWriteLock())
       {
         foreach (var wrapper in _modules.Values)
           wrapper.LifetimeDefinition.Terminate();
