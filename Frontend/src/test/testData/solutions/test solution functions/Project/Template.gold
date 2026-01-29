@@ -2,7 +2,7 @@ DTE: JetBrains.EnvDTE.Client.Impl.DteImplementation
 Parent: JetBrains.EnvDTE.Client.Impl.DteImplementation
 File name exists: True
 Full name exists: True
-Item(1): JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectImplementation
-Count: 3
-Projects: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectsImplementation
-Enumerator: System.Linq.Enumerable+SelectListIterator`2[JetBrains.Rider.Model.ProjectModel,JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectImplementation]
+Item(1): JetBrains.EnvDTE.Client.Impl.ProjectModelImpl.ProjectImplementation
+Count: 1
+Projects: JetBrains.EnvDTE.Client.Impl.ProjectModelImpl.ProjectsImplementation
+Enumerator: System.Linq.Enumerable+SelectListIterator`2[JetBrains.Rider.Model.ProjectItemModel,JetBrains.EnvDTE.Client.Impl.ProjectModelImpl.ProjectImplementation]

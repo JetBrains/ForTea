@@ -1,7 +1,7 @@
 Project:
     Name: Project
-    ProjectItems: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectItemsImplementation
+    ProjectItems: JetBrains.EnvDTE.Client.Impl.ProjectModelImpl.ProjectItemsImplementation
     DTE: JetBrains.EnvDTE.Client.Impl.DteImplementation
     FileName exists: True
     FullName exists: True
-    Collection: JetBrains.EnvDTE.Client.Impl.ProjectModel.ProjectsImplementation
+    Collection: JetBrains.EnvDTE.Client.Impl.ProjectModelImpl.ProjectsImplementation
