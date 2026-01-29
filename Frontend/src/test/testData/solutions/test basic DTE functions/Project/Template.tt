@@ -1,5 +1,6 @@
 <#@ template language="C#" hostspecific="true" #>
 <#@ assembly name="EnvDTE" #>
+<#@ assembly name="netstandard"#>
 <#@ import namespace="EnvDTE" #>
 <#
     var provider = (IServiceProvider) Host;
