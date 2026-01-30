@@ -150,6 +150,8 @@ namespace JetBrains.ForTea.Tests
       var assembly = metadataLoader.TryLoad(assemblyNameInfo, JetFunc<AssemblyNameInfo>.False, false);
       if (assembly == null) return;
 
+      assemblyNameInfo = assembly.AssemblyName; // Switch to the true assembly name as we actually have on disk, to avoid reporting fake assembly versions
+
       var subplatformOfAssembly = allAssemblies.FindSubplatformOfAssembly(assemblyNameInfo, OnError.Ignore);
 
       if (subplatformOfAssembly != null)
