@@ -14,6 +14,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Special;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -56,7 +57,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
       // Since we need no context when compiling a file, we need to build the tree manually
       var file = sourceFile.BuildT4Tree();
       var error = file.ThisAndDescendants<IErrorElement>().Collect();
-      if (!error.IsEmpty()) return Converter.SyntaxErrors(error);
+      if (!error.IsEmpty()) return Converter.SyntaxErrors(error).With(LogBuildErrors);
 
       return lifetime.UsingNested(nested =>
       {
@@ -102,7 +103,7 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
         {
           return Converter.ToT4BuildResult(e);
         }
-      });
+      }).With(LogBuildErrors);
     }
 
     [NotNull]
@@ -131,6 +132,12 @@ namespace JetBrains.ForTea.RiderPlugin.TemplateProcessing.Managing.Impl
         new[] { syntaxTree },
         options: options,
         references: references);
+    }
+
+    private void LogBuildErrors(T4BuildResult result)
+    {
+      if (result.BuildResultKind == T4BuildResultKind.HasErrors) 
+        Logger.Verbose("T4 build result: {0}", result);
     }
   }
 }
