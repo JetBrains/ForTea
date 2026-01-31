@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.highlighting
 
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.checkSwea
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import org.testng.annotations.Test
 
 class T4IncludeWithMultipleTargetFrameworksTest : T4HighlightingTestBase() {

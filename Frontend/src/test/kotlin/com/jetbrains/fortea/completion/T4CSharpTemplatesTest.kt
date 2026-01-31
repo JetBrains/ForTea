@@ -4,7 +4,12 @@ import com.jetbrains.fortea.inTests.waitForIndirectInvalidation
 import com.jetbrains.rider.protocol.protocol
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
+import com.jetbrains.rider.test.scriptingApi.completeWithEnter
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
+import com.jetbrains.rider.test.scriptingApi.pressEnter
+import com.jetbrains.rider.test.scriptingApi.typeWithLatency
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 class T4CSharpTemplatesTest : CompletionTestBase() {

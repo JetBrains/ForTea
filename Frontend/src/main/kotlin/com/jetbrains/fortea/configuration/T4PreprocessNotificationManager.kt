@@ -3,12 +3,12 @@ package com.jetbrains.fortea.configuration
 import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.workspaceModel.ide.toPath
-import com.jetbrains.rd.platform.util.getComponent
-import com.jetbrains.rd.platform.util.lifetime
-import com.jetbrains.rd.util.reactive.advise
 import com.jetbrains.fortea.model.T4PreprocessingResult
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.RiderT4Bundle
+import com.jetbrains.rd.platform.util.getComponent
+import com.jetbrains.rd.platform.util.lifetime
+import com.jetbrains.rd.util.reactive.advise
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 

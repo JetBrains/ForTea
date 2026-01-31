@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.configuration
 
-import com.jetbrains.rider.model.BuildResultKind
 import com.jetbrains.fortea.model.T4BuildResultKind
+import com.jetbrains.rider.model.BuildResultKind
 
 val T4BuildResultKind.isSuccess
   get() = when (this) {

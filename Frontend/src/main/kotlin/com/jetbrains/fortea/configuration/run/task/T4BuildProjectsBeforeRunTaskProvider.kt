@@ -7,10 +7,10 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.application
-import com.intellij.util.concurrency.Semaphore
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.platform.backend.workspace.virtualFile
+import com.intellij.util.application
+import com.intellij.util.concurrency.Semaphore
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.RiderT4Bundle

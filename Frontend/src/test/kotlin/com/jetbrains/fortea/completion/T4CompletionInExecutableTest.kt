@@ -3,7 +3,15 @@ package com.jetbrains.fortea.completion
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.assertCurrentLookupItemEquals
+import com.jetbrains.rider.test.scriptingApi.assertLookupNotContains
+import com.jetbrains.rider.test.scriptingApi.completeWithEnter
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
+import com.jetbrains.rider.test.scriptingApi.ensureThereIsNoLookup
+import com.jetbrains.rider.test.scriptingApi.pressEnter
+import com.jetbrains.rider.test.scriptingApi.typeWithLatency
+import com.jetbrains.rider.test.scriptingApi.undo
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 

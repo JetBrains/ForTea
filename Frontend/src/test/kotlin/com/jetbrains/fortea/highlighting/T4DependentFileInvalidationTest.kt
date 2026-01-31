@@ -4,14 +4,14 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rdclient.daemon.FrontendMarkupAdapter
 import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
+import com.jetbrains.rdclient.daemon.util.annotateDocumentWithHighlighterTags
 import com.jetbrains.rdclient.daemon.util.severity
 import com.jetbrains.rdclient.testFramework.typeWithLatency
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
-import com.jetbrains.rdclient.daemon.util.annotateDocumentWithHighlighterTags
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
 import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Ignore
 import org.testng.annotations.Test

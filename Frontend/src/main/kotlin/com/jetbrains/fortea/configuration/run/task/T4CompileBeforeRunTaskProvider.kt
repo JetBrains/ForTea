@@ -5,18 +5,18 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
-import com.intellij.util.concurrency.Semaphore
 import com.intellij.platform.backend.workspace.WorkspaceModel
+import com.intellij.util.concurrency.Semaphore
 import com.intellij.workspaceModel.ide.toPath
 import com.jetbrains.fortea.configuration.T4BuildSessionView
 import com.jetbrains.fortea.configuration.isSuccess
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
-import com.jetbrains.fortea.utils.handleEndOfExecution
-import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.fortea.model.t4ProtocolModel
 import com.jetbrains.fortea.utils.RiderT4Bundle
-import com.jetbrains.rider.projectView.solution
+import com.jetbrains.fortea.utils.handleEndOfExecution
+import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rd.platform.util.lifetime
+import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 
 class T4CompileBeforeRunTaskProvider : BeforeRunTaskProvider<T4CompileBeforeRunTask>() {
