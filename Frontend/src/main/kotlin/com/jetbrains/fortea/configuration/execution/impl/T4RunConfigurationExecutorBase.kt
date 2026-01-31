@@ -3,9 +3,9 @@ package com.jetbrains.fortea.configuration.execution.impl
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.openapi.project.Project
-import com.intellij.util.PathUtil
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.platform.backend.workspace.virtualFile
+import com.intellij.util.PathUtil
 import com.jetbrains.fortea.configuration.execution.T4RunConfigurationExecutor
 import com.jetbrains.fortea.configuration.run.T4RunConfiguration
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationFactory

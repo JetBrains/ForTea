@@ -4,8 +4,8 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.openapi.util.Key
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
-import com.jetbrains.fortea.utils.handleEndOfExecution
 import com.jetbrains.fortea.model.T4ProtocolModel
+import com.jetbrains.fortea.utils.handleEndOfExecution
 
 class T4PostProcessorProcessListener(
   private val model: T4ProtocolModel,

@@ -4,8 +4,8 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.fortea.inTests.waitForIndirectInvalidation
 import com.jetbrains.rider.protocol.protocol
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 
 abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
   protected open val fileName get() = "Template.tt"

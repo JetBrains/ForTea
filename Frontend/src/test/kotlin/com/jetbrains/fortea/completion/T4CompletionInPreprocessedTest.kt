@@ -2,7 +2,13 @@ package com.jetbrains.fortea.completion
 
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.assertCurrentLookupItemEquals
+import com.jetbrains.rider.test.scriptingApi.completeWithEnter
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditor
+import com.jetbrains.rider.test.scriptingApi.ensureThereIsNoLookup
+import com.jetbrains.rider.test.scriptingApi.typeWithLatency
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 class T4CompletionInPreprocessedTest : CompletionTestBase() {

@@ -1,9 +1,9 @@
 package com.jetbrains.fortea.markup
 
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.daemon.generated.ReSharperAttributesIds
 import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.scriptingApi.`is`
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import org.testng.annotations.Ignore
 import org.testng.annotations.Test
 
