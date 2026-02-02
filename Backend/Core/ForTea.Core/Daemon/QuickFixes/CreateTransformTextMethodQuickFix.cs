@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Linq;
 using GammaJul.ForTea.Core.Daemon.Highlightings;
@@ -8,15 +7,14 @@ using JetBrains.Application.Progress;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.BulbActions;
-using JetBrains.ReSharper.Feature.Services.Intentions;
-using JetBrains.ReSharper.Feature.Services.Intentions.CreateDeclaration;
-using JetBrains.ReSharper.Feature.Services.Intentions.DataProviders;
-using JetBrains.ReSharper.Feature.Services.Intentions.Impl.DeclarationBuilders;
-using JetBrains.ReSharper.Feature.Services.Intentions.Impl.LanguageSpecific;
+using JetBrains.ReSharper.Feature.Services.CreateFromUsage;
+using JetBrains.ReSharper.Feature.Services.CreateFromUsage.CreateDeclaration;
+using JetBrains.ReSharper.Feature.Services.CreateFromUsage.DataProviders;
+using JetBrains.ReSharper.Feature.Services.CreateFromUsage.DeclarationBuilders;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
+using JetBrains.ReSharper.Feature.Services.Util.Intentions;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.TextControl;
 using JetBrains.Util;
 
 namespace GammaJul.ForTea.Core.Daemon.QuickFixes
