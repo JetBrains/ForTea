@@ -11,9 +11,9 @@ namespace JetBrains.ForTea.ReSharperPluginActivation.InProcess
 {
   [ZoneActivator]
   [ZoneMarker(typeof(IVisualStudioFrontendEnvZone))]
-  public class ReSharperT4PluginActivator(VisualStudioProtocolConnector protocolConnector) : IActivateDynamic<IT4Zone>
+  public class ReSharperT4PluginActivator(VisualStudioOutOfProcessMode myOopMode) : IActivateDynamic<IT4Zone>
   {
-    bool IActivateDynamic<IT4Zone>.ActivatorEnabled() => !protocolConnector.IsOutOfProcess;
+    bool IActivateDynamic<IT4Zone>.ActivatorEnabled() => !myOopMode.IsOutOfProcess;
   }
 }
 
