@@ -7,17 +7,16 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
-  [DaemonStage(Instantiation.DemandAnyThreadUnsafe, StagesBefore = new[] { typeof(GlobalFileStructureCollectorStage) })]
-  public class T4ProblemAnalyzerStage : T4DaemonStageBase
+  [DaemonStage(Instantiation.DemandAnyThreadUnsafe, StagesBefore = [typeof(GlobalFileStructureCollectorStage)])]
+  public class T4ProblemAnalyzerStage([NotNull] ElementProblemAnalyzerRegistrar registrar)
+    : T4DaemonStageBase
   {
-    [NotNull] private ElementProblemAnalyzerRegistrar Registrar { get; }
-
-    public T4ProblemAnalyzerStage([NotNull] ElementProblemAnalyzerRegistrar registrar) => Registrar = registrar;
+    [NotNull] private ElementProblemAnalyzerRegistrar Registrar { get; } = registrar;
 
     protected override IDaemonStageProcess CreateProcess(
-      IDaemonProcess process,
-      IT4File file,
-      IContextBoundSettingsStore settings
-    ) => new T4ProblemAnalyzerProcess(file, process, Registrar, settings);
+      IDaemonProcess process, IT4File file, IContextBoundSettingsStore settings)
+    {
+      return new T4ProblemAnalyzerProcess(file, process, Registrar, settings);
+    }
   }
 }

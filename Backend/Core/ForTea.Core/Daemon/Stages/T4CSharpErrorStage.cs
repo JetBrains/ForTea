@@ -10,17 +10,16 @@ using JetBrains.ReSharper.Psi.CSharp.Tree;
 
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
-  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = new[] { typeof(CSharpErrorStage) })]
+  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = [typeof(CSharpErrorStage)])]
   public class T4CSharpErrorStage : CSharpDaemonStageBase
   {
     protected override bool IsSupported(IPsiSourceFile sourceFile)
-      => base.IsSupported(sourceFile) && sourceFile?.IsLanguageSupported<T4Language>() == true;
+      => base.IsSupported(sourceFile) && sourceFile.IsLanguageSupported<T4Language>();
 
     protected override IDaemonStageProcess CreateProcess(
-      IDaemonProcess process,
-      IContextBoundSettingsStore settings,
-      DaemonProcessKind processKind,
-      ICSharpFile file
-    ) => new T4CSharpErrorProcess(process, settings, file);
+      IDaemonProcess process, IContextBoundSettingsStore settings, DaemonProcessKind processKind, ICSharpFile file)
+    {
+      return new T4CSharpErrorProcess(process, settings, file);
+    }
   }
 }
