@@ -7,13 +7,13 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace GammaJul.ForTea.Core.Daemon.Stages
 {
-  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = new[] { typeof(CollectUsagesStage) })]
+  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = [typeof(CollectUsagesStage)])]
   public sealed class T4IncludeAwareDaemonStage : T4DaemonStageBase
   {
     protected override IDaemonStageProcess CreateProcess(
-      IDaemonProcess process,
-      IT4File file,
-      IContextBoundSettingsStore settings
-    ) => new T4IncludeAwareDaemonProcess(file, process);
+      IDaemonProcess process, IT4File file, IContextBoundSettingsStore settings)
+    {
+      return new T4IncludeAwareDaemonProcess(file, process);
+    }
   }
 }
