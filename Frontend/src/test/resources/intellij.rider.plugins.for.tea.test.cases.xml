@@ -2,7 +2,6 @@
     <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
     <dependencies>
       <plugin id="org.jetbrains.fortea"/>
-      <module name="intellij.rider.languages"/>
       <module name="intellij.rider.test.framework"/>
       <module name="intellij.rider.test.framework.integration.testng"/>
       <module name="intellij.rider.test.framework.integration.testng.tests"/>
@@ -21,6 +20,7 @@
       <module name="intellij.platform.ide.core"/>
       <module name="intellij.platform.ide.impl"/>
       <module name="intellij.platform.lang.impl"/>
+      <module name="intellij.rider.languages"/>
     </dependencies>
     <!-- endregion -->
 </idea-plugin>
