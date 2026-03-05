@@ -1,5 +1,7 @@
 <idea-plugin>
+    <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
     <dependencies>
+      <plugin id="org.jetbrains.fortea"/>
       <module name="intellij.rider.test.framework"/>
       <module name="intellij.rider.test.framework.integration.testng"/>
       <module name="intellij.rider.test.framework.integration.testng._test"/>
@@ -7,9 +9,8 @@
       <module name="intellij.rider.test.framework.testng"/>
       <module name="intellij.rider.test.framework.unit"/>
       <module name="intellij.rider.test.framework.junit"/>
-      <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
-      <plugin id="org.jetbrains.fortea"/>
+      <module name="intellij.platform.execution"/>
       <module name="intellij.platform.execution.impl"/>
-      <!-- endregion -->
     </dependencies>
+    <!-- endregion -->
 </idea-plugin>
