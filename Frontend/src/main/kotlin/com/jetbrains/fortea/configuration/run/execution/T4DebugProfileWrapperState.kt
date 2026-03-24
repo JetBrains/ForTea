@@ -3,6 +3,7 @@ package com.jetbrains.fortea.configuration.run.execution
 import com.intellij.execution.ExecutionResult
 import com.intellij.execution.Executor
 import com.intellij.execution.runners.ProgramRunner
+import com.intellij.execution.ui.ConsoleView
 import com.jetbrains.fortea.configuration.run.T4RunConfigurationParameters
 import com.jetbrains.fortea.model.T4ProtocolModel
 import com.jetbrains.rd.util.lifetime.Lifetime
@@ -34,15 +35,17 @@ class T4DebugProfileWrapperState(
   override suspend fun execute(
     executor: Executor,
     runner: ProgramRunner<*>,
+    workerConsole: ConsoleView,
     workerProcessHandler: DebuggerWorkerProcessHandler
-  ) = listen { wrappee.execute(executor, runner, workerProcessHandler) }
+  ) = listen { wrappee.execute(executor, runner, workerConsole, workerProcessHandler) }
 
   override suspend fun execute(
     executor: Executor,
     runner: ProgramRunner<*>,
+    workerConsole: ConsoleView,
     workerProcessHandler: DebuggerWorkerProcessHandler,
     lifetime: Lifetime
-  ) = listen { wrappee.execute(executor, runner, workerProcessHandler, lifetime) }
+  ) = listen { wrappee.execute(executor, runner, workerConsole, workerProcessHandler, lifetime) }
 
   private suspend fun listen(startExecution: suspend () -> ExecutionResult): ExecutionResult {
     val listener = T4PostProcessorProcessListener(model, parameters)
