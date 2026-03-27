@@ -65,6 +65,7 @@ dependencies {
 
         // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
         bundledPlugin("rider.intellij.plugin.appender")
+        bundledModule("intellij.rd.client")
         bundledModule("intellij.rider.rdclient.dotnet")
         bundledModule("intellij.rider.languages")
 
