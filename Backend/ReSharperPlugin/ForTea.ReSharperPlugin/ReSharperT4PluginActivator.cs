@@ -1,7 +1,7 @@
 using GammaJul.ForTea.Core;
 using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.Environment;
-using JetBrains.Platform.VisualStudio.Protocol.BuildScript;
+using JetBrains.Platform.VisualStudio.AnyEnd.BuildScript;
 using JetBrains.VsIntegration.Env;
 using JetBrains.VsIntegration.Zones;
 
