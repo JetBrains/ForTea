@@ -12,6 +12,7 @@ import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
+import kotlin.io.path.pathString
 
 abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
   override val testSolution
@@ -41,7 +42,7 @@ abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
 
 
   private fun preprocessT4File() {
-    val virtualFile = helper!!.t4File.path.toVirtualFile(true).shouldNotBeNull()
+    val virtualFile = helper!!.t4File.pathString.toVirtualFile(true).shouldNotBeNull()
     val projectModelEntity = WorkspaceModel.getInstance(project).getProjectModelEntities(virtualFile, project).single()
     val id = projectModelEntity.getId(project)!!
     val location = T4FileLocation(id)

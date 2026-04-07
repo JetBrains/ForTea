@@ -1,20 +1,22 @@
 package com.jetbrains.fortea.run
 
 import com.jetbrains.fortea.utils.T4TestHelper
-import com.jetbrains.rider.projectView.solutionDirectory
+import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.framework.combine
 import org.testng.annotations.Test
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 
 class T4RunFileInSubfolderTest : T4RunFileTestBase() {
   override fun createTestHelper() = object : T4TestHelper(project) {
-    override val t4File: File
+    override val t4File: Path
       get() = project
-        .solutionDirectory
+        .solutionDirectoryPath
         .combine("Project")
         .combine("Subdirectory")
-        .listFiles { _, name -> name.endsWith(".tt") or name.endsWith(".t4") }
+        .listDirectoryEntries().filter { it.name.endsWith(".tt") or it.name.endsWith(".t4") }
         .shouldNotBeNull()
         .single()
   }
