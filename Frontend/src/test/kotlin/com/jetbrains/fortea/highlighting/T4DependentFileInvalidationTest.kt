@@ -15,8 +15,9 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Ignore
 import org.testng.annotations.Test
-import java.io.File
 import java.io.PrintStream
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
 
 /**
  * This class duplicates some logic from BaseTestWithMarkup.
@@ -70,7 +71,7 @@ class T4DependentFileInvalidationTest : EditorTestBase() {
 
   private fun doTestWithMarkupModel(testFilePath: String, goldFileName: String) {
     withOpenedEditor(testFilePath) {
-      val goldFile = File(testCaseGoldDirectory, goldFileName).apply { if (!exists()) { parentFile.mkdirs(); } }
+      val goldFile = testCaseGoldDirectory.resolve(goldFileName).apply { if (!exists()) { parent.createDirectories() } }
       executeWithGold(goldFile) { stream: PrintStream ->
         _printStream = stream
         waitForDaemon()

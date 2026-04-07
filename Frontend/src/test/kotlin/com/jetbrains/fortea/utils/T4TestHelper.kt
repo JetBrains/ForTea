@@ -3,7 +3,7 @@ package com.jetbrains.fortea.utils
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
-import com.jetbrains.rider.projectView.solutionDirectory
+import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.framework.combine
 import com.jetbrains.rider.test.framework.compareXml
@@ -12,27 +12,31 @@ import com.jetbrains.rider.test.framework.flushQueues
 import com.jetbrains.rider.test.scriptingApi.waitAllCommandsFinished
 import com.jetbrains.rider.test.scriptingApi.waitForProjectModelReady
 import com.jetbrains.rider.test.scriptingApi.waitRefreshIsFinished
-import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.readText
 
 open class T4TestHelper(val project: Project) {
-  open val t4File: File
+  open val t4File: Path
     get() = project
-      .solutionDirectory
+      .solutionDirectoryPath
       .combine("Project")
-      .listFiles { _, name -> name.endsWith(".tt") or name.endsWith(".t4") }
+      .listDirectoryEntries().filter { it.name.endsWith(".tt") or it.name.endsWith(".t4") }
       .shouldNotBeNull()
       .single()
 
   private val csprojFile
     get() = t4File
-      .parentFile
-      .listFiles { _, name -> name.endsWith(".csproj") }
+      .parent
+      .listDirectoryEntries().filter { it.name.endsWith(".csproj") }
       .shouldNotBeNull()
       .single()
 
   private val outputFileCandidates
-    get() = t4File.parentFile.listFiles().shouldNotBeNull()
+    get() = t4File.parent.listDirectoryEntries().shouldNotBeNull()
 
   fun saveSolution(project: Project) {
     application.saveAll()
@@ -47,7 +51,7 @@ open class T4TestHelper(val project: Project) {
     comparator = { goldFile, tempFile -> compareXml("", goldFile, tempFile, "") }
   )
 
-  private fun findOutputFile(resultExtension: String?): File {
+  private fun findOutputFile(resultExtension: String?): Path {
     return if (resultExtension == null) outputFileCandidates.single {
       it.nameWithoutExtension == t4File.nameWithoutExtension
         && it.name != t4File.name
@@ -59,7 +63,7 @@ open class T4TestHelper(val project: Project) {
   }
 
   fun dumpExecutionResult(resultExtension: String? = null, printer: ((String) -> String)? = null) = executeWithGold(t4File) {
-    val text = Files.readString(findOutputFile(resultExtension).toPath())
+    val text = Files.readString(findOutputFile(resultExtension))
       .replace("\\r\\n", "\\n").replace("\uFEFF", "")
     it.print(printer?.let { printer(text) } ?: text)
   }
@@ -70,7 +74,7 @@ open class T4TestHelper(val project: Project) {
     }
     assert(item == null) {
       "Execution should have failed, but seems to have succeeded. " +
-        "File name: $item; File contents: ${Files.readString(item!!.toPath())}"
+        "File name: $item; File contents: ${Files.readString(item!!)}"
     }
   }
 }

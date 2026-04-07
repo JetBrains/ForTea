@@ -8,7 +8,8 @@ import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForDaemonAndCaches
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import java.io.File
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
 
 abstract class T4OutputDependentLexerTestBase : EditorTestBase() {
   protected fun doTest(fileName: String = "Template.tt", goldFileName: String? = null) =
@@ -21,8 +22,8 @@ abstract class T4OutputDependentLexerTestBase : EditorTestBase() {
       editor.waitForDaemon()
       waitBackend()
     }
-    val goldFile = File(testCaseGoldDirectory, goldFileName)
-    if (!goldFile.exists()) goldFile.parentFile.mkdirs()
+    val goldFile = testCaseGoldDirectory.resolve(goldFileName)
+    if (!goldFile.exists()) goldFile.parent.createDirectories()
     executeWithGold(goldFile) { stream ->
       wait(editor)
       val iterator = editor.highlighter.createIterator(0)

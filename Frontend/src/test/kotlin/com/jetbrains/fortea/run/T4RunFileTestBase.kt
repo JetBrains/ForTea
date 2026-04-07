@@ -16,6 +16,7 @@ import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.util.idea.getService
 import org.testng.annotations.BeforeMethod
+import kotlin.io.path.pathString
 
 abstract class T4RunFileTestBase : BaseTestWithSolution() {
   override val waitForCaches = true
@@ -48,7 +49,7 @@ abstract class T4RunFileTestBase : BaseTestWithSolution() {
   }
 
   private fun executeT4File() {
-    val virtualFile = helper.t4File.path.toVirtualFile(true).shouldNotBeNull()
+    val virtualFile = helper.t4File.pathString.toVirtualFile(true).shouldNotBeNull()
     val projectModelEntity = WorkspaceModel.getInstance(project).getProjectModelEntities(virtualFile, project).single()
     val id = projectModelEntity.getId(project)!!
     val location = T4FileLocation(id)
