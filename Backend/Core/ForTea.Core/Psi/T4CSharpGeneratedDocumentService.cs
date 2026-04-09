@@ -96,7 +96,7 @@ namespace GammaJul.ForTea.Core.Psi
       if (rangeTranslator == null)
         return null;
 
-      TreeTextRange range = rangeTranslator.OriginalToGenerated(oldTreeRange, JetPredicate<IUserDataHolder>.True);
+      TreeTextRange range = rangeTranslator.OriginalToGenerated(oldTreeRange, JetPredicate<MappedRangeType>.True);
       DocumentRange documentRange = cachedPsiFile.PsiFile.DocumentRangeTranslator.Translate(range);
       if (!documentRange.IsValid())
         return null;
