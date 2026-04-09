@@ -5,7 +5,7 @@ import com.intellij.util.application
 import com.jetbrains.rider.ideaInterop.vfs.VfsWriteOperationsHost
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.framework.combine
+import com.jetbrains.rider.test.scriptingApi.combine
 import com.jetbrains.rider.test.framework.compareXml
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.flushQueues

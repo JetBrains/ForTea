@@ -3,7 +3,7 @@ package com.jetbrains.fortea.run
 import com.jetbrains.fortea.utils.T4TestHelper
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.framework.combine
+import com.jetbrains.rider.test.scriptingApi.combine
 import org.testng.annotations.Test
 import java.nio.file.Path
 import kotlin.io.path.listDirectoryEntries
