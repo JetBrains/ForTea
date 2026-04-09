@@ -171,7 +171,8 @@ tasks {
     val compileBackend by registering(Exec::class) {
         dependsOn("prepare")
         workingDir = backendPluginPath
-        executable = "dotnet"
+        val dotNetCliPath = projectDir.parentFile.resolve("dotnet-sdk.cmd")
+        executable = dotNetCliPath.canonicalPath
         args(listOf("build", backendPluginSolutionPath))
     }
 
@@ -208,7 +209,7 @@ tasks {
 
     withType<KotlinCompile>().configureEach {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget.set(JvmTarget.JVM_25)
         }
         dependsOn(":protocol:rdgen", ":grammarkit:generateLexer", ":grammarkit:generateParser")
     }
@@ -280,7 +281,7 @@ tasks {
     }
 
     wrapper {
-        gradleVersion = "8.14.3"
+        gradleVersion = "9.4.1"
         distributionUrl =
             "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
     }
