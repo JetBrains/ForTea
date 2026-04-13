@@ -19,6 +19,7 @@ import com.jetbrains.rider.build.BuildHost
 import com.jetbrains.rider.build.BuildParameters
 import com.jetbrains.rider.model.BuildResultKind
 import com.jetbrains.rider.model.BuildTarget
+import com.jetbrains.rider.model.SilentMode
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import javax.swing.Icon
@@ -60,7 +61,7 @@ class T4BuildProjectsBeforeRunTaskProvider : BeforeRunTaskProvider<T4BuildProjec
     var result = false
     // when false returned build was not started because another is in progress, we should not run task
     application.invokeLater {
-      result = buildHost.requestBuild(BuildParameters(BuildTarget(), selectedProjectsForBuild, silentMode = true)) {
+      result = buildHost.requestBuild(BuildParameters(BuildTarget(), selectedProjectsForBuild, silentMode = SilentMode.Silent)) {
         result = it == BuildResultKind.Successful || it == BuildResultKind.HasWarnings
         finished.up()
       }
