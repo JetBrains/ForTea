@@ -3,4 +3,4 @@
 |<#@ assembly name="mscorlib" #>|(0)
 
 ---------------------------------------------------------
-(0): ReSharper Hint: Assembly already referenced
+(0): ReSharper Warning: Assembly already referenced
