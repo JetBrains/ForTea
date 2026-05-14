@@ -28,6 +28,7 @@
         fieldName="INSTANCE"
         extensions="tt;t4;ttinclude"/>
     <rd.languageAssociation backendLanguage="T4" frontendLanguage="T4" />
+    <!-- TODO: Add <lightweight.backend.language.support language="T4" implementationClass="com.jetbrains.rider.rdclient.languages.LightweightBackendLanguage"/> in 263, when plugins are fixed in lightweight backend -->
     <lang.parserDefinition
         language="T4"
         implementationClass="com.jetbrains.fortea.parser.T4ParserDefinition"/>
