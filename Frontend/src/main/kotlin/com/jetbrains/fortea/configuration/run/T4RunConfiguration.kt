@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.rd.util.lifetime
 import com.jetbrains.fortea.configuration.run.execution.T4ExecutorFactory
 import com.jetbrains.rider.debugger.IRiderDebuggable
+import com.jetbrains.rider.run.IRiderRunnable
 import com.jetbrains.rider.run.RiderRunBundle
 import com.jetbrains.rider.run.configurations.AsyncRunConfiguration
 import com.jetbrains.rider.run.configurations.RiderAsyncRunConfiguration
@@ -25,7 +26,7 @@ class T4RunConfiguration(
   T4RunConfigurationFactory,
   { throw UnsupportedOperationException() },
   T4ExecutorFactory(project, parameters)
-), IRiderDebuggable, AsyncRunConfiguration {
+), IRiderRunnable, IRiderDebuggable, AsyncRunConfiguration {
 
   override suspend fun getRunProfileStateAsync(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
     return withContext(Dispatchers.EDT) {
