@@ -1,5 +1,6 @@
 package com.jetbrains.fortea.completion
 
+import com.jetbrains.fortea.Tags
 import com.jetbrains.fortea.inTests.waitForIndirectInvalidation
 import com.jetbrains.rider.protocol.protocol
 import com.jetbrains.rider.test.junit5.base.CompletionTestBase
@@ -10,8 +11,10 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.pressEnter
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
+@Tag(Tags.Episode.ForTea)
 class T4CSharpTemplatesTest : CompletionTestBase() {
   override val testSolution = "ProjectWithT4"
 

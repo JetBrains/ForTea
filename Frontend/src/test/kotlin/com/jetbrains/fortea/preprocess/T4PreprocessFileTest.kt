@@ -1,11 +1,14 @@
 package com.jetbrains.fortea.preprocess
 
+import com.jetbrains.fortea.Tags
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
+@Tag(Tags.Episode.ForTea)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class T4PreprocessFileTest : T4PreprocessFileTestBase() {
   @Solution("test empty file in core project preprocessing")
