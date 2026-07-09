@@ -44,7 +44,7 @@ namespace JetBrains.ForTea.Tests
     public override void SetUp()
     {
       var mainAssembly = GetType().Assembly;
-      var productBinariesDir = mainAssembly.GetPath().Parent;
+      var productBinariesDir = mainAssembly.GetDirectory();
       var assemblyNameInfo = AssemblyNameInfo.Parse(mainAssembly.FullName);
 
       var packageArtifactDummy = new ApplicationPackageArtifact(new SubplatformName(assemblyNameInfo.Name),
@@ -102,12 +102,12 @@ namespace JetBrains.ForTea.Tests
     protected override JetHostItems.Packages CreateJetHostPackages(JetHostItems.Engine engine)
     {
       var mainAssembly = GetType().Assembly;
-      var productBinariesDir = mainAssembly.GetPath().Parent;
+      var productBinariesDir = mainAssembly.GetDirectory();
 
       TestUtil.SetHomeDir(mainAssembly);
 
       Lazy<ProductBinariesDirArtifact> productBinariesDirArtifact =
-        Lazy.Of(() => new ProductBinariesDirArtifact(mainAssembly.GetPath().Directory));
+        Lazy.Of(() => new ProductBinariesDirArtifact(mainAssembly.GetDirectory()));
       var jethostitempackages = new JetHostItems.Packages(engine.Items.Concat(
         new CollectProductPackagesInDirectoryFlatNoCachingHostMixin(productBinariesDirArtifact,
           allass => new[] { allass.FindSubplatformOfAssembly(mainAssembly.GetNameInfo(), OnError.Throw) },
