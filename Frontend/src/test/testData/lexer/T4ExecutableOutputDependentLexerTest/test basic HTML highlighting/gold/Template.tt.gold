@@ -93,63 +93,63 @@ XML_TAG_END                             | >
 T4TokenType.NEW_LINE                    | \n
 WHITE_SPACE                             |     
 JS:FUNCTION_KEYWORD                     | function
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 T4TokenType.EXPRESSION_BLOCK_START      | <#=
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 IDENTIFIER                              | functionName
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 T4TokenType.BLOCK_END                   | #>
 JS:LPAR                                 | (
 JS:RPAR                                 | )
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 JS:LBRACE                               | {
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |       
 JS:RETURN_KEYWORD                       | return
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 JS:THIS_KEYWORD                         | this
 JS:SEMICOLON                            | ;
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |     
 JS:RBRACE                               | }
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |   
 XML_END_TAG_START                       | </
 XML_TAG_NAME                            | script
 XML_TAG_END                             | >
 T4TokenType.NEW_LINE                    | \n
-XML_WHITE_SPACE                         |
+XML_WHITE_SPACE                         |   
 XML_START_TAG_START                     | <
 XML_TAG_NAME                            | style
 XML_TAG_END                             | >
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |     
 CSS_IDENT                               | p
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 CSS_LBRACE                              | {
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |       
 CSS_PROPERTY_NAME                       | color
 CSS_COLON                               | :
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 T4TokenType.EXPRESSION_BLOCK_START      | <#=
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 IDENTIFIER                              | colour
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 T4TokenType.BLOCK_END                   | #>
 CSS_SEMICOLON                           | ;
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |       
 CSS_PROPERTY_NAME                       | text-align
 CSS_COLON                               | :
-WHITE_SPACE                             |
+WHITE_SPACE                             |  
 CSS_PROPERTY_VALUE                      | center
 CSS_SEMICOLON                           | ;
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |     
 CSS_RBRACE                              | }
 T4TokenType.NEW_LINE                    | \n
-WHITE_SPACE                             |
+WHITE_SPACE                             |   
 XML_END_TAG_START                       | </
 XML_TAG_NAME                            | style
 XML_TAG_END                             | >
