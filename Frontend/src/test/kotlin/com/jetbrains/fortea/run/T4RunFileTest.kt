@@ -1,16 +1,18 @@
 package com.jetbrains.fortea.run
 
+import com.jetbrains.fortea.Tags
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.Mono
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 // Note: due to Windows path length restriction
 // test method name cannot be longer than 60 symbols
+@Tag(Tags.Episode.ForTea)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK, mono = Mono.UNIX_ONLY)
 class T4RunFileTest : T4RunFileTestBase() {
   @Solution("testThatFileCanBeExecuted")
@@ -89,7 +91,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Solution("test access to ValueTuple")
   @Test fun `test access to ValueTuple`() = doTest(dumpCsproj = false)
 
-  @Disabled("Broken on the buildserver")
+  @Mute("Broken on the buildserver")
   @Solution("test access to ValueTuple in old framework")
   @Test
   fun `test access to ValueTuple in old framework`() = testExecutionFailure(".txt")
@@ -104,7 +106,7 @@ class T4RunFileTest : T4RunFileTestBase() {
   @Test fun `test file with a macro twice`() = doTest(dumpCsproj = false)
   @Solution("test default references")
   @Test fun `test default references`() = doTest(dumpCsproj = false)
-  @Disabled
+  @Mute
   @Solution("test host specific template references")
   @Test fun `test host specific template references`() = doTest(dumpCsproj = false)
   // https://youtrack.jetbrains.com/issue/RIDER-69121

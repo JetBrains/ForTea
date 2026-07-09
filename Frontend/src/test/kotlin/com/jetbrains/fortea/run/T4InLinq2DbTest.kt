@@ -1,11 +1,14 @@
 package com.jetbrains.fortea.run
 
+import com.jetbrains.fortea.Tags
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
+@Tag(Tags.Episode.ForTea)
 class T4InLinq2DbTest : T4RunFileTestBase() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
     super.modifyOpenSolutionParams(params)

@@ -1,13 +1,16 @@
 package com.jetbrains.fortea.markup
 
+import com.jetbrains.fortea.Tags
 import com.jetbrains.rider.daemon.generated.ReSharperAttributesIds
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.junit5.base.DocumentationTestBase
 import com.jetbrains.rider.test.scriptingApi.`is`
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
+@Tag(Tags.Episode.ForTea)
 @Mute
 @Solution("ProjectWithT4")
 class T4CSharpDocumentationTest : DocumentationTestBase() {
