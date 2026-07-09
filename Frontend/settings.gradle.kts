@@ -21,6 +21,7 @@ pluginManagement {
         id("com.jetbrains.rdgen") version rdVersion
         id("org.jetbrains.kotlin.jvm") version rdKotlinVersion
         id("org.jetbrains.intellij.platform") version intellijPlatformGradlePluginVersion
+        id("org.jetbrains.intellij.platform.module") version intellijPlatformGradlePluginVersion
         id("org.jetbrains.grammarkit") version grammarKitVersion
         id("me.filippov.gradle.jvm.wrapper") version gradleJvmWrapperVersion
     }
@@ -37,6 +38,13 @@ pluginManagement {
         }
     }
 }
+dependencyResolutionManagement {
+  repositories {
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://cache-redirector.jetbrains.com/maven-central")
+  }
+}
 
 include(":protocol")
 include(":grammarkit")
+include(":unitTest")

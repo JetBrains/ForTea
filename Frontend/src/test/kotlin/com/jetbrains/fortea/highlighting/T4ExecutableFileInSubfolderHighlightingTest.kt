@@ -2,8 +2,10 @@ package com.jetbrains.fortea.highlighting
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.jetbrains.rider.test.annotations.Mute
-import org.testng.annotations.Test
+import com.jetbrains.rider.test.annotations.Solution
+import org.junit.jupiter.api.Test
 
+@Solution("testHostSpecificFileWithIncludeAndReference")
 class T4ExecutableFileInSubfolderHighlightingTest : T4HighlightingTestBase() {
   override val testSolution = "testHostSpecificFileWithIncludeAndReference"
   override val testFilePath get() = "Project/Subdirectory/$fileName"

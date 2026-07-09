@@ -1,8 +1,9 @@
 package com.jetbrains.fortea.completion
 
 import com.intellij.openapi.editor.impl.EditorImpl
-import com.jetbrains.rider.test.base.CompletionTestBase
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.framework.executeWithGold
+import com.jetbrains.rider.test.junit5.base.CompletionTestBase
 import com.jetbrains.rider.test.scriptingApi.assertCurrentLookupItemEquals
 import com.jetbrains.rider.test.scriptingApi.assertLookupNotContains
 import com.jetbrains.rider.test.scriptingApi.completeWithEnter
@@ -12,13 +13,12 @@ import com.jetbrains.rider.test.scriptingApi.pressEnter
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.undo
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Ignore
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Test
 
 class T4CompletionInExecutableTest : CompletionTestBase() {
   override val testSolution = "ProjectWithT4"
 
-  @Ignore("broken")
+  @Mute("broken")
   @Test
   fun testClassName() = doTest {
     // correct name should be hidden. See https://github.com/JetBrains/ForTea/issues/28

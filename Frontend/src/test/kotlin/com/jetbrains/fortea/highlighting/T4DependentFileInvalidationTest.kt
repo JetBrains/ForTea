@@ -7,14 +7,14 @@ import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
 import com.jetbrains.rdclient.daemon.util.annotateDocumentWithHighlighterTags
 import com.jetbrains.rdclient.daemon.util.severity
 import com.jetbrains.rdclient.testFramework.typeWithLatency
-import com.jetbrains.rider.test.base.EditorTestBase
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.framework.executeWithGold
+import com.jetbrains.rider.test.junit5.base.EditorTestBase
 import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
 import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Ignore
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Test
 import java.io.PrintStream
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
@@ -28,7 +28,7 @@ import kotlin.io.path.exists
  * I made some changes in that API and will supposedly merge them into net202.
  * TODO: can I remove waitForDaemon() calls?
  */
-@Ignore("Broken")
+@Mute("Broken")
 class T4DependentFileInvalidationTest : EditorTestBase() {
   override val testSolution = "ProjectWithManyTemplates"
   private val projectName = "ProjectWithManyTemplates"

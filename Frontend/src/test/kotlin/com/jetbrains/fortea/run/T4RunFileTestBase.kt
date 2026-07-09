@@ -12,20 +12,22 @@ import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
+import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.junit5.base.PerTestSolutionTestBase
 import com.jetbrains.rider.util.idea.getService
-import org.testng.annotations.BeforeMethod
+import org.junit.jupiter.api.BeforeEach
+import java.time.Duration
 import kotlin.io.path.pathString
 
-abstract class T4RunFileTestBase : BaseTestWithSolution() {
-  override val waitForCaches = true
-  override val testSolution
-    get() = testMethod.name
-
+abstract class T4RunFileTestBase : PerTestSolutionTestBase() {
   protected lateinit var helper: T4TestHelper
 
-  @BeforeMethod
+  override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
+    params.waitForCaches = true
+  }
+
+  @BeforeEach
   open fun setUp() {
     val manager = project.getService<ExecutionManager>() as ExecutionManagerImpl
     manager.forceCompilationInTests = true

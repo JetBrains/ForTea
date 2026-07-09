@@ -3,8 +3,9 @@ package com.jetbrains.fortea.run
 import com.jetbrains.fortea.utils.T4TestHelper
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.scriptingApi.combine
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
@@ -21,6 +22,8 @@ class T4RunFileInSubfolderTest : T4RunFileTestBase() {
         .single()
   }
 
+  @Solution("testThatFileInSubdirectoryCanBeExecuted")
   @Test fun testThatFileInSubdirectoryCanBeExecuted() = doTest(dumpCsproj = false)
+  @Solution("testHostSpecificFileWithIncludeAndReference")
   @Test fun testHostSpecificFileWithIncludeAndReference() = doTest(dumpCsproj = false)
 }

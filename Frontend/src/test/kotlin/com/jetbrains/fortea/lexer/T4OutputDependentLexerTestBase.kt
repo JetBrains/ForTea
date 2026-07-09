@@ -2,7 +2,7 @@ package com.jetbrains.fortea.lexer
 
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.util.TextRange
-import com.jetbrains.rider.test.base.EditorTestBase
+import com.jetbrains.rider.test.junit5.base.EditorTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
