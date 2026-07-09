@@ -10,7 +10,10 @@ T4TokenType.QUOTE                       | "
 WHITE_SPACE                             |  
 T4TokenType.BLOCK_END                   | #>
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    | using System;
+USING_KEYWORD                           | using
+WHITE_SPACE                             |  
+IDENTIFIER                              | System
+SEMICOLON                               | ;
 T4TokenType.NEW_LINE                    | \n
 T4TokenType.NEW_LINE                    | \n
 T4TokenType.STATEMENT_BLOCK_START       | <#
@@ -28,23 +31,44 @@ NEW_LINE                                | \n
 T4TokenType.BLOCK_END                   | #>
 T4TokenType.NEW_LINE                    | \n
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    | namespace ProjectWithT4
+NAMESPACE_KEYWORD                       | namespace
+WHITE_SPACE                             |  
+IDENTIFIER                              | ProjectWithT4
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    | {
+LBRACE                                  | {
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    |     public static class MeaningProvider
+WHITE_SPACE                             |     
+PUBLIC_KEYWORD                          | public
+WHITE_SPACE                             |  
+STATIC_KEYWORD                          | static
+WHITE_SPACE                             |  
+CLASS_KEYWORD                           | class
+WHITE_SPACE                             |  
+IDENTIFIER                              | MeaningProvider
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    |     {
+WHITE_SPACE                             |     
+LBRACE                                  | {
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    |         public static int Meaning => 
+WHITE_SPACE                             |         
+PUBLIC_KEYWORD                          | public
+WHITE_SPACE                             |  
+STATIC_KEYWORD                          | static
+WHITE_SPACE                             |  
+INT_KEYWORD                             | int
+WHITE_SPACE                             |  
+IDENTIFIER                              | Meaning
+WHITE_SPACE                             |  
+LAMBDA_ARROW                            | =>
+WHITE_SPACE                             |  
 T4TokenType.EXPRESSION_BLOCK_START      | <#=
 WHITE_SPACE                             |  
 IDENTIFIER                              | meaning
 WHITE_SPACE                             |  
 T4TokenType.BLOCK_END                   | #>
-T4TokenType.RAW_TEXT                    | ;
+SEMICOLON                               | ;
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    |     }
+WHITE_SPACE                             |     
+RBRACE                                  | }
 T4TokenType.NEW_LINE                    | \n
-T4TokenType.RAW_TEXT                    | }
+RBRACE                                  | }
 T4TokenType.NEW_LINE                    | \n
