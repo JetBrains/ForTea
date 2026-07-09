@@ -1,7 +1,9 @@
 package com.jetbrains.fortea.highlighting
 
-import org.testng.annotations.Test
+import com.jetbrains.rider.test.annotations.Solution
+import org.junit.jupiter.api.Test
 
+@Solution("ProjectWithPreprocessedT4")
 class T4PreprocessedTemplateHighlightingTest : T4HighlightingTestBase() {
   override val testSolution = "ProjectWithPreprocessedT4"
 

@@ -1,7 +1,7 @@
 package com.jetbrains.fortea.lexer
 
 import com.jetbrains.rider.test.base.psi.lexer.RiderFrontendLexerTest
-import org.testng.annotations.Test
+import org.junit.Test
 
 class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   override fun createLexer() = T4Lexer()

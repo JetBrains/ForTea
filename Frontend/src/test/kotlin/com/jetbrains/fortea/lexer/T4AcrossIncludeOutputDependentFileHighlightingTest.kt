@@ -1,14 +1,14 @@
 package com.jetbrains.fortea.lexer
 
 import com.intellij.openapi.editor.impl.EditorImpl
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForDaemonAndCaches
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Ignore
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Test
 
-@Ignore("Broken")
+@Mute("Broken")
 class T4AcrossIncludeOutputDependentFileHighlightingTest : T4OutputDependentLexerTestBase() {
   override val testSolution = "ProjectWithT4AndIncluder"
 

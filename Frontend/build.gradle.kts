@@ -18,6 +18,11 @@ plugins {
     kotlin("jvm")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
 apply {
     plugin("kotlin")
 }
@@ -54,7 +59,7 @@ dependencies {
 
                 else -> {
                     logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-                    rider("$riderBaseVersion-SNAPSHOT")
+                    rider("$riderBaseVersion-SNAPSHOT") { useInstaller = false }
                 }
             }
         }
@@ -64,13 +69,36 @@ dependencies {
         instrumentationTools()
 
         // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-        bundledPlugin("rider.intellij.plugin.appender")
+        bundledPlugin("intellij.vcs.plugin")
+        bundledPlugin("intellij.vcs.split.plugin")
+        bundledPlugin("Git4Idea")
+        bundledPlugin("intellij.problemView.plugin")
+        bundledPlugin("intellij.ssh.plugin")
+        bundledPlugin("intellij.bookmarks.plugin")
+        bundledPlugin("intellij.libraries.misc.plugin")
         bundledModule("intellij.rd.client")
+        bundledModule("intellij.rider")
+        bundledModule("intellij.rider.rdclient.dotnet.spellchecker")
         bundledModule("intellij.rider.rdclient.dotnet")
         bundledModule("intellij.rider.languages")
+        bundledPlugin("com.intellij.modules.json")
+        bundledPlugin("com.intellij.modules.jcef")
+        bundledPlugin("JavaScript")
+        bundledPlugin("com.intellij.css")
+        bundledPlugin("com.intellij.database")
+        bundledModule("intellij.platform.langInjection")
+        bundledPlugin("org.jetbrains.plugins.textmate")
+        bundledPlugin("rider.intellij.plugin.appender")
+        bundledPlugin("intellij.structureView.plugin")
+        bundledModule("intellij.resharper.assist")
 
         testFramework(TestFrameworkType.Bundled)
     }
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.params)
+    testRuntimeOnly(libs.junit.launcher)
+    testRuntimeOnly(libs.junit.engine)
+    testImplementation(libs.kotlin.test)
 }
 
 val isMonorepo = rootProject.projectDir != projectDir
@@ -214,8 +242,14 @@ tasks {
         dependsOn(":protocol:rdgen", ":grammarkit:generateLexer", ":grammarkit:generateParser")
     }
 
+    named<KotlinCompile>("compileTestKotlin") {
+        compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
+    }
+
     withType<Test>().configureEach {
-        useTestNG()
+        // Ignore IJ Platform JUnit5 framework set up and tear down
+        systemProperty("intellij.build.test.ignoreFirstAndLastTests", "true")
+        useJUnitPlatform()
 
         environment("NO_FS_ROOTS_ACCESS_CHECK", true)
         testLogging {

@@ -1,13 +1,15 @@
 package com.jetbrains.fortea.markup
 
 import com.jetbrains.fortea.daemon.T4HighlightingAttributeIds
-import com.jetbrains.rider.test.base.DocumentationTestBase
+import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
+import com.jetbrains.rider.test.junit5.base.DocumentationTestBase
 import com.jetbrains.rider.test.scriptingApi.`is`
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
-import org.testng.annotations.Ignore
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Test
 
-@Ignore
+@Mute
+@Solution("ProjectWithT4")
 class T4DocumentationTest : DocumentationTestBase() {
   override val testSolution = "ProjectWithT4"
 

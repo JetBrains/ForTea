@@ -9,14 +9,12 @@ import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.protocol.protocol
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.base.BaseTestWithSolution
-import org.testng.annotations.AfterMethod
-import org.testng.annotations.BeforeMethod
+import com.jetbrains.rider.test.junit5.base.PerTestSolutionTestBase
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import kotlin.io.path.pathString
 
-abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
-  override val testSolution
-    get() = testMethod.name
+abstract class T4PreprocessFileTestBase : PerTestSolutionTestBase() {
   private var helper: T4TestHelper? = null
 
   protected fun doTest(dumpCsproj: Boolean = false) {
@@ -30,12 +28,12 @@ abstract class T4PreprocessFileTestBase : BaseTestWithSolution() {
     if (dumpCsproj) helper!!.dumpCsprojContents()
   }
 
-  @BeforeMethod
+  @BeforeEach
   open fun setUp() {
     helper = T4TestHelper(project)
   }
 
-  @AfterMethod
+  @AfterEach
   fun tearDown() {
     helper = null
   }

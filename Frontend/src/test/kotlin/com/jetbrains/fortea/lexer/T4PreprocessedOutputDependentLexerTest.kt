@@ -1,6 +1,6 @@
 package com.jetbrains.fortea.lexer
 
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Test
 
 class T4PreprocessedOutputDependentLexerTest : T4OutputDependentLexerTestBase() {
   override val testSolution = "ProjectWithSimplePreprocessedT4"
