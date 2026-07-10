@@ -65,9 +65,6 @@ dependencies {
         }
 
         jetbrainsRuntime()
-
-        instrumentationTools()
-
         // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
         bundledPlugin("intellij.vcs.plugin")
         bundledPlugin("intellij.vcs.split.plugin")
