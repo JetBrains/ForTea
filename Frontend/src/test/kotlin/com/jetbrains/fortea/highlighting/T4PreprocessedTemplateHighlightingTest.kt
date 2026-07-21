@@ -1,11 +1,11 @@
 package com.jetbrains.fortea.highlighting
 
-import com.jetbrains.fortea.Tags
 import com.jetbrains.rider.test.annotations.Solution
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWithPreprocessedT4")
 class T4PreprocessedTemplateHighlightingTest : T4HighlightingTestBase() {
   override val testSolution = "ProjectWithPreprocessedT4"

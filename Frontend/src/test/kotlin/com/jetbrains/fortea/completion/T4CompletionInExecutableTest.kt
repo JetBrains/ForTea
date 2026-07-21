@@ -1,7 +1,6 @@
 package com.jetbrains.fortea.completion
 
 import com.intellij.openapi.editor.impl.EditorImpl
-import com.jetbrains.fortea.Tags
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.junit5.base.CompletionTestBase
@@ -14,10 +13,11 @@ import com.jetbrains.rider.test.scriptingApi.pressEnter
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.undo
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea)
 class T4CompletionInExecutableTest : CompletionTestBase() {
   override val testSolution = "ProjectWithT4"
 

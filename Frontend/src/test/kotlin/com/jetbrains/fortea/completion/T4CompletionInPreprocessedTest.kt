@@ -1,6 +1,5 @@
 package com.jetbrains.fortea.completion
 
-import com.jetbrains.fortea.Tags
 import com.jetbrains.rider.test.junit5.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.assertCurrentLookupItemEquals
@@ -10,10 +9,11 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditor
 import com.jetbrains.rider.test.scriptingApi.ensureThereIsNoLookup
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea)
 class T4CompletionInPreprocessedTest : CompletionTestBase() {
   override val testSolution = "ProjectWithPreprocessedT4"
 
