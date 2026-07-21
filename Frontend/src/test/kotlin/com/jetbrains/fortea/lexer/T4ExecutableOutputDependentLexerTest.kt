@@ -1,10 +1,10 @@
 package com.jetbrains.fortea.lexer
 
-import com.jetbrains.fortea.Tags
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea)
 class T4ExecutableOutputDependentLexerTest : T4OutputDependentLexerTestBase() {
   override val testSolution = "ProjectWithT4"
 

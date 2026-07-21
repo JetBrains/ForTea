@@ -2,7 +2,6 @@ package com.jetbrains.fortea.highlighting
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.impl.EditorImpl
-import com.jetbrains.fortea.Tags
 import com.jetbrains.rdclient.daemon.FrontendMarkupAdapter
 import com.jetbrains.rdclient.daemon.components.FrontendMarkupHost
 import com.jetbrains.rdclient.daemon.util.annotateDocumentWithHighlighterTags
@@ -15,6 +14,7 @@ import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
 import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.io.PrintStream
@@ -31,7 +31,7 @@ import kotlin.io.path.exists
  * TODO: can I remove waitForDaemon() calls?
  */
 @Mute("Broken")
-@Tag(Tags.Episode.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea)
 class T4DependentFileInvalidationTest : EditorTestBase() {
   override val testSolution = "ProjectWithManyTemplates"
   private val projectName = "ProjectWithManyTemplates"
