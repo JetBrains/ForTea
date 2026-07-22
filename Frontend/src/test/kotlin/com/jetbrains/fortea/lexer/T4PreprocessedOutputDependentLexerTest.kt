@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWithSimplePreprocessedT4")
 class T4PreprocessedOutputDependentLexerTest : T4OutputDependentLexerTestBase() {
-  override val testSolution = "ProjectWithSimplePreprocessedT4"
   override val checkSolutionLoad = false
 
   @Test fun `test default extension in preprocessed template`() { doTest() }

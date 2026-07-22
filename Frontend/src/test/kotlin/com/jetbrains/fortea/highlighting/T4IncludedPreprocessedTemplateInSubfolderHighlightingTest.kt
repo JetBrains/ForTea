@@ -9,9 +9,8 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWithT4IncludedInSubfolder")
 class T4IncludedPreprocessedTemplateInSubfolderHighlightingTest : T4HighlightingTestBase() {
-  override val testSolution: String = "ProjectWithT4IncludedInSubfolder"
   override val testFilePath: String
-    get() = "$testSolution/Folder/$fileName"
+    get() = "$activeSolution/Folder/$fileName"
 
   @Mute("FIXME")
   @Test

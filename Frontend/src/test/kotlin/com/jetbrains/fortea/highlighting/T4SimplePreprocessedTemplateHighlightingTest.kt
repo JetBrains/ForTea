@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWithSimplePreprocessedT4")
 class T4SimplePreprocessedTemplateHighlightingTest : T4HighlightingTestBase() {
-  override val testSolution = "ProjectWithSimplePreprocessedT4"
   override val checkSolutionLoad = false
 
   @Test

@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWithT4AndIncluder")
 class T4IncludedExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
-  override val testSolution = "ProjectWithT4AndIncluder"
-
   // https://youtrack.jetbrains.com/issue/RIDER-36962
   @Test fun testReferenceResolutionInHostSpecificInclude() = doTestErrors()
 }

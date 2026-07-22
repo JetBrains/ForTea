@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("testHostSpecificFileWithIncludeAndReference")
 class T4ExecutableFileInSubfolderHighlightingTest : T4HighlightingTestBase() {
-  override val testSolution = "testHostSpecificFileWithIncludeAndReference"
   override val testFilePath get() = "Project/Subdirectory/$fileName"
 
   @Test fun testHostAssemblyInclude() = doTest(HighlightSeverity.ERROR)

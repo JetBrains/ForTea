@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWith4AndIncluderInSubfolder")
 class T4IncludedExecutableTemplateInSubfolderHighlightingTest : T4HighlightingTestBase() {
-  override val testSolution = "ProjectWith4AndIncluderInSubfolder"
   override val testFilePath get() = "Project/Folder/$fileName"
   @Test fun testDefaultClassesResolution() = doTestErrors()
 }

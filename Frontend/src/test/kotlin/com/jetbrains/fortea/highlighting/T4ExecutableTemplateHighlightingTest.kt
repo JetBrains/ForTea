@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWithT4")
 class T4ExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
-  override val testSolution = "ProjectWithT4"
-
   @Test fun testGutterMarks() = doTest(T4RunMarkerAttributeIds.RUN_T4_FILE_MARKER_ID)
   @Test fun testClass() = doTestErrors()
   @Test fun testIncompleteMacro() = doTestErrors()
