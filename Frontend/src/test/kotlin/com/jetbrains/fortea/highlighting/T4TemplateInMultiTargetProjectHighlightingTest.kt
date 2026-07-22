@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK, mono = Mono.UNIX_ONLY)
 @Solution("ProjectWithMultipleTargetFrameworks")
 class T4TemplateInMultiTargetProjectHighlightingTest : T4HighlightingTestBase() {
-  override val testSolution = "ProjectWithMultipleTargetFrameworks"
   override val testFilePath get() = "Project/$fileName"
 
   @Test fun testSimpleFile() = doTestErrors()

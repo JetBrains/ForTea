@@ -8,6 +8,7 @@ import com.jetbrains.rdclient.daemon.util.annotateDocumentWithHighlighterTags
 import com.jetbrains.rdclient.daemon.util.severity
 import com.jetbrains.rdclient.testFramework.typeWithLatency
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.junit5.base.EditorTestBase
 import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
@@ -32,8 +33,8 @@ import kotlin.io.path.exists
  */
 @Mute("Broken")
 @Tag(TeamCityTags.Plugins.ForTea)
+@Solution("ProjectWithManyTemplates")
 class T4DependentFileInvalidationTest : EditorTestBase() {
-  override val testSolution = "ProjectWithManyTemplates"
   private val projectName = "ProjectWithManyTemplates"
 
   override val traceCategories = listOf("#com.jetbrains.rider.daemon", "JetBrains.ReSharper.Host.Features.Daemon")

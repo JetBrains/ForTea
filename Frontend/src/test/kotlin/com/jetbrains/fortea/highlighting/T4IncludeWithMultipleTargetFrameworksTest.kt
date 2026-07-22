@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("IncludeInMultipleTargetFrameworks")
 class T4IncludeWithMultipleTargetFrameworksTest : T4HighlightingTestBase() {
-  override val testSolution = "IncludeInMultipleTargetFrameworks"
   override val fileName = "Include.ttinclude"
   override val checkSolutionLoad = false
 

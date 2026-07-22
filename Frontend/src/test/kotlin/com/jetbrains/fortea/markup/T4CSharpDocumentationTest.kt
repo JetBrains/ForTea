@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Test
 @Mute
 @Solution("ProjectWithT4")
 class T4CSharpDocumentationTest : DocumentationTestBase() {
-  override val testSolution = "ProjectWithT4"
-
   @Test
   fun testCSharpVarToolTip() {
     doTestWithMarkupModel("Template.tt", "Template.tt") {

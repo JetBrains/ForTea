@@ -1,5 +1,6 @@
 package com.jetbrains.fortea.completion
 
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.junit5.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.assertCurrentLookupItemEquals
@@ -14,9 +15,8 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 @Tag(TeamCityTags.Plugins.ForTea)
+@Solution("ProjectWithPreprocessedT4")
 class T4CompletionInPreprocessedTest : CompletionTestBase() {
-  override val testSolution = "ProjectWithPreprocessedT4"
-
   @Test
   fun testClassName() = doTest("Templa", "Template")
 

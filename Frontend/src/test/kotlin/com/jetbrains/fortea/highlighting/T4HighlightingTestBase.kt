@@ -10,7 +10,7 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 abstract class T4HighlightingTestBase : BaseTestWithMarkup() {
   protected open val fileName get() = "Template.tt"
   protected open val goldFileName get() = "$fileName.gold"
-  protected open val testFilePath get() = "$testSolution/$fileName"
+  protected open val testFilePath get() = "$activeSolution/$fileName"
 
   fun doTest(attributeId: String) = doTestWithMarkupModel {
     waitForDaemon()

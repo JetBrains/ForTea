@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 @Tag(TeamCityTags.Plugins.ForTea)
 @Solution("ProjectWithPreprocessedT4IncludedWithPartial")
 class T4IncludedPreprocessedTemplatePartialTest : T4HighlightingTestBase() {
-  override val testSolution = "ProjectWithPreprocessedT4IncludedWithPartial"
   override val fileName = "Include.ttinclude"
   override val testFilePath: String
     get() = "Project/$fileName"

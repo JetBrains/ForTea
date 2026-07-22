@@ -2,6 +2,7 @@ package com.jetbrains.fortea.completion
 
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.junit5.base.CompletionTestBase
 import com.jetbrains.rider.test.scriptingApi.assertCurrentLookupItemEquals
@@ -18,9 +19,8 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 @Tag(TeamCityTags.Plugins.ForTea)
+@Solution("ProjectWithT4")
 class T4CompletionInExecutableTest : CompletionTestBase() {
-  override val testSolution = "ProjectWithT4"
-
   @Mute("broken")
   @Test
   fun testClassName() = doTest {
