@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 // Note: due to Windows path length restriction
 // test method name cannot be longer than 60 symbols
 @Mute("RIDER-98455")
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK, mono = Mono.UNIX_ONLY)
 internal class T4EnvDTETest : T4RunFileTestBase() {
   @Solution("test that host specific template can access EnvDTE")

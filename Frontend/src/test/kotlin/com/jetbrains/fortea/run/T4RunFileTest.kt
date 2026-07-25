@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 
 // Note: due to Windows path length restriction
 // test method name cannot be longer than 60 symbols
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK, mono = Mono.UNIX_ONLY)
 class T4RunFileTest : T4RunFileTestBase() {
   @Solution("testThatFileCanBeExecuted")

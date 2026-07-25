@@ -6,7 +6,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @Solution("ProjectWithT4")
 class T4ExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
   @Test fun testGutterMarks() = doTest(T4RunMarkerAttributeIds.RUN_T4_FILE_MARKER_ID)

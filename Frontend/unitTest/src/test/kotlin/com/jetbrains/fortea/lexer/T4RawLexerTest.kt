@@ -5,7 +5,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.ForTeaUnit)
+@Tag(TeamCityTags.Plugins.ForTea.Unit)
 class T4RawLexerTest : RiderFrontendLexerTest("tt", { T4Lexer() }) {
   @Test
   fun `test assembly directive`() = doTextTest(

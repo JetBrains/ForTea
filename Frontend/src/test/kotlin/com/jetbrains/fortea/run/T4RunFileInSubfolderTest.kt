@@ -12,7 +12,7 @@ import java.nio.file.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 class T4RunFileInSubfolderTest : T4RunFileTestBase() {
   override fun createTestHelper() = object : T4TestHelper(project) {
     override val t4File: Path

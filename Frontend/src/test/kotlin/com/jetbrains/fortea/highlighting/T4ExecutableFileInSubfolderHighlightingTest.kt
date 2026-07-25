@@ -7,7 +7,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @Solution("testHostSpecificFileWithIncludeAndReference")
 class T4ExecutableFileInSubfolderHighlightingTest : T4HighlightingTestBase() {
   override val testFilePath get() = "Project/Subdirectory/$fileName"
