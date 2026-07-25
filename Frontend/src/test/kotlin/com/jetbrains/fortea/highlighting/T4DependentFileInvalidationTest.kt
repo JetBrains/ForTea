@@ -32,7 +32,7 @@ import kotlin.io.path.exists
  * TODO: can I remove waitForDaemon() calls?
  */
 @Mute("Broken")
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @Solution("ProjectWithManyTemplates")
 class T4DependentFileInvalidationTest : EditorTestBase() {
   private val projectName = "ProjectWithManyTemplates"

@@ -18,7 +18,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @Solution("ProjectWithT4")
 class T4CompletionInExecutableTest : CompletionTestBase() {
   @Mute("broken")

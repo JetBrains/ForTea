@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 class T4InLinq2DbTest : T4RunFileTestBase() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
     super.modifyOpenSolutionParams(params)

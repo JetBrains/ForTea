@@ -5,7 +5,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @Solution("ProjectWithT4AndIncluder")
 class T4IncludedExecutableTemplateHighlightingTest : T4HighlightingTestBase() {
   // https://youtrack.jetbrains.com/issue/RIDER-36962

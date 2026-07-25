@@ -5,7 +5,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.ForTea)
+@Tag(TeamCityTags.Plugins.ForTea.General)
 @Solution("ProjectWith4AndIncluderInSubfolder")
 class T4IncludedExecutableTemplateInSubfolderHighlightingTest : T4HighlightingTestBase() {
   override val testFilePath get() = "Project/Folder/$fileName"
