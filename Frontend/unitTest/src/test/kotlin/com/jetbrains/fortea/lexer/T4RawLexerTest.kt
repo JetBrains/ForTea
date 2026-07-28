@@ -1,13 +1,14 @@
 package com.jetbrains.fortea.lexer
 
 import com.jetbrains.rider.test.base.psi.lexer.RiderFrontendLexerTest
-import org.junit.Test
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-class T4RawLexerTest : RiderFrontendLexerTest("tt") {
-  override fun createLexer() = T4Lexer()
-
+@Tag(TeamCityTags.Plugins.ForTeaUnit)
+class T4RawLexerTest : RiderFrontendLexerTest("tt", { T4Lexer() }) {
   @Test
-  fun `test assembly directive`() = doTest(
+  fun `test assembly directive`() = doTextTest(
     """<#@ assembly name="Foo.dll" #>""",
     """
     |T4TokenType.DIRECTIVE_START ('<#@')
@@ -25,7 +26,7 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   )
 
   @Test
-  fun `test flat text`() = doTest(
+  fun `test flat text`() = doTextTest(
     """Hello, world!
     |This is sample text.
     |""".trimMargin(),
@@ -38,7 +39,7 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   )
 
   @Test
-  fun `test expression block`() = doTest(
+  fun `test expression block`() = doTextTest(
     """<#= 2 + 2 #>""",
     """
     |T4TokenType.EXPRESSION_BLOCK_START ('<#=')
@@ -48,7 +49,7 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   )
 
   @Test
-  fun `test empty expression block`() = doTest(
+  fun `test empty expression block`() = doTextTest(
     """<#=#>""",
     """
     |T4TokenType.EXPRESSION_BLOCK_START ('<#=')
@@ -57,7 +58,7 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   )
 
   @Test
-  fun `test expression block that starts with octothorpe`() = doTest(
+  fun `test expression block that starts with octothorpe`() = doTextTest(
     """<#=##>""",
     """
     |T4TokenType.EXPRESSION_BLOCK_START ('<#=')
@@ -66,13 +67,13 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   )
 
   @Test
-  fun `test special characters in flat text`() = doTest(
+  fun `test special characters in flat text`() = doTextTest(
     """Hello, #123><2#@""",
     """T4TokenType.RAW_TEXT ('Hello, #123><2#@')""".trimMargin()
   )
 
   @Test
-  fun `test complex file`() = doTest(
+  fun `test complex file`() = doTextTest(
     """
     |<#@ output extension=".txt" #>
     |<# const int UPPER = 10; #>
@@ -143,7 +144,7 @@ class T4RawLexerTest : RiderFrontendLexerTest("tt") {
   )
 
   @Test
-  fun `test that lexer merges tokens`() = doTest(
+  fun `test that lexer merges tokens`() = doTextTest(
     """
     |hello<<#@ output extension=".txt" #>
     |""".trimMargin(),
