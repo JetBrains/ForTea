@@ -11,7 +11,7 @@ internal object T4SyntaxHighlighter : SyntaxHighlighterBase() {
   private val EQUAL_KEYS = arrayOf(T4TextAttributeKeys.T4_DIRECTIVE_EQ_SIGN)
   private val QUOTE_KEYS = arrayOf(T4TextAttributeKeys.T4_DIRECTIVE_QUOTE)
 
-  override fun getTokenHighlights(elementType: IElementType?): Array<TextAttributesKey> = when (elementType) {
+  override fun getTokenHighlights(elementType: IElementType): Array<out TextAttributesKey> = when (elementType) {
     T4ElementTypes.BLOCK_END -> BLOCK_MARKER_KEYS
     T4ElementTypes.STATEMENT_BLOCK_START -> BLOCK_MARKER_KEYS
     T4ElementTypes.DIRECTIVE_START -> BLOCK_MARKER_KEYS
