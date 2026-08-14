@@ -6,25 +6,23 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 import java.util.function.Supplier
 
-class RiderT4Bundle : DynamicBundle(BUNDLE) {
-  companion object {
-    @NonNls
-    private const val BUNDLE = "messages.RiderT4Bundle"
-    private val INSTANCE: RiderT4Bundle = RiderT4Bundle()
+object RiderT4Bundle {
+  @NonNls
+  private const val BUNDLE = "messages.RiderT4Bundle"
+  private val instance = DynamicBundle(RiderT4Bundle::class.java, BUNDLE)
 
-    @Nls
-    fun message(
-      @PropertyKey(resourceBundle = BUNDLE) key: String,
-      vararg params: Any
-    ): String {
-      return INSTANCE.getMessage(key, *params)
-    }
+  @Nls
+  fun message(
+    @PropertyKey(resourceBundle = BUNDLE) key: String,
+    vararg params: Any
+  ): String {
+    return instance.getMessage(key, *params)
+  }
 
-    fun messagePointer(
-      @PropertyKey(resourceBundle = BUNDLE) key: String,
-      vararg params: Any
-    ): Supplier<String> {
-      return INSTANCE.getLazyMessage(key, *params)
-    }
+  fun messagePointer(
+    @PropertyKey(resourceBundle = BUNDLE) key: String,
+    vararg params: Any
+  ): Supplier<String> {
+    return instance.getLazyMessage(key, *params)
   }
 }
