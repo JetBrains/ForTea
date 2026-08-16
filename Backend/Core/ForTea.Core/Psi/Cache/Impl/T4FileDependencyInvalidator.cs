@@ -22,6 +22,11 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
     [NotNull] private readonly IShellLocks myLocks;
 
     [NotNull, ItemNotNull]
+    private readonly Queue<ISet<IPsiSourceFile>> myPendingIndirectDependencies = new();
+
+    private bool myInvalidationScheduled;
+
+    [NotNull, ItemNotNull]
     private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; set; } =
       new HashSet<IPsiSourceFile>();
 
@@ -38,10 +43,36 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
 
     protected sealed override void AfterCommitSync(ISet<IPsiSourceFile> indirectDependencies)
     {
+      myLocks.AssertMainThread();
+
+      if (indirectDependencies.Count == 0 &&
+          PreviousIterationIndirectDependencies.Count == 0 &&
+          myPendingIndirectDependencies.Count == 0 &&
+          !myInvalidationScheduled)
+        return;
+
+      myPendingIndirectDependencies.Enqueue(indirectDependencies);
+      ScheduleInvalidation();
+    }
+
+    private void ScheduleInvalidation()
+    {
+      if (myInvalidationScheduled)
+        return;
+
+      myInvalidationScheduled = true;
       myLocks.ExecuteWithWriteLockOrQueueAsync(Lifetime,
         $"{nameof(T4FileDependencyInvalidator)} :: AfterCommitSync",
-        () =>
+        ProcessPendingInvalidations);
+    }
+
+    private void ProcessPendingInvalidations()
+    {
+      try
+      {
+        while (myPendingIndirectDependencies.Count > 0)
         {
+          var indirectDependencies = myPendingIndirectDependencies.Dequeue();
           foreach (var file in indirectDependencies)
           {
             if (!file.IsValid()) return;
@@ -56,7 +87,14 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
           }
 
           PreviousIterationIndirectDependencies = indirectDependencies;
-        });
+        }
+      }
+      finally
+      {
+        myInvalidationScheduled = false;
+        if (myPendingIndirectDependencies.Count > 0)
+          ScheduleInvalidation();
+      }
     }
 
     protected override string ActivityName => "T4 indirect dependencies invalidation";
