@@ -27,7 +27,7 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
     private bool myInvalidationScheduled;
 
     [NotNull, ItemNotNull]
-    private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; set; } =
+    private ISet<IPsiSourceFile> PreviousIterationIndirectDependencies { get; } =
       new HashSet<IPsiSourceFile>();
 
     public T4FileDependencyInvalidator(
@@ -73,27 +73,32 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
         while (myPendingIndirectDependencies.Count > 0)
         {
           var indirectDependencies = myPendingIndirectDependencies.Dequeue();
+          var validIndirectDependencies = new HashSet<IPsiSourceFile>();
           foreach (var file in indirectDependencies)
           {
-            if (!file.IsValid()) return;
+            if (!file.IsValid()) continue;
+            validIndirectDependencies.Add(file);
+            PreviousIterationIndirectDependencies.Add(file);
             file.SetBeingIndirectlyUpdated(true);
             Services.Caches.MarkAsDirty(file);
             Services.Files.MarkAsDirty(file);
           }
 
-          foreach (var file in PreviousIterationIndirectDependencies.Except(indirectDependencies))
+          foreach (var file in PreviousIterationIndirectDependencies.Except(validIndirectDependencies).ToList())
           {
-            file.SetBeingIndirectlyUpdated(false);
+            if (file.IsValid())
+              file.SetBeingIndirectlyUpdated(false);
+            PreviousIterationIndirectDependencies.Remove(file);
           }
-
-          PreviousIterationIndirectDependencies = indirectDependencies;
         }
       }
       finally
       {
         myInvalidationScheduled = false;
         if (myPendingIndirectDependencies.Count > 0)
-          ScheduleInvalidation();
+          myLocks.ExecuteOrQueue(Lifetime,
+            $"{nameof(T4FileDependencyInvalidator)} :: RescheduleInvalidation",
+            ScheduleInvalidation);
       }
     }
 
