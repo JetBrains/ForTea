@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Application;
 using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
@@ -70,7 +72,9 @@ namespace GammaJul.ForTea.Core.Psi.Cache.Impl
     {
       try
       {
-        while (myPendingIndirectDependencies.Count > 0)
+        var stopwatch = Stopwatch.StartNew();
+        while (myPendingIndirectDependencies.Count > 0 &&
+               stopwatch.ElapsedMilliseconds < Interruption.InterruptionHandler.AcceptableTimeBetweenInterruptsMs)
         {
           var indirectDependencies = myPendingIndirectDependencies.Dequeue();
           var validIndirectDependencies = new HashSet<IPsiSourceFile>();
