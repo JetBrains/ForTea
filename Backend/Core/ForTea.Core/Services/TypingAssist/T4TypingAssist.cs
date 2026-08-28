@@ -23,7 +23,7 @@ namespace GammaJul.ForTea.Core.Services.TypingAssist
   [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class T4TypingAssist : TypingAssistLanguageBase<T4Language>, ITypingHandler
   {
-    private static IReadOnlySet<TokenNodeType> AttributeValueTokens { get; } = new JetHashSet<TokenNodeType>
+    private static IJetReadOnlySet<TokenNodeType> AttributeValueTokens { get; } = new JetHashSet<TokenNodeType>
     {
       T4TokenNodeTypes.RAW_ATTRIBUTE_VALUE,
       T4TokenNodeTypes.DOLLAR,
