@@ -5,5 +5,6 @@
     <PackageLock Include="JetBrains.EnvDTE.Client" Version="20260624.75.0" />
     <PackageLock Include="JetBrains.EnvDTE.Host" Version="20260624.75.0" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2026.3.0" />
+    <PackageLock Include="JetBrains.VisualStudio.Interop" Version="20260624.75.0" />
   </ItemGroup>
 </Project>
