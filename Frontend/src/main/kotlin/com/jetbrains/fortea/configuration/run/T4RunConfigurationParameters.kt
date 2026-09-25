@@ -17,7 +17,7 @@ open class T4RunConfigurationParameters(
   emptyMap(),
   false,
 ) {
-  override fun createDotNetExecutableTemplate(): DotNetExecutable = DotNetExecutable(
+  override suspend fun createDotNetExecutableTemplate(): DotNetExecutable = DotNetExecutable(
     exePath,
     null,
     workingDirectory,
