@@ -3,9 +3,11 @@ using GammaJul.ForTea.Core;
 using JetBrains.ForTea.RiderPlugin;
 using JetBrains.ForTea.TestsActivator;
 using JetBrains.TestFramework;
+using JetBrains.TestFramework.Build.Nunit;
 using NUnit.Framework;
 
 [assembly: RequiresThread(ApartmentState.STA)]
+[assembly : NUnitRunTestsOnNetFrameworkOrMonoRuntime]
 
 namespace JetBrains.ForTea.Tests
 {
