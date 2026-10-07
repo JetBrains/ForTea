@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <PackageLock Include="JetBrains.EnvDTE" Version="20260624.75.0" />
-    <PackageLock Include="JetBrains.EnvDTE.Client" Version="20260624.75.0" />
-    <PackageLock Include="JetBrains.EnvDTE.Host" Version="20260624.75.0" />
+    <PackageLock Include="JetBrains.EnvDTE" Version="20261006.78.0" />
+    <PackageLock Include="JetBrains.EnvDTE.Client" Version="20261006.78.0" />
+    <PackageLock Include="JetBrains.EnvDTE.Host" Version="20261006.78.0" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2026.3.2" />
-    <PackageLock Include="JetBrains.VisualStudio.Interop" Version="20260624.75.0" />
+    <PackageLock Include="JetBrains.VisualStudio.Interop" Version="20261006.78.0" />
   </ItemGroup>
 </Project>
