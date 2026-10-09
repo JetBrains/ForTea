@@ -4,7 +4,6 @@ import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
-import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.io.path.absolute
@@ -141,7 +140,7 @@ val riderForTeaTargetsGroup = "T4"
 fun File.writeTextIfChanged(content: String) {
     val bytes = content.toByteArray()
 
-    if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
+    if (!exists() || !readBytes().contentEquals(bytes)) {
         println("Writing $path")
         writeBytes(bytes)
     }
