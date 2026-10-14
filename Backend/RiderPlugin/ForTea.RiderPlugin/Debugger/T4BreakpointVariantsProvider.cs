@@ -35,7 +35,7 @@ namespace JetBrains.ForTea.RiderPlugin.Debugger
       var document = sourceFile.Document;
 
       int lineCount = (int)document.GetLineCount();
-      if (line > lineCount)
+      if (line >= lineCount)
         return variants;
 
       variants.Add(new LineBreakpoint());
