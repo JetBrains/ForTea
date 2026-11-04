@@ -3,7 +3,7 @@ package com.jetbrains.fortea.completion
 import com.jetbrains.fortea.inTests.waitForIndirectInvalidation
 import com.jetbrains.rider.protocol.protocol
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.junit5.base.CompletionTestBase
+import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithEnter

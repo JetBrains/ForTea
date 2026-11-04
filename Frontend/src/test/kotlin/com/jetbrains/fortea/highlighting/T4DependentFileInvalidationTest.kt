@@ -10,7 +10,7 @@ import com.jetbrains.rdclient.testFramework.typeWithLatency
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.junit5.base.EditorTestBase
+import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.scriptingApi.commitBackendPsiFiles
 import com.jetbrains.rider.test.scriptingApi.setCaretAfterWord
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon

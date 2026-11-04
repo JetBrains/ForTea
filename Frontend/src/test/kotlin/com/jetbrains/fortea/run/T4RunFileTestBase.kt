@@ -14,7 +14,7 @@ import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.junit5.base.PerTestSolutionTestBase
+import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.util.idea.getService
 import org.junit.jupiter.api.BeforeEach
 import java.time.Duration
