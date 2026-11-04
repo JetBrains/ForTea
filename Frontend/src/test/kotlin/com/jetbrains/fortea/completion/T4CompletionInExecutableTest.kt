@@ -4,7 +4,7 @@ import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.junit5.base.CompletionTestBase
+import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.scriptingApi.assertCurrentLookupItemEquals
 import com.jetbrains.rider.test.scriptingApi.assertLookupNotContains
 import com.jetbrains.rider.test.scriptingApi.completeWithEnter
