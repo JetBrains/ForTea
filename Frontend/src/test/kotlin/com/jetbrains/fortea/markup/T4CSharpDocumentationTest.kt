@@ -3,7 +3,7 @@ package com.jetbrains.fortea.markup
 import com.jetbrains.rider.daemon.generated.ReSharperAttributesIds
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.junit5.base.DocumentationTestBase
+import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.scriptingApi.`is`
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.shared.constants.TeamCityTags
