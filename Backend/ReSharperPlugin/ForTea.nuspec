@@ -19,5 +19,7 @@
 	<files>
         <file src="..\output\ForTea.Core\$configuration$\ForTea.Core.dll" target="DotFiles" />
 		<file src="..\output\ForTea.ReSharperPlugin\$configuration$\ForTea.ReSharperPlugin.dll" target="DotFiles" />
+        <file src="..\output\ForTea.ReSharperPlugin.AnyEnd\$configuration$\ForTea.ReSharperPlugin.AnyEnd.dll" target="DotFiles" />
+        <file src="..\output\ForTea.ReSharperPlugin.VisualStudio\$configuration$\ForTea.ReSharperPlugin.VisualStudio.dll" target="DotFiles" />
 	</files>
 </package>

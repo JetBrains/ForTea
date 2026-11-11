@@ -1,0 +1,24 @@
+using GammaJul.ForTea.Core.Daemon.Stages;
+using GammaJul.ForTea.Core.Tree;
+using JetBrains.Application.Parts;
+using JetBrains.Application.Settings;
+using JetBrains.ForTea.ReSharperPlugin.Backend.Daemon.Processes;
+using JetBrains.ReSharper.Daemon.CSharp.Stages;
+using JetBrains.ReSharper.Daemon.UsageChecking;
+using JetBrains.ReSharper.Feature.Services.Daemon;
+
+namespace JetBrains.ForTea.ReSharperPlugin.Backend.Daemon.Stages
+{
+  /// <summary>Daemon stage that creates processes for highlighting tokens.</summary>
+  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = new[] { typeof(GlobalFileStructureCollectorStage) },
+    StagesAfter = new[] { typeof(CollectUsagesStage), typeof(IdentifierHighlightingStage) }
+  )]
+  public class T4HighlightingStage : T4DaemonStageBase
+  {
+    protected override IDaemonStageProcess CreateProcess(
+      IDaemonProcess process,
+      IT4File file,
+      IContextBoundSettingsStore settings
+    ) => new T4HighlightingProcess(file, process);
+  }
+}
