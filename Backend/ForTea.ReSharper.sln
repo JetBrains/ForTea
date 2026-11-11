@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.Core", "Core\ForTea.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.ReSharperPlugin", "ReSharperPlugin\ForTea.ReSharperPlugin\ForTea.ReSharperPlugin.csproj", "{1BEFF5F2-2357-40F9-82F0-B7FC75B92CF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.ReSharperPlugin.AnyEnd", "ReSharperPlugin\ForTea.ReSharperPlugin.AnyEnd\ForTea.ReSharperPlugin.AnyEnd.csproj", "{A1E5AB81-B7DC-4C3B-94E7-A831CA6C7BB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTea.ReSharperPlugin.VisualStudio", "ReSharperPlugin\ForTea.ReSharperPlugin.VisualStudio\ForTea.ReSharperPlugin.VisualStudio.csproj", "{6D66E18A-198E-40B3-9856-F64F971BC0CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,14 @@ Global
 		{1BEFF5F2-2357-40F9-82F0-B7FC75B92CF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BEFF5F2-2357-40F9-82F0-B7FC75B92CF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BEFF5F2-2357-40F9-82F0-B7FC75B92CF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1E5AB81-B7DC-4C3B-94E7-A831CA6C7BB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1E5AB81-B7DC-4C3B-94E7-A831CA6C7BB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1E5AB81-B7DC-4C3B-94E7-A831CA6C7BB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1E5AB81-B7DC-4C3B-94E7-A831CA6C7BB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D66E18A-198E-40B3-9856-F64F971BC0CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D66E18A-198E-40B3-9856-F64F971BC0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D66E18A-198E-40B3-9856-F64F971BC0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D66E18A-198E-40B3-9856-F64F971BC0CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

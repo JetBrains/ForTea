@@ -1,7 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <UseWpf>true</UseWpf>
     <InternalBuild Condition="'$(SolutionFileName)' != 'ForTea.All.sln' and '$(SolutionFileName)' != 'ForTea.Backend.sln' and '$(SolutionFileName)' != 'ForTea.ReSharper.sln'">True</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
   </PropertyGroup>
@@ -20,30 +19,15 @@
   <ItemGroup Label="PackageReference">
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.Lifetimes" />
-    <PackageReference Include="JetBrains.Platform.Lib.VisualStudio.AnyVs.ShellInterop.PrivateBuild" />
-    <PackageReference Include="JetBrains.Vs.SinceVs10.CoreUtility" />
-    <PackageReference Include="JetBrains.Vs.SinceVs10.Text" />
-    <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
-    <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\Core\ForTea.Core\ForTea.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup Label="T4">
-    <None Update="Daemon\Attributes\T4MefDefinitions.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4MefDefinitions.cs</LastGenOutput>
-    </None>
-    <Compile Update="Daemon\Attributes\T4MefDefinitions.cs">
-      <DependentUpon>T4MefDefinitions.tt</DependentUpon>
-    </Compile>
+    <ProjectReference Include="..\ForTea.ReSharperPlugin.AnyEnd\ForTea.ReSharperPlugin.AnyEnd.csproj" />
   </ItemGroup>
   <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">
     <RemoveDir Directories="obj" />
   </Target>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
-  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_VisualStudio_SinceVs10.Props')" />
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.Toolset.MainSolution.Sdk" Version="20200625.1.1.2" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
