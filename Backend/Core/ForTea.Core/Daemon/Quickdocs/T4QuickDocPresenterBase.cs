@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using JetBrains.Application.UI.PopupLayout;
 using JetBrains.ReSharper.Feature.Services.QuickDoc;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -36,7 +35,7 @@ namespace GammaJul.ForTea.Core.Daemon.Quickdocs
       return null;
     }
 
-    public void OpenInEditor(string navigationId = "", PopupWindowContextSource windowContext = null)
+    public void OpenInEditor(string navigationId = "")
     {
     }
 
