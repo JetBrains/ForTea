@@ -91,6 +91,7 @@ dependencies {
 
         testFramework(TestFrameworkType.Bundled)
     }
+    testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.params)
     testRuntimeOnly(libs.junit.launcher)
