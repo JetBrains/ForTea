@@ -17,6 +17,7 @@ repositories {
 dependencies {
     implementation(project(":"))
     testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit4)
     testRuntimeOnly(libs.junit.vintage)
     testRuntimeOnly(libs.junit.engine)
